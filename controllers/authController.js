@@ -11,7 +11,8 @@ import {
   updateUserDetailsService,
   getAllUsers,
   getUsersByRole,
-} from '../services/authService.js';
+  observertovolunteer,
+} from "../services/authService.js";
 import multer from '../config/multer.js';
 
 export const register = async (req, res) => {
@@ -113,3 +114,18 @@ export const getUsersByRoleController = async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 };
+
+
+export const submitVolunteerDetails = [ multer.single('governmentId'), async (req, res) => {
+  try {
+    const email = req.body.email;
+    const details = req.body;
+    const file = req.file;
+
+    await observertovolunteer(email, details, file);
+    res.status(200).json({ message: 'Details submitted successfully. You are now a volunteer.' });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+},
+]

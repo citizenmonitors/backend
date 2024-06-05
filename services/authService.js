@@ -1,11 +1,11 @@
 // services/authService.js
-
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import transporter from "../config/email.js";
 import { hashPassword } from "../utils/hashPassword.js";
+import path from "path";
 
 const generateVerificationCode = () => {
   return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit code
@@ -79,16 +79,44 @@ export const submitRoleFormDetails = async ({ email, role, details, file }) => {
   }
 
   if (role === "observer") {
-    user.observerDetails = details;
+    // Update observer-specific details
+    user.firstName = details.firstName;
+    user.lastName = details.lastName;
+    user.gender = details.gender;
+    user.state = details.state;
+    user.localGovernment = details.localGovernment;
+    user.ward = details.ward;
+    user.pollingUnit = details.pollingUnit;
+    user.registeredVoter = details.registeredVoter;
+    user.politicalParty = details.politicalParty;
+    user.electionWitness = details.electionWitness;
+    user.politicalSurvey = details.politicalSurvey;
   } else if (role === "volunteer") {
+    // Update volunteer-specific details
     if (file) {
       const ext = path.extname(file.originalname).toLowerCase();
       if (![".jpg", ".jpeg", ".png"].includes(ext)) {
         throw new Error("Only image files are allowed");
       }
-      details.governmentId = file.path;
+      user.governmentId = file.path;
     }
-    user.volunteerDetails = details;
+    user.phoneNumber = details.phoneNumber;
+    user.bankName = details.bankName;
+    user.bankAccountNumber = details.bankAccountNumber;
+    user.accountName = details.accountName;
+
+    // Update other common details
+    user.firstName = details.firstName || user.firstName;
+    user.lastName = details.lastName || user.lastName;
+    user.gender = details.gender || user.gender;
+    user.state = details.state || user.state;
+    user.localGovernment = details.localGovernment || user.localGovernment;
+    user.ward = details.ward || user.ward;
+    user.pollingUnit = details.pollingUnit || user.pollingUnit;
+    user.registeredVoter = details.registeredVoter || user.registeredVoter;
+    user.politicalParty = details.politicalParty || user.politicalParty;
+    user.electionWitness = details.electionWitness || user.electionWitness;
+    user.politicalSurvey = details.politicalSurvey || user.politicalSurvey;
   } else {
     throw new Error("Invalid role");
   }
@@ -96,7 +124,7 @@ export const submitRoleFormDetails = async ({ email, role, details, file }) => {
   user.isVerified = true;
   user.formCompletion = true;
   await user.save();
-  return true;
+  return user;
 };
 
 export const authenticateUser = async ({ email, password }) => {
@@ -110,9 +138,16 @@ export const authenticateUser = async ({ email, password }) => {
     throw new Error("Invalid password");
   }
 
-  const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
-    expiresIn: "1h",
-  });
+  // Include more user-related information in the JWT payload
+  const tokenPayload = {
+    email: user.email,
+    userId: user._id,
+    role: user.role,
+    // Add more user-related data as needed
+  };
+
+  const token = jwt.sign(tokenPayload, process.env.JWT_SECRET);
+
   return token;
 };
 
@@ -187,4 +222,50 @@ export const getUsersByRole = async (role) => {
     throw new Error("Invalid role");
   }
   return await User.find({ role });
+};
+
+
+export const observertovolunteer = async (email, details, file) => {
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  if (!user.isVerified) {
+    throw new Error("User is not verified");
+  }
+
+  // Update user details with volunteer-specific information
+  
+  user.firstName = details.firstName || user.firstName;
+  user.lastName = details.lastName || user.lastName;
+  user.gender = details.gender || user.gender;
+  user.state = details.state || user.state;
+  user.localGovernment = details.localGovernment || user.localGovernment;
+  user.ward = details.ward || user.ward;
+  user.pollingUnit = details.pollingUnit || user.pollingUnit;
+  user.registeredVoter = details.registeredVoter || user.registeredVoter;
+  user.politicalParty = details.politicalParty || user.politicalParty;
+  user.electionWitness = details.electionWitness || user.electionWitness;
+  user.politicalSurvey = details.politicalSurvey || user.politicalSurvey;
+
+  if (file) {
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (![".jpg", ".jpeg", ".png"].includes(ext)) {
+      throw new Error("Only image files are allowed");
+    }
+    user.volunteerDetails.governmentId = file.path;
+  }
+
+  user.phoneNumber = details.phoneNumber || user.phoneNumber;
+  user.bankName = details.bankName || user.bankName;
+  user.bankAccountNumber = details.bankAccountNumber || user.bankAccountNumber;
+  user.accountName = details.accountName || user.accountName;
+
+  // Set role to volunteer
+  user.role = "volunteer";
+
+  await user.save();
+  return user;
 };

@@ -6,26 +6,22 @@ const storage = multer.diskStorage({
     cb(null, "uploads/");
   },
   filename: (req, file, cb) => {
-    cb(null, `${Date.now()}_${file.originalname}`);
+    cb(null, Date.now() + path.extname(file.originalname));
   },
 });
 
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = /jpeg|jpg|png/;
-  const extname = allowedTypes.test(
-    path.extname(file.originalname).toLowerCase()
-  );
-  const mimetype = allowedTypes.test(file.mimetype);
-
-  if (extname && mimetype) {
-    return cb(null, true);
+  const ext = path.extname(file.originalname).toLowerCase();
+  const allowedTypes = [".png", ".jpg", ".jpeg", ".mp4"];
+  if (allowedTypes.includes(ext)) {
+    cb(null, true);
   } else {
-    cb("Error: Images Only!");
+    cb(new Error("Only images (png, jpg, jpeg) and videos (mp4) are allowed"));
   }
 };
 
 export default multer({
   storage,
+  limits: { fileSize: 100 * 1024 * 1024 }, // 100MB limit
   fileFilter,
-  limits: { fileSize: 1024 * 1024 * 5 },
 });

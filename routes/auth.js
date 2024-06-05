@@ -10,6 +10,7 @@ import {
   updateUserDetails,
   getAllUsersController,
   getUsersByRoleController,
+  submitVolunteerDetails,
 } from "../controllers/authController.js";
 
 const router = express.Router();
@@ -24,5 +25,6 @@ router.post("/reset-password", resetPassword);
 router.put("/update-user", updateUserDetails);
 router.get("/users", getAllUsersController);
 router.get("/users/:role", getUsersByRoleController);
+router.put("/observer-to-volunteer", submitVolunteerDetails);
 
 export default router;

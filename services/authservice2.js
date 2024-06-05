@@ -1,19 +1,17 @@
+// services/authService.js
+
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import crypto from "crypto";
-// import fs from "fs";
-import path from "path";
+import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import transporter from "../config/email.js";
-import { generateToken } from "../utils/generateToken.js";
 import { hashPassword } from "../utils/hashPassword.js";
-import { body, validationResult } from "express-validator";
 
-const BASE_URL = process.env.BASE_URL;
+const generateVerificationCode = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit code
+};
 
-// Register User
 export const registerUser = async ({ email, password, confirmPassword }) => {
-  // Input validation
   if (password !== confirmPassword) {
     throw new Error("Passwords do not match");
   }
@@ -24,66 +22,58 @@ export const registerUser = async ({ email, password, confirmPassword }) => {
   }
 
   const hashedPassword = await hashPassword(password);
-  const verificationToken = generateToken({ email });
+  const verificationCode = generateVerificationCode();
+  const verificationCodeExpires = Date.now() + 3600000; // 1 hour
 
   const newUser = new User({
     email,
     password: hashedPassword,
-    verificationToken,
+    verificationCode,
+    isVerified: false,
+    verificationCodeExpires,
   });
   await newUser.save();
 
-  const observerUrl = `${BASE_URL}/api/auth/verify-email?token=${verificationToken}&role=observer`;
-  const volunteerUrl = `${BASE_URL}/api/auth/verify-email?token=${verificationToken}&role=volunteer`;
-
-  try {
-    await transporter.sendMail({
-      from: "Navalny",
-      to: email,
-      subject: "Verify your email",
-      html: `
-      <p>Please verify your email by selecting a role:</p>
-      <a href="${observerUrl}">Observer</a>
-      <a href="${volunteerUrl}">Volunteer</a>
-    `,
-    });
-  } catch (error) {
-    console.error("Error sending verification email:", error);
-    throw new Error("Error sending verification email");
-  }
+  await transporter.sendMail({
+    to: email,
+    subject: "Verify your email",
+    html: `<p>Your verification code is: <strong>${verificationCode}</strong></p>`,
+  });
 
   return true;
 };
 
-// Verify User Email
-export const verifyUserEmail = async (token, role) => {
-  if (!["observer", "volunteer"].includes(role)) {
-    throw new Error("Invalid role");
-  }
-
-  let decoded;
-  try {
-    decoded = jwt.verify(token, process.env.JWT_SECRET);
-  } catch (error) {
-    throw new Error("Invalid or expired token");
-  }
-
-  const user = await User.findOne({ email: decoded.email });
+export const verifyUserCode = async (email, code) => {
+  const user = await User.findOne({ email, verificationCode: code });
   if (!user) {
-    throw new Error("Invalid token");
+    throw new Error("Invalid verification code");
   }
 
-  user.isVerified = true;
-  user.role = role;
-  user.verificationToken = null;
+  user.verificationCode = null;
   await user.save();
 
   return true;
 };
 
-// Submit Role Form Details
+export const selectUserRole = async (email, role) => {
+  if (!["observer", "volunteer"].includes(role)) {
+    throw new Error("Invalid role");
+  }
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  user.role = role;
+  await user.save();
+
+  return true;
+};
+
 export const submitRoleFormDetails = async ({ email, role, details, file }) => {
   const user = await User.findOne({ email });
+
   if (!user) {
     throw new Error("User not found");
   }
@@ -103,14 +93,15 @@ export const submitRoleFormDetails = async ({ email, role, details, file }) => {
     throw new Error("Invalid role");
   }
 
+  user.isVerified = true;
+  user.formCompletion = true;
   await user.save();
   return true;
 };
 
-// Authenticate User
 export const authenticateUser = async ({ email, password }) => {
   const user = await User.findOne({ email });
-  if (!user || !user.isVerified) {
+  if (!user) {
     throw new Error("Invalid email or email not verified");
   }
 
@@ -125,7 +116,6 @@ export const authenticateUser = async ({ email, password }) => {
   return token;
 };
 
-// Generate Reset Token
 export const generateResetToken = async (email) => {
   const user = await User.findOne({ email });
   if (!user) {
@@ -138,7 +128,7 @@ export const generateResetToken = async (email) => {
 
   await user.save();
 
-  const resetUrl = `${BASE_URL}/reset-password?token=${resetToken}`;
+  const resetUrl = `${process.env.BASE_URL}/reset-password?token=${resetToken}`;
 
   await transporter.sendMail({
     to: email,
@@ -152,7 +142,6 @@ export const generateResetToken = async (email) => {
   return true;
 };
 
-// Reset User Password
 export const resetUserPassword = async (token, newPassword) => {
   const user = await User.findOne({
     resetPasswordToken: token,
@@ -170,28 +159,32 @@ export const resetUserPassword = async (token, newPassword) => {
   return true;
 };
 
-// Validation Middleware
-export const validate = (method) => {
-  switch (method) {
-    case "registerUser": {
-      return [
-        body("email").isEmail().withMessage("Must be a valid email"),
-        body("password")
-          .isLength({ min: 6 })
-          .withMessage("Password must be at least 6 characters long"),
-        body("confirmPassword").custom((value, { req }) => {
-          if (value !== req.body.password) {
-            throw new Error("Password confirmation does not match password");
-          }
-          return true;
-        }),
-      ];
-    }
-    case "authenticateUser": {
-      return [
-        body("email").isEmail().withMessage("Must be a valid email"),
-        body("password").exists().withMessage("Password is required"),
-      ];
+export const updateUserDetailsService = async (email, updateData) => {
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  // Update any fields provided in the updateData object
+  for (const key in updateData) {
+    if (key === "password") {
+      user[key] = await hashPassword(updateData[key]);
+    } else {
+      user[key] = updateData[key];
     }
   }
+
+  await user.save();
+  return user;
+};
+
+export const getAllUsers = async () => {
+  return await User.find({});
+};
+
+export const getUsersByRole = async (role) => {
+  if (!["observer", "volunteer"].includes(role)) {
+    throw new Error("Invalid role");
+  }
+  return await User.find({ role });
 };

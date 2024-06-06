@@ -1,55 +1,63 @@
-// services/authService.js
 import bcrypt from "bcryptjs";
-import crypto from "crypto";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 import User from "../models/User.js";
+import CompletedUser from "../models/CompletedUser.js";
 import transporter from "../config/email.js";
+import { generateToken } from "../utils/generateToken.js";
 import { hashPassword } from "../utils/hashPassword.js";
+import fs from "fs";
 import path from "path";
 
-const generateVerificationCode = () => {
-  return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit code
-};
+const BASE_URL = process.env.BASE_URL;
 
 export const registerUser = async ({ email, password, confirmPassword }) => {
   if (password !== confirmPassword) {
     throw new Error("Passwords do not match");
   }
 
-  const existingUser = await User.findOne({ email });
-  if (existingUser) {
-    throw new Error("User already exists");
+  let user = await User.findOne({ email });
+  if (user) {
+    // If user exists but is not verified, update the password and verification token
+    user.password = await hashPassword(password);
+    user.verificationToken = generateToken({ email });
+    await user.save();
+  } else {
+    // If user does not exist, create a new one
+    const hashedPassword = await hashPassword(password);
+    const verificationToken = generateToken({ email });
+
+    user = new User({
+      email,
+      password: hashedPassword,
+      verificationToken,
+    });
+    await user.save();
   }
 
-  const hashedPassword = await hashPassword(password);
-  const verificationCode = generateVerificationCode();
-  const verificationCodeExpires = Date.now() + 3600000; // 1 hour
-
-  const newUser = new User({
-    email,
-    password: hashedPassword,
-    verificationCode,
-    isVerified: false,
-    verificationCodeExpires,
-  });
-  await newUser.save();
+  const verificationCode = Math.floor(
+    100000 + Math.random() * 900000
+  ).toString();
+  user.verificationCode = verificationCode;
+  await user.save();
 
   await transporter.sendMail({
     to: email,
     subject: "Verify your email",
-    html: `<p>Your verification code is: <strong>${verificationCode}</strong></p>`,
+    html: `<p>Your verification code is: ${verificationCode}</p>`,
   });
 
   return true;
 };
 
-export const verifyUserCode = async (email, code) => {
-  const user = await User.findOne({ email, verificationCode: code });
-  if (!user) {
+export const verifyUserEmail = async (email, verificationCode) => {
+  const user = await User.findOne({ email });
+  if (!user || user.verificationCode !== verificationCode) {
     throw new Error("Invalid verification code");
   }
 
   user.verificationCode = null;
+  user.isVerified = true;
   await user.save();
 
   return true;
@@ -71,6 +79,37 @@ export const selectUserRole = async (email, role) => {
   return true;
 };
 
+// export const submitRoleFormDetails = async ({ email, role, details, file }) => {
+//   const user = await User.findOne({ email });
+
+//   if (!user) {
+//     throw new Error("User not found");
+//   }
+
+//   if (file) {
+//     const ext = path.extname(file.originalname).toLowerCase();
+//     if (![".jpg", ".jpeg", ".png"].includes(ext)) {
+//       throw new Error("Only image are allowed");
+//     }
+//     details.governmentId = file.path;
+//   }
+
+//   user.role = role;
+//   user.details = { ...user.details, ...details };
+
+//   // Move to CompletedUser collection if the form is complete
+//   const completedUser = new CompletedUser({
+//     email: user.email,
+//     password: user.password,
+//     role: user.role,
+//     details: user.details,
+//   });
+//   await completedUser.save();
+//   await user.deleteOne();
+
+//   return completedUser;
+// };
+
 export const submitRoleFormDetails = async ({ email, role, details, file }) => {
   const user = await User.findOne({ email });
 
@@ -78,57 +117,51 @@ export const submitRoleFormDetails = async ({ email, role, details, file }) => {
     throw new Error("User not found");
   }
 
-  if (role === "observer") {
-    // Update observer-specific details
-    user.firstName = details.firstName;
-    user.lastName = details.lastName;
-    user.gender = details.gender;
-    user.state = details.state;
-    user.localGovernment = details.localGovernment;
-    user.ward = details.ward;
-    user.pollingUnit = details.pollingUnit;
-    user.registeredVoter = details.registeredVoter;
-    user.politicalParty = details.politicalParty;
-    user.electionWitness = details.electionWitness;
-    user.politicalSurvey = details.politicalSurvey;
-  } else if (role === "volunteer") {
-    // Update volunteer-specific details
-    if (file) {
-      const ext = path.extname(file.originalname).toLowerCase();
-      if (![".jpg", ".jpeg", ".png"].includes(ext)) {
-        throw new Error("Only image files are allowed");
-      }
-      user.governmentId = file.path;
+  if (file) {
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (![".jpg", ".jpeg", ".png"].includes(ext)) {
+      throw new Error("Only images are allowed");
     }
-    user.phoneNumber = details.phoneNumber;
-    user.bankName = details.bankName;
-    user.bankAccountNumber = details.bankAccountNumber;
-    user.accountName = details.accountName;
-
-    // Update other common details
-    user.firstName = details.firstName || user.firstName;
-    user.lastName = details.lastName || user.lastName;
-    user.gender = details.gender || user.gender;
-    user.state = details.state || user.state;
-    user.localGovernment = details.localGovernment || user.localGovernment;
-    user.ward = details.ward || user.ward;
-    user.pollingUnit = details.pollingUnit || user.pollingUnit;
-    user.registeredVoter = details.registeredVoter || user.registeredVoter;
-    user.politicalParty = details.politicalParty || user.politicalParty;
-    user.electionWitness = details.electionWitness || user.electionWitness;
-    user.politicalSurvey = details.politicalSurvey || user.politicalSurvey;
-  } else {
-    throw new Error("Invalid role");
+    details.governmentId = file.path;
   }
 
-  user.isVerified = true;
-  user.formCompletion = true;
-  await user.save();
-  return user;
-};
+  // Update user fields with details
+  Object.assign(user, details);
+  user.role = role;
+  user.isVerified = true; // Mark user as verified if form is complete
 
+  // Move user data to CompletedUser collection
+  const completedUserData = {
+    email: user.email,
+    password: user.password,
+    role: role,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    gender: user.gender,
+    state: user.state,
+    localGovernment: user.localGovernment,
+    ward: user.ward,
+    pullingUnit: user.pullingUnit,
+    registeredVoter: user.registeredVoter,
+    politicalParty: user.politicalParty,
+    electionWitness: user.electionWitness,
+    politicalSurvey: user.politicalSurvey,
+    governmentId: user.governmentId,
+    phoneNumber: user.phoneNumber,
+    bankName: user.bankName,
+    bankAccountNumber: user.bankAccountNumber,
+    accountName: user.accountName,
+  };
+
+  const completedUser = new CompletedUser(completedUserData);
+  await completedUser.save();
+  await user.deleteOne();
+
+  const token = generateToken({ email: user.email });
+  return {token, completedUser};
+};
 export const authenticateUser = async ({ email, password }) => {
-  const user = await User.findOne({ email });
+  const user = await CompletedUser.findOne({ email });
   if (!user) {
     throw new Error("Invalid email or email not verified");
   }
@@ -138,21 +171,12 @@ export const authenticateUser = async ({ email, password }) => {
     throw new Error("Invalid password");
   }
 
-  // Include more user-related information in the JWT payload
-  const tokenPayload = {
-    email: user.email,
-    userId: user._id,
-    role: user.role,
-    // Add more user-related data as needed
-  };
-
-  const token = jwt.sign(tokenPayload, process.env.JWT_SECRET);
-
-  return token;
+  const token = generateToken({ email: user.email });
+  return { token, user };
 };
 
 export const generateResetToken = async (email) => {
-  const user = await User.findOne({ email });
+  const user = await CompletedUser.findOne({ email });
   if (!user) {
     throw new Error("User not found");
   }
@@ -163,22 +187,19 @@ export const generateResetToken = async (email) => {
 
   await user.save();
 
-  const resetUrl = `${process.env.BASE_URL}/reset-password?token=${resetToken}`;
+  const resetUrl = `${BASE_URL}/reset-password?token=${resetToken}`;
 
   await transporter.sendMail({
     to: email,
     subject: "Password Reset",
-    html: `
-      <p>You requested a password reset</p>
-      <p>Click this <a href="${resetUrl}">link</a> to reset your password</p>
-    `,
+    html: `<p>You requested a password reset</p><p>Click this <a href="${resetUrl}">link</a> to reset your password</p>`,
   });
 
   return true;
 };
 
 export const resetUserPassword = async (token, newPassword) => {
-  const user = await User.findOne({
+  const user = await CompletedUser.findOne({
     resetPasswordToken: token,
     resetPasswordExpires: { $gt: Date.now() },
   });
@@ -194,78 +215,15 @@ export const resetUserPassword = async (token, newPassword) => {
   return true;
 };
 
-export const updateUserDetailsService = async (email, updateData) => {
-  const user = await User.findOne({ email });
-  if (!user) {
-    throw new Error("User not found");
-  }
-
-  // Update any fields provided in the updateData object
-  for (const key in updateData) {
-    if (key === "password") {
-      user[key] = await hashPassword(updateData[key]);
-    } else {
-      user[key] = updateData[key];
+export const validateTokenService = async (token) => {
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await CompletedUser.findOne({ email: decoded.email });
+    if (!user) {
+      throw new Error("Invalid token");
     }
+    return user;
+  } catch (err) {
+    throw new Error("Token is not valid or expired");
   }
-
-  await user.save();
-  return user;
-};
-
-export const getAllUsers = async () => {
-  return await User.find({});
-};
-
-export const getUsersByRole = async (role) => {
-  if (!["observer", "volunteer"].includes(role)) {
-    throw new Error("Invalid role");
-  }
-  return await User.find({ role });
-};
-
-
-export const observertovolunteer = async (email, details, file) => {
-  const user = await User.findOne({ email });
-
-  if (!user) {
-    throw new Error("User not found");
-  }
-
-  if (!user.isVerified) {
-    throw new Error("User is not verified");
-  }
-
-  // Update user details with volunteer-specific information
-  
-  user.firstName = details.firstName || user.firstName;
-  user.lastName = details.lastName || user.lastName;
-  user.gender = details.gender || user.gender;
-  user.state = details.state || user.state;
-  user.localGovernment = details.localGovernment || user.localGovernment;
-  user.ward = details.ward || user.ward;
-  user.pollingUnit = details.pollingUnit || user.pollingUnit;
-  user.registeredVoter = details.registeredVoter || user.registeredVoter;
-  user.politicalParty = details.politicalParty || user.politicalParty;
-  user.electionWitness = details.electionWitness || user.electionWitness;
-  user.politicalSurvey = details.politicalSurvey || user.politicalSurvey;
-
-  if (file) {
-    const ext = path.extname(file.originalname).toLowerCase();
-    if (![".jpg", ".jpeg", ".png"].includes(ext)) {
-      throw new Error("Only image files are allowed");
-    }
-    user.volunteerDetails.governmentId = file.path;
-  }
-
-  user.phoneNumber = details.phoneNumber || user.phoneNumber;
-  user.bankName = details.bankName || user.bankName;
-  user.bankAccountNumber = details.bankAccountNumber || user.bankAccountNumber;
-  user.accountName = details.accountName || user.accountName;
-
-  // Set role to volunteer
-  user.role = "volunteer";
-
-  await user.save();
-  return user;
 };

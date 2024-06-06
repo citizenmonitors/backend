@@ -1,31 +1,31 @@
 import mongoose from "mongoose";
 
-const UserSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  isVerified: { type: Boolean, default: false },
-  role: { type: String, enum: ["observer", "volunteer"], default: "observer" },
+  verificationToken: { type: String },
   verificationCode: { type: String },
-  firstName: { type: String },
-  lastName: { type: String },
-  gender: { type: String },
-  state: { type: String },
-  localGovernment: { type: String },
-  ward: { type: String },
-  pollingUnit: { type: String },
-  registeredVoter: { type: Boolean },
-  politicalParty: { type: Boolean },
-  electionWitness: { type: Boolean },
-  politicalSurvey: { type: Boolean },
-  volunteerDetails: {
-    governmentId: { type: String },
-    phoneNumber: { type: String },
-    bankName: { type: String },
-    bankAccountNumber: { type: String },
-    accountName: { type: String },
-  },
-  resetPasswordToken: { type: String },
-  resetPasswordExpires: { type: Date },
+  isVerified: { type: Boolean, default: false },
+  role: { type: String, enum: ["observer", "volunteer"], default: null },
+  // Common fields
+  firstName: String,
+  lastName: String,
+  gender: String,
+  state: String,
+  localGovernment: String,
+  ward: String,
+  pullingUnit: String,
+  registeredVoter: Boolean,
+  politicalParty: Boolean,
+  electionWitness: Boolean,
+  politicalSurvey: Boolean,
+  // Volunteer specific fields
+  governmentId: String,
+  phoneNumber: String,
+  bankName: String,
+  bankAccountNumber: String,
+  accountName: String,
+  
 });
 
-export default mongoose.model("User", UserSchema);
+export default mongoose.model("User", userSchema);

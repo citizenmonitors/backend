@@ -1,23 +1,19 @@
-// controllers/authController.js
-
 import {
   registerUser,
-  verifyUserCode,
+  verifyUserEmail,
   selectUserRole,
   submitRoleFormDetails,
   authenticateUser,
+  validateTokenService,
   generateResetToken,
   resetUserPassword,
-  updateUserDetailsService,
-  getAllUsers,
-  getUsersByRole,
-  observertovolunteer,
-} from "../services/authService.js";
+} from '../services/authService.js';
 import multer from '../config/multer.js';
+import CompletedUser from '../models/CompletedUser.js';
 
 export const register = async (req, res) => {
   try {
-    await registerUser(req.body);
+    const result = await registerUser(req.body);
     res.status(201).json({
       message: 'Registration successful! Please check your email for the verification code.',
     });
@@ -26,43 +22,64 @@ export const register = async (req, res) => {
   }
 };
 
-export const verifyCode = async (req, res) => {
+export const verifyEmail = async (req, res) => {
   try {
-    await verifyUserCode(req.body.email, req.body.code);
-    res.status(200).json({ message: 'Email verified successfully. Please select your role.' });
+    const result = await verifyUserEmail(req.body.email, req.body.verificationCode);
+    res.status(200).json({ message: 'Email verified successfully.' });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 };
 
-export const selectRole = async (req, res) => {
+export const pickRole = async (req, res) => {
   try {
-    await selectUserRole(req.body.email, req.body.role);
-    res.status(200).json({ message: 'Role selected successfully. Please complete the form.' });
+    const { email, role } = req.body;
+    const user = await selectUserRole(email, role);
+    res.status(200).json({ message: "Role selected successfully", user });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 };
 
-export const submitRoleForm = [
-  multer.single("governmentId"),
-  async (req, res) => {
-    try {
-      const { email, role } = req.body;
-      const details = req.body;
-      const file = req.file;
-      await submitRoleFormDetails({ email, role, details, file });
-      res.status(200).json({ message: "Details submitted successfully." });
-    } catch (err) {
-      res.status(400).json({ message: err.message });
-    }
-  },
-];
+// export const submitRoleForm =[ multer.single('governmentId'), async (req, res) => {
+//   try {
+//     const details = req.body;
+//     const file = req.file;
+//     const result = await submitRoleFormDetails({ email: req.body.email, role: req.body.role, details, file });
+//     res.status(200).json({ message: 'Details submitted successfully.' });
+//   } catch (err) {
+//     res.status(400).json({ message: err.message });
+//   }
+// },
+// ]
+
+export const submitRoleForm = async (req, res) => {
+  try {
+    const { email, role, ...details } = req.body;
+    const file = req.file;
+
+    const completedUser = await submitRoleFormDetails({
+      email,
+      role,
+      details,
+      file,
+    });
+    res
+      .status(200)
+      .json({
+        message:
+          "Details submitted successfully and user moved to completed database",
+        completedUser,
+      });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
 
 export const signIn = async (req, res) => {
   try {
-    const token = await authenticateUser(req.body);
-    res.status(200).json({ token });
+    const { token, user } = await authenticateUser(req.body);
+    res.status(200).json({ token, user });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
@@ -70,7 +87,7 @@ export const signIn = async (req, res) => {
 
 export const forgotPassword = async (req, res) => {
   try {
-    await generateResetToken(req.body.email);
+    const result = await generateResetToken(req.body.email);
     res.status(200).json({ message: 'Password reset link sent to your email.' });
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -79,53 +96,36 @@ export const forgotPassword = async (req, res) => {
 
 export const resetPassword = async (req, res) => {
   try {
-    await resetUserPassword(req.body.token, req.body.password);
+    const result = await resetUserPassword(req.body.token, req.body.password);
     res.status(200).json({ message: 'Password reset successful.' });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 };
 
-export const updateUserDetails = async (req, res) => {
+// export const validateUserSession = async (req, res) => {
+//   try {
+//     const user = await validateTokenService(
+//       req.headers.authorization.split(" ")[1]
+//     );
+//     res.status(200).json(user);
+//   } catch (err) {
+//     res.status(401).json({ message: "Invalid token" });
+//   }
+// };
+
+export const validateUserSession = async (req, res) => {
   try {
-    const { email, updateData } = req.body;
-    const user = await updateUserDetailsService(email, updateData);
-    res.status(200).json({ message: 'User details updated successfully.', user });
+    const token = req.header("Authorization")?.replace("Bearer ", "");
+    if (!token) {
+      return res
+        .status(401)
+        .json({ message: "No token provided, authorization denied" });
+    }
+
+    const user = await validateTokenService(token);
+    res.status(200).json({ user });
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(401).json({ message: err.message });
   }
 };
-
-export const getAllUsersController = async (req, res) => {
-  try {
-    const users = await getAllUsers();
-    res.status(200).json(users);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-};
-
-export const getUsersByRoleController = async (req, res) => {
-  try {
-    const { role } = req.params;
-    const users = await getUsersByRole(role);
-    res.status(200).json(users);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-};
-
-
-export const submitVolunteerDetails = [ multer.single('governmentId'), async (req, res) => {
-  try {
-    const email = req.body.email;
-    const details = req.body;
-    const file = req.file;
-
-    await observertovolunteer(email, details, file);
-    res.status(200).json({ message: 'Details submitted successfully. You are now a volunteer.' });
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-},
-]

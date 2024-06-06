@@ -16,6 +16,11 @@ export const registerUser = async ({ email, password, confirmPassword }) => {
     throw new Error("Passwords do not match");
   }
 
+  let completedUser = await CompletedUser.findOne({ email });
+  if (completedUser) {
+    throw new Error("User already exists in the completed users database.");
+  }
+
   let user = await User.findOne({ email });
   if (user) {
     // If user exists but is not verified, update the password and verification token

@@ -137,25 +137,26 @@ export const submitRoleFormDetails = async ({ email, role, details, file }) => {
 
   // Move user data to CompletedUser collection
   const completedUserData = {
-    email: user.email,
-    password: user.password,
     role: role,
+    email: user.email,
     firstName: user.firstName,
     lastName: user.lastName,
     gender: user.gender,
+    dateOfBirth: user.dateOfBirth,
     state: user.state,
     localGovernment: user.localGovernment,
     ward: user.ward,
-    pullingUnit: user.pullingUnit,
-    registeredVoter: user.registeredVoter,
-    politicalParty: user.politicalParty,
-    electionWitness: user.electionWitness,
-    politicalSurvey: user.politicalSurvey,
+    pollingUnit: user.pollingUnit,
+    isRegisteredVoter: user.isRegisteredVoter,
+    isPoliticalPartyMember: user.isPoliticalPartyMember,
+    isElectionWitnessReady: user.isElectionWitnessReady,
+    isOpenToSurvey: user.isOpenToSurvey,
     governmentId: user.governmentId,
     phoneNumber: user.phoneNumber,
     bankName: user.bankName,
     bankAccountNumber: user.bankAccountNumber,
-    accountName: user.accountName,
+    bankAccountName: user.bankAccountName,
+    password: user.password,
   };
 
   const completedUser = new CompletedUser(completedUserData);
@@ -163,7 +164,7 @@ export const submitRoleFormDetails = async ({ email, role, details, file }) => {
   await user.deleteOne();
 
   const token = generateToken({ email: user.email });
-  return {token, completedUser};
+  return { token, completedUser };
 };
 export const authenticateUser = async ({ email, password }) => {
   const user = await CompletedUser.findOne({ email });

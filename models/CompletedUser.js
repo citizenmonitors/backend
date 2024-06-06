@@ -1,29 +1,29 @@
 import mongoose from "mongoose";
 
 const completedUserSchema = new mongoose.Schema({
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
   role: { type: String, enum: ["observer", "volunteer"] },
-  // Common fields
+  email: { type: String, required: true, unique: true },
   firstName: String,
   lastName: String,
   gender: String,
+  dateOfBirth: String,
   state: String,
   localGovernment: String,
   ward: String,
-  pullingUnit: String,
-  registeredVoter: Boolean,
-  politicalParty: Boolean,
-  electionWitness: Boolean,
-  politicalSurvey: Boolean,
+  pollingUnit: String,
+  isRegisteredVoter: Boolean,
+  isPoliticalPartyMember: Boolean,
+  isElectionWitnessReady: Boolean,
+  isOpenToSurvey: Boolean,
   // Volunteer specific fields
   governmentId: String,
   phoneNumber: String,
   bankName: String,
   bankAccountNumber: String,
-  accountName: String,
+  bankAccountName: String,
   resetPasswordToken: { type: String, required: false },
   resetPasswordExpires: { type: Date, required: false },
+  password: { type: String, required: true },
 });
 
 export default mongoose.model("CompletedUser", completedUserSchema);

@@ -61,8 +61,12 @@ export const registerUser = async ({ email, password, confirmPassword }) => {
 
 export const verifyUserEmail = async (email, verificationCode) => {
   const user = await User.findOne({ email });
-  if (!user || user.verificationCode !== verificationCode) {
-    throw new Error("Invalid account or wrong verification code");
+  if (!user) {
+    throw new Error("Invalid account ");
+  }
+
+  if (user.verificationCode !== verificationCode) {
+    throw new Error("Wrong verification code");
   }
 
   const currentTime = moment();
@@ -111,6 +115,10 @@ export const selectUserRole = async (email, role) => {
     throw new Error("Invalid email address");
   }
 
+   if (!user.isVerified) {
+     throw new Error("User has not verified their account with verification code");
+   }
+
   user.role = role;
   await user.save();
 
@@ -153,6 +161,14 @@ export const submitRoleFormDetails = async ({ email, role, details, file }) => {
 
   if (!user) {
     throw new Error("No account found with this email address");
+  }
+
+  if (!user.isVerified) {
+    throw new Error("User has not verified their account");
+  }
+
+  if (!user.role) {
+    throw new Error("User has not selected a role");
   }
 
   if (file) {

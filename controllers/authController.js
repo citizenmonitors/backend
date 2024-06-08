@@ -1,13 +1,14 @@
 import {
   registerUser,
   verifyUserEmail,
+  resendTokenService,
   selectUserRole,
   submitRoleFormDetails,
   authenticateUser,
-  validateTokenService,
   generateResetToken,
   resetUserPassword,
-} from '../services/authService.js';
+  validateTokenService,
+} from "../services/authService.js";
 import multer from '../config/multer.js';
 import CompletedUser from '../models/CompletedUser.js';
 
@@ -28,6 +29,16 @@ export const verifyEmail = async (req, res) => {
     res.status(200).json({ message: 'Email verified successfully.' });
   } catch (err) {
     res.status(400).json({ message: err.message });
+  }
+};
+
+export const resendToken = async (req, res) => {
+  try {
+    const { email } = req.body;
+    await resendTokenService(email);
+    res.status(200).json({ message: "Verification code resent successfully" });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
 };
 
@@ -53,12 +64,12 @@ export const pickRole = async (req, res) => {
 // },
 // ]
 
-export const submitRoleForm = async (req, res) => {
+export const submitRoleForm = [ multer.single('governmentId'), async (req, res) => {
   try {
     const { email, role, ...details } = req.body;
     const file = req.file;
 
-    const completedUser = await submitRoleFormDetails({
+    const { token, user } = await submitRoleFormDetails({
       email,
       role,
       details,
@@ -67,19 +78,24 @@ export const submitRoleForm = async (req, res) => {
     res
       .status(200)
       .json({
+        token,
+        user,
         message:
-          "Details submitted successfully and user moved to completed database",
-        completedUser,
+          "Details submitted successfully. You can now login to your account.",
       });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
-};
+},]
 
 export const signIn = async (req, res) => {
   try {
     const { token, user } = await authenticateUser(req.body);
-    res.status(200).json({ token, user });
+    res.status(200).json({
+      token,
+      user,
+      message: "Login successfully",
+    });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }

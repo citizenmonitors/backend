@@ -8,7 +8,7 @@ const completedUserSchema = new mongoose.Schema({
   gender: String,
   dateOfBirth: String,
   state: String,
-  localGovernment: String,
+  lga: String,
   ward: String,
   pollingUnit: String,
   isRegisteredVoter: Boolean,

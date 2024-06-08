@@ -2,6 +2,7 @@ import express from "express";
 import {
   register,
   verifyEmail,
+  resendToken,
   submitRoleForm,
   signIn,
   pickRole,
@@ -14,6 +15,7 @@ const router = express.Router();
 
 router.post("/register", register);
 router.post("/verify-email", verifyEmail);
+router.post("/resend-token", resendToken);
 router.post("/select-role", pickRole);
 router.post("/submit-role-form",  submitRoleForm);
 router.post("/signin", signIn);

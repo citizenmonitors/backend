@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
   gender: String,
   dateOfBirth: String,
   state: String,
-  localGovernment: String,
+  lga: String,
   ward: String,
   pollingUnit: String,
   isRegisteredVoter: Boolean,
@@ -25,6 +25,7 @@ const userSchema = new mongoose.Schema({
   isVerified: { type: Boolean, default: false },
   verificationToken: { type: String },
   verificationCode: { type: String },
+  verificationCodeExpires: { type: Date, required: false },
 });
 
 export default mongoose.model("User", userSchema);

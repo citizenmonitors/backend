@@ -72,9 +72,9 @@ export const submitRoleForm = [ multer.single('governmentId'), async (req, res) 
      console.log("Request body:", req.body);
      console.log("Uploaded file:", req.file);
 
-    if (!file) {
-        return res.status(400).json({ message: 'Government ID is required' });
-      }
+    // if (!file) {
+    //     return res.status(400).json({ message: 'Government ID is required' });
+    //   }
 
 
 

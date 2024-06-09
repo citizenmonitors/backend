@@ -69,6 +69,12 @@ export const submitRoleForm = [ multer.single('governmentId'), async (req, res) 
     const { email, role, ...details } = req.body;
     const file = req.file;
 
+    if (!file) {
+        return res.status(400).json({ message: 'Government ID is required' });
+      }
+
+      
+
     const { token, user } = await submitRoleFormDetails({
       email,
       role,

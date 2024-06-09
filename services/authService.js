@@ -125,37 +125,6 @@ export const selectUserRole = async (email, role) => {
   // return true;
 };
 
-// export const submitRoleFormDetails = async ({ email, role, details, file }) => {
-//   const user = await User.findOne({ email });
-
-//   if (!user) {
-//     throw new Error("User not found");
-//   }
-
-//   if (file) {
-//     const ext = path.extname(file.originalname).toLowerCase();
-//     if (![".jpg", ".jpeg", ".png"].includes(ext)) {
-//       throw new Error("Only image are allowed");
-//     }
-//     details.governmentId = file.path;
-//   }
-
-//   user.role = role;
-//   user.details = { ...user.details, ...details };
-
-//   // Move to CompletedUser collection if the form is complete
-//   const completedUser = new CompletedUser({
-//     email: user.email,
-//     password: user.password,
-//     role: user.role,
-//     details: user.details,
-//   });
-//   await completedUser.save();
-//   await user.deleteOne();
-
-//   return completedUser;
-// };
-
 export const submitRoleFormDetails = async ({ email, role, details, file }) => {
   const user = await User.findOne({ email });
 
@@ -171,15 +140,29 @@ export const submitRoleFormDetails = async ({ email, role, details, file }) => {
     throw new Error("User has not selected a role");
   }
 
-  if (file) {
-    const ext = path.extname(file.originalname).toLowerCase();
-    if (![".jpg", ".jpeg", ".png"].includes(ext)) {
-      throw new Error(
-        "Only images are allowed. Please upload a jpg, jpeg, or png file."
-      );
-    }
-    details.governmentId = file.path;
-  }
+  // if (file) {
+  //   const ext = path.extname(file.originalname).toLowerCase();
+  //   if (![".jpg", ".jpeg", ".png"].includes(ext)) {
+  //     throw new Error(
+  //       "Only images are allowed. Please upload a jpg, jpeg, or png file."
+  //     );
+  //   }
+  //   details.governmentId = file.path;
+  // }
+
+   if (role === "volunteer") {
+     if (!file) {
+       throw new Error("Government ID is required for volunteers");
+     }
+
+     const ext = path.extname(file.originalname).toLowerCase();
+     if (![".jpg", ".jpeg", ".png"].includes(ext)) {
+       throw new Error(
+         "Only images are allowed. Please upload a jpg, jpeg, or png file."
+       );
+     }
+     details.governmentId = file.path;
+   }
 
   //  user details
   Object.assign(user, details);

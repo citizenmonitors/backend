@@ -52,19 +52,48 @@ export const pickRole = async (req, res) => {
   }
 };
 
-// export const submitRoleForm =[ multer.single('governmentId'), async (req, res) => {
+// export const submitRoleForm = [ multer.single('governmentId'), async (req, res) => {
 //   try {
-//     const details = req.body;
+//     const { email, role, ...details } = req.body;
 //     const file = req.file;
-//     const result = await submitRoleFormDetails({ email: req.body.email, role: req.body.role, details, file });
-//     res.status(200).json({ message: 'Details submitted successfully.' });
+
+//      console.log("Request body:", req.body);
+//      console.log("Uploaded file:", req.file);
+
+//     // if (!file) {
+//     //     return res.status(400).json({ message: 'Government ID is required' });
+//     //   }
+
+
+//     const { token, user } = await submitRoleFormDetails({
+//       email,
+//       role,
+//       details,
+//       file,
+//     });
+//     res
+//       .status(200)
+//       .json({
+//         token,
+//         user,
+//         message:
+//           "Details submitted successfully. You can now login to your account.",
+//       });
+      
 //   } catch (err) {
 //     res.status(400).json({ message: err.message });
 //   }
-// },
-// ]
+// },]
 
-export const submitRoleForm = [ multer.single('governmentId'), async (req, res) => {
+export const submitRoleForm = [ (req, res, next) => {
+  const { role } = req.body;
+
+  if (role === "volunteer") {
+    multer.single("governmentId")(req, res, next);
+  } else {
+    next();
+  }
+}, async (req, res) => {
   try {
     const { email, role, ...details } = req.body;
     const file = req.file;
@@ -75,7 +104,6 @@ export const submitRoleForm = [ multer.single('governmentId'), async (req, res) 
     // if (!file) {
     //     return res.status(400).json({ message: 'Government ID is required' });
     //   }
-
 
 
     const { token, user } = await submitRoleFormDetails({

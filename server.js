@@ -8,6 +8,7 @@ import { connectDB } from "./config/db.js";
 import authRoutes from "./routes/auth.js";
 import electionRoutes from "./routes/electionRoutes.js";
 import locations from "./routes/locations.js";
+import bankRoutes from "./routes/bankRoutes.js";
 
 const app = express();
 app.use(bodyParser.json());
@@ -19,6 +20,9 @@ connectDB();
 app.use("/api/auth", authRoutes);
 app.use("/api/election", electionRoutes);
 app.use("/api", locations);
+app.use("/api", bankRoutes);
+
+
 
 app.use((err, req, res, next) => {
   res.status(500).json({ message: err.message });

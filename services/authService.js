@@ -186,6 +186,9 @@ export const submitRoleFormDetails = async ({ email, role, details, file }) => {
   user.role = role;
   user.isVerified = true; 
 
+  //  console.log("User Details:", details);
+   console.log("File Path:", file.path);
+
   // Move user data to Completed User db
   const completedUserData = {
     role: role,
@@ -217,6 +220,7 @@ export const submitRoleFormDetails = async ({ email, role, details, file }) => {
   const token = generateToken({ email: user.email });
   const { password, ...usersDetails } = completedUser.toObject();
   return { token, user: usersDetails };
+ 
 };
 export const authenticateUser = async ({ email, password }) => {
   const user = await CompletedUser.findOne({ email });

@@ -9,7 +9,7 @@ import {
   resetUserPassword,
   validateTokenService,
 } from "../services/authService.js";
-import multer from '../config/multer.js';
+import upload from "../config/multer.js";
 import CompletedUser from '../models/CompletedUser.js';
 
 export const register = async (req, res) => {
@@ -85,46 +85,49 @@ export const pickRole = async (req, res) => {
 //   }
 // },]
 
-export const submitRoleForm = [ (req, res, next) => {
-  const { role } = req.body;
+export const submitRoleForm = [
+  upload.single("governmentId"),
+  async (req, res) => {
+    try {
+      const { email, role, ...details } = req.body;
+      const file = req.file;
 
-  if (role === "volunteer") {
-    multer.single("governmentId")(req, res, next);
-  } else {
-    next();
-  }
-}, async (req, res) => {
-  try {
-    const { email, role, ...details } = req.body;
-    const file = req.file;
+      // console.log("Request body:", req.body); 
+      // console.log("Uploaded file:", req.file); 
 
-     console.log("Request body:", req.body);
-     console.log("Uploaded file:", req.file);
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
 
-    // if (!file) {
-    //     return res.status(400).json({ message: 'Government ID is required' });
-    //   }
+      if (!role) {
+        return res.status(400).json({ message: "Role is required" });
+      }
 
+      if (role === "volunteer" && !file) {
+        return res
+          .status(400)
+          .json({ message: "Government ID is required for volunteers" });
+      }
 
-    const { token, user } = await submitRoleFormDetails({
-      email,
-      role,
-      details,
-      file,
-    });
-    res
-      .status(200)
-      .json({
-        token,
-        user,
+      const { token, user } = await submitRoleFormDetails({
+        email,
+        role,
+        details,
+        file,
+      });
+
+      res.status(200).json({
         message:
           "Details submitted successfully. You can now login to your account.",
+        token,
+        user,
       });
-      
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-},]
+    } catch (err) {
+      console.error(err); 
+      res.status(400).json({ message: err.message });
+    }
+  },
+];
 
 export const signIn = async (req, res) => {
   try {

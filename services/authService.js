@@ -126,9 +126,11 @@ export const selectUserRole = async (email, role) => {
 };
 
 export const submitRoleFormDetails = async ({ email, role, details, file }) => {
+  // console.log("Searching for user with email:", email); 
   const user = await User.findOne({ email });
 
   if (!user) {
+    // console.log("No account found with email:", email);
     throw new Error("No account found with this email address");
   }
 
@@ -139,16 +141,6 @@ export const submitRoleFormDetails = async ({ email, role, details, file }) => {
   if (!user.role) {
     throw new Error("User has not selected a role");
   }
-
-  // if (file) {
-  //   const ext = path.extname(file.originalname).toLowerCase();
-  //   if (![".jpg", ".jpeg", ".png"].includes(ext)) {
-  //     throw new Error(
-  //       "Only images are allowed. Please upload a jpg, jpeg, or png file."
-  //     );
-  //   }
-  //   details.governmentId = file.path;
-  // }
 
    if (role === "volunteer") {
      if (!file) {
@@ -169,8 +161,10 @@ export const submitRoleFormDetails = async ({ email, role, details, file }) => {
   user.role = role;
   user.isVerified = true; 
 
-  //  console.log("User Details:", details);
-   console.log("File Path:", file.path);
+//  console.log("User Details:", details); 
+//  if (file) {
+//    console.log("File Path:", file.path); 
+//  }
 
   // Move user data to Completed User db
   const completedUserData = {
@@ -188,7 +182,7 @@ export const submitRoleFormDetails = async ({ email, role, details, file }) => {
     isPoliticalPartyMember: user.isPoliticalPartyMember,
     isElectionWitnessReady: user.isElectionWitnessReady,
     isOpenToSurvey: user.isOpenToSurvey,
-    governmentId: user.governmentId,
+    governmentId: details.governmentId,
     phoneNumber: user.phoneNumber,
     bankName: user.bankName,
     bankAccountNumber: user.bankAccountNumber,

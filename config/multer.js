@@ -7,13 +7,13 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const uploadDir = path.join(__dirname, "../uploads");
+const uploadDir = path.join(__dirname, "../governmentId");
 
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
-  console.log('Uploads directory created:', uploadDir);
+  console.log("governmentId directory created:", uploadDir);
 } else {
-  console.log('Uploads directory exists:', uploadDir);
+  console.log("governmentId directory exists:", uploadDir);
 }
 
 const storage = multer.diskStorage({

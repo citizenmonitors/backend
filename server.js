@@ -6,9 +6,10 @@ import express from "express";
 import bodyParser from "body-parser";
 import { connectDB } from "./config/db.js";
 import authRoutes from "./routes/auth.js";
-import electionRoutes from "./routes/electionRoutes.js";
+import electionRoutes from "./routes/Election/electionRoutes.js";
 import locations from "./routes/locations.js";
 import bankRoutes from "./routes/bankRoutes.js";
+import userRoutes from "./routes/userDashboard/userRoutes.js";
 
 const app = express();
 app.use(bodyParser.json());
@@ -21,6 +22,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/election", electionRoutes);
 app.use("/api", locations);
 app.use("/api", bankRoutes);
+app.use("/api", userRoutes);
 
 
 

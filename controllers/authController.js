@@ -12,6 +12,7 @@ import {
 import upload from "../config/multer.js";
 import CompletedUser from '../models/CompletedUser.js';
 
+
 export const register = async (req, res) => {
   try {
     const result = await registerUser(req.body);
@@ -51,39 +52,6 @@ export const pickRole = async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 };
-
-// export const submitRoleForm = [ multer.single('governmentId'), async (req, res) => {
-//   try {
-//     const { email, role, ...details } = req.body;
-//     const file = req.file;
-
-//      console.log("Request body:", req.body);
-//      console.log("Uploaded file:", req.file);
-
-//     // if (!file) {
-//     //     return res.status(400).json({ message: 'Government ID is required' });
-//     //   }
-
-
-//     const { token, user } = await submitRoleFormDetails({
-//       email,
-//       role,
-//       details,
-//       file,
-//     });
-//     res
-//       .status(200)
-//       .json({
-//         token,
-//         user,
-//         message:
-//           "Details submitted successfully. You can now login to your account.",
-//       });
-      
-//   } catch (err) {
-//     res.status(400).json({ message: err.message });
-//   }
-// },]
 
 export const submitRoleForm = [
   upload.single("governmentId"),
@@ -160,17 +128,6 @@ export const resetPassword = async (req, res) => {
   }
 };
 
-// export const validateUserSession = async (req, res) => {
-//   try {
-//     const user = await validateTokenService(
-//       req.headers.authorization.split(" ")[1]
-//     );
-//     res.status(200).json(user);
-//   } catch (err) {
-//     res.status(401).json({ message: "Invalid token" });
-//   }
-// };
-
 export const validateUserSession = async (req, res) => {
   try {
     const token = req.header("Authorization")?.replace("Bearer ", "");
@@ -186,3 +143,6 @@ export const validateUserSession = async (req, res) => {
     res.status(401).json({ message: err.message });
   }
 };
+
+
+

@@ -25,9 +25,28 @@ const statesLocalGovsWardsPollingUnitsData = JSON.parse(
 );
 
 
+const sortByString = (array) => {
+  return array.sort((a, b) => {
+    const nameA = a ? a.toUpperCase() : '';
+    const nameB = b ? b.toUpperCase() : '';
+
+    if (nameA < nameB) {
+      return -1;
+    }
+    if (nameA > nameB) {
+      return 1;
+    }
+    return 0;
+  });
+};
+
+
 // Endpoint to get all states
+
 router.get("/states", (req, res) => {
-  res.json(statesData);
+  const sortedStates = sortByString(statesData, "state");
+   console.log(`Total number of states: ${sortedStates.length}`);
+  res.json(sortedStates);
 });
 
 // Endpoint to get local governments by state
@@ -37,7 +56,8 @@ router.get("/state/:state", (req, res) => {
     (s) => s.state.toLowerCase() === state.toLowerCase()
   );
   if (stateData) {
-    res.json(stateData.lgas);
+    const sortedLgas = sortByString(stateData.lgas, "lga");
+    res.json(sortedLgas);
   } else {
     res.status(404).json({ message: "State not found" });
   }
@@ -54,7 +74,8 @@ router.get("/state/:state/lga/:lga", (req, res) => {
       (l) => l.lga.toLowerCase() === lga.toLowerCase()
     );
     if (lgaData) {
-      res.json(lgaData.wards);
+      const sortedWards = sortByString(lgaData.wards, "ward");
+      res.json(sortedWards);
     } else {
       res.status(404).json({ message: "Local Government not found" });
     }
@@ -64,6 +85,7 @@ router.get("/state/:state/lga/:lga", (req, res) => {
 });
 
 // Endpoint to get polling units by state, local government, and ward
+
 router.get("/state/:state/lga/:lga/ward/:ward", (req, res) => {
   const { state, lga, ward } = req.params;
   const stateData = statesLocalGovsWardsPollingUnitsData.find(
@@ -78,7 +100,11 @@ router.get("/state/:state/lga/:lga/ward/:ward", (req, res) => {
         (w) => w.ward.toLowerCase() === ward.toLowerCase()
       );
       if (wardData) {
-        res.json(wardData.polling_units);
+        const sortedPollingUnits = sortByString(
+          wardData.polling_units,
+          "polling_unit"
+        );
+        res.json(sortedPollingUnits);
       } else {
         res.status(404).json({ message: "Ward not found" });
       }
@@ -90,4 +116,57 @@ router.get("/state/:state/lga/:lga/ward/:ward", (req, res) => {
   }
 });
 
+// Endpoint to get all local governments
+router.get("/local-governments", (req, res) => {
+  let allLocalGovs = [];
+  statesLocalGovsData.forEach((state) => {
+    allLocalGovs = allLocalGovs.concat(state.lgas.map(lga => ({ state: state.state, lga: lga.lga })));
+  });
+  const sortedLocalGovs = (allLocalGovs);
+  console.log("Total number of Local Governments:", sortedLocalGovs.length);
+  res.json(sortedLocalGovs);
+});
+
 export default router;
+
+
+router.get("/wards", (req, res) => {
+  let allWards = [];
+  statesLocalGovsWardsData.forEach((state) => {
+    state.lgas.forEach((lga) => {
+      allWards = allWards.concat(
+        lga.wards.map((ward) => ({
+          state: state.state,
+          lga: lga.lga,
+          ward: ward.ward,
+        }))
+      );
+    });
+  });
+  const sortedWards = (allWards);
+  console.log("Total number of Wards:", sortedWards.length);
+  res.json("Wards");
+
+});
+
+// Endpoint to get all polling units
+router.get("/polling-units", (req, res) => {
+  let allPollingUnits = [];
+  statesLocalGovsWardsPollingUnitsData.forEach((state) => {
+    state.lgas.forEach((lga) => {
+      lga.wards.forEach((ward) => {
+        allPollingUnits = allPollingUnits.concat(
+          ward.polling_units.map((pollingUnit) => ({
+            state: state.state,
+            lga: lga.lga,
+            ward: ward.ward,
+            pollingUnit,
+          }))
+        );
+      });
+    });
+  });
+  const sortedPollingUnits = (allPollingUnits);
+  console.log("Total number of Polling Units:", sortedPollingUnits.length);
+  res.json("Polling units");
+});

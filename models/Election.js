@@ -17,31 +17,12 @@ const ElectionSchema = new mongoose.Schema(
       ],
       required: true,
     },
-    signedResultImage: {
-      type: String,
-    },
-    resultAnnouncementVideo: {
-      type: String,
-    },
-    results: [
-      {
-        party: String,
-        votes: Number,
-      },
-    ],
-    ratedGood: {
-      type: Boolean,
-      required: true,
-    },
-    createdBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
   },
   {
     timestamps: true,
   }
 );
+
+ElectionSchema.index({ year: 1, type: 1 }, { unique: true });
 
 export default mongoose.model("Election", ElectionSchema);

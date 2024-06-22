@@ -1,4 +1,3 @@
-// multerConfig.js
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -27,11 +26,15 @@ const storage = multer.diskStorage({
 
 const fileFilter = (req, file, cb) => {
   const ext = path.extname(file.originalname).toLowerCase();
-  const allowedTypes = [".png", ".jpg", ".jpeg", ".mp4"];
+  const allowedTypes = [".png", ".jpg", ".jpeg", ".mp4", ".pdf"];
   if (allowedTypes.includes(ext)) {
     cb(null, true);
   } else {
-    cb(new Error("Only images (png, jpg, jpeg) and videos (mp4) are allowed"));
+    cb(
+      new Error(
+        "Only images (png, jpg, jpeg), videos (mp4), and PDFs are allowed"
+      )
+    );
   }
 };
 

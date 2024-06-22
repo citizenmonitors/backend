@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const ElectionSchema = new mongoose.Schema(
   {
     year: {
-      type: Number,
+      type: String,
       required: true,
     },
     type: {
@@ -12,9 +12,17 @@ const ElectionSchema = new mongoose.Schema(
         "presidential",
         "senatorial",
         "gubernatorial",
-        "house_of_representatives",
-        "state_house_of_assembly",
+        "house-of-representatives",
+        "state-house-of-assembly",
       ],
+      required: true,
+    },
+    startDate: {
+      type: String, 
+      required: true,
+    },
+    endDate: {
+      type: String, 
       required: true,
     },
   },
@@ -22,7 +30,5 @@ const ElectionSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
-ElectionSchema.index({ year: 1, type: 1 }, { unique: true });
 
 export default mongoose.model("Election", ElectionSchema);

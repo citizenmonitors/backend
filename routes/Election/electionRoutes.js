@@ -1,63 +1,61 @@
-// routes/electionRoutes.js
-
 import express from "express";
-import multer from "multer";
 import {
-  createElectionController,
-  getAllElectionsController,
-  getOngoingElectionsController,
-  getPreviousElectionsController,
-  getElectionByTypeAndYearController,
-  uploadElectionDataController,
+  uploadElectionData,
   getUserElectionDataController,
-  deleteUserElectionDataController,
   updateUserElectionDataController,
-} from "../../controllers/Election/electionController.js";
+  deleteUserElectionDataController,
+  createElectionController,
+  getAllElectionResultsController,
+  addPoliticalPartyController,
+  getPoliticalPartiesController,
+  getElectionResultsByTypeAndYearController,
+} from "../../controllers/Election/electionDataController.js";
 import authMiddleware from "../../middleware/authMiddleware.js";
+import upload from "../../config/electionMulter.js";
 
 const router = express.Router();
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
-});
 
-const upload = multer({ storage: storage });
-
-router.post("/", authMiddleware, createElectionController);
-router.get("/", authMiddleware, getAllElectionsController);
-router.get("/ongoing", authMiddleware, getOngoingElectionsController);
-router.get("/previous", authMiddleware, getPreviousElectionsController);
-router.get("/:type/:year", authMiddleware, getElectionByTypeAndYearController);
-
+router.post("/create-election", authMiddleware, createElectionController);
+router.post("/add-political-party",
+  authMiddleware,
+  addPoliticalPartyController
+);
+router.get("/political-parties", authMiddleware, getPoliticalPartiesController);
 router.post(
-  "/:type/:year/upload",
+  "/election/:year/:type/data",
   authMiddleware,
   upload.fields([
-    { name: "resultSheets", maxCount: 10 },
-    { name: "videos", maxCount: 10 },
+    { name: "resultSheets", maxCount: 5 },
+    { name: "resultVideos", maxCount: 2 },
   ]),
-  uploadElectionDataController
+  uploadElectionData
+);
+router.get(
+  "/election-results",
+  authMiddleware,
+  getAllElectionResultsController
+);
+router.get(
+  "/election/:type/:year/results",
+  authMiddleware,
+  getElectionResultsByTypeAndYearController
 );
 
-router.get("/user/data", authMiddleware, getUserElectionDataController);
-router.delete(
-  "/user/data/:id",
+router.get(
+  "/user-election-data",
   authMiddleware,
-  deleteUserElectionDataController
+  getUserElectionDataController
 );
 router.put(
-  "/user/data/:id",
+  "/user-election-data/:dataId",
   authMiddleware,
-  upload.fields([
-    { name: "resultSheets", maxCount: 10 },
-    { name: "videos", maxCount: 10 },
-  ]),
   updateUserElectionDataController
+);
+router.delete(
+  "/user-election-data/:dataId",
+  authMiddleware,
+  deleteUserElectionDataController
 );
 
 export default router;

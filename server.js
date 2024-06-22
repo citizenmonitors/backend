@@ -19,7 +19,7 @@ app.use(cors());
 connectDB();
 
 app.use("/api/auth", authRoutes);
-app.use("/api/election", electionRoutes);
+app.use("/api/elections", electionRoutes);
 app.use("/api", locations);
 app.use("/api", bankRoutes);
 app.use("/api", userRoutes);

@@ -20,6 +20,7 @@ export const createElectionService = async (data) => {
     throw error;
   }
   const election = new Election({ electionType, startDate, endDate });
+  
   return await election.save();
 };
 
@@ -222,33 +223,33 @@ export const deleteUserElectionData = async (dataId, userId) => {
 };
 
 export const getAllElectionResults = async () => {
-  try {
-    const allElections = await Election.find().lean();
-    if (!allElections || allElections.length === 0) {
-      throw new Error("No allElections found");
-    }
+ try {
+   const elections = await Election.find().lean();
+   if (!elections || elections.length === 0) {
+     throw new Error("No elections found");
+   }
 
-    const allResults = {};
+   const allResults = {};
 
-    for (const allElection of allElections) {
-      const results = await ElectionData.find({
-       election: allElection
-      }).lean();
-      if (!results || results.length === 0) {
-        console.log(`No results found for election ${allElection}`);
-        allResults[allElection] = [];
-        continue;
-      }
+   for (const election of elections) {
+     const results = await ElectionData.find({
+       election: election._id,
+     }).lean();
+     if (!results || results.length === 0) {
+       console.log(`No results found for election ${election._id}`);
+       allResults[election._id] = [];
+       continue;
+     }
 
-      const aggregatedResults = aggregateResults(results);
-      allResults[allElection] = aggregatedResults;
-    }
+     const aggregatedResults = aggregateResults(results);
+     allResults[election._id] = aggregatedResults;
+   }
 
-    return allResults;
-  } catch (error) {
-    console.error(`Error fetching all election results: ${error.message}`);
-    throw new Error(`Error fetching all election results: ${error.message}`);
-  }
+   return allResults;
+ } catch (error) {
+   console.error(`Error fetching all election results: ${error.message}`);
+   throw new Error(`Error fetching all election results: ${error.message}`);
+ }
 };
 // Service to get election results by id
 
@@ -534,7 +535,6 @@ export const updateIncidentReportDataService = async (
 //   return Object.entries(votes).map(([party, count]) => ({ party, count }));
 // };
 
-// Helper function to aggregate results
 const aggregateResults = (results) => {
   const aggregated = {};
 
@@ -548,8 +548,8 @@ const aggregateResults = (results) => {
       otherPartiesVotes,
       voterIntimidation,
       voteBuying,
-      rating,
-      resultSheets,
+      voteRating,
+      resultPictures,
       resultVideos,
     } = result;
 
@@ -584,7 +584,7 @@ const aggregateResults = (results) => {
         goodRating: 0,
         okayRating: 0,
         badRating: 0,
-        resultSheets: 0,
+        resultPictures: 0,
         resultVideos: 0,
       };
     }
@@ -595,21 +595,25 @@ const aggregateResults = (results) => {
       ];
 
     // Count parties votes
-    for (const { party, count } of partiesVotes) {
-      if (!pollingUnitData.partiesVotes[party]) {
-        pollingUnitData.partiesVotes[party] = 0;
+    if (partiesVotes) {
+      for (const { party, count } of partiesVotes) {
+        if (!pollingUnitData.partiesVotes[party]) {
+          pollingUnitData.partiesVotes[party] = 0;
+        }
+        pollingUnitData.partiesVotes[party] += count;
+        pollingUnitData.totalVotes += count;
       }
-      pollingUnitData.partiesVotes[party] += count;
-      pollingUnitData.totalVotes += count;
     }
 
     // Count other parties votes
-    for (const { party, count } of otherPartiesVotes) {
-      if (!pollingUnitData.otherPartiesVotes[party]) {
-        pollingUnitData.otherPartiesVotes[party] = 0;
+    if (otherPartiesVotes) {
+      for (const { party, count } of otherPartiesVotes) {
+        if (!pollingUnitData.otherPartiesVotes[party]) {
+          pollingUnitData.otherPartiesVotes[party] = 0;
+        }
+        pollingUnitData.otherPartiesVotes[party] += count;
+        pollingUnitData.totalVotes += count;
       }
-      pollingUnitData.otherPartiesVotes[party] += count;
-      pollingUnitData.totalVotes += count;
     }
 
     // Count boolean fields
@@ -621,17 +625,17 @@ const aggregateResults = (results) => {
     }
 
     // Count rating fields
-    if (rating === "good") {
+    if (voteRating === "good") {
       pollingUnitData.goodRating++;
-    } else if (rating === "okay") {
+    } else if (voteRating === "okay") {
       pollingUnitData.okayRating++;
-    } else if (rating === "bad") {
+    } else if (voteRating === "bad") {
       pollingUnitData.badRating++;
     }
 
-    // Count result sheets and videos
-    pollingUnitData.resultSheets += resultSheets.length;
-    pollingUnitData.resultVideos += resultVideos.length;
+    // Count result pictures and videos
+    pollingUnitData.resultPictures += (resultPictures || []).length;
+    pollingUnitData.resultVideos += (resultVideos || []).length;
 
     aggregated[state].totalVotes += pollingUnitData.totalVotes;
     aggregated[state].localGovernments[lga].totalVotes +=
@@ -643,7 +647,6 @@ const aggregateResults = (results) => {
   return formatAggregatedResults(aggregated);
 };
 
-// Helper function to format aggregated results
 const formatAggregatedResults = (aggregated) => {
   const formattedResults = [];
 
@@ -681,7 +684,7 @@ const formatAggregatedResults = (aggregated) => {
             goodRating,
             okayRating,
             badRating,
-            resultSheets,
+            resultPictures,
             resultVideos,
           } =
             aggregated[state].localGovernments[lga].wards[ward].pollingUnits[
@@ -698,7 +701,7 @@ const formatAggregatedResults = (aggregated) => {
             goodRating,
             okayRating,
             badRating,
-            resultSheets,
+            resultPictures,
             resultVideos,
           };
 
@@ -717,7 +720,6 @@ const formatAggregatedResults = (aggregated) => {
   return formattedResults;
 };
 
-// Helper function to format vote counts
 const formatVoteCounts = (votes) => {
   return Object.entries(votes).map(([party, count]) => ({ party, count }));
 };

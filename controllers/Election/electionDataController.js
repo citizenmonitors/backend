@@ -118,17 +118,15 @@ export const updateResultData = async (req, res) => {
 
 
 export const getAllElectionResultsController = async (req, res) => {
-  try {
-    const results = await getAllElectionResults();
-    res.status(200).json(results);
-  } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Error fetching all election results",
-        error: error.message,
-      });
-  }
+   try {
+     const allResults = await getAllElectionResults();
+     res.status(200).json(allResults);
+   } catch (error) {
+     res.status(500).json({
+       message: "Error fetching all election results",
+       error: error.message,
+     });
+   }
 };
 
 

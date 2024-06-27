@@ -11,7 +11,33 @@ const incidentReportSchema = new mongoose.Schema({
     ref: "CompletedUser",
     required: true,
   },
-  selectIncident: { type: String },
+  state: {
+    type: String,
+    required: true,
+  },
+  lga: {
+    type: String,
+    required: true,
+  },
+  ward: {
+    type: String,
+    required: true,
+  },
+  pollingUnit: {
+    type: String,
+    required: true,
+  },
+  selectIncident: {
+    type: String,
+    enum: [
+      "Thuggery and Violence",
+      "Lack of electoral materials",
+      "Fraudulent electoral officers",
+      "Late commencement",
+      "Over voting",
+      "Other",
+    ],
+  },
   incidentNote: { type: String },
   incidentPictures: [{ type: String }],
   incidentVideos: [{ type: String }],

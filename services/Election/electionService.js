@@ -1,89 +1,202 @@
 import Election from "../../models/Election/Election.js";
 import ElectionData from "../../models/Election/ElectionData.js";
-import PoliticalParty from "../../models/Election/PoliticalParty.js";
 import CompletedUser from "../../models/CompletedUser.js";
+import { politicalParties } from "../../models/Election/PoliticalParty.js";
+import IncidentReport from "../../models/Election/IncidentReport.js";
 
-export const createElection = async (type, year, startDate, endDate) => {
-  const existingElection = await Election.findOne({ type, year });
-  if (existingElection) {
-    throw new Error("Election already exists for this type and year");
+
+export const createElectionService = async (data) => {
+  const { electionType, startDate, endDate } = data;
+
+    const existingElection = await Election.findOne({
+      electionType,
+      startDate,
+      endDate,
+    });
+    if (existingElection) {
+    const error = new Error("Election already exists for this type and date range");
+      error.statusCode = 400;
+      throw error;
+    }
+  const election = new Election({ electionType, startDate, endDate });
+  return await election.save();
+};
+
+export const updateElectionService = async (electionId, data) => {
+
+  const election = await Election.findByIdAndUpdate(electionId, data, {
+    new: true,
+  });
+  if (!election) {
+    const error = new Error("Election not found");
+    error.statusCode = 404;
+    throw error;
   }
-
-  const election = new Election({ type, year, startDate, endDate });
-  await election.save();
   return election;
 };
 
-export const addPoliticalParty = async (politicalPartyName) => {
-    const newPartyName = politicalPartyName.toLowerCase();
-  const existingParty = await PoliticalParty.findOne({ partyName: newPartyName });
-  if (existingParty) {
-    throw new Error("Political party already exists");
-  }
+export const getAllElectionsService = async () => {
+  const elections = await Election.find().select("-results -incidentReports");
+  return elections;
 
-  const newParty = new PoliticalParty({ partyName: newPartyName });
-  await newParty.save();
-  return newParty;
 };
 
+export const getElectionResultById = async (electionId, userId) => {
+  const election = await Election.findById(electionId).lean();
+  if (!election) {
+    throw new Error("Election not found");
+  }
+  const result = await ElectionData.findOne({
+    election: electionId,
+    user: userId,
+  }).lean();
+  const incidentReport = await IncidentReport.findOne({
+    election: electionId,
+    user: userId,
+  }).lean();
 
-// export const uploadElectionDataService = async (req) => {
-//   const { year, type } = req.params;
-//   const {
-//     partiesVotes,
-//     otherPartiesVotes,
-//     voterIntimidation,
-//     voteBuying,
-//     rating,
-//   } = req.body;
-//   const userId = req.user._id;
+  const { results, incidentReports, ...electionData } = election;
 
-//   const election = await Election.findOne({ year, type });
-//   if (!election) {
-//     throw new Error("Election not found");
-//   }
+  if (result || incidentReport) {
+    return { election: electionData, result, incidentReport };
+  }
+};
 
-//   const user = await CompletedUser.findById(userId);
-//   if (!user) {
-//     throw new Error("User not found");
-//   }
+export const getElectionById = async (electionId) => {
+  const election = await Election.findById(electionId).lean();
+  if (!election) {
+    throw new Error("Election not found");
+  }
+  const { results, incidentReports, ...electionData } = election;
+  return { election: electionData, politicalParties };
+};
 
-//   const electionData = new ElectionData({
-//     election: election._id,
-//     user: userId,
-//     state: user.state,
-//     lga: user.lga,
-//     ward: user.ward,
-//     pollingUnit: user.pollingUnit,
-//     partiesVotes: JSON.parse(partiesVotes),
-//     otherPartiesVotes: JSON.parse(otherPartiesVotes),
-//     voterIntimidation,
-//     voteBuying,
-//     resultSheets: req.files?.resultSheets?.[0]?.path,
-//     resultVideos: req.files?.resultVideos?.[0]?.path,
-//     rating,
-//   });
+export const uploadResultDataService = async (electionId, userId, data, files) => {
+  try {
+    const {
+      partiesVotes,
+      otherPartiesVotes,
+      voterIntimidation,
+      voteBuying,
+      voteRating,
+    } = data;
 
-//   return await electionData.save();
-// };
+    // Check if the election exists
+    const election = await Election.findById(electionId);
+    if (!election) {
+      throw new Error("Election not found");
+    }
+
+    const user = await CompletedUser.findById(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Check if the user has already uploaded result data for this election
+    const existingResult = await ElectionData.findOne({
+      election: electionId,
+      user: userId,
+    });
+
+    if (existingResult) {
+      return existingResult;
+    }
+
+    // Create new result data
+    const electionData = new ElectionData({
+      election: electionId,
+      user: userId,
+      state: user.state,
+      lga: user.lga,
+      ward: user.ward,
+      pollingUnit: user.pollingUnit,
+      partiesVotes: JSON.parse(partiesVotes),
+      otherPartiesVotes: JSON.parse(otherPartiesVotes),
+      voterIntimidation,
+      voteBuying,
+      resultPictures: files?.resultPictures?.[0]?.path,
+      resultVideos: files?.resultVideos?.[0]?.path,
+      voteRating,
+    });
+
+    return await electionData.save();
+  } catch (error) {
+    throw new Error(`Error saving election data: ${error.message}`);
+  }
+  
+};
+
+export const updateResultDataService = async (electionId, userId, data, files) => {
+    try {
+
+      const {
+        partiesVotes,
+        otherPartiesVotes,
+        voterIntimidation,
+        voteBuying,
+        voteRating,
+      } = data;
+
+      // Check if the election exists
+      const electionExists = await Election.findById(electionId);
+      if (!electionExists) {
+        throw new Error("Election not found");
+      }
+      // console.log("Election found:", electionExists);
+
+      // Check if the user exists
+      const userExists = await CompletedUser.findById(userId);
+      if (!userExists) {
+        throw new Error("User not found or unauthorized");
+      }
+      // console.log("User found:", userExists);
+
+      // Find the result data
+      const result = await ElectionData.findOne({
+        election: electionId,
+        user: userId,
+      });
+
+      if (!result) {
+        throw new Error("Result data not found or unauthorized");
+      }
+      // console.log("Result data found:", result);
+
+result.partiesVotes = partiesVotes
+  ? JSON.parse(partiesVotes)
+  : result.partiesVotes;
+result.otherPartiesVotes = otherPartiesVotes
+  ? JSON.parse(otherPartiesVotes)
+  : result.otherPartiesVotes;
+result.voterIntimidation =
+  voterIntimidation !== undefined
+    ? voterIntimidation
+    : result.voterIntimidation;
+result.voteBuying = voteBuying !== undefined ? voteBuying : result.voteBuying;
+result.voteRating = voteRating !== undefined ? voteRating : result.voteRating;
+
+      // Handle file updates
+      if (files && files.resultPictures) {
+        result.resultPictures = files.resultPictures.map((file) => file.path);
+      }
+      if (files && files.resultVideos) {
+        result.resultVideos = files.resultVideos.map((file) => file.path);
+      }
+
+      // Save the updated result
+      const updatedResult = await result.save();
+      // console.log("Result updated successfully:", updatedResult);
+
+      return updatedResult;
+    } catch (error) {
+      console.error(`Error: ${error.message}`);
+      throw new Error(`Failed to update result data: ${error.message}`);
+    }
+};
 
 export const getUserElectionData = async (userId) => {
   return await ElectionData.find({ user: userId }).populate("election");
 };
-
-// export const updateUserElectionData = async (dataId, userId, data) => {
-//   const electionData = await ElectionData.findOne({
-//     _id: dataId,
-//     user: userId,
-//   });
-//   if (!electionData) {
-//     throw new Error("Election data not found or unauthorized");
-//   }
-
-//   Object.assign(electionData, data);
-//   await electionData.save();
-//   return electionData;
-// };
 
 export const deleteUserElectionData = async (dataId, userId) => {
   const electionData = await ElectionData.findOne({
@@ -98,29 +211,131 @@ export const deleteUserElectionData = async (dataId, userId) => {
   return electionData;
 };
 
-// export const getAllElectionResults = async () => {
-//   try {
-//     const elections = await Election.find();
-//     if (!elections || elections.length === 0) {
-//       throw new Error("No elections found");
-//     }
+export const getAllElectionResults = async () => {
+  try {
+    const elections = await Election.find().lean();
+    if (!elections || elections.length === 0) {
+      throw new Error("No elections found");
+    }
 
-//     const allResults = {};
+    const allResults = {};
 
-//     for (const election of elections) {
-//       const results = await ElectionData.find({
-//         election: election._id,
-//       }).lean();
-//       const aggregatedResults = aggregateResults(results);
-//       allResults[`${election.type}-${election.year}`] = aggregatedResults;
-//     }
+    for (const election of elections) {
+      const results = await ElectionData.find({ election: election }).lean();
+      if (!results || results.length === 0) {
+        console.log(`No results found for election ${election}`);
+        allResults[election] = [];
+        continue;
+      }
 
-//     return allResults;
-//   } catch (error) {
-//     throw new Error(`Error fetching all election results: ${error.message}`);
-//   }
-// };
+      const aggregatedResults = aggregateResults(results);
+      allResults[election] = aggregatedResults;
+    }
 
+    return allResults;
+  } catch (error) {
+    console.error(`Error fetching all election results: ${error.message}`);
+    throw new Error(`Error fetching all election results: ${error.message}`);
+  }
+};
+// Service to get election results by id
+
+export const uploadIncidentReportDataService = async (
+  electionId,
+  userId,
+  data,
+  files
+) => {
+  try{
+    const { selectIncident, incidentNote } = data;
+
+    const election = await Election.findById(electionId);
+    if (!election) {
+      throw new Error("Election not found");
+    }
+
+    const user = await CompletedUser.findById(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Check if the user has already uploaded incident data for this election
+    const existingReport = await IncidentReport.findOne({
+      election: electionId,
+      user: userId,
+    });
+
+      if (existingReport) {
+        return existingReport;
+      }
+
+    const incidentReport = new IncidentReport({
+      election: electionId,
+      user: userId,
+      selectIncident,
+      incidentNote,
+      incidentPictures: files?.incidentPictures?.[0]?.path,
+      incidentVideos: files?.incidentVideos?.[0]?.path,
+    });
+
+    const savedReport = await incidentReport.save();
+    election.incidentReports.push(savedReport._id);
+    await election.save();
+
+    return savedReport;
+  }catch(error){
+   throw new Error(`Error saving election incident: ${error.message}`);
+}
+};
+
+export const updateIncidentReportDataService = async (
+  electionId,
+  userId,
+  data,
+  files
+) => {
+  try {
+    const {
+      selectIncident,
+      incidentNote,
+    } = data;
+
+    // Check if the election exists
+    const electionExists = await Election.findById(electionId);
+    if (!electionExists) {
+      throw new Error("Election not found");
+    }
+
+    // Check if the incident report exists and belongs to the user
+    const report = await IncidentReport.findOne({
+      election: electionId,
+      user: userId,
+    });
+
+    if (!report) {
+      throw new Error("Incident report not found or unauthorized");
+    }
+
+    // Update report data
+    report.selectIncident = selectIncident !== undefined ? selectIncident : report.selectIncident;
+    report.incidentNote = incidentNote !== undefined ? incidentNote : report.incidentNote;
+
+    // Handle file updates
+    if (files && files.incidentPictures) {
+      report.incidentPictures = files.incidentPictures.map((file) => file.path);
+    }
+    if (files && files.incidentVideos) {
+      report.incidentVideos = files.incidentVideos.map((file) => file.path);
+    }
+
+    // Save the updated report
+    return await report.save();
+  } catch (error) {
+    throw new Error(`Failed to update incident report data: ${error.message}`);
+  }
+};
+
+// Helper function to aggregate results
 // const aggregateResults = (results) => {
 //   const aggregated = {};
 
@@ -229,6 +444,7 @@ export const deleteUserElectionData = async (dataId, userId) => {
 //   return formatAggregatedResults(aggregated);
 // };
 
+// // Helper function to format aggregated results
 // const formatAggregatedResults = (aggregated) => {
 //   const formattedResults = [];
 
@@ -302,170 +518,11 @@ export const deleteUserElectionData = async (dataId, userId) => {
 //   return formattedResults;
 // };
 
+// // Helper function to format vote counts
 // const formatVoteCounts = (votes) => {
 //   return Object.entries(votes).map(([party, count]) => ({ party, count }));
 // };
 
-// export const getElectionResultsByTypeAndYear = async (type, year) => {
-//   try {
-//     const election = await Election.findOne({ type, year });
-//     if (!election) {
-//       throw new Error("Election not found");
-//     }
-
-//     const results = await ElectionData.find({ election: election._id }).lean();
-//     const aggregatedResults = aggregateResults(results);
-
-//     return {
-//       election: {
-//         type: election.type,
-//         year: election.year,
-//         startDate: election.startDate,
-//         endDate: election.endDate,
-//       },
-//       results: aggregatedResults,
-//     };
-//   } catch (error) {
-//     throw new Error(`Error fetching election results: ${error.message}`);
-//   }
-// };
-
-// export const getPoliticalParties = async () => {
-//   return await PoliticalParty.find();
-// };
-
-
-// Service to get all political parties
-export const getPoliticalParties = async () => {
-  const parties = await PoliticalParty.find();
-  return parties;
-};
-
-// Service to upload election data
-export const uploadElectionDataService = async (req) => {
-  const { year, type } = req.params;
-  const {
-    partiesVotes,
-    otherPartiesVotes,
-    voterIntimidation,
-    voteBuying,
-    rating,
-  } = req.body;
-  const userId = req.user._id;
-
-  const election = await Election.findOne({ year, type });
-  if (!election) {
-    throw new Error("Election not found");
-  }
-
-  const user = await CompletedUser.findById(userId);
-  if (!user) {
-    throw new Error("User not found");
-  }
-
-  const electionData = new ElectionData({
-    election: election._id,
-    user: userId,
-    state: user.state,
-    lga: user.lga,
-    ward: user.ward,
-    pollingUnit: user.pollingUnit,
-    partiesVotes: JSON.parse(partiesVotes),
-    otherPartiesVotes: JSON.parse(otherPartiesVotes),
-    voterIntimidation,
-    voteBuying,
-    resultSheets: req.files?.resultSheets?.[0]?.path,
-    resultVideos: req.files?.resultVideos?.[0]?.path,
-    rating,
-  });
-
-  return await electionData.save();
-};
-
-// Service to update user's election data
-export const updateUserElectionData = async (dataId, userId, data) => {
-   const {
-     partiesVotes,
-     otherPartiesVotes,
-     voterIntimidation,
-     voteBuying,
-     rating,
-     resultSheets,
-     resultVideos,
-   } = data;
-
-    const electionData = await ElectionData.findOne({
-    _id: dataId,
-    user: userId,
-  });
-  if (!electionData) {
-    throw new Error("Election data not found or unauthorized");
-  }
-
-  electionData.partiesVotes = partiesVotes || electionData.partiesVotes;
-  electionData.otherPartiesVotes =
-    otherPartiesVotes || electionData.otherPartiesVotes;
-  electionData.voterIntimidation =
-    voterIntimidation || electionData.voterIntimidation;
-  electionData.voteBuying = voteBuying || electionData.voteBuying;
-  electionData.rating = rating || electionData.rating;
-  electionData.resultSheets = resultSheets || electionData.resultSheets;
-  electionData.resultVideos = resultVideos || electionData.resultVideos;
-
-  // Save the updated election data
-  await electionData.save();
-
-  return electionData.toObject();
-};
-
-// Service to get all election results
-export const getAllElectionResults = async () => {
-  try {
-    const elections = await Election.find();
-    if (!elections || elections.length === 0) {
-      throw new Error("No elections found");
-    }
-
-    const allResults = {};
-
-    for (const election of elections) {
-      const results = await ElectionData.find({
-        election: election._id,
-      }).lean();
-      const aggregatedResults = aggregateResults(results);
-      allResults[`${election.type}-${election.year}`] = aggregatedResults;
-    }
-
-    return allResults;
-  } catch (error) {
-    throw new Error(`Error fetching all election results: ${error.message}`);
-  }
-};
-
-// Service to get election results by type and year
-export const getElectionResultsByTypeAndYear = async (type, year) => {
-  try {
-    const election = await Election.findOne({ type, year });
-    if (!election) {
-      throw new Error("Election not found");
-    }
-
-    const results = await ElectionData.find({ election: election._id }).lean();
-    const aggregatedResults = aggregateResults(results);
-
-    return {
-      election: {
-        type: election.type,
-        year: election.year,
-        startDate: election.startDate,
-        endDate: election.endDate,
-      },
-      results: aggregatedResults,
-    };
-  } catch (error) {
-    throw new Error(`Error fetching election results: ${error.message}`);
-  }
-};
 
 // Helper function to aggregate results
 const aggregateResults = (results) => {
@@ -654,3 +711,5 @@ const formatAggregatedResults = (aggregated) => {
 const formatVoteCounts = (votes) => {
   return Object.entries(votes).map(([party, count]) => ({ party, count }));
 };
+
+

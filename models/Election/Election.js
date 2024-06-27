@@ -2,11 +2,7 @@ import mongoose from "mongoose";
 
 const ElectionSchema = new mongoose.Schema(
   {
-    year: {
-      type: String,
-      required: true,
-    },
-    type: {
+    electionType: {
       type: String,
       enum: [
         "presidential",
@@ -18,13 +14,17 @@ const ElectionSchema = new mongoose.Schema(
       required: true,
     },
     startDate: {
-      type: String, 
+      type: String,
       required: true,
     },
     endDate: {
-      type: String, 
+      type: String,
       required: true,
     },
+    results: [{ type: mongoose.Schema.Types.ObjectId, ref: "ElectionData" }],
+    incidentReports: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "IncidentReport" },
+    ],
   },
   {
     timestamps: true,

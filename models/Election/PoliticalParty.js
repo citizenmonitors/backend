@@ -1,11 +1,40 @@
-import mongoose from "mongoose";
 
-const PoliticalPartySchema = new mongoose.Schema({
-  partyName: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-});
+const politicalParties = [
+  "Accord (A)",
+  "Action Alliance (AA)",
+  "African Action Congress (AAC)",
+  "Action Democratic Party (ADP)",
+  "Action Peoples Party (APP)",
+  "All Progressives Congress (APC)",
+  "All Progressives Grand Alliance (APGA)",
+  "Allied Peoples Movement (APM)",
+  "Better Nigeria Progressive Party (BNPP)",
+  "Democratic Alternative (DA)",
+  "Democratic Peoples Congress (DPC)",
+  "Democratic Peoples Party (DPP)",
+  "Green Party of Nigeria (GPN)",
+  "Hope Democratic Party (HDP)",
+  "Labour Party (LP)",
+  "Liberal Democratic Party (LDP)",
+  "Mega Party of Nigeria (MPN)",
+  "National Conscience Party (NCP)",
+  "National Democratic Liberty Party (NDLP)",
+  "National Interest Party (NIP)",
+  "New Democratic Party (NDP)",
+  "Nigeria Democratic Congress Party (NDCP)",
+  "Nigeria Elements Progressive Party (NEPP)",
+  "Nigeria Peoples Congress (NPC)",
+  "People's Democratic Party (PDP)",
+  "Peoples Party of Nigeria (PPN)",
+  "Progressive Peoples Alliance (PPA)",
+  "Peoples Progressive Party (PPP)",
+  "Social Democratic Party (SDP)",
+  "United Democratic Party (UDP)",
+  "United Progressive Party (UPP)",
+  "Young Democratic Party (YDP)",
+  "Young Progressive Party (YPP)",
+  "Zenith Labour Party (ZLP)",
+];
 
-export default mongoose.model("PoliticalParty", PoliticalPartySchema);
+export { politicalParties };
+

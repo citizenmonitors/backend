@@ -28,7 +28,7 @@ const ElectionDataSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    resultSheets: [
+    resultPictures: [
       {
         type: String,
         required: true,
@@ -52,20 +52,17 @@ const ElectionDataSchema = new mongoose.Schema(
         count: Number,
       },
     ],
-    rating: {
+    voteRating: {
       type: String,
       enum: ["good", "okay", "bad"],
-      required: true,
     },
     voterIntimidation: {
       type: String,
       enum: ["yes", "no"],
-      required: true,
     },
     voteBuying: {
       type: String,
       enum: ["yes", "no"],
-      required: true,
     },
   },
   {

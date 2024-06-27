@@ -1,45 +1,61 @@
 import express from "express";
 import {
-  uploadElectionData,
   getUserElectionDataController,
-  updateUserElectionDataController,
   deleteUserElectionDataController,
-  createElectionController,
+  createElection,
+  updateElection,
   getAllElectionResultsController,
-  addPoliticalPartyController,
-  getPoliticalPartiesController,
-  getElectionResultsByTypeAndYearController,
+  getElectionResultByIdCont,
+  getElectionByIdCont,
+  updateResultData,
+  uploadIncidentReportData,
+  uploadResultData,
+  getAllElections,
+  updateIncidentReportData,
 } from "../../controllers/Election/electionDataController.js";
 import authMiddleware from "../../middleware/authMiddleware.js";
 import upload from "../../config/electionMulter.js";
+import uploadIncident from "../../config/incidentMulter.js";
 
 const router = express.Router();
 
 
-router.post("/create-election", authMiddleware, createElectionController);
-router.post("/add-political-party",
-  authMiddleware,
-  addPoliticalPartyController
-);
-router.get("/political-parties", authMiddleware, getPoliticalPartiesController);
-router.post(
-  "/election/:year/:type/data",
-  authMiddleware,
-  upload.fields([
-    { name: "resultSheets", maxCount: 5 },
-    { name: "resultVideos", maxCount: 2 },
-  ]),
-  uploadElectionData
-);
+router.get("/", authMiddleware, getAllElections);
 router.get(
-  "/election-results",
+  "/elections/results",
   authMiddleware,
   getAllElectionResultsController
 );
 router.get(
-  "/election/:type/:year/results",
+  "/election/:electionId/result",
   authMiddleware,
-  getElectionResultsByTypeAndYearController
+  getElectionResultByIdCont
+);
+router.get(
+  "/election/:electionId",
+  authMiddleware,
+  getElectionByIdCont
+);
+router.post("/election", authMiddleware, createElection);
+router.put("/election/:electionId", authMiddleware, updateElection);
+
+router.post(
+  "/election/:electionId/results",
+  authMiddleware,
+  upload.fields([
+    { name: "resultPictures", maxCount: 5 },
+    { name: "resultVideos", maxCount: 2 },
+  ]),
+  uploadResultData
+);
+router.put(
+  "/election/:electionId/results",
+  authMiddleware,
+  upload.fields([
+    { name: "resultPictures", maxCount: 5 },
+    { name: "resultVideos", maxCount: 2 },
+  ]),
+  updateResultData
 );
 
 router.get(
@@ -48,9 +64,22 @@ router.get(
   getUserElectionDataController
 );
 router.put(
-  "/user-election-data/:dataId",
+  "/election/:electionId/report",
   authMiddleware,
-  updateUserElectionDataController
+  uploadIncident.fields([
+    { name: "incidentPictures", maxCount: 5 },
+    { name: "incidentVideos", maxCount: 2 },
+  ]),
+  updateIncidentReportData
+);
+router.post(
+  "/election/:electionId/report",
+  authMiddleware,
+  uploadIncident.fields([
+    { name: "incidentPictures", maxCount: 5 },
+    { name: "incidentVideos", maxCount: 2 },
+  ]),
+  uploadIncidentReportData
 );
 router.delete(
   "/user-election-data/:dataId",

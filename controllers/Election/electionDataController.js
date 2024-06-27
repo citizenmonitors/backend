@@ -1,61 +1,121 @@
 import {
-  uploadElectionDataService,
+  uploadResultDataService,
   getUserElectionData,
-  updateUserElectionData,
+  updateResultDataService,
   deleteUserElectionData,
-  createElection,
-  addPoliticalParty,
-  getPoliticalParties,
+  createElectionService,
   getAllElectionResults,
-  getElectionResultsByTypeAndYear,
+  getElectionResultById,
+  getElectionById,
+  updateElectionService,
+  uploadIncidentReportDataService,
+  updateIncidentReportDataService,
+  getAllElectionsService,
 } from "../../services/Election/electionService.js";
 
-export const createElectionController = async (req, res) => {
+export const createElection = async (req, res) => {
   try {
-    const { type, year, startDate, endDate } = req.body;
-    const election = await createElection(type, year, startDate, endDate);
+    const election = await createElectionService(req.body);
     res.status(201).json(election);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+   if (error.statusCode) {
+     res.status(error.statusCode).json({ message: error.message });
+   } else {
+     res
+       .status(500)
+       .json({ message: "Error creating election", error: error.message });
+   }
   }
 };
 
-export const addPoliticalPartyController = async (req, res) => {
+export const updateElection = async (req, res) => {
   try {
-    const { partyName } = req.body;
-    const party = await addPoliticalParty(partyName);
-    res
-      .status(201)
-      .json({ message: "Political party added successfully", party });
+    const { electionId } = req.params;
+    const updatedElection = await updateElectionService(electionId, req.body);
+    res.status(200).json(updatedElection);
   } catch (error) {
-    if (error.message === "Political party already exists") {
-      res.status(400).json({ message: "Political party already exists" });
-    } else {
-      res.status(500).json({ message: "Error adding political party", error });
-    }
+    res
+      .status(500)
+      .json({ message: "Error updating election", error: error.message });
   }
 };
 
-export const getPoliticalPartiesController = async (req, res) => {
+export const getAllElections = async (req, res) => {
   try {
-    const parties = await getPoliticalParties();
-    res.status(200).json(parties);
+    const elections = await getAllElectionsService();
+    res.status(200).json({ elections });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching elections", error });
+  }
+};
+
+export const getElectionResultByIdCont = async (req, res) => {
+  try {
+    const { electionId } = req.params;
+    const userId = req.user._id;
+    const result = await getElectionResultById(electionId, userId);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching election", error });
+  }
+};
+
+export const getElectionByIdCont = async (req, res) => {
+  try {
+    const { electionId } = req.params;
+    const election = await getElectionById(electionId);
+    res.status(200).json(election);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching election details", error });
+  }
+};
+
+export const uploadResultData = async (req, res) => {
+  try {
+    const { electionId } = req.params;
+    const userId = req.user._id;
+    const resultData = await uploadResultDataService(
+      electionId,
+      userId,
+      req.body,
+      req.files
+    );
+    res.status(201).json(resultData);
   } catch (error) {
     res
       .status(500)
-      .json({ message: "Error fetching political parties", error });
+      .json({ message: "Error uploading result data", error: error.message });
   }
 };
-export const uploadElectionData = async (req, res) => {
-  try {
-    const result = await uploadElectionDataService(req);
-    res.status(201).json(result);
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error uploading election data", error: error.message });
-  }
+
+export const updateResultData = async (req, res) => {
+ try {
+   const { electionId } = req.params;
+   const userId = req.user._id;
+   const data = req.body;
+   const files = req.files;
+
+
+   if (!electionId) {
+     console.error("electionId is undefined");
+     return res.status(400).json({ message: "Invalid electionId" });
+   }
+
+   const updatedResult = await updateResultDataService(
+     electionId,
+     userId,
+     data,
+     files
+   );
+   res.status(200).json(updatedResult);
+ } catch (error) {
+   console.error(error);
+   res
+     .status(500)
+     .json({ message: "Error updating result data", error: error.message });
+ }
 };
+
 
 export const getAllElectionResultsController = async (req, res) => {
   try {
@@ -70,16 +130,42 @@ export const getAllElectionResultsController = async (req, res) => {
       });
   }
 };
-export const getElectionResultsByTypeAndYearController = async (req, res) => {
+
+
+export const uploadIncidentReportData = async (req, res) => {
   try {
-    const { type, year } = req.params;
-    const data = await getElectionResultsByTypeAndYear(type, year);
-    res.status(200).json(data);
+    const { electionId } = req.params;
+    const report = await uploadIncidentReportDataService(
+      electionId,
+      req.user._id,
+      req.body,
+      req.files
+    );
+    res.status(201).json(report);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error uploading incident report data", error });
+  }
+};
+export const updateIncidentReportData = async (req, res) => {
+  try {
+    const { electionId } = req.params;
+    const userId = req.user._id;
+
+    const report = await updateIncidentReportDataService(
+      electionId,
+      userId,
+      req.body,
+      req.files
+    );
+
+    res.status(200).json(report);
   } catch (error) {
     res
       .status(500)
       .json({
-        message: "Error fetching election results",
+        message: "Error updating incident report data",
         error: error.message,
       });
   }
@@ -92,23 +178,6 @@ export const getUserElectionDataController = async (req, res) => {
     res.status(200).json(electionData);
   } catch (error) {
     res.status(500).json({ message: "Error fetching election data", error });
-  }
-};
-
-export const updateUserElectionDataController = async (req, res) => {
-  try {
-    const { dataId } = req.params;
-    const userId = req.user._id;
-    const data = req.body;
-
-    const updatedElectionData = await updateUserElectionData(
-      dataId,
-      userId,
-      data
-    );
-    res.status(200).json({ message: "Election data updated successfully", updatedElectionData});
-  } catch (error) {
-  res.status(500).json({ message: "Error updating election data", error: error.message });
   }
 };
 

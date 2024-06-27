@@ -22,7 +22,7 @@ const router = express.Router();
 
 router.get("/", authMiddleware, getAllElections);
 router.get(
-  "/elections/results",
+  "/results",
   authMiddleware,
   getAllElectionResultsController
 );

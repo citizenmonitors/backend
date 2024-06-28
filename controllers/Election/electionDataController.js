@@ -2,7 +2,7 @@ import {
   uploadResultDataService,
   getUserElectionData,
   updateResultDataService,
-  deleteUserElectionData,
+  deleteElectionResultDataService,
   createElectionService,
   getAllElectionResults,
   getElectionResultById,
@@ -11,6 +11,7 @@ import {
   uploadIncidentReportDataService,
   updateIncidentReportDataService,
   getAllElectionsService,
+  deleteIncidentReportDataService,
 } from "../../services/Election/electionService.js";
 
 export const createElection = async (req, res) => {
@@ -181,14 +182,29 @@ export const getUserElectionDataController = async (req, res) => {
   }
 };
 
-export const deleteUserElectionDataController = async (req, res) => {
+export const deleteElectionResultData = async (req, res) => {
   try {
-    const { dataId } = req.params;
-    const userId = req.user._id;
-    await deleteUserElectionData(dataId, userId);
-    res.status(200).json({ message: "Election data updated successfully"});
+    const { electionId } = req.params;
+    const response = await deleteElectionResultDataService(electionId);
+    res.status(200).json(response);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res
+      .status(400)
+      .json({ message: "Error deleting result data", error: error.message });
   }
 };
 
+export const deleteIncidentReportData = async (req, res) => {
+  try {
+    const { electionId } = req.params;
+    const response = await deleteIncidentReportDataService(electionId);
+    res.status(200).json(response);
+  } catch (error) {
+    res
+      .status(400)
+      .json({
+        message: "Error deleting incident report data",
+        error: error.message,
+      });
+  }
+};

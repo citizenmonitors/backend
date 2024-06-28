@@ -21,7 +21,13 @@ export const createElectionService = async (data) => {
   }
   const election = new Election({ electionType, startDate, endDate });
   
-  return await election.save();
+ const savedElection = await election.save();
+
+ // Remove the fields from the saved election object
+ const { results, incidentReports, politicalParties, ...electionData } =
+   savedElection.toObject();
+
+ return electionData;
 };
 
 export const updateElectionService = async (electionId, data) => {
@@ -37,7 +43,9 @@ export const updateElectionService = async (electionId, data) => {
 };
 
 export const getAllElectionsService = async () => {
-  const elections = await Election.find().select("-results -incidentReports");
+  const elections = await Election.find().select(
+    "-results -incidentReports -politicalParties"
+  );
   return elections;
 };
 
@@ -55,20 +63,59 @@ export const getElectionResultById = async (electionId, userId) => {
     user: userId,
   }).lean();
 
-  const { results, incidentReports, ...electionData } = election;
-
   if (result || incidentReport) {
-    return { election: electionData, result, incidentReport };
+    return { election, result, incidentReport };
   }
 };
 
-export const getElectionById = async (electionId) => {
-  const election = await Election.findById(electionId).lean();
-  if (!election) {
-    throw new Error("Election not found");
+export const getElectionById = async (electionId, userId) => {
+  try {
+    // Fetch the election data by ID
+    const election = await Election.findById(electionId).lean();
+    if (!election) {
+      throw new Error("Election not found");
+    }
+
+    // Fetch the election result data for the specific user and election
+    const result = await ElectionData.findOne({
+      election: electionId,
+      user: userId,
+    }).lean();
+
+    // Fetch the incident report data for the specific user and election
+    const incidentReport = await IncidentReport.findOne({
+      election: electionId,
+      user: userId,
+    }).lean();
+
+    // Fetch detailed data for all results
+    const detailedResults = await ElectionData.find({
+      _id: { $in: election.results },
+    }).lean();
+
+    // Fetch detailed data for all incident reports
+    const detailedIncidentReports = await IncidentReport.find({
+      _id: { $in: election.incidentReports },
+    }).lean();
+
+    // Create the election data object including political parties, results, and incident reports
+    const electionData = {
+      ...election,
+      politicalParties: politicalParties.map((party) => ({
+        name: party.name,
+        code: party.code,
+      })),
+      results: detailedResults, // Include detailed data for all results
+      incidentReports: detailedIncidentReports, // Include detailed data for all incident reports
+    };
+
+    // Remove the resultsCount field from the election data object
+    delete electionData.resultsCount;
+
+    return { election: electionData };
+  } catch (error) {
+    throw new Error(`Error fetching election data: ${error.message}`);
   }
-  const { results, incidentReports, ...electionData } = election;
-  return { election: electionData, politicalParties };
 };
 
 export const uploadResultDataService = async (
@@ -80,7 +127,6 @@ export const uploadResultDataService = async (
   try {
     const {
       partiesVotes,
-      otherPartiesVotes,
       voterIntimidation,
       voteBuying,
       voteRating,
@@ -107,6 +153,13 @@ export const uploadResultDataService = async (
       return existingResult;
     }
 
+    const formatFileDetails = (file) => ({
+      location: file.path,
+      name: file.originalname,
+      type: file.mimetype,
+      size: file.size,
+    });
+
     // Create new result data
     const electionData = new ElectionData({
       election: electionId,
@@ -116,15 +169,25 @@ export const uploadResultDataService = async (
       ward: user.ward,
       pollingUnit: user.pollingUnit,
       partiesVotes: JSON.parse(partiesVotes),
-      otherPartiesVotes: JSON.parse(otherPartiesVotes),
       voterIntimidation,
       voteBuying,
-      resultPictures: files?.resultPictures?.[0]?.path,
-      resultVideos: files?.resultVideos?.[0]?.path,
+      resultPictures: files.resultPictures
+        ? files.resultPictures.map(formatFileDetails)
+        : [],
+      resultVideos:
+        files.resultVideos && files.resultVideos.length
+          ? formatFileDetails(files.resultVideos[0])
+          : null,
       voteRating,
     });
 
-    return await electionData.save();
+    const savedResultData = await electionData.save();
+    election.results.push(savedResultData);
+    election.resultsCount += 1;
+   await election.save();
+
+   return savedResultData;
+
   } catch (error) {
     throw new Error(`Error saving election data: ${error.message}`);
   }
@@ -137,27 +200,19 @@ export const updateResultDataService = async (
   files
 ) => {
   try {
-    const {
-      partiesVotes,
-      otherPartiesVotes,
-      voterIntimidation,
-      voteBuying,
-      voteRating,
-    } = data;
+    const { partiesVotes, voterIntimidation, voteBuying, voteRating } = data;
 
     // Check if the election exists
     const electionExists = await Election.findById(electionId);
     if (!electionExists) {
       throw new Error("Election not found");
     }
-    // console.log("Election found:", electionExists);
 
     // Check if the user exists
     const userExists = await CompletedUser.findById(userId);
     if (!userExists) {
       throw new Error("User not found or unauthorized");
     }
-    // console.log("User found:", userExists);
 
     // Find the result data
     const result = await ElectionData.findOne({
@@ -168,14 +223,19 @@ export const updateResultDataService = async (
     if (!result) {
       throw new Error("Result data not found or unauthorized");
     }
-    // console.log("Result data found:", result);
 
+    // Helper function to format file details
+    const formatFileDetails = (file) => ({
+      location: file.path,
+      name: file.originalname,
+      type: file.mimetype,
+      size: file.size,
+    });
+
+    // Update result data
     result.partiesVotes = partiesVotes
       ? JSON.parse(partiesVotes)
       : result.partiesVotes;
-    result.otherPartiesVotes = otherPartiesVotes
-      ? JSON.parse(otherPartiesVotes)
-      : result.otherPartiesVotes;
     result.voterIntimidation =
       voterIntimidation !== undefined
         ? voterIntimidation
@@ -186,17 +246,15 @@ export const updateResultDataService = async (
       voteRating !== undefined ? voteRating : result.voteRating;
 
     // Handle file updates
-    if (files && files.resultPictures) {
-      result.resultPictures = files.resultPictures.map((file) => file.path);
+    if (files.resultPictures && files.resultPictures.length) {
+      result.resultPictures = files.resultPictures.map(formatFileDetails);
     }
-    if (files && files.resultVideos) {
-      result.resultVideos = files.resultVideos.map((file) => file.path);
+    if (files.resultVideos && files.resultVideos.length) {
+      result.resultVideos = formatFileDetails(files.resultVideos[0]);
     }
 
     // Save the updated result
     const updatedResult = await result.save();
-    // console.log("Result updated successfully:", updatedResult);
-
     return updatedResult;
   } catch (error) {
     console.error(`Error: ${error.message}`);
@@ -204,21 +262,31 @@ export const updateResultDataService = async (
   }
 };
 
-export const getUserElectionData = async (userId) => {
-  return await ElectionData.find({ user: userId }).populate("election");
+export const deleteElectionResultDataService = async (electionId) => {
+  try {
+    // Find and delete the result data
+    const result = await ElectionData.findOneAndDelete({
+      election: electionId,
+    });
+
+    if (!result) {
+      throw new Error("Result data not found or unauthorized");
+    }
+
+    // Update the election to remove the reference to the deleted result
+    await Election.findByIdAndUpdate(electionId, {
+      $pull: { results: result._id },
+      $inc: { resultsCount: -1 },
+    });
+
+    return { message: "Result data deleted successfully" };
+  } catch (error) {
+    throw new Error(`Failed to delete result data: ${error.message}`);
+  }
 };
 
-export const deleteUserElectionData = async (dataId, userId) => {
-  const electionData = await ElectionData.findOne({
-    _id: dataId,
-    user: userId,
-  });
-  if (!electionData) {
-    throw new Error("Election data not found or unauthorized");
-  }
-
-  await electionData.deleteOne();
-  return electionData;
+export const getUserElectionData = async (userId) => {
+  return await ElectionData.find({ user: userId }).populate("election");
 };
 
 export const getAllElectionResults = async () => {
@@ -258,11 +326,13 @@ export const getAllElectionResults = async () => {
           electionType: election.electionType,
           startDate: election.startDate,
           endDate: election.endDate,
+          resultsCount: election.resultsCount,
         },
         results: aggregatedResults,
         incidents: aggregateIncidents(incidents) || [],
       };
     }
+
 
     return allResults;
   } catch (error) {
@@ -279,7 +349,7 @@ export const uploadIncidentReportDataService = async (
   files
 ) => {
   try {
-    const { selectIncident, incidentNote } = data;
+    const { selectIncident, incidentNote, electionRating } = data;
 
     const election = await Election.findById(electionId);
     if (!election) {
@@ -292,6 +362,7 @@ export const uploadIncidentReportDataService = async (
     }
 
     // Check if the user has already uploaded incident data for this election
+
     const existingReport = await IncidentReport.findOne({
       election: electionId,
       user: userId,
@@ -302,6 +373,14 @@ export const uploadIncidentReportDataService = async (
       return existingReport;
     }
 
+      const formatFileDetails = (file) => ({
+        location: file.path,
+        name: file.originalname,
+        type: file.mimetype,
+        size: file.size,
+      });
+
+
     const incidentReport = new IncidentReport({
       election: electionId,
       user: userId,
@@ -311,12 +390,18 @@ export const uploadIncidentReportDataService = async (
       pollingUnit: user.pollingUnit,
       selectIncident,
       incidentNote,
-      incidentPictures: files?.incidentPictures?.map((file) => file.path) || [],
-      incidentVideos: files?.incidentVideos?.map((file) => file.path) || [],
+      electionRating,
+      incidentPictures: files.incidentPictures
+        ? files.incidentPictures.map(formatFileDetails)
+        : [],
+      incidentVideos:
+        files.incidentVideos && files.incidentVideos.length
+          ? formatFileDetails(files.incidentVideos[0])
+          : null,
     });
 
     const savedReport = await incidentReport.save();
-    election.incidentReports.push(savedReport._id);
+    election.incidentReports.push(savedReport);
     await election.save();
 
     return savedReport;
@@ -333,7 +418,7 @@ export const updateIncidentReportDataService = async (
   files
 ) => {
   try {
-    const { selectIncident, incidentNote } = data;
+    const { selectIncident, incidentNote, electionRating } = data;
 
     // Check if the election exists
     const electionExists = await Election.findById(electionId);
@@ -351,19 +436,30 @@ export const updateIncidentReportDataService = async (
       throw new Error("Incident report not found or unauthorized");
     }
 
+    // Helper function to format file details
+    const formatFileDetails = (file) => ({
+      location: file.path,
+      name: file.originalname,
+      type: file.mimetype,
+      size: file.size,
+    });
+
     // Update report data
     report.selectIncident =
       selectIncident !== undefined ? selectIncident : report.selectIncident;
     report.incidentNote =
       incidentNote !== undefined ? incidentNote : report.incidentNote;
+    report.electionRating =
+      electionRating !== undefined ? electionRating : report.electionRating;
 
     // Handle file updates
-    if (files && files.incidentPictures) {
-      report.incidentPictures = files.incidentPictures.map((file) => file.path);
-    }
-    if (files && files.incidentVideos) {
-      report.incidentVideos = files.incidentVideos.map((file) => file.path);
-    }
+    report.incidentPictures = files.incidentPictures
+      ? files.incidentPictures.map(formatFileDetails)
+      : report.incidentPictures;
+    report.incidentVideos =
+      files.incidentVideos && files.incidentVideos.length
+        ? formatFileDetails(files.incidentVideos[0])
+        : report.incidentVideos;
 
     // Save the updated report
     return await report.save();
@@ -372,196 +468,27 @@ export const updateIncidentReportDataService = async (
   }
 };
 
+export const deleteIncidentReportDataService = async (electionId) => {
+  try {
+    // Find and delete the incident report
+    const incidentReport = await IncidentReport.findOneAndDelete({
+      election: electionId,
+    });
 
-// const aggregateResults = (results) => {
-//   const aggregated = {};
+    if (!incidentReport) {
+      throw new Error("Incident report not found or unauthorized");
+    }
 
-//   results.forEach((result) => {
-//     const {
-//       state,
-//       lga,
-//       ward,
-//       pollingUnit,
-//       partiesVotes,
-//       otherPartiesVotes,
-//       voterIntimidation,
-//       voteBuying,
-//       voteRating,
-//       resultPictures,
-//       resultVideos,
-//     } = result;
+    // Update the election to remove the reference to the deleted incident report
+    await Election.findByIdAndUpdate(electionId, {
+      $pull: { incidentReports: incidentReport._id },
+    });
 
-//     if (!aggregated[state]) {
-//       aggregated[state] = { totalVotes: 0, localGovernments: {} };
-//     }
-
-//     if (!aggregated[state].localGovernments[lga]) {
-//       aggregated[state].localGovernments[lga] = { totalVotes: 0, wards: {} };
-//     }
-
-//     if (!aggregated[state].localGovernments[lga].wards[ward]) {
-//       aggregated[state].localGovernments[lga].wards[ward] = {
-//         totalVotes: 0,
-//         pollingUnits: {},
-//       };
-//     }
-
-//     if (
-//       !aggregated[state].localGovernments[lga].wards[ward].pollingUnits[
-//         pollingUnit
-//       ]
-//     ) {
-//       aggregated[state].localGovernments[lga].wards[ward].pollingUnits[
-//         pollingUnit
-//       ] = {
-//         totalVotes: 0,
-//         partiesVotes: {},
-//         otherPartiesVotes: {},
-//         voterIntimidation: 0,
-//         voteBuying: 0,
-//         goodRating: 0,
-//         okayRating: 0,
-//         badRating: 0,
-//         resultPictures: 0,
-//         resultVideos: 0,
-//       };
-//     }
-
-//     const pollingUnitData =
-//       aggregated[state].localGovernments[lga].wards[ward].pollingUnits[
-//         pollingUnit
-//       ];
-
-//     // Count parties votes
-//     if (partiesVotes) {
-//       for (const { party, count } of partiesVotes) {
-//         if (!pollingUnitData.partiesVotes[party]) {
-//           pollingUnitData.partiesVotes[party] = 0;
-//         }
-//         pollingUnitData.partiesVotes[party] += count;
-//         pollingUnitData.totalVotes += count;
-//       }
-//     }
-
-//     // Count other parties votes
-//     if (otherPartiesVotes) {
-//       for (const { party, count } of otherPartiesVotes) {
-//         if (!pollingUnitData.otherPartiesVotes[party]) {
-//           pollingUnitData.otherPartiesVotes[party] = 0;
-//         }
-//         pollingUnitData.otherPartiesVotes[party] += count;
-//         pollingUnitData.totalVotes += count;
-//       }
-//     }
-
-//     // Count boolean fields
-//     if (voterIntimidation === "yes") {
-//       pollingUnitData.voterIntimidation++;
-//     }
-//     if (voteBuying === "yes") {
-//       pollingUnitData.voteBuying++;
-//     }
-
-//     // Count rating fields
-//     if (voteRating === "good") {
-//       pollingUnitData.goodRating++;
-//     } else if (voteRating === "okay") {
-//       pollingUnitData.okayRating++;
-//     } else if (voteRating === "bad") {
-//       pollingUnitData.badRating++;
-//     }
-
-//     // Count result pictures and videos
-//     pollingUnitData.resultPictures += (resultPictures || []).length;
-//     pollingUnitData.resultVideos += (resultVideos || []).length;
-
-//     aggregated[state].totalVotes += pollingUnitData.totalVotes;
-//     aggregated[state].localGovernments[lga].totalVotes +=
-//       pollingUnitData.totalVotes;
-//     aggregated[state].localGovernments[lga].wards[ward].totalVotes +=
-//       pollingUnitData.totalVotes;
-//   });
-
-//   return formatAggregatedResults(aggregated);
-// };
-
-// const formatAggregatedResults = (aggregated) => {
-//   const formattedResults = [];
-
-//   for (const state in aggregated) {
-//     const stateData = {
-//       state,
-//       totalVotes: aggregated[state].totalVotes,
-//       localGovernments: [],
-//     };
-
-//     for (const lga in aggregated[state].localGovernments) {
-//       const lgaData = {
-//         localGovernment: lga,
-//         totalVotes: aggregated[state].localGovernments[lga].totalVotes,
-//         wards: [],
-//       };
-
-//       for (const ward in aggregated[state].localGovernments[lga].wards) {
-//         const wardData = {
-//           ward,
-//           totalVotes:
-//             aggregated[state].localGovernments[lga].wards[ward].totalVotes,
-//           pollingUnits: [],
-//         };
-
-//         for (const pollingUnit in aggregated[state].localGovernments[lga].wards[
-//           ward
-//         ].pollingUnits) {
-//           const {
-//             totalVotes,
-//             partiesVotes,
-//             otherPartiesVotes,
-//             voterIntimidation,
-//             voteBuying,
-//             goodRating,
-//             okayRating,
-//             badRating,
-//             resultPictures,
-//             resultVideos,
-//           } =
-//             aggregated[state].localGovernments[lga].wards[ward].pollingUnits[
-//               pollingUnit
-//             ];
-
-//           const pollingUnitData = {
-//             pollingUnit,
-//             totalVotes,
-//             partiesVotes: formatVoteCounts(partiesVotes),
-//             otherPartiesVotes: formatVoteCounts(otherPartiesVotes),
-//             voterIntimidation,
-//             voteBuying,
-//             goodRating,
-//             okayRating,
-//             badRating,
-//             resultPictures,
-//             resultVideos,
-//           };
-
-//           wardData.pollingUnits.push(pollingUnitData);
-//         }
-
-//         lgaData.wards.push(wardData);
-//       }
-
-//       stateData.localGovernments.push(lgaData);
-//     }
-
-//     formattedResults.push(stateData);
-//   }
-
-//   return formattedResults;
-// };
-
-// const formatVoteCounts = (votes) => {
-//   return Object.entries(votes).map(([party, count]) => ({ party, count }));
-// };
-
+    return { message: "Incident report deleted successfully" };
+  } catch (error) {
+    throw new Error(`Failed to delete incident report data: ${error.message}`);
+  }
+};
 
 const aggregateResults = (results) => {
   const aggregated = {};

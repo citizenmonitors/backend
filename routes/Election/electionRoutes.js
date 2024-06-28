@@ -1,7 +1,7 @@
 import express from "express";
 import {
   getUserElectionDataController,
-  deleteUserElectionDataController,
+  deleteElectionResultData,
   createElection,
   updateElection,
   getAllElectionResultsController,
@@ -12,6 +12,7 @@ import {
   uploadResultData,
   getAllElections,
   updateIncidentReportData,
+  deleteIncidentReportData,
 } from "../../controllers/Election/electionDataController.js";
 import authMiddleware from "../../middleware/authMiddleware.js";
 import upload from "../../config/electionMulter.js";
@@ -58,6 +59,12 @@ router.put(
   updateResultData
 );
 
+router.delete(
+  "/election/:electionId/results",
+  authMiddleware,
+  deleteElectionResultData
+);
+
 router.get(
   "/user-election-data",
   authMiddleware,
@@ -81,10 +88,12 @@ router.post(
   ]),
   uploadIncidentReportData
 );
+
 router.delete(
-  "/user-election-data/:dataId",
+  "/election/:electionId/results",
   authMiddleware,
-  deleteUserElectionDataController
+  deleteIncidentReportData
 );
+
 
 export default router;

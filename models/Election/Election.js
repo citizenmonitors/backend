@@ -25,6 +25,16 @@ const ElectionSchema = new mongoose.Schema(
     incidentReports: [
       { type: mongoose.Schema.Types.ObjectId, ref: "IncidentReport" },
     ],
+    resultsCount: {
+      type: Number,
+      default: 0,
+    },
+    politicalParties: [
+      {
+        name: { type: String, },
+        code: { type: String, },
+      },
+    ],
   },
   {
     timestamps: true,

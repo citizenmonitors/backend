@@ -1,5 +1,12 @@
 import mongoose from "mongoose";
 
+const fileSchema = new mongoose.Schema({
+  location: String,
+  name: String,
+  type: String,
+  size: Number,
+});
+
 const incidentReportSchema = new mongoose.Schema({
   election: {
     type: mongoose.Schema.Types.ObjectId,
@@ -39,8 +46,9 @@ const incidentReportSchema = new mongoose.Schema({
     ],
   },
   incidentNote: { type: String },
-  incidentPictures: [{ type: String }],
-  incidentVideos: [{ type: String }],
+  electionRating: { type: String },
+  incidentPictures: [fileSchema],
+  incidentVideos: fileSchema,
 });
 
 export default mongoose.model("IncidentReport", incidentReportSchema);

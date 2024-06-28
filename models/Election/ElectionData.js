@@ -1,5 +1,13 @@
 import mongoose from "mongoose";
 
+
+const fileSchema = new mongoose.Schema({
+  location: String,
+  name: String,
+  type: String,
+  size: Number,
+});
+
 const ElectionDataSchema = new mongoose.Schema(
   {
     election: {
@@ -28,25 +36,10 @@ const ElectionDataSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    resultPictures: [
-      {
-        type: String,
-        required: true,
-      },
-    ],
-    resultVideos: [
-      {
-        type: String,
-        required: true,
-      },
-    ],
+    resultPictures: [fileSchema],
+    resultVideos: fileSchema,
+
     partiesVotes: [
-      {
-        party: String,
-        count: Number,
-      },
-    ],
-    otherPartiesVotes: [
       {
         party: String,
         count: Number,

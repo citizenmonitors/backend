@@ -33,7 +33,7 @@ export const createElectionService = async (data) => {
 export const updateElectionService = async (electionId, data) => {
   const election = await Election.findByIdAndUpdate(electionId, data, {
     new: true,
-  });
+  }).lean();
   if (!election) {
     const error = new Error("Election not found");
     error.statusCode = 404;

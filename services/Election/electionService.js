@@ -39,7 +39,14 @@ export const updateElectionService = async (electionId, data) => {
     error.statusCode = 404;
     throw error;
   }
-  return election;
+  const {
+    politicalParties,
+    resultsCount,
+    incidentReports,
+    results,
+    ...electionData
+  } = election;
+  return electionData;
 };
 
 export const getAllElectionsService = async () => {

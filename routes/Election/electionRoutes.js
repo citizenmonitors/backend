@@ -44,8 +44,8 @@ router.post(
   "/election/:electionId/results",
   authMiddleware,
   upload.fields([
-    { name: "resultPictures", maxCount: 5 },
-    { name: "resultVideos", maxCount: 1 },
+    { name: "resultPictures", maxCount: 9999 },
+    { name: "resultVideos", maxCount: 9999 },
   ]),
   uploadResultData
 );
@@ -53,8 +53,8 @@ router.put(
   "/election/:electionId/results",
   authMiddleware,
   upload.fields([
-    { name: "resultPictures", maxCount: 5 },
-    { name: "resultVideos", maxCount: 1 },
+    { name: "resultPictures", maxCount: 9999 },
+    { name: "resultVideos", maxCount: 9999 },
   ]),
   updateResultData
 );
@@ -74,8 +74,8 @@ router.put(
   "/election/:electionId/report",
   authMiddleware,
   uploadIncident.fields([
-    { name: "incidentPictures", maxCount: 5 },
-    { name: "incidentVideos", maxCount: 1 },
+    { name: "incidentPictures", maxCount: 9999 },
+    { name: "incidentVideos", maxCount: 9999 },
   ]),
   updateIncidentReportData
 );
@@ -83,8 +83,8 @@ router.post(
   "/election/:electionId/report",
   authMiddleware,
   uploadIncident.fields([
-    { name: "incidentPictures", maxCount: 5 },
-    { name: "incidentVideos", maxCount: 1 },
+    { name: "incidentPictures", maxCount: 9999 },
+    { name: "incidentVideos", maxCount: 9999 },
   ]),
   uploadIncidentReportData
 );

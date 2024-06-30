@@ -24,22 +24,25 @@ const storage = multer.diskStorage({
   },
 });
 
+const allowedExtensions = [".png", ".jpg", ".jpeg", ".svg", ".mp4", ".pdf"];
+const allowedMimeTypes = [
+  "image/png",
+  "image/jpeg",
+  "image/svg+xml",
+  "video/mp4",
+  "application/pdf",
+];
+
 const fileFilter = (req, file, cb) => {
   const ext = path.extname(file.originalname).toLowerCase();
-  const allowedExtensions = [
-    "image/png",
-    "image/jpeg",
-    "image/svg+xml",
-    "video/mp4",
-    "application/pdf",
-  ];
-  const allowedMimeTypes = [
-    "image/png",
-    "image/jpeg",
-    "image/svg+xml",
-    "video/mp4",
-    "application/pdf",
-  ];
+  console.log(
+    "Checking file:",
+    file.originalname,
+    "with extension:",
+    ext,
+    "and MIME type:",
+    file.mimetype
+  );
 
   if (
     allowedExtensions.includes(ext) &&
@@ -55,10 +58,31 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const uploadIncident = multer({
+const uploadIncidentReport = multer({
   storage,
   limits: { fileSize: 100 * 1024 * 1024 },
   fileFilter,
-});
+}).fields([
+  { name: "incidentPictures", maxCount: 10 },
+  { name: "incidentVideos", maxCount: 1 },
+]);
 
-export default uploadIncident;
+const uploadMiddleware = (req, res, next) => {
+  uploadIncidentReport(req, res, (err) => {
+    if (err instanceof multer.MulterError) {
+      console.error("Multer error:", err);
+      return res
+        .status(400)
+        .json({ message: "Multer error", error: err.message });
+    } else if (err) {
+      console.error("Unknown error:", err);
+      return res
+        .status(400)
+        .json({ message: "Unknown error", error: err.message });
+    }
+    console.log("Files received:", req.files);
+    next();
+  });
+};
+
+export default uploadMiddleware;

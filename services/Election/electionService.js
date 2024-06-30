@@ -413,6 +413,8 @@ export const uploadIncidentReportDataService = async (
       //     : null,
     });
 
+  
+
     const savedReport = await incidentReport.save();
     election.incidentReports.push(savedReport);
     await election.save();

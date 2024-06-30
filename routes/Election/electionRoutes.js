@@ -73,19 +73,13 @@ router.get(
 router.put(
   "/election/:electionId/report",
   authMiddleware,
-  uploadIncident.fields([
-    { name: "incidentPictures", maxCount: 9999 },
-    { name: "incidentVideos", maxCount: 9999 },
-  ]),
+  uploadIncident,
   updateIncidentReportData
 );
 router.post(
   "/election/:electionId/report",
   authMiddleware,
-  uploadIncident.fields([
-    { name: "incidentPictures", maxCount: 9999 },
-    { name: "incidentVideos", maxCount: 9999 },
-  ]),
+  uploadIncident,
   uploadIncidentReportData
 );
 

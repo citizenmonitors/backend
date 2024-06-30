@@ -132,26 +132,25 @@ export const getAllElectionResultsController = async (req, res) => {
 
 
 export const uploadIncidentReportData = async (req, res) => {
-try {
+  try {
+    console.log("Body received:", req.body);
+    console.log("Files received:", req.files);
 
-  console.log("Files received:", req.files);
-  console.log("Body received:", req.body); 
-
-  const { electionId } = req.params;
-  const report = await uploadIncidentReportDataService(
-    electionId,
-    req.user._id,
-    req.body,
-    req.files
-  );
-  res.status(201).json(report);
-} catch (error) {
-  console.error("Error uploading incident report data", error); 
-  res.status(500).json({
-    message: "Error uploading incident report data",
-    error: error.message, 
-  });
-}
+    const { electionId } = req.params;
+    const report = await uploadIncidentReportDataService(
+      electionId,
+      req.user._id,
+      req.body,
+      req.files
+    );
+    res.status(201).json(report);
+  } catch (error) {
+    console.error("Error uploading incident report data", error);
+    res.status(500).json({
+      message: "Error uploading incident report data",
+      error: error.message,
+    });
+  }
 };
 export const updateIncidentReportData = async (req, res) => {
   try {

@@ -3,6 +3,7 @@ import ElectionData from "../../models/Election/ElectionData.js";
 import CompletedUser from "../../models/CompletedUser.js";
 import { politicalParties } from "../../models/Election/PoliticalParty.js";
 import IncidentReport from "../../models/Election/IncidentReport.js";
+import path from "path";
 
 export const createElectionService = async (data) => {
   const { electionType, startDate, endDate } = data;
@@ -358,72 +359,86 @@ export const uploadIncidentReportDataService = async (
   data,
   files
 ) => {
-  try {
-    const { selectIncident, incidentNote, electionRating } = data;
+ try {
+   const { selectIncident, incidentNote, electionRating } = data;
 
-    const election = await Election.findById(electionId);
-    if (!election) {
-      throw new Error("Election not found");
-    }
+   const election = await Election.findById(electionId);
+   if (!election) {
+     throw new Error("Election not found");
+   }
 
-    const user = await CompletedUser.findById(userId);
-    if (!user) {
-      throw new Error("User not found");
-    }
+   const user = await CompletedUser.findById(userId);
+   if (!user) {
+     throw new Error("User not found");
+   }
 
-    // Check if the user has already uploaded incident data for this election
+   const existingReport = await IncidentReport.findOne({
+     election: electionId,
+     user: userId,
+   });
+   if (existingReport) {
+     return existingReport;
+   }
 
-    const existingReport = await IncidentReport.findOne({
-      election: electionId,
-      user: userId,
-    });
+   const formatFileDetails = (file) => ({
+     location: file.path,
+     name: file.originalname,
+     type: file.mimetype,
+     size: file.size,
+   });
+
+   const validateFiles = (filesArray, allowedExtensions) => {
+     filesArray.forEach((file) => {
+       const ext = path.extname(file.originalname).toLowerCase();
+       if (!allowedExtensions.includes(ext)) {
+         throw new Error(
+           `Only ${allowedExtensions.join(
+             ", "
+           )} are allowed. Please upload a valid file.`
+         );
+       }
+     });
+   };
+
+   // Validate pictures
+   if (files.incidentPictures) {
+     validateFiles(files.incidentPictures, [".jpg", ".jpeg", ".png", "svg"]);
+   }
 
 
-    if (existingReport) {
-      return existingReport;
-    }
+   // Validate video
+   if (files.incidentVideos) {
+     validateFiles(files.incidentVideos, [".mp4"]);
+   }
 
-      const formatFileDetails = (file) => ({
-        location: file.path,
-        name: file.originalname,
-        type: file.mimetype,
-        size: file.size,
-      });
+   const incidentReport = new IncidentReport({
+     election: electionId,
+     user: userId,
+     state: user.state,
+     lga: user.lga,
+     ward: user.ward,
+     pollingUnit: user.pollingUnit,
+     selectIncident,
+     incidentNote,
+     electionRating,
+     incidentPictures: files.incidentPictures
+       ? files.incidentPictures.map(formatFileDetails)
+       : [],
+     incidentVideos:
+       files.incidentVideos && files.incidentVideos.length
+         ? formatFileDetails(files.incidentVideos[0])
+         : null,
+   });
 
+   const savedReport = await incidentReport.save();
+   election.incidentReports.push(savedReport);
+   await election.save();
 
-    const incidentReport = new IncidentReport({
-      election: electionId,
-      user: userId,
-      state: user.state,
-      lga: user.lga,
-      ward: user.ward,
-      pollingUnit: user.pollingUnit,
-      selectIncident,
-      incidentNote,
-      electionRating,
-      incidentPictures: files.incidentPictures
-        ? files.incidentPictures.map(formatFileDetails)
-        : [],
-      incidentVideos: files.incidentVideos
-        ? formatFileDetails(files.incidentVideos[0])
-        : null,
-      // incidentVideos:
-      //   files.incidentVideos && files.incidentVideos.length
-      //     ? formatFileDetails(files.incidentVideos[0])
-      //     : null,
-    });
-
-  
-
-    const savedReport = await incidentReport.save();
-    election.incidentReports.push(savedReport);
-    await election.save();
-
-    return savedReport;
-  } catch (error) {
-    console.error("Error uploading incident report data", error); 
-    throw new Error(`Error saving election incident: ${error.message}`);
-  }
+   return savedReport;
+ } catch (error) {
+   console.error("Error uploading incident report data", error);
+   throw new Error(`Error saving election incident: ${error.message}`);
+ }
 };
 
 export const updateIncidentReportDataService = async (

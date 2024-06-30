@@ -24,13 +24,13 @@ const storage = multer.diskStorage({
   },
 });
 
-const allowedExtensions = [".png", ".jpg", ".jpeg", ".svg", ".mp4", ".pdf"];
+const allowedExtensions = [".png", ".jpg", ".jpeg", ".svg", ".mp4", ];
 const allowedMimeTypes = [
   "image/png",
+  "image/jpg",
   "image/jpeg",
   "image/svg+xml",
   "video/mp4",
-  "application/pdf",
 ];
 
 const fileFilter = (req, file, cb) => {
@@ -52,7 +52,7 @@ const fileFilter = (req, file, cb) => {
   } else {
     cb(
       new Error(
-        "Only images (png, jpg, jpeg, svg), videos (mp4), and PDFs are allowed"
+        "Only images (png, jpg, jpeg, svg), videos (mp4) are allowed"
       )
     );
   }
@@ -63,8 +63,8 @@ const uploadIncidentReport = multer({
   limits: { fileSize: 100 * 1024 * 1024 },
   fileFilter,
 }).fields([
-  { name: "incidentPictures", maxCount: 10 },
-  { name: "incidentVideos", maxCount: 1 },
+  { name: "incidentPictures", maxCount: 99 },
+  { name: "incidentVideos", maxCount: 99 },
 ]);
 
 const uploadMiddleware = (req, res, next) => {

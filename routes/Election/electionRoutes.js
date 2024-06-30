@@ -45,7 +45,7 @@ router.post(
   authMiddleware,
   upload.fields([
     { name: "resultPictures", maxCount: 5 },
-    { name: "resultVideos", maxCount: 2 },
+    { name: "resultVideos", maxCount: 1 },
   ]),
   uploadResultData
 );
@@ -54,7 +54,7 @@ router.put(
   authMiddleware,
   upload.fields([
     { name: "resultPictures", maxCount: 5 },
-    { name: "resultVideos", maxCount: 2 },
+    { name: "resultVideos", maxCount: 1 },
   ]),
   updateResultData
 );
@@ -75,7 +75,7 @@ router.put(
   authMiddleware,
   uploadIncident.fields([
     { name: "incidentPictures", maxCount: 5 },
-    { name: "incidentVideos", maxCount: 2 },
+    { name: "incidentVideos", maxCount: 1 },
   ]),
   updateIncidentReportData
 );
@@ -84,7 +84,7 @@ router.post(
   authMiddleware,
   uploadIncident.fields([
     { name: "incidentPictures", maxCount: 5 },
-    { name: "incidentVideos", maxCount: 2 },
+    { name: "incidentVideos", maxCount: 1 },
   ]),
   uploadIncidentReportData
 );

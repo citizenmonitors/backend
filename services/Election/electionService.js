@@ -125,6 +125,11 @@ export const getElectionById = async (electionId, userId) => {
   }
 };
 
+// {
+//     "message": "Error uploading result data",
+//     "error": "Error saving election data: \"[object Object]\" is not valid JSON"
+// }
+
 export const uploadResultDataService = async (
   electionId,
   userId,
@@ -239,7 +244,6 @@ export const updateResultDataService = async (
       size: file.size,
     });
 
-    // Update result data
     result.partiesVotes = partiesVotes
       ? JSON.parse(partiesVotes)
       : result.partiesVotes;
@@ -252,7 +256,6 @@ export const updateResultDataService = async (
     result.voteRating =
       voteRating !== undefined ? voteRating : result.voteRating;
 
-    // Handle file updates
     if (files.resultPictures && files.resultPictures.length) {
       result.resultPictures = files.resultPictures.map(formatFileDetails);
     }
@@ -260,7 +263,6 @@ export const updateResultDataService = async (
       result.resultVideos = formatFileDetails(files.resultVideos[0]);
     }
 
-    // Save the updated result
     const updatedResult = await result.save();
     return updatedResult;
   } catch (error) {
@@ -347,7 +349,8 @@ export const getAllElectionResults = async () => {
     throw new Error(`Error fetching all election results: ${error.message}`);
   }
 };
-// Service to get election results by id
+
+// {"message":"Unexpected field"}
 
 export const uploadIncidentReportDataService = async (
   electionId,
@@ -401,10 +404,13 @@ export const uploadIncidentReportDataService = async (
       incidentPictures: files.incidentPictures
         ? files.incidentPictures.map(formatFileDetails)
         : [],
-      incidentVideos:
-        files.incidentVideos && files.incidentVideos.length
-          ? formatFileDetails(files.incidentVideos[0])
-          : null,
+      incidentVideos: files.incidentVideos
+        ? formatFileDetails(files.incidentVideos[0])
+        : null,
+      // incidentVideos:
+      //   files.incidentVideos && files.incidentVideos.length
+      //     ? formatFileDetails(files.incidentVideos[0])
+      //     : null,
     });
 
     const savedReport = await incidentReport.save();
@@ -413,7 +419,7 @@ export const uploadIncidentReportDataService = async (
 
     return savedReport;
   } catch (error) {
-    console.error("Error uploading incident report data", error); // Improved logging
+    console.error("Error uploading incident report data", error); 
     throw new Error(`Error saving election incident: ${error.message}`);
   }
 };

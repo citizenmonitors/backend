@@ -71,7 +71,7 @@ router.get(
 );
 
 router.delete(
-  "/election/:electionId/results",
+  "/election/:electionId/report",
   authMiddleware,
   deleteIncidentReportData
 );

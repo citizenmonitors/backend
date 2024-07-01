@@ -396,8 +396,8 @@ export const uploadIncidentReportDataService = async (
         )
       : [];
 
-    const incidentVideos = files.incidentVideos
-      ? validateFile(files.incidentVideos[0], [".mp4"])
+    const incidentVideo = files.incidentVideo
+      ? validateFile(files.incidentVideo[0], [".mp4"])
       : null;
 
    const incidentReport = new IncidentReport({
@@ -411,7 +411,7 @@ export const uploadIncidentReportDataService = async (
      incidentNote,
      electionRating,
      incidentPictures,
-     incidentVideos,
+     incidentVideo,
    });
 
    const savedReport = await incidentReport.save();

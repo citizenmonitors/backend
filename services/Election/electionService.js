@@ -179,7 +179,7 @@ export const uploadResultDataService = async (
       lga: user.lga,
       ward: user.ward,
       pollingUnit: user.pollingUnit,
-      partiesVotes: JSON.parse(partiesVotes),
+      partiesVotes,
       voterIntimidation,
       voteBuying,
       resultPicture,
@@ -240,8 +240,9 @@ export const updateResultDataService = async (
       size: file.size,
     });
 
+
     result.partiesVotes = partiesVotes
-      ? JSON.parse(partiesVotes)
+      ? partiesVotes
       : result.partiesVotes;
     result.voterIntimidation =
       voterIntimidation !== undefined
@@ -252,11 +253,11 @@ export const updateResultDataService = async (
     result.voteRating =
       voteRating !== undefined ? voteRating : result.voteRating;
 
-    if (files.resultPicture && files.resultPicture.length) {
-      result.resultPicture = formatFileDetails(files.resultPicture[0]);
+    if (files?.resultPicture && files.resultPicture.length) {
+      result.resultPicture = formatFileDetails(files.resultPicture);
     }
-    if (files.resultVideo && files.resultVideo.length) {
-      result.resultVideo = formatFileDetails(files.resultVideo[0]);
+    if (files?.resultVideo && files.resultVideo.length) {
+      result.resultVideo = formatFileDetails(files.resultVideo);
     }
 
     const updatedResult = await result.save();
@@ -352,8 +353,10 @@ export const uploadIncidentReportDataService = async (
   data,
   files
 ) => {
+
  try {
    const { selectIncident, incidentNote, electionRating } = data;
+
 
    const election = await Election.findById(electionId);
    if (!election) {
@@ -390,15 +393,12 @@ export const uploadIncidentReportDataService = async (
       };
     };
 
-    const incidentPictures = files.incidentPictures
-      ? files.incidentPictures.map((file) =>
-          validateFile(file, [".jpg", ".jpeg", ".png", ".svg"])
-        )
-      : [];
 
-    const incidentVideo = files.incidentVideo
-      ? validateFile(files.incidentVideo[0], [".mp4"])
-      : null;
+   const incidentVideo = validateFile(files.at(-1), [".mp4"]);
+
+    const incidentPictures = files.slice(0,files.length-1).map((file) =>
+      validateFile(file, [".jpg", ".jpeg", ".png", ".svg"])
+    );
 
    const incidentReport = new IncidentReport({
      election: electionId,
@@ -420,10 +420,12 @@ export const uploadIncidentReportDataService = async (
 
    return savedReport;
  } catch (error) {
+  console.log(error);
    console.error("Error uploading incident report data", error);
    throw new Error(`Error saving election incident: ${error.message}`);
  }
 };
+
 
 export const updateIncidentReportDataService = async (
   electionId,
@@ -493,7 +495,7 @@ export const deleteIncidentReportDataService = async (electionId) => {
       throw new Error("Incident report not found or unauthorized");
     }
 
-    // Update the election to remove the reference to the deleted incident report
+
     await Election.findByIdAndUpdate(electionId, {
       $pull: { incidentReports: incidentReport._id },
     });
@@ -766,6 +768,7 @@ const formatAggregatedIncidents = (aggregated) => {
 
   return formattedIncidents;
 };
+
 
 const formatVoteCounts = (votes) => {
   return Object.entries(votes).map(([party, count]) => ({ party, count }));

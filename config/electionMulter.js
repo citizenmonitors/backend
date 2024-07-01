@@ -140,7 +140,5 @@ export const uploadResultDataFiles = upload.fields([
   { name: "resultVideo", maxCount: 1 },
 ]);
 
-export const uploadIncidentDataFiles = upload.fields([
-  { name: "incidentPictures", maxCount: 99 },
-  { name: "incidentVideo", maxCount: 1 },
-]);
+// export const uploadIncidentVid = upload.any("incidentVideo");
+export const uploadMultiImg = upload.any(["incidentPictures", "incidentVideo"]);

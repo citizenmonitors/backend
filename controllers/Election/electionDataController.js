@@ -73,6 +73,9 @@ export const getElectionByIdCont = async (req, res) => {
 
 export const uploadResultData = async (req, res) => {
   try {
+     console.log("Body received:", req.body);
+     console.log("Files received:", req.files);
+
     const { electionId } = req.params;
     const userId = req.user._id;
     const resultData = await uploadResultDataService(
@@ -83,13 +86,13 @@ export const uploadResultData = async (req, res) => {
     );
     res.status(201).json(resultData);
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       message: "Error uploading result data",
       error: error.message,
     });
   }
 };
-
 
 
 export const updateResultData = async (req, res) => {
@@ -135,10 +138,9 @@ export const getAllElectionResultsController = async (req, res) => {
 
 
 export const uploadIncidentReportData = async (req, res) => {
+  console.log("Body received:", req.body);
+  console.log("Files received:", req.files);
   try {
-    console.log("Body received:", req.body);
-    console.log("Files received:", req.files);
-
     const { electionId } = req.params;
     const report = await uploadIncidentReportDataService(
       electionId,

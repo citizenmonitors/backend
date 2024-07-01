@@ -17,6 +17,7 @@ import {
 import authMiddleware from "../../middleware/authMiddleware.js";
 import {
   uploadResultDataFiles,
+  uploadMultiImg,
 } from "../../config/electionMulter.js";
 import {
   uploadIncidentDataFiles,
@@ -78,11 +79,12 @@ router.delete(
 
 // new routes
 
+
 router.post(
   "/election/:electionId/report",
   authMiddleware,
   (req, res, next) => {
-    uploadIncidentDataFiles(req, res, (err) => {
+    uploadMultiImg(req, res, (err) => {
       if (err) {
         return res.status(400).json({
           message: "Upload incident data Multer error",
@@ -112,6 +114,22 @@ router.post(
     });
   },
   uploadResultData
+);
+router.put(
+  "/election/:electionId/results",
+  authMiddleware,
+  (req, res, next) => {
+    uploadResultDataFiles(req, res, (err) => {
+      if (err) {
+        return res.status(400).json({
+          message: "Update result data  error",
+          error: err.message,
+        });
+      }
+      next();
+    });
+  },
+  updateResultData
 );
 
 

@@ -83,11 +83,14 @@ export const uploadResultData = async (req, res) => {
     );
     res.status(201).json(resultData);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error uploading result data", error: error.message });
+    res.status(500).json({
+      message: "Error uploading result data",
+      error: error.message,
+    });
   }
 };
+
+
 
 export const updateResultData = async (req, res) => {
  try {

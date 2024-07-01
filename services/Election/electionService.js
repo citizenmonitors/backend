@@ -126,11 +126,6 @@ export const getElectionById = async (electionId, userId) => {
   }
 };
 
-// {
-//     "message": "Error uploading result data",
-//     "error": "Error saving election data: \"[object Object]\" is not valid JSON"
-// }
-
 export const uploadResultDataService = async (
   electionId,
   userId,
@@ -138,14 +133,8 @@ export const uploadResultDataService = async (
   files
 ) => {
   try {
-    const {
-      partiesVotes,
-      voterIntimidation,
-      voteBuying,
-      voteRating,
-    } = data;
+    const { partiesVotes, voterIntimidation, voteBuying, voteRating } = data;
 
-    // Check if the election exists
     const election = await Election.findById(electionId);
     if (!election) {
       throw new Error("Election not found");
@@ -156,7 +145,6 @@ export const uploadResultDataService = async (
       throw new Error("User not found");
     }
 
-    // Check if the user has already uploaded result data for this election
     const existingResult = await ElectionData.findOne({
       election: electionId,
       user: userId,
@@ -166,14 +154,24 @@ export const uploadResultDataService = async (
       return existingResult;
     }
 
-    const formatFileDetails = (file) => ({
-      location: file.path,
-      name: file.originalname,
-      type: file.mimetype,
-      size: file.size,
-    });
+    const resultPicture = files.resultPicture
+      ? {
+          location: files.resultPicture[0].path,
+          name: files.resultPicture[0].originalname,
+          type: files.resultPicture[0].mimetype,
+          size: files.resultPicture[0].size,
+        }
+      : null;
 
-    // Create new result data
+    const resultVideo = files.resultVideo
+      ? {
+          location: files.resultVideo[0].path,
+          name: files.resultVideo[0].originalname,
+          type: files.resultVideo[0].mimetype,
+          size: files.resultVideo[0].size,
+        }
+      : null;
+
     const electionData = new ElectionData({
       election: electionId,
       user: userId,
@@ -184,27 +182,24 @@ export const uploadResultDataService = async (
       partiesVotes: JSON.parse(partiesVotes),
       voterIntimidation,
       voteBuying,
-      resultPictures: files.resultPictures
-        ? files.resultPictures.map(formatFileDetails)
-        : [],
-      resultVideos:
-        files.resultVideos && files.resultVideos.length
-          ? formatFileDetails(files.resultVideos[0])
-          : null,
+      resultPicture,
+      resultVideo,
       voteRating,
     });
 
     const savedResultData = await electionData.save();
     election.results.push(savedResultData);
     election.resultsCount += 1;
-   await election.save();
+    await election.save();
 
-   return savedResultData;
-
+    return savedResultData;
   } catch (error) {
     throw new Error(`Error saving election data: ${error.message}`);
   }
 };
+
+
+
 
 export const updateResultDataService = async (
   electionId,
@@ -257,11 +252,11 @@ export const updateResultDataService = async (
     result.voteRating =
       voteRating !== undefined ? voteRating : result.voteRating;
 
-    if (files.resultPictures && files.resultPictures.length) {
-      result.resultPictures = files.resultPictures.map(formatFileDetails);
+    if (files.resultPicture && files.resultPicture.length) {
+      result.resultPicture = formatFileDetails(files.resultPicture[0]);
     }
-    if (files.resultVideos && files.resultVideos.length) {
-      result.resultVideos = formatFileDetails(files.resultVideos[0]);
+    if (files.resultVideo && files.resultVideo.length) {
+      result.resultVideo = formatFileDetails(files.resultVideo[0]);
     }
 
     const updatedResult = await result.save();
@@ -351,8 +346,6 @@ export const getAllElectionResults = async () => {
   }
 };
 
-// {"message":"Unexpected field"}
-
 export const uploadIncidentReportDataService = async (
   electionId,
   userId,
@@ -372,44 +365,40 @@ export const uploadIncidentReportDataService = async (
      throw new Error("User not found");
    }
 
-   const existingReport = await IncidentReport.findOne({
-     election: electionId,
-     user: userId,
-   });
-   if (existingReport) {
-     return existingReport;
-   }
+  //  const existingReport = await IncidentReport.findOne({
+  //    election: electionId,
+  //    user: userId,
+  //  });
+  //  if (existingReport) {
+  //    return existingReport;
+  //  }
 
-   const formatFileDetails = (file) => ({
-     location: file.path,
-     name: file.originalname,
-     type: file.mimetype,
-     size: file.size,
-   });
+    const validateFile = (file, allowedExtensions) => {
+      const ext = path.extname(file.originalname).toLowerCase();
+      if (!allowedExtensions.includes(ext)) {
+        throw new Error(
+          `Invalid file type. Please upload one of the following: ${allowedExtensions.join(
+            ", "
+          )}`
+        );
+      }
+      return {
+        location: file.path,
+        name: file.originalname,
+        type: file.mimetype,
+        size: file.size,
+      };
+    };
 
-   const validateFiles = (filesArray, allowedExtensions) => {
-     filesArray.forEach((file) => {
-       const ext = path.extname(file.originalname).toLowerCase();
-       if (!allowedExtensions.includes(ext)) {
-         throw new Error(
-           `Only ${allowedExtensions.join(
-             ", "
-           )} are allowed. Please upload a valid file.`
-         );
-       }
-     });
-   };
+    const incidentPictures = files.incidentPictures
+      ? files.incidentPictures.map((file) =>
+          validateFile(file, [".jpg", ".jpeg", ".png", ".svg"])
+        )
+      : [];
 
-   // Validate pictures
-   if (files.incidentPictures) {
-     validateFiles(files.incidentPictures, [".jpg", ".jpeg", ".png", "svg"]);
-   }
-
-
-   // Validate video
-   if (files.incidentVideos) {
-     validateFiles(files.incidentVideos, [".mp4"]);
-   }
+    const incidentVideos = files.incidentVideos
+      ? validateFile(files.incidentVideos[0], [".mp4"])
+      : null;
 
    const incidentReport = new IncidentReport({
      election: electionId,
@@ -421,13 +410,8 @@ export const uploadIncidentReportDataService = async (
      selectIncident,
      incidentNote,
      electionRating,
-     incidentPictures: files.incidentPictures
-       ? files.incidentPictures.map(formatFileDetails)
-       : [],
-     incidentVideos:
-       files.incidentVideos && files.incidentVideos.length
-         ? formatFileDetails(files.incidentVideos[0])
-         : null,
+     incidentPictures,
+     incidentVideos,
    });
 
    const savedReport = await incidentReport.save();

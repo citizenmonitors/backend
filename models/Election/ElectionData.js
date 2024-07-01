@@ -36,8 +36,8 @@ const ElectionDataSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    resultPictures: [fileSchema],
-    resultVideos: fileSchema,
+    resultPicture: fileSchema,
+    resultVideo: fileSchema,
 
     partiesVotes: [
       {

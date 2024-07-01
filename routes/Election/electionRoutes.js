@@ -15,10 +15,26 @@ import {
   deleteIncidentReportData,
 } from "../../controllers/Election/electionDataController.js";
 import authMiddleware from "../../middleware/authMiddleware.js";
-import upload from "../../config/electionMulter.js";
-import uploadIncident from "../../config/incidentMulter.js";
+import {
+  uploadResultDataFiles,
+} from "../../config/electionMulter.js";
+import {
+  uploadIncidentDataFiles,
+} from "../../config/incidentMulter.js";
 
 const router = express.Router();
+
+// Middleware to log fields
+const logFields = (req, res, next) => {
+  console.log('Body:', req.body);
+  console.log('Files:', req.files);
+  req.files.forEach((file) => {
+    console.log(
+      `File fieldname: ${file.fieldname}, originalname: ${file.originalname}`
+    );
+  });
+  next();
+};
 
 
 router.get("/", authMiddleware, getAllElections);
@@ -40,24 +56,7 @@ router.get(
 router.post("/election", authMiddleware, createElection);
 router.put("/election/:electionId", authMiddleware, updateElection);
 
-router.post(
-  "/election/:electionId/results",
-  authMiddleware,
-  upload.fields([
-    { name: "resultPictures", maxCount: 9999 },
-    { name: "resultVideos", maxCount: 9999 },
-  ]),
-  uploadResultData
-);
-router.put(
-  "/election/:electionId/results",
-  authMiddleware,
-  upload.fields([
-    { name: "resultPictures", maxCount: 9999 },
-    { name: "resultVideos", maxCount: 9999 },
-  ]),
-  updateResultData
-);
+
 
 router.delete(
   "/election/:electionId/results",
@@ -70,18 +69,6 @@ router.get(
   authMiddleware,
   getUserElectionDataController
 );
-router.put(
-  "/election/:electionId/report",
-  authMiddleware,
-  uploadIncident,
-  updateIncidentReportData
-);
-router.post(
-  "/election/:electionId/report",
-  authMiddleware,
-  uploadIncident,
-  uploadIncidentReportData
-);
 
 router.delete(
   "/election/:electionId/results",
@@ -89,5 +76,79 @@ router.delete(
   deleteIncidentReportData
 );
 
+// new routes
+
+router.post(
+  "/election/:electionId/report",
+  authMiddleware,
+  (req, res, next) => {
+    uploadIncidentDataFiles(req, res, (err) => {
+      if (err) {
+        return res.status(400).json({
+          message: "Upload incident data Multer error",
+          error: err.message,
+        });
+      }
+      next();
+    });
+  },
+  uploadIncidentReportData
+);
+
+
+// Upload result data (single picture)
+router.post(
+  "/election/:electionId/results",
+  authMiddleware,
+  (req, res, next) => {
+    uploadResultDataFiles(req, res, (err) => {
+      if (err) {
+        return res.status(400).json({
+          message: "Upload result data Multer error",
+          error: err.message,
+        });
+      }
+      next();
+    });
+  },
+  uploadResultData
+);
+
+
+
+// former routew
+
+// router.post(
+//   "/election/:electionId/results",
+//   authMiddleware,
+//   upload.fields([
+//     { name: "resultPictures", maxCount: 9999 },
+//     { name: "resultVideos", maxCount: 9999 },
+//   ]),
+//   uploadResultData
+// );
+// router.put(
+//   "/election/:electionId/results",
+//   authMiddleware,
+//   upload.fields([
+//     { name: "resultPictures", maxCount: 9999 },
+//     { name: "resultVideos", maxCount: 9999 },
+//   ]),
+//   updateResultData
+// );
+
+
+// router.put(
+//   "/election/:electionId/report",
+//   authMiddleware,
+//   uploadIncident,
+//   updateIncidentReportData
+// );
+// router.post(
+//   "/election/:electionId/report",
+//   authMiddleware,
+//   uploadIncident,
+//   uploadIncidentReportData
+// );
 
 export default router;

@@ -69,7 +69,6 @@
 //   fileFilter,
 // }).single("resultVideo");
 
-
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -141,4 +140,9 @@ export const uploadResultDataFiles = upload.fields([
 ]);
 
 // export const uploadIncidentVid = upload.any("incidentVideo");
-export const uploadMultiImg = upload.any(["incidentPictures", "incidentVideo"]);
+// export const uploadMultiImg = upload.any(["incidentPictures", "incidentVideo"]);
+
+export const uploadReportDataFiles = upload.fields([
+  { name: "incidentPictures[]", maxCount: 5 },
+  { name: "incidentVideo", maxCount: 1 },
+]);

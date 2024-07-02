@@ -96,27 +96,19 @@ export const uploadResultData = async (req, res) => {
 
 
 export const updateResultData = async (req, res) => {
+   console.log("Body received:", req.body);
+   console.log("Files received:", req.files);
  try {
    const { electionId } = req.params;
    const userId = req.user._id;
-   const data = req.body;
-   const files = req.files;
-
-
-   if (!electionId) {
-     console.error("electionId is undefined");
-     return res.status(400).json({ message: "Invalid electionId" });
-   }
-
-   const updatedResult = await updateResultDataService(
+   const updatedResultData = await updateResultDataService(
      electionId,
      userId,
-     data,
-     files
+     req.body,
+     req.files
    );
-   res.status(200).json(updatedResult);
+   res.status(200).json(updatedResultData);
  } catch (error) {
-   console.error(error);
    res
      .status(500)
      .json({ message: "Error updating result data", error: error.message });
@@ -158,6 +150,8 @@ export const uploadIncidentReportData = async (req, res) => {
   }
 };
 export const updateIncidentReportData = async (req, res) => {
+    console.log("Body received:", req.body);
+    console.log("Files received:", req.files);
   try {
     const { electionId } = req.params;
     const userId = req.user._id;

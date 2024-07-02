@@ -1,11 +1,6 @@
 import mongoose from "mongoose";
+import {fileSchema} from "../file.js";
 
-const fileSchema = new mongoose.Schema({
-  location: String,
-  name: String,
-  type: String,
-  size: Number,
-});
 
 const incidentReportSchema = new mongoose.Schema({
   election: {

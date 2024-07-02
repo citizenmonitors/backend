@@ -17,18 +17,16 @@ import {
 import authMiddleware from "../../middleware/authMiddleware.js";
 import {
   uploadResultDataFiles,
-  uploadMultiImg,
+  uploadReportDataFiles,
 } from "../../config/electionMulter.js";
-import {
-  uploadIncidentDataFiles,
-} from "../../config/incidentMulter.js";
+import { uploadIncidentDataFiles } from "../../config/incidentMulter.js";
 
 const router = express.Router();
 
 // Middleware to log fields
 const logFields = (req, res, next) => {
-  console.log('Body:', req.body);
-  console.log('Files:', req.files);
+  console.log("Body:", req.body);
+  console.log("Files:", req.files);
   req.files.forEach((file) => {
     console.log(
       `File fieldname: ${file.fieldname}, originalname: ${file.originalname}`
@@ -37,27 +35,16 @@ const logFields = (req, res, next) => {
   next();
 };
 
-
 router.get("/", authMiddleware, getAllElections);
-router.get(
-  "/results",
-  authMiddleware,
-  getAllElectionResultsController
-);
+router.get("/results", authMiddleware, getAllElectionResultsController);
 router.get(
   "/election/:electionId/result",
   authMiddleware,
   getElectionResultByIdCont
 );
-router.get(
-  "/election/:electionId",
-  authMiddleware,
-  getElectionByIdCont
-);
+router.get("/election/:electionId", authMiddleware, getElectionByIdCont);
 router.post("/election", authMiddleware, createElection);
 router.put("/election/:electionId", authMiddleware, updateElection);
-
-
 
 router.delete(
   "/election/:electionId/results",
@@ -79,12 +66,11 @@ router.delete(
 
 // new routes
 
-
 router.post(
   "/election/:electionId/report",
   authMiddleware,
   (req, res, next) => {
-    uploadMultiImg(req, res, (err) => {
+    uploadReportDataFiles(req, res, (err) => {
       if (err) {
         return res.status(400).json({
           message: "Upload incident data Multer error",
@@ -96,7 +82,22 @@ router.post(
   },
   uploadIncidentReportData
 );
-
+router.put(
+  "/election/:electionId/report",
+  authMiddleware,
+  (req, res, next) => {
+    uploadReportDataFiles(req, res, (err) => {
+      if (err) {
+        return res.status(400).json({
+          message: "Update incident data Multer error",
+          error: err.message,
+        });
+      }
+      next();
+    });
+  },
+  updateIncidentReportData
+);
 
 // Upload result data (single picture)
 router.post(
@@ -132,8 +133,6 @@ router.put(
   updateResultData
 );
 
-
-
 // former routew
 
 // router.post(
@@ -154,7 +153,6 @@ router.put(
 //   ]),
 //   updateResultData
 // );
-
 
 // router.put(
 //   "/election/:electionId/report",

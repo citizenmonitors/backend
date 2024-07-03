@@ -64,7 +64,8 @@ export const getElectionResultByIdCont = async (req, res) => {
 export const getElectionByIdCont = async (req, res) => {
   try {
     const { electionId } = req.params;
-    const election = await getElectionById(electionId);
+    const userId = req.user._id;
+    const election = await getElectionById(electionId, userId);
     res.status(200).json(election);
   } catch (error) {
     res.status(500).json({ message: "Error fetching election details", error });

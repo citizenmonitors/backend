@@ -84,6 +84,7 @@ export const getElectionById = async (electionId, userId) => {
     if (!election) {
       throw new Error("Election not found");
     }
+    console.log("election and user", electionId, userId);
 
     // Fetch the election result data for the specific user and election
     const result = await ElectionData.findOne({
@@ -91,21 +92,24 @@ export const getElectionById = async (electionId, userId) => {
       user: userId,
     }).lean();
 
+
     // Fetch the incident report data for the specific user and election
     const incidentReport = await IncidentReport.findOne({
       election: electionId,
       user: userId,
     }).lean();
 
-    // Fetch detailed data for all results
-    const detailedResults = await ElectionData.find({
-      _id: { $in: election.results },
-    }).lean();
+    
 
-    // Fetch detailed data for all incident reports
-    const detailedIncidentReports = await IncidentReport.find({
-      _id: { $in: election.incidentReports },
-    }).lean();
+    // Fetch detailed data for all results
+    // const detailedResults = await ElectionData.find({
+    //   _id: { $in: election.results },
+    // }).lean();
+
+    // // Fetch detailed data for all incident reports
+    // const detailedIncidentReports = await IncidentReport.find({
+    //   _id: { $in: election.incidentReports },
+    // }).lean();
 
     // Create the election data object including political parties, results, and incident reports
     const electionData = {
@@ -114,8 +118,8 @@ export const getElectionById = async (electionId, userId) => {
         name: party.name,
         code: party.code,
       })),
-      results: detailedResults, // Include detailed data for all results
-      incidentReports: detailedIncidentReports, // Include detailed data for all incident reports
+      results: result ? [result] : [], // Include detailed data for all results
+      incidentReports: incidentReport?[incidentReport] : [], // Include detailed data for all incident reports
     };
 
     // Remove the resultsCount field from the election data object

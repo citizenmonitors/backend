@@ -8,6 +8,7 @@ import { connectDB } from "./config/db.js";
 import authRoutes from "./routes/auth.js";
 import electionRoutes from "./routes/Election/electionRoutes.js";
 import locations from "./routes/locations.js";
+import address from "./routes/Location/locationRoutes.js";
 import bankRoutes from "./routes/bankRoutes.js";
 import userRoutes from "./routes/userDashboard/userRoutes.js";
 
@@ -21,6 +22,7 @@ connectDB();
 app.use("/api/auth", authRoutes);
 app.use("/api/elections", electionRoutes);
 app.use("/api", locations);
+app.use("/api/locations", address);
 app.use("/api", bankRoutes);
 app.use("/api", userRoutes);
 

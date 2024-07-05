@@ -815,3 +815,4 @@ const formatVoteCounts = (votes) => {
 const formatIncidentCounts = (incidents) => {
   return Object.entries(incidents).map(([type, count]) => ({ type, count }));
 };
+

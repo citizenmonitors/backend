@@ -1,0 +1,1471 @@
+[
+  {
+    "id": "50982",
+    "name": "IHOGBE I - INST. OF CONT. EDUCATION I",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "001",
+    "units": "001",
+    "delimitation": "12/12/05/001",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3505356,
+      "longitude": 5.617847900000001,
+      "viewport": {
+        "northeast": {
+          "lat": 6.351943579892722,
+          "lng": 5.619133129892723
+        },
+        "southwest": {
+          "lat": 6.349243920107278,
+          "lng": 5.616433470107278
+        }
+      },
+      "formatted_address": "9J29+649, I.C.E. Rd, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3505356,5.617847900000001",
+      "google_place_id": "ChIJkwGEMxHTQBARG1L08AqB7Xc"
+    }
+  },
+  {
+    "id": "50983",
+    "name": "IHOGBE I - INST. OF CONT. EDUCATION  II",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "002",
+    "units": "002",
+    "delimitation": "12/12/05/002",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3505356,
+      "longitude": 5.617847900000001,
+      "viewport": {
+        "northeast": {
+          "lat": 6.351943579892722,
+          "lng": 5.619133129892723
+        },
+        "southwest": {
+          "lat": 6.349243920107278,
+          "lng": 5.616433470107278
+        }
+      },
+      "formatted_address": "9J29+649, I.C.E. Rd, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3505356,5.617847900000001",
+      "google_place_id": "ChIJkwGEMxHTQBARG1L08AqB7Xc"
+    }
+  },
+  {
+    "id": "50984",
+    "name": "IHOGBE I - INST. OF CONT. EDUCATION  III",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "003",
+    "units": "003",
+    "delimitation": "12/12/05/003",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3505356,
+      "longitude": 5.617847900000001,
+      "viewport": {
+        "northeast": {
+          "lat": 6.351943579892722,
+          "lng": 5.619133129892723
+        },
+        "southwest": {
+          "lat": 6.349243920107278,
+          "lng": 5.616433470107278
+        }
+      },
+      "formatted_address": "9J29+649, I.C.E. Rd, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3505356,5.617847900000001",
+      "google_place_id": "ChIJkwGEMxHTQBARG1L08AqB7Xc"
+    }
+  },
+  {
+    "id": "50985",
+    "name": "IHOGBE I - AKENZUA II SEC. SCHOOL I",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "004",
+    "units": "004",
+    "delimitation": "12/12/05/004",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3489486,
+      "longitude": 5.616099999999999,
+      "viewport": {
+        "northeast": {
+          "lat": 6.350263479892721,
+          "lng": 5.617487679892722
+        },
+        "southwest": {
+          "lat": 6.347563820107277,
+          "lng": 5.614788020107278
+        }
+      },
+      "formatted_address": "8JX8+HCH, I.C.E. Rd, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3489486,5.616099999999999",
+      "google_place_id": "ChIJ-eEK7xDTQBARo7sL8nia5Tg"
+    }
+  },
+  {
+    "id": "50986",
+    "name": "IHOGBE I,  - AKENZUA II SEC. SCHOOL  II",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "005",
+    "units": "005",
+    "delimitation": "12/12/05/005",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3489486,
+      "longitude": 5.616099999999999,
+      "viewport": {
+        "northeast": {
+          "lat": 6.350263479892721,
+          "lng": 5.617487679892722
+        },
+        "southwest": {
+          "lat": 6.347563820107277,
+          "lng": 5.614788020107278
+        }
+      },
+      "formatted_address": "8JX8+HCH, I.C.E. Rd, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3489486,5.616099999999999",
+      "google_place_id": "ChIJ-eEK7xDTQBARo7sL8nia5Tg"
+    }
+  },
+  {
+    "id": "50987",
+    "name": "IHOGBE I , IHOGBE COLLEGE I",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "006",
+    "units": "006",
+    "delimitation": "12/12/05/006",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3489486,
+      "longitude": 5.616099999999999,
+      "viewport": {
+        "northeast": {
+          "lat": 6.350263479892721,
+          "lng": 5.617487679892722
+        },
+        "southwest": {
+          "lat": 6.347563820107277,
+          "lng": 5.614788020107278
+        }
+      },
+      "formatted_address": "8JX8+HCH, I.C.E. Rd, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3489486,5.616099999999999",
+      "google_place_id": "ChIJ-eEK7xDTQBARo7sL8nia5Tg"
+    }
+  },
+  {
+    "id": "50988",
+    "name": "IHOGBE I , IHOGBE COLLEGE II",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "007",
+    "units": "007",
+    "delimitation": "12/12/05/007",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3489486,
+      "longitude": 5.616099999999999,
+      "viewport": {
+        "northeast": {
+          "lat": 6.350263479892721,
+          "lng": 5.617487679892722
+        },
+        "southwest": {
+          "lat": 6.347563820107277,
+          "lng": 5.614788020107278
+        }
+      },
+      "formatted_address": "8JX8+HCH, I.C.E. Rd, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3489486,5.616099999999999",
+      "google_place_id": "ChIJ-eEK7xDTQBARo7sL8nia5Tg"
+    }
+  },
+  {
+    "id": "50989",
+    "name": "IHOGBE I , IHOGBE COLLEGE III",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "008",
+    "units": "008",
+    "delimitation": "12/12/05/008",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3489486,
+      "longitude": 5.616099999999999,
+      "viewport": {
+        "northeast": {
+          "lat": 6.350263479892721,
+          "lng": 5.617487679892722
+        },
+        "southwest": {
+          "lat": 6.347563820107277,
+          "lng": 5.614788020107278
+        }
+      },
+      "formatted_address": "8JX8+HCH, I.C.E. Rd, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3489486,5.616099999999999",
+      "google_place_id": "ChIJ-eEK7xDTQBARo7sL8nia5Tg"
+    }
+  },
+  {
+    "id": "50990",
+    "name": "IHOGBE II , IVBIORE PRIMARY SCHOOL I",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "009",
+    "units": "009",
+    "delimitation": "12/12/05/009",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3489486,
+      "longitude": 5.616099999999999,
+      "viewport": {
+        "northeast": {
+          "lat": 6.350263479892721,
+          "lng": 5.617487679892722
+        },
+        "southwest": {
+          "lat": 6.347563820107277,
+          "lng": 5.614788020107278
+        }
+      },
+      "formatted_address": "8JX8+HCH, I.C.E. Rd, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3489486,5.616099999999999",
+      "google_place_id": "ChIJ-eEK7xDTQBARo7sL8nia5Tg"
+    }
+  },
+  {
+    "id": "50991",
+    "name": "IHOGBE II , IVBIORE PRIMARY SCHOOL II",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "010",
+    "units": "010",
+    "delimitation": "12/12/05/010",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.34948,
+      "longitude": 5.6103146,
+      "viewport": {
+        "northeast": {
+          "lat": 6.3554039,
+          "lng": 5.6224517
+        },
+        "southwest": {
+          "lat": 6.3401446,
+          "lng": 5.5967214
+        }
+      },
+      "formatted_address": "Ihogbe/ Isekhere/ Oreoghene/ Ibiwe/ Ice Road, 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.34948,5.6103146",
+      "google_place_id": "ChIJn4kWehvTQBARdNQQm1X9DMc"
+    }
+  },
+  {
+    "id": "50992",
+    "name": "IHOGBE II , IVBIORE PRIMARY SCHOOL III",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "011",
+    "units": "011",
+    "delimitation": "12/12/05/011",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.34948,
+      "longitude": 5.6103146,
+      "viewport": {
+        "northeast": {
+          "lat": 6.3554039,
+          "lng": 5.6224517
+        },
+        "southwest": {
+          "lat": 6.3401446,
+          "lng": 5.5967214
+        }
+      },
+      "formatted_address": "Ihogbe/ Isekhere/ Oreoghene/ Ibiwe/ Ice Road, 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.34948,5.6103146",
+      "google_place_id": "ChIJn4kWehvTQBARdNQQm1X9DMc"
+    }
+  },
+  {
+    "id": "50993",
+    "name": "IHOGBE II , IVBIORE PRIMARY SCHOOL IV",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "012",
+    "units": "012",
+    "delimitation": "12/12/05/012",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3489486,
+      "longitude": 5.616099999999999,
+      "viewport": {
+        "northeast": {
+          "lat": 6.350263479892721,
+          "lng": 5.617487679892722
+        },
+        "southwest": {
+          "lat": 6.347563820107277,
+          "lng": 5.614788020107278
+        }
+      },
+      "formatted_address": "8JX8+HCH, I.C.E. Rd, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3489486,5.616099999999999",
+      "google_place_id": "ChIJ-eEK7xDTQBARo7sL8nia5Tg"
+    }
+  },
+  {
+    "id": "50994",
+    "name": "IHOGBE II , IVBIORE PRIMARY SCHOOL V",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "013",
+    "units": "013",
+    "delimitation": "12/12/05/013",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3489486,
+      "longitude": 5.616099999999999,
+      "viewport": {
+        "northeast": {
+          "lat": 6.350263479892721,
+          "lng": 5.617487679892722
+        },
+        "southwest": {
+          "lat": 6.347563820107277,
+          "lng": 5.614788020107278
+        }
+      },
+      "formatted_address": "8JX8+HCH, I.C.E. Rd, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3489486,5.616099999999999",
+      "google_place_id": "ChIJ-eEK7xDTQBARo7sL8nia5Tg"
+    }
+  },
+  {
+    "id": "50995",
+    "name": "IHOGBE II , IYOBA PRIMARY SCHOOL I",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "014",
+    "units": "014",
+    "delimitation": "12/12/05/014",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3489486,
+      "longitude": 5.616099999999999,
+      "viewport": {
+        "northeast": {
+          "lat": 6.350263479892721,
+          "lng": 5.617487679892722
+        },
+        "southwest": {
+          "lat": 6.347563820107277,
+          "lng": 5.614788020107278
+        }
+      },
+      "formatted_address": "8JX8+HCH, I.C.E. Rd, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3489486,5.616099999999999",
+      "google_place_id": "ChIJ-eEK7xDTQBARo7sL8nia5Tg"
+    }
+  },
+  {
+    "id": "50996",
+    "name": "IHOGBE II , IYOBA PRIMARY SCHOOL II",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "015",
+    "units": "015",
+    "delimitation": "12/12/05/015",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3489486,
+      "longitude": 5.616099999999999,
+      "viewport": {
+        "northeast": {
+          "lat": 6.350263479892721,
+          "lng": 5.617487679892722
+        },
+        "southwest": {
+          "lat": 6.347563820107277,
+          "lng": 5.614788020107278
+        }
+      },
+      "formatted_address": "8JX8+HCH, I.C.E. Rd, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3489486,5.616099999999999",
+      "google_place_id": "ChIJ-eEK7xDTQBARo7sL8nia5Tg"
+    }
+  },
+  {
+    "id": "50997",
+    "name": "IHOGBE II,  IYOBA PRIMARY SCHOOL III",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "016",
+    "units": "016",
+    "delimitation": "12/12/05/016",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3489486,
+      "longitude": 5.616099999999999,
+      "viewport": {
+        "northeast": {
+          "lat": 6.350263479892721,
+          "lng": 5.617487679892722
+        },
+        "southwest": {
+          "lat": 6.347563820107277,
+          "lng": 5.614788020107278
+        }
+      },
+      "formatted_address": "8JX8+HCH, I.C.E. Rd, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3489486,5.616099999999999",
+      "google_place_id": "ChIJ-eEK7xDTQBARo7sL8nia5Tg"
+    }
+  },
+  {
+    "id": "50998",
+    "name": "IHOGBE II, SCHOOL FOR THE BLIND",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "017",
+    "units": "017",
+    "delimitation": "12/12/05/017",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3479052,
+      "longitude": 5.613561799999999,
+      "viewport": {
+        "northeast": {
+          "lat": 6.349270179892722,
+          "lng": 5.614893829892721
+        },
+        "southwest": {
+          "lat": 6.346570520107278,
+          "lng": 5.612194170107277
+        }
+      },
+      "formatted_address": "8JX7+5C8, Ukhegie St, off I.C.E Road, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3479052,5.613561799999999",
+      "google_place_id": "ChIJQ89GiBrTQBAR9ytwn5CxgZg"
+    }
+  },
+  {
+    "id": "50999",
+    "name": "ORE-OGHENE I,  ORE-OGHENE PRIMARY SCHOOL I",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "018",
+    "units": "018",
+    "delimitation": "12/12/05/018",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3433039,
+      "longitude": 5.6131867,
+      "viewport": {
+        "northeast": {
+          "lat": 6.344623529892723,
+          "lng": 5.614913029892723
+        },
+        "southwest": {
+          "lat": 6.341923870107279,
+          "lng": 5.612213370107279
+        }
+      },
+      "formatted_address": "Ore-Oghene St, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3433039,5.6131867",
+      "google_place_id": "ChIJydvnbgXTQBAR-a9CYcW3gho"
+    }
+  },
+  {
+    "id": "51000",
+    "name": "ORE-OGHENE I , ORE-OGHENE PRIMARY SCHOOL II",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "019",
+    "units": "019",
+    "delimitation": "12/12/05/019",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3433039,
+      "longitude": 5.6131867,
+      "viewport": {
+        "northeast": {
+          "lat": 6.344623529892723,
+          "lng": 5.614913029892723
+        },
+        "southwest": {
+          "lat": 6.341923870107279,
+          "lng": 5.612213370107279
+        }
+      },
+      "formatted_address": "Ore-Oghene St, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3433039,5.6131867",
+      "google_place_id": "ChIJydvnbgXTQBAR-a9CYcW3gho"
+    }
+  },
+  {
+    "id": "51001",
+    "name": "ORE-OGHENE I, ORE-OGHENE PRIMARY SCHOOL III",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "020",
+    "units": "020",
+    "delimitation": "12/12/05/020",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3433039,
+      "longitude": 5.6131867,
+      "viewport": {
+        "northeast": {
+          "lat": 6.344623529892723,
+          "lng": 5.614913029892723
+        },
+        "southwest": {
+          "lat": 6.341923870107279,
+          "lng": 5.612213370107279
+        }
+      },
+      "formatted_address": "Ore-Oghene St, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3433039,5.6131867",
+      "google_place_id": "ChIJydvnbgXTQBAR-a9CYcW3gho"
+    }
+  },
+  {
+    "id": "51002",
+    "name": "ORE-OGHENE I,  ORE-OGHENE PRIMARY SCHOOL IV",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "021",
+    "units": "021",
+    "delimitation": "12/12/05/021",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3433039,
+      "longitude": 5.6131867,
+      "viewport": {
+        "northeast": {
+          "lat": 6.344623529892723,
+          "lng": 5.614913029892723
+        },
+        "southwest": {
+          "lat": 6.341923870107279,
+          "lng": 5.612213370107279
+        }
+      },
+      "formatted_address": "Ore-Oghene St, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3433039,5.6131867",
+      "google_place_id": "ChIJydvnbgXTQBAR-a9CYcW3gho"
+    }
+  },
+  {
+    "id": "51003",
+    "name": "ORE-OGHENE I,  BAPTIST HIGH SCHOOL I",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "022",
+    "units": "022",
+    "delimitation": "12/12/05/022",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3489486,
+      "longitude": 5.616099999999999,
+      "viewport": {
+        "northeast": {
+          "lat": 6.350263479892721,
+          "lng": 5.617487679892722
+        },
+        "southwest": {
+          "lat": 6.347563820107277,
+          "lng": 5.614788020107278
+        }
+      },
+      "formatted_address": "8JX8+HCH, I.C.E. Rd, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3489486,5.616099999999999",
+      "google_place_id": "ChIJ-eEK7xDTQBARo7sL8nia5Tg"
+    }
+  },
+  {
+    "id": "51004",
+    "name": "ORE-OGHENE I , BAPTIST HIGH SCHOOL II",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "023",
+    "units": "023",
+    "delimitation": "12/12/05/023",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3489486,
+      "longitude": 5.616099999999999,
+      "viewport": {
+        "northeast": {
+          "lat": 6.350263479892721,
+          "lng": 5.617487679892722
+        },
+        "southwest": {
+          "lat": 6.347563820107277,
+          "lng": 5.614788020107278
+        }
+      },
+      "formatted_address": "8JX8+HCH, I.C.E. Rd, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3489486,5.616099999999999",
+      "google_place_id": "ChIJ-eEK7xDTQBARo7sL8nia5Tg"
+    }
+  },
+  {
+    "id": "51005",
+    "name": "ORE-OGHENE I ,,BAPTIST HIGH SCHOOL  III",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "024",
+    "units": "024",
+    "delimitation": "12/12/05/024",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3489486,
+      "longitude": 5.616099999999999,
+      "viewport": {
+        "northeast": {
+          "lat": 6.350263479892721,
+          "lng": 5.617487679892722
+        },
+        "southwest": {
+          "lat": 6.347563820107277,
+          "lng": 5.614788020107278
+        }
+      },
+      "formatted_address": "8JX8+HCH, I.C.E. Rd, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3489486,5.616099999999999",
+      "google_place_id": "ChIJ-eEK7xDTQBARo7sL8nia5Tg"
+    }
+  },
+  {
+    "id": "51006",
+    "name": "OLIHA I , OLIHA PRIMARY SCHOOL I",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "025",
+    "units": "025",
+    "delimitation": "12/12/05/025",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.345965199999999,
+      "longitude": 5.609668999999999,
+      "viewport": {
+        "northeast": {
+          "lat": 6.347236929892722,
+          "lng": 5.610936829892721
+        },
+        "southwest": {
+          "lat": 6.344537270107278,
+          "lng": 5.608237170107278
+        }
+      },
+      "formatted_address": "8JW5+9VM, Okhokhugbo 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.345965199999999,5.609668999999999",
+      "google_place_id": "ChIJtYvZ8-HTQBARe3lwTwzqP5s"
+    }
+  },
+  {
+    "id": "51007",
+    "name": "OLIHA I , OLIHA PRIMARY SCHOOL II",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "026",
+    "units": "026",
+    "delimitation": "12/12/05/026",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3489486,
+      "longitude": 5.616099999999999,
+      "viewport": {
+        "northeast": {
+          "lat": 6.350263479892721,
+          "lng": 5.617487679892722
+        },
+        "southwest": {
+          "lat": 6.347563820107277,
+          "lng": 5.614788020107278
+        }
+      },
+      "formatted_address": "8JX8+HCH, I.C.E. Rd, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3489486,5.616099999999999",
+      "google_place_id": "ChIJ-eEK7xDTQBARo7sL8nia5Tg"
+    }
+  },
+  {
+    "id": "51008",
+    "name": "OLIHA I , OLIHA PRIMARY SCHOOL III",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "027",
+    "units": "027",
+    "delimitation": "12/12/05/027",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3433039,
+      "longitude": 5.6131867,
+      "viewport": {
+        "northeast": {
+          "lat": 6.344623529892723,
+          "lng": 5.614913029892723
+        },
+        "southwest": {
+          "lat": 6.341923870107279,
+          "lng": 5.612213370107279
+        }
+      },
+      "formatted_address": "Ore-Oghene St, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3433039,5.6131867",
+      "google_place_id": "ChIJydvnbgXTQBAR-a9CYcW3gho"
+    }
+  },
+  {
+    "id": "51009",
+    "name": "OLIHA I , OLIHA PRIMARY SCHOOL IV",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "028",
+    "units": "028",
+    "delimitation": "12/12/05/028",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3433039,
+      "longitude": 5.6131867,
+      "viewport": {
+        "northeast": {
+          "lat": 6.344623529892723,
+          "lng": 5.614913029892723
+        },
+        "southwest": {
+          "lat": 6.341923870107279,
+          "lng": 5.612213370107279
+        }
+      },
+      "formatted_address": "Ore-Oghene St, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3433039,5.6131867",
+      "google_place_id": "ChIJydvnbgXTQBAR-a9CYcW3gho"
+    }
+  },
+  {
+    "id": "51010",
+    "name": "OLIHA I, OLIHA PRIMARY SCHOOL V",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "029",
+    "units": "029",
+    "delimitation": "12/12/05/029",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3433039,
+      "longitude": 5.6131867,
+      "viewport": {
+        "northeast": {
+          "lat": 6.344623529892723,
+          "lng": 5.614913029892723
+        },
+        "southwest": {
+          "lat": 6.341923870107279,
+          "lng": 5.612213370107279
+        }
+      },
+      "formatted_address": "Ore-Oghene St, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3433039,5.6131867",
+      "google_place_id": "ChIJydvnbgXTQBAR-a9CYcW3gho"
+    }
+  },
+  {
+    "id": "51011",
+    "name": "OLIHA I,  OLIHA PRIMARY SCHOOL VI",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "030",
+    "units": "030",
+    "delimitation": "12/12/05/030",
+    "remark": "EXISTING PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3433039,
+      "longitude": 5.6131867,
+      "viewport": {
+        "northeast": {
+          "lat": 6.344623529892723,
+          "lng": 5.614913029892723
+        },
+        "southwest": {
+          "lat": 6.341923870107279,
+          "lng": 5.612213370107279
+        }
+      },
+      "formatted_address": "Ore-Oghene St, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3433039,5.6131867",
+      "google_place_id": "ChIJydvnbgXTQBAR-a9CYcW3gho"
+    }
+  },
+  {
+    "id": "51012",
+    "name": "OPEN SPACE -MOAT BEHIND NTA PREMISES",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "031",
+    "units": "031",
+    "delimitation": "12/12/05/031",
+    "remark": "NEW PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3540917,
+      "longitude": 5.6173396,
+      "viewport": {
+        "northeast": {
+          "lat": 6.35534852989272,
+          "lng": 5.61877292989272
+        },
+        "southwest": {
+          "lat": 6.352648870107276,
+          "lng": 5.616073270107276
+        }
+      },
+      "formatted_address": "9J38+JWP, T.V Road, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3540917,5.6173396",
+      "google_place_id": "ChIJC4swThbTQBARZXW0FvKGv3k"
+    }
+  },
+  {
+    "id": "51013",
+    "name": "OPEN SPACE -UWA LANE BY THE MOAT(BRIDGE)",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "032",
+    "units": "032",
+    "delimitation": "12/12/05/032",
+    "remark": "NEW PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.349050399999999,
+      "longitude": 5.621568600000001,
+      "viewport": {
+        "northeast": {
+          "lat": 6.350427029892722,
+          "lng": 5.622949529892722
+        },
+        "southwest": {
+          "lat": 6.347727370107278,
+          "lng": 5.620249870107278
+        }
+      },
+      "formatted_address": "Local Government Area, Shop 21, Ero shopping Complex, Urubi Street, Iya-Ero, 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.349050399999999,5.621568600000001",
+      "google_place_id": "ChIJCV69EoXTQBARTO4Vu3e8xj4"
+    }
+  },
+  {
+    "id": "51014",
+    "name": "OPEN SPACE -UWA STREET BY NTA FENCE",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "033",
+    "units": "033",
+    "delimitation": "12/12/05/033",
+    "remark": "NEW PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3288899,
+      "longitude": 5.583996399999999,
+      "viewport": {
+        "northeast": {
+          "lat": 6.330270579892723,
+          "lng": 5.585335629892722
+        },
+        "southwest": {
+          "lat": 6.327570920107279,
+          "lng": 5.582635970107277
+        }
+      },
+      "formatted_address": "8HHM+HH5, Ekenhuan Rd, Ogogugbo 300103, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3288899,5.583996399999999",
+      "google_place_id": "ChIJia2kkV3SQBAR28T-MJ0Zt2w"
+    }
+  },
+  {
+    "id": "51015",
+    "name": "OPEN SPACE -EKI-UWA MARKET",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "034",
+    "units": "034",
+    "delimitation": "12/12/05/034",
+    "remark": "NEW PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.345965199999999,
+      "longitude": 5.609668999999999,
+      "viewport": {
+        "northeast": {
+          "lat": 6.347236929892722,
+          "lng": 5.610936829892721
+        },
+        "southwest": {
+          "lat": 6.344537270107278,
+          "lng": 5.608237170107278
+        }
+      },
+      "formatted_address": "8JW5+9VM, Okhokhugbo 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.345965199999999,5.609668999999999",
+      "google_place_id": "ChIJtYvZ8-HTQBARe3lwTwzqP5s"
+    }
+  },
+  {
+    "id": "51016",
+    "name": "OPEN SPACE BEHIND EKI-UWA MARKET ,BY SECOND WEST ROAD",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "035",
+    "units": "035",
+    "delimitation": "12/12/05/035",
+    "remark": "NEW PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.336126399999999,
+      "longitude": 5.638508600000001,
+      "viewport": {
+        "northeast": {
+          "lat": 6.337440579892721,
+          "lng": 5.639857529892723
+        },
+        "southwest": {
+          "lat": 6.334740920107278,
+          "lng": 5.637157870107279
+        }
+      },
+      "formatted_address": "market, Ekiuwa Street, junction 300104, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.336126399999999,5.638508600000001",
+      "google_place_id": "ChIJUVudYW_TQBARAKAxhbwyoPg"
+    }
+  },
+  {
+    "id": "51017",
+    "name": "OPEN SPACE OSASUMWEN STREET BY SECOND WEST JUNCTION",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "036",
+    "units": "036",
+    "delimitation": "12/12/05/036",
+    "remark": "NEW PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3498395,
+      "longitude": 5.6172515,
+      "viewport": {
+        "northeast": {
+          "lat": 6.351336729892722,
+          "lng": 5.618620429892721
+        },
+        "southwest": {
+          "lat": 6.348637070107278,
+          "lng": 5.615920770107278
+        }
+      },
+      "formatted_address": "59 C, ICE Road, Off Wire Rd, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3498395,5.6172515",
+      "google_place_id": "ChIJxWr2xcfTQBARuAL-8-Ynyb4"
+    }
+  },
+  {
+    "id": "51018",
+    "name": "BAPTIST SECONDARY SCHOOL",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "037",
+    "units": "037",
+    "delimitation": "12/12/05/037",
+    "remark": "NEW PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.348490399999999,
+      "longitude": 5.6099862,
+      "viewport": {
+        "northeast": {
+          "lat": 6.349999429892722,
+          "lng": 5.611013379892722
+        },
+        "southwest": {
+          "lat": 6.347299770107278,
+          "lng": 5.608313720107278
+        }
+      },
+      "formatted_address": "2 Second West Circular Rd, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.348490399999999,5.6099862",
+      "google_place_id": "ChIJS0aRnxvTQBAR7IVqxi1dL44"
+    }
+  },
+  {
+    "id": "51019",
+    "name": "OLIHA MARKET BY TV ROAD JUNCTION",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "038",
+    "units": "038",
+    "delimitation": "12/12/05/038",
+    "remark": "NEW PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.345965199999999,
+      "longitude": 5.609668999999999,
+      "viewport": {
+        "northeast": {
+          "lat": 6.347236929892722,
+          "lng": 5.610936829892721
+        },
+        "southwest": {
+          "lat": 6.344537270107278,
+          "lng": 5.608237170107278
+        }
+      },
+      "formatted_address": "8JW5+9VM, Okhokhugbo 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.345965199999999,5.609668999999999",
+      "google_place_id": "ChIJtYvZ8-HTQBARe3lwTwzqP5s"
+    }
+  },
+  {
+    "id": "51020",
+    "name": "OLIHA MARKET PREMISES BY SECOND WEST JUNCTION",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "039",
+    "units": "039",
+    "delimitation": "12/12/05/039",
+    "remark": "NEW PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.345965199999999,
+      "longitude": 5.609668999999999,
+      "viewport": {
+        "northeast": {
+          "lat": 6.347236929892722,
+          "lng": 5.610936829892721
+        },
+        "southwest": {
+          "lat": 6.344537270107278,
+          "lng": 5.608237170107278
+        }
+      },
+      "formatted_address": "8JW5+9VM, Okhokhugbo 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.345965199999999,5.609668999999999",
+      "google_place_id": "ChIJtYvZ8-HTQBARe3lwTwzqP5s"
+    }
+  },
+  {
+    "id": "51021",
+    "name": "OPEN SPACE IN FRONT OF UNIVERSITY PRESS PLC",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "040",
+    "units": "040",
+    "delimitation": "12/12/05/040",
+    "remark": "NEW PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.341689,
+      "longitude": 5.6264878,
+      "viewport": {
+        "northeast": {
+          "lat": 6.343038829892722,
+          "lng": 5.627837629892722
+        },
+        "southwest": {
+          "lat": 6.340339170107278,
+          "lng": 5.625137970107278
+        }
+      },
+      "formatted_address": "Main Campus, Mission Rd, Okada, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.341689,5.6264878",
+      "google_place_id": "ChIJzxzo823TQBARiYZhJyufP88"
+    }
+  },
+  {
+    "id": "51022",
+    "name": "OPEN SPACE -UKHEGIE STREET JUNCTION BY OREOGHENE",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "041",
+    "units": "041",
+    "delimitation": "12/12/05/041",
+    "remark": "NEW PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": null
+  },
+  {
+    "id": "51023",
+    "name": "OPEN SPACE BY ORE - OGHENE LANE JUNCTION BY ORE - OGHENE STREET",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "042",
+    "units": "042",
+    "delimitation": "12/12/05/042",
+    "remark": "NEW PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3427954,
+      "longitude": 5.613945699999999,
+      "viewport": {
+        "northeast": {
+          "lat": 6.34820055000005,
+          "lng": 5.6195982
+        },
+        "southwest": {
+          "lat": 6.337889549999949,
+          "lng": 5.607294199999999
+        }
+      },
+      "formatted_address": "Ore-Oghene St, Use 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3427954,5.613945699999999",
+      "google_place_id": "Ei5PcmUtT2doZW5lIFN0LCBVc2UgMzAwMTAyLCBCZW5pbiBDaXR5LCBOaWdlcmlhIi4qLAoUChIJwTjcdgXTQBARR3c8ZoP5vJESFAoSCZ-JFnob00AQEXTUEJtV_QzH"
+    }
+  },
+  {
+    "id": "51024",
+    "name": "OPEN SPACE -ARAGUA STREET JUNCTION",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "043",
+    "units": "043",
+    "delimitation": "12/12/05/043",
+    "remark": "NEW PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3498395,
+      "longitude": 5.6172515,
+      "viewport": {
+        "northeast": {
+          "lat": 6.351336729892722,
+          "lng": 5.618620429892721
+        },
+        "southwest": {
+          "lat": 6.348637070107278,
+          "lng": 5.615920770107278
+        }
+      },
+      "formatted_address": "59 C, ICE Road, Off Wire Rd, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3498395,5.6172515",
+      "google_place_id": "ChIJxWr2xcfTQBARuAL-8-Ynyb4"
+    }
+  },
+  {
+    "id": "51025",
+    "name": "OPEN SPACE -ARAGUA STREET BY ORE-GHENE",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "044",
+    "units": "044",
+    "delimitation": "12/12/05/044",
+    "remark": "NEW PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.349050399999999,
+      "longitude": 5.621568600000001,
+      "viewport": {
+        "northeast": {
+          "lat": 6.350427029892722,
+          "lng": 5.622949529892722
+        },
+        "southwest": {
+          "lat": 6.347727370107278,
+          "lng": 5.620249870107278
+        }
+      },
+      "formatted_address": "Local Government Area, Shop 21, Ero shopping Complex, Urubi Street, Iya-Ero, 300102, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.349050399999999,5.621568600000001",
+      "google_place_id": "ChIJCV69EoXTQBARTO4Vu3e8xj4"
+    }
+  },
+  {
+    "id": "51026",
+    "name": "OPEN SPACE - OREGHOSA JUNCTION OFF ARAGWA STREET BY TRANSFORMER",
+    "registration_area_id": "2723",
+    "precise_location": null,
+    "abbreviation": "045",
+    "units": "045",
+    "delimitation": "12/12/05/045",
+    "remark": "NEW PU",
+    "ward_id": "2723",
+    "ward_name": "IHOGBE/ ISEKHERE/ OREOGHENE/ IBIWE/ ICE ROAD",
+    "local_government_id": "236",
+    "local_government_name": "OREDO",
+    "state_id": "12",
+    "state_name": "EDO",
+    "location": {
+      "latitude": 6.3498395,
+      "longitude": 5.6172515,
+      "viewport": {
+        "northeast": {
+          "lat": 6.351336729892722,
+          "lng": 5.618620429892721
+        },
+        "southwest": {
+          "lat": 6.348637070107278,
+          "lng": 5.615920770107278
+        }
+      },
+      "formatted_address": "59 C, ICE Road, Off Wire Rd, Benin City, Nigeria",
+      "google_map_url": "https://maps.google.com?q=6.3498395,5.6172515",
+      "google_place_id": "ChIJxWr2xcfTQBARuAL-8-Ynyb4"
+    }
+  }
+]

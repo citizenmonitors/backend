@@ -41,7 +41,7 @@ const ElectionDataSchema = new mongoose.Schema(
     ],
     voteRating: {
       type: String,
-      enum: ["good", "okay", "bad"],
+      enum: ["good", "okay", "poor"],
     },
     voterIntimidation: {
       type: String,

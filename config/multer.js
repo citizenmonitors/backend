@@ -3,7 +3,6 @@ import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
 
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -27,17 +26,21 @@ const storage = multer.diskStorage({
 
 const fileFilter = (req, file, cb) => {
   const ext = path.extname(file.originalname).toLowerCase();
-  const allowedTypes = [".png", ".jpg", ".jpeg", "svg", ".mp4", "pdf"];
+  const allowedTypes = [".png", ".jpg", ".jpeg", "pdf", "svg", ".mp4"];
   if (allowedTypes.includes(ext)) {
     cb(null, true);
   } else {
-    cb(new Error("Only images (png, jpg, jpeg) and videos (mp4) are allowed"));
+    cb(
+      new Error(
+        "Only images (png, jpg, pdf, jpeg) and videos (mp4) are allowed"
+      )
+    );
   }
 };
 
 const upload = multer({
   storage,
-  limits: { fileSize: 100 * 1024 * 1024 }, 
+  limits: { fileSize: 100 * 1024 * 1024 },
   fileFilter,
 });
 

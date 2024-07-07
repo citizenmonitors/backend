@@ -593,7 +593,7 @@ const aggregateResults = (results) => {
         voteBuying: 0,
         goodRating: 0,
         okayRating: 0,
-        badRating: 0,
+        poorRating: 0,
         resultPictures: 0,
         resultVideos: 0,
       };
@@ -639,8 +639,8 @@ const aggregateResults = (results) => {
       pollingUnitData.goodRating++;
     } else if (voteRating === "okay") {
       pollingUnitData.okayRating++;
-    } else if (voteRating === "bad") {
-      pollingUnitData.badRating++;
+    } else if (voteRating === "poor") {
+      pollingUnitData.poorRating++;
     }
 
     // Count result pictures and videos
@@ -732,7 +732,7 @@ const formatAggregatedResults = (aggregated) => {
             voteBuying,
             goodRating,
             okayRating,
-            badRating,
+            poorRating,
             resultPictures,
             resultVideos,
           } =
@@ -749,7 +749,7 @@ const formatAggregatedResults = (aggregated) => {
             voteBuying,
             goodRating,
             okayRating,
-            badRating,
+            poorRating,
             resultPictures,
             resultVideos,
           };

@@ -12,9 +12,9 @@ export const observerToVolunteerService = async ({ email, details, file }) => {
 
   if (file) {
     const ext = path.extname(file.originalname).toLowerCase();
-    if (![".jpg", ".jpeg", ".png"].includes(ext)) {
+    if (![".jpg", ".jpeg", "pdf", ".png"].includes(ext)) {
       throw new Error(
-        "Only images are allowed. Please upload a jpg, jpeg, or png file."
+        "Only images are allowed. Please upload a jpg, jpeg, pdf, or png file."
       );
     }
     details.governmentId = file.path;

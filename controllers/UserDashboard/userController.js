@@ -1,5 +1,7 @@
 import {
   observerToVolunteerService,
+  updateUserService,
+  deleteUserService,
 } from "../../services/UserDashboard/userService.js";
 import upload from "../../config/multer.js";
 
@@ -47,3 +49,43 @@ export const ObserverToVolunteer = [
     }
   },
 ];
+
+
+// Update user details
+export const updateUser = async (req, res) => {
+ try {
+   const userId = req.user._id;
+   const { currentPassword, ...updateData } = req.body;
+
+   // Validate new password confirmation if provided
+   if (updateData.password && !updateData.confirmPassword) {
+     return res
+       .status(400)
+       .json({ message: "Please confirm your new password" });
+   }
+
+   const updatedUser = await updateUserService(
+     userId,
+     updateData,
+     currentPassword
+   );
+   res.status(200).json(updatedUser);
+ } catch (error) {
+   res
+     .status(500)
+     .json({ message: "Error updating user details", error: error.message });
+ }
+};
+
+// Delete user account
+export const deleteUser = async (req, res) => {
+   try {
+     const userId = req.user._id;
+     await deleteUserService(userId);
+     res.status(200).json({ message: "User account deleted successfully" });
+   } catch (error) {
+     res
+       .status(500)
+       .json({ message: "Error deleting user account", error: error.message });
+   }
+};

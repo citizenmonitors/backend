@@ -1,25 +1,19 @@
-import express from "express";
-import {
-  getAllData,
-  getStates,
-  getLocalGovernmentsByState,
-  getWardsByLocalGovernment,
-  getPollingUnitsByWard,
-} from "../../controllers/Location/locationController.js";
+import express from 'express';
+import { getStates, getLGAs, getWards, getPollingUnits } from '../../controllers/Location/locationController.js';
 
 const router = express.Router();
 
-router.get("/data", getAllData);
+// Endpoint to get all states
 router.get("/states", getStates);
-router.get("/states/:stateName/local_governments", getLocalGovernmentsByState);
-router.get(
-  "/states/:stateName/local_governments/:lgaName/wards",
-  getWardsByLocalGovernment
-);
-router.get(
-  "/states/:stateName/local_governments/:lgaName/wards/:wardName/polling_units",
-  getPollingUnitsByWard
-);
+
+// Endpoint to get LGAs for a specific state
+router.get("/states/:state/local_governments", getLGAs);
+
+// Endpoint to get wards for a specific LGA
+router.get("/states/:state/local_governments/*/wards", getWards);
+
+// Endpoint to get polling units for a specific ward with nested directories
+router.get("/states/:state/local_governments/*/wards/*/polling_units", getPollingUnits);
 
 export default router;
 

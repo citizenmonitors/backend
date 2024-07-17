@@ -131,6 +131,43 @@ export const getElectionById = async (electionId, userId) => {
   }
 };
 
+export const getLiveElectionById = async (electionId) => {
+  try {
+    // Fetch the election data by ID
+    const election = await Election.findById(electionId).lean();
+    if (!election) {
+      throw new Error("Election not found");
+    }
+    console.log("election", electionId);
+
+    // Fetch the election result data for the specific election
+    const results = await ElectionData.find({ election: electionId }).lean();
+
+    // Create the election data
+    const electionData = {
+      electionDetails: {
+        electiontype: election.electionType,
+        startdate: election.startDate,
+        enddate: election.endDate,
+      },
+      results: results.map((result) => ({
+        state: result.state,
+        lga: result.lga,
+        ward: result.ward,
+        pollingUnit: result.pollingUnit,
+        partiesVotes: result.partiesVotes,
+        voteRating: result.voteRating,
+        voterIntimidation: result.voterIntimidation,
+        voteBuying: result.voteBuying,
+      })),
+    };
+
+    return { election: electionData };
+  } catch (error) {
+    throw new Error(`Error fetching election data: ${error.message}`);
+  }
+};
+
 export const uploadResultDataService = async (
   electionId,
   userId,

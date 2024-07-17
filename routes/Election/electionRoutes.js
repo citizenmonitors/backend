@@ -13,8 +13,9 @@ import {
   getAllElections,
   updateIncidentReportData,
   deleteIncidentReportData,
+  getLiveElectionByIdCont,
 } from "../../controllers/Election/electionDataController.js";
-import authMiddleware from "../../middleware/authMiddleware.js";
+import { authMiddleware } from "../../middleware/authMiddleware.js";
 import {
   uploadResultDataFiles,
   uploadReportDataFiles,
@@ -43,6 +44,7 @@ router.get(
   getElectionResultByIdCont
 );
 router.get("/election/:electionId", authMiddleware, getElectionByIdCont);
+router.get("/live-election/:electionId", authMiddleware, getLiveElectionByIdCont);
 router.post("/election", authMiddleware, createElection);
 router.put("/election/:electionId", authMiddleware, updateElection);
 

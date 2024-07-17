@@ -4,7 +4,7 @@ import {
   updateUser,
   deleteUser,
 } from "../../controllers/UserDashboard/userController.js";
-import authMiddleware from "../../middleware/authMiddleware.js";
+import {authMiddleware} from "../../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -16,3 +16,4 @@ router.put("/user", authMiddleware, updateUser);
 // Delete user account
 router.delete("/user", authMiddleware, deleteUser);
 export default router;
+

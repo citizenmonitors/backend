@@ -58,3 +58,4 @@ const ElectionDataSchema = new mongoose.Schema(
 );
 
 export default mongoose.model("ElectionData", ElectionDataSchema);
+

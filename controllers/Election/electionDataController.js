@@ -12,6 +12,7 @@ import {
   updateIncidentReportDataService,
   getAllElectionsService,
   deleteIncidentReportDataService,
+  getLiveElectionById,
 } from "../../services/Election/electionService.js";
 
 export const createElection = async (req, res) => {
@@ -72,6 +73,16 @@ export const getElectionByIdCont = async (req, res) => {
   }
 };
 
+export const getLiveElectionByIdCont = async (req, res) => {
+  try {
+    const { electionId } = req.params;
+    const election = await getLiveElectionById(electionId,);
+    res.status(200).json(election);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching live election details", error });
+  }
+};
+
 export const uploadResultData = async (req, res) => {
   try {
      console.log("Body received:", req.body);
@@ -115,7 +126,6 @@ export const updateResultData = async (req, res) => {
      .json({ message: "Error updating result data", error: error.message });
  }
 };
-
 
 export const getAllElectionResultsController = async (req, res) => {
    try {
@@ -211,3 +221,6 @@ export const deleteIncidentReportData = async (req, res) => {
       });
   }
 };
+
+
+

@@ -51,12 +51,57 @@ export const updateElectionService = async (electionId, data) => {
   return electionData;
 };
 
-export const getAllElectionsService = async () => {
-  const elections = await Election.find().select(
-    "-results -incidentReports -politicalParties"
-  );
-  return elections;
+export const getAllElectionsService = async (userId) => {
+  const elections = await Election.find()
+    .populate({ path: "results", select: "election user" })
+    .populate({ path: "incidentReports", select: "election user" });
+
+  console.log(userId.toString());
+
+  return elections.map((election) => {
+    election.results = election.results
+      .filter((result) => result.user.toString() === userId.toString())
+      .map((result) => result._id);
+    election.incidentReports = election.incidentReports
+      .filter((report) => report.user.toString() === userId.toString())
+      .map((report) => report._id);
+    return election;
+  });
 };
+
+
+
+// export const getAllElectionsService = async (userId) => {
+//   try {
+//     const elections = await Election.find().lean();
+
+//     const electionPromises = elections.map(async (election) => {
+//       const userElectionData = await ElectionData.find({
+//         election: election._id,
+//         user: userId,
+//       }).lean();
+//       const userIncidentReports = await IncidentReport.find({
+//         election: election._id,
+//         user: userId,
+//       }).lean();
+
+//       const results = userElectionData.map((data) => data._id);
+//       const incidentReports = userIncidentReports.map((report) => report._id);
+
+//       return {
+//         ...election,
+//         results,
+//         incidentReports,
+//         resultsCount: results.length,
+//       };
+//     });
+
+//     const electionsWithUserData = await Promise.all(electionPromises);
+//     return electionsWithUserData;
+//   } catch (error) {
+//     throw new Error(`Error fetching elections: ${error.message}`);
+//   }
+// };
 
 export const getElectionResultById = async (electionId, userId) => {
   const election = await Election.findById(electionId).lean();
@@ -92,14 +137,11 @@ export const getElectionById = async (electionId, userId) => {
       user: userId,
     }).lean();
 
-
     // Fetch the incident report data for the specific user and election
     const incidentReport = await IncidentReport.findOne({
       election: electionId,
       user: userId,
     }).lean();
-
-    
 
     // Fetch detailed data for all results
     // const detailedResults = await ElectionData.find({
@@ -119,7 +161,7 @@ export const getElectionById = async (electionId, userId) => {
         code: party.code,
       })),
       results: result ? [result] : [], // Include detailed data for all results
-      incidentReports: incidentReport?[incidentReport] : [], // Include detailed data for all incident reports
+      incidentReports: incidentReport ? [incidentReport] : [], // Include detailed data for all incident reports
     };
 
     // Remove the resultsCount field from the election data object
@@ -852,4 +894,3 @@ const formatVoteCounts = (votes) => {
 const formatIncidentCounts = (incidents) => {
   return Object.entries(incidents).map(([type, count]) => ({ type, count }));
 };
-

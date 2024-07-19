@@ -135,38 +135,4 @@ router.put(
   updateResultData
 );
 
-// former routew
-
-// router.post(
-//   "/election/:electionId/results",
-//   authMiddleware,
-//   upload.fields([
-//     { name: "resultPictures", maxCount: 9999 },
-//     { name: "resultVideos", maxCount: 9999 },
-//   ]),
-//   uploadResultData
-// );
-// router.put(
-//   "/election/:electionId/results",
-//   authMiddleware,
-//   upload.fields([
-//     { name: "resultPictures", maxCount: 9999 },
-//     { name: "resultVideos", maxCount: 9999 },
-//   ]),
-//   updateResultData
-// );
-
-// router.put(
-//   "/election/:electionId/report",
-//   authMiddleware,
-//   uploadIncident,
-//   updateIncidentReportData
-// );
-// router.post(
-//   "/election/:electionId/report",
-//   authMiddleware,
-//   uploadIncident,
-//   uploadIncidentReportData
-// );
-
 export default router;

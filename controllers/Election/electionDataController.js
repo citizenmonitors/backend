@@ -44,12 +44,17 @@ export const updateElection = async (req, res) => {
 
 export const getAllElections = async (req, res) => {
   try {
-    const elections = await getAllElectionsService();
+    const userId = req.user._id;
+    const elections = await getAllElectionsService(userId);
     res.status(200).json({ elections });
   } catch (error) {
     res.status(500).json({ message: "Error fetching elections", error });
   }
 };
+// new ObjectId('6666a337fec60b167dbe9ccf')
+
+// "user": "6666a337fec60b167dbe9ccf"
+//  "user": "669024850bd09db106796cb4"
 
 export const getElectionResultByIdCont = async (req, res) => {
   try {

@@ -1,114 +1,135 @@
-// import { getData } from "../../services/Location/locationService.js";
+// import {
+//   getData,
+//   buildLocalGovernments,
+//   buildWards,
+//   buildPollingUnits,
+//   findDirectoryWithPrefix,
+//   resolveNestedDirectories,
+// } from "../../services/Location/locationService.js";
 // import path from "path";
 // import { fileURLToPath } from "url";
-
 // const __filename = fileURLToPath(import.meta.url);
 // const __dirname = path.dirname(__filename);
-// const baseDir = path.join(__dirname, "../../data/states");
+// // const baseDir = path.join(__dirname, "../../data/states");
 
-// const getAllData = (req, res) => {
-//   try {
-//     const data = getData(baseDir);
-//     res.json(data);
-//   } catch (error) {
-//     console.error(`Error getting data: ${error.message}`);
-//     res.status(500).send("Error reading data");
-//   }
+// global.baseDir = path.join(__dirname, "../../data/states");
+
+// const transformResponse = (data) => {
+//   return data.map((item) => ({ name: item }));
 // };
 
-// const getStates = (req, res) => {
+// export const getStates = (req, res) => {
 //   try {
-//     const data = getData(baseDir);
-//     res.json(data.states.map((state) => ({ id: state.id, name: state.name })));
+//     const data = getData();
+//     res.json(transformResponse(data.states));
 //   } catch (error) {
 //     console.error(`Error getting states: ${error.message}`);
-//     res.status(500).send("Error reading state data");
+//     res.status(500).send("Error getting states");
 //   }
 // };
 
-// const getLocalGovernmentsByState = (req, res) => {
+// export const getLGAs = (req, res) => {
+//   const state = decodeURIComponent(req.params.state.toLowerCase());
+//   console.log(`Requested state: ${state}`);
+//   const stateDirName = findDirectoryWithPrefix(global.baseDir, state);
+
+//   if (!stateDirName) {
+//     console.error(`State directory not found for: ${state}`);
+//     return res.status(404).send(`State directory not found for: ${state}`);
+//   }
+
+//   const stateDir = path.join(global.baseDir, stateDirName);
+//   console.log(`Resolved state directory: ${stateDir}`);
+
 //   try {
-//     const { stateName } = req.params;
-//     const data = getData(baseDir);
-//     const state = data.states.find(
-//       (s) => s.name.toLowerCase() === stateName.toLowerCase()
-//     );
-//     if (state) {
-//       res.json(state.local_governments);
-//     } else {
-//       res.status(404).send("State not found");
-//     }
+//     const localGovernments = buildLocalGovernments(stateDir);
+//     res.json(transformResponse(localGovernments));
 //   } catch (error) {
-//     console.error(`Error getting local governments: ${error.message}`);
-//     res.status(500).send("Error reading data");
+//     console.error(`Error getting LGAs: ${error.message}`);
+//     res.status(500).send("Error getting LGAs");
 //   }
 // };
 
-// const getWardsByLocalGovernment = (req, res) => {
+// export const getWards = (req, res) => {
+//   const state = decodeURIComponent(req.params.state.toLowerCase());
+//   const lgaPath = req.params[0];
+//   console.log(`Requested state: ${state}, LGA path: ${lgaPath}`);
+//   const stateDirName = findDirectoryWithPrefix(global.baseDir, state);
+
+//   if (!stateDirName) {
+//     console.error(`State directory not found for: ${state}`);
+//     return res.status(404).send(`State directory not found for: ${state}`);
+//   }
+
+//   const lgaParts = lgaPath
+//     .split("/")
+//     .map(decodeURIComponent)
+//     .map((part) => part.toLowerCase());
+//   const lgaDir = resolveNestedDirectories(
+//     path.join(global.baseDir, stateDirName, "lgas"),
+//     lgaParts
+//   );
+//   if (!lgaDir) {
+//     console.error(`LGA directory not found for: ${lgaPath}`);
+//     return res.status(404).send(`LGA directory not found for: ${lgaPath}`);
+//   }
+
+//   console.log(`Resolved LGA directory: ${lgaDir}`);
+
 //   try {
-//     const { stateName, lgaName } = req.params;
-//     const data = getData(baseDir);
-//     const state = data.states.find(
-//       (s) => s.name.toLowerCase() === stateName.toLowerCase()
-//     );
-//     if (state) {
-//       const lga = state.local_governments.find(
-//         (l) => l.name.toLowerCase() === lgaName.toLowerCase()
-//       );
-//       if (lga) {
-//         res.json(lga.wards);
-//       } else {
-//         res.status(404).send("Local government not found");
-//       }
-//     } else {
-//       res.status(404).send("State not found");
-//     }
+//     const wards = buildWards(lgaDir);
+//     res.json(transformResponse(wards));
 //   } catch (error) {
 //     console.error(`Error getting wards: ${error.message}`);
-//     res.status(500).send("Error reading data");
+//     res.status(500).send("Error getting wards");
 //   }
 // };
 
-// const getPollingUnitsByWard = (req, res) => {
+// export const getPollingUnits = (req, res) => {
+//   const state = decodeURIComponent(req.params.state.toLowerCase());
+//   const lgaPath = req.params[0];
+//   const wardPath = req.params[1];
+//   console.log(
+//     `Requested state: ${state}, LGA path: ${lgaPath}, Ward path: ${wardPath}`
+//   );
+//   const stateDirName = findDirectoryWithPrefix(global.baseDir, state);
+
+//   if (!stateDirName) {
+//     console.error(`State directory not found for: ${state}`);
+//     return res.status(404).send(`State directory not found for: ${state}`);
+//   }
+
+//   const lgaParts = lgaPath
+//     .split("/")
+//     .map(decodeURIComponent)
+//     .map((part) => part.toLowerCase());
+//   const lgaDir = resolveNestedDirectories(
+//     path.join(global.baseDir, stateDirName, "lgas"),
+//     lgaParts
+//   );
+//   if (!lgaDir) {
+//     console.error(`LGA directory not found for: ${lgaPath}`);
+//     return res.status(404).send(`LGA directory not found for: ${lgaPath}`);
+//   }
+
+//   console.log(`Resolved LGA directory: ${lgaDir}`);
+
+//   const wardParts = wardPath
+//     .split("/")
+//     .map(decodeURIComponent)
+//     .map((part) => part.toLowerCase());
+
 //   try {
-//     const { stateName, lgaName, wardName } = req.params;
-//     const data = getData(baseDir);
-//     const state = data.states.find(
-//       (s) => s.name.toLowerCase() === stateName.toLowerCase()
-//     );
-//     if (state) {
-//       const lga = state.local_governments.find(
-//         (l) => l.name.toLowerCase() === lgaName.toLowerCase()
-//       );
-//       if (lga) {
-//         const ward = lga.wards.find(
-//           (w) => w.name.toLowerCase() === wardName.toLowerCase()
-//         );
-//         if (ward) {
-//           res.json(ward.polling_units);
-//         } else {
-//           res.status(404).send("Ward not found");
-//         }
-//       } else {
-//         res.status(404).send("Local government not found");
-//       }
-//     } else {
-//       res.status(404).send("State not found");
-//     }
+//     const pollingUnits = buildPollingUnits(lgaDir, wardParts);
+//     res.json(transformResponse(pollingUnits));
 //   } catch (error) {
 //     console.error(`Error getting polling units: ${error.message}`);
-//     res.status(500).send("Error reading data");
+//     res.status(500).send("Error getting polling units");
 //   }
 // };
 
-// export {
-//   getAllData,
-//   getStates,
-//   getLocalGovernmentsByState,
-//   getWardsByLocalGovernment,
-//   getPollingUnitsByWard,
-// };
-
+// Import necessary modules and functions
+import path from "path";
 import {
   getData,
   buildLocalGovernments,
@@ -117,21 +138,22 @@ import {
   findDirectoryWithPrefix,
   resolveNestedDirectories,
 } from "../../services/Location/locationService.js";
-import path from "path";
 import { fileURLToPath } from "url";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-// const baseDir = path.join(__dirname, "../../data/states");
-
 global.baseDir = path.join(__dirname, "../../data/states");
 
-const transformResponse = (data) => {
-  return data.map((item) => ({ name: item }));
-};
+// Function to normalize names (e.g., replace spaces with hyphens)
+const normalizeName = (name) => name.trim().toLowerCase().replace(/\s+/g, "-");
 
-export const getStates = (req, res) => {
+// Helper function to transform response
+const transformResponse = (data) => data.map((item) => ({ name: item }));
+
+// Endpoint to get all states
+const getStates = (req, res) => {
   try {
-    const data = getData();
+    const data = getData(global.baseDir);
     res.json(transformResponse(data.states));
   } catch (error) {
     console.error(`Error getting states: ${error.message}`);
@@ -139,8 +161,9 @@ export const getStates = (req, res) => {
   }
 };
 
-export const getLGAs = (req, res) => {
-  const state = decodeURIComponent(req.params.state.toLowerCase());
+// Endpoint to get LGAs for a specific state
+const getLGAs = (req, res) => {
+  const state = normalizeName(decodeURIComponent(req.params.state));
   console.log(`Requested state: ${state}`);
   const stateDirName = findDirectoryWithPrefix(global.baseDir, state);
 
@@ -161,8 +184,9 @@ export const getLGAs = (req, res) => {
   }
 };
 
-export const getWards = (req, res) => {
-  const state = decodeURIComponent(req.params.state.toLowerCase());
+// Endpoint to get wards for a specific LGA
+const getWards = (req, res) => {
+  const state = normalizeName(decodeURIComponent(req.params.state));
   const lgaPath = req.params[0];
   console.log(`Requested state: ${state}, LGA path: ${lgaPath}`);
   const stateDirName = findDirectoryWithPrefix(global.baseDir, state);
@@ -175,7 +199,7 @@ export const getWards = (req, res) => {
   const lgaParts = lgaPath
     .split("/")
     .map(decodeURIComponent)
-    .map((part) => part.toLowerCase());
+    .map(normalizeName);
   const lgaDir = resolveNestedDirectories(
     path.join(global.baseDir, stateDirName, "lgas"),
     lgaParts
@@ -196,8 +220,9 @@ export const getWards = (req, res) => {
   }
 };
 
-export const getPollingUnits = (req, res) => {
-  const state = decodeURIComponent(req.params.state.toLowerCase());
+// Endpoint to get polling units for a specific ward with nested directories
+const getPollingUnits = (req, res) => {
+  const state = normalizeName(decodeURIComponent(req.params.state));
   const lgaPath = req.params[0];
   const wardPath = req.params[1];
   console.log(
@@ -213,7 +238,7 @@ export const getPollingUnits = (req, res) => {
   const lgaParts = lgaPath
     .split("/")
     .map(decodeURIComponent)
-    .map((part) => part.toLowerCase());
+    .map(normalizeName);
   const lgaDir = resolveNestedDirectories(
     path.join(global.baseDir, stateDirName, "lgas"),
     lgaParts
@@ -228,7 +253,7 @@ export const getPollingUnits = (req, res) => {
   const wardParts = wardPath
     .split("/")
     .map(decodeURIComponent)
-    .map((part) => part.toLowerCase());
+    .map(normalizeName);
 
   try {
     const pollingUnits = buildPollingUnits(lgaDir, wardParts);
@@ -238,3 +263,5 @@ export const getPollingUnits = (req, res) => {
     res.status(500).send("Error getting polling units");
   }
 };
+
+export { getStates, getLGAs, getWards, getPollingUnits };

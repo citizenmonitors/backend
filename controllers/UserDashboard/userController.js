@@ -1,6 +1,8 @@
 import {
   observerToVolunteerService,
   updateUserService,
+  verifyUserEmail,
+  resendTokenService,
   deleteUserService,
 } from "../../services/UserDashboard/userService.js";
 import upload from "../../config/multer.js";
@@ -64,17 +66,43 @@ export const updateUser = async (req, res) => {
        .json({ message: "Please confirm your new password" });
    }
 
-   const updatedUser = await updateUserService(
+   const result = await updateUserService(
      userId,
      updateData,
      currentPassword
    );
-   res.status(200).json(updatedUser);
+  if (result.message){ 
+    return res.status(200).json(result);
+  };
+
+  res.status(200).json(result);
  } catch (error) {
    res
      .status(500)
      .json({ message: "Error updating user details", error: error.message });
  }
+};
+
+// Send verification email
+export const verifyEmail = async (req, res) => {
+  try {
+    const { email, verificationCode } = req.body;
+    await verifyUserEmail(email,verificationCode)
+    res.status(200).json({ message: "Email verified successfully." });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// Resend verification token
+export const resendToken = async (req, res) => {
+  try {
+    const { email } = req.body;
+    await resendTokenService(email);
+    res.status(200).json({ message: "Verification code resent successfully" });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
 
 // Delete user account

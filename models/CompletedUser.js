@@ -15,14 +15,16 @@ const completedUserSchema = new mongoose.Schema({
   isPoliticalPartyMember: Boolean,
   isElectionWitnessReady: Boolean,
   isOpenToSurvey: Boolean,
+  verificationCode: String,
+  verificationCodeExpires: Date,
   // Volunteer specific fields
   governmentId: String,
   phoneNumber: String,
   bankName: String,
   bankAccountNumber: String,
   bankAccountName: String,
-  resetPasswordToken: { type: String, required: false },
-  resetPasswordExpires: { type: Date, required: false },
+  resetPasswordToken: String,
+  resetPasswordExpires: Date,
   password: { type: String, required: true },
 });
 

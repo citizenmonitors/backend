@@ -116,7 +116,7 @@ export const updateUserService = async (
     if (updatedEmail) {
       return { message: "Please verify your new email address" };
     }
-    
+
     return updatedUser;
   } catch (error) {
     throw new Error(`Error updating user details: ${error.message}`);
@@ -141,6 +141,7 @@ export const verifyUserEmail = async (email, verificationCode) => {
   }
 
   user.verificationCode = null;
+  user.verificationCodeExpires = null;
   await user.save();
 
   return true;

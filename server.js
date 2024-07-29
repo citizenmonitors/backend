@@ -12,6 +12,7 @@ import locations from "./routes/locations.js";
 import locationRoutes from "./routes/Location/locationRoutes.js";
 import bankRoutes from "./routes/bankRoutes.js";
 import userRoutes from "./routes/userDashboard/userRoutes.js";
+import adminRoutes from "./routes/adminRoutes/adminElectionRoutes.js"
 
 const app = express();
 app.use(bodyParser.json());
@@ -26,7 +27,7 @@ app.use("/api", locations);
 app.use("/api/locations", locationRoutes);
 app.use("/api", bankRoutes);
 app.use("/api", userRoutes);
-
+app.use("/api", adminRoutes);
 
 
 app.use((err, req, res, next) => {

@@ -69,8 +69,6 @@ export const getAllElectionsService = async (userId) => {
   });
 };
 
-
-
 // export const getAllElectionsService = async (userId) => {
 //   try {
 //     const elections = await Election.find().lean();

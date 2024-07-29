@@ -3,6 +3,8 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import User from "../models/User.js";
 import CompletedUser from "../models/CompletedUser.js";
+import DailyTraffic from "../models/DailyTraffic/dailyTraffic.js"
+import monthlyActiveUsers from "../models/ActiveMontlyUsers/activeMontlyUsers.js"
 import transporter from "../config/email.js";
 import { generateToken } from "../utils/generateToken.js";
 import { hashPassword } from "../utils/hashPassword.js";
@@ -77,6 +79,7 @@ export const verifyUserEmail = async (email, verificationCode) => {
   }
 
   user.verificationCode = null;
+  user.verificationCodeExpires = null;
   user.isVerified = true;
   await user.save();
 
@@ -209,7 +212,48 @@ export const authenticateUser = async ({ email, password }) => {
   if (!isMatch) {
     throw new Error("The password you entered is incorrect");
   }
+user.isActive = true;
+user.lastLogin = new Date();
+await user.save();
 
+// Update daily login count
+const today = moment().startOf('day').format('DD MM YYYY');
+  let dailyTraffic = await DailyTraffic.findOne({ date: today });
+
+  if (!dailyTraffic) {
+    dailyTraffic = new DailyTraffic({ date: today, loginCount: 0, users: [] });
+  }
+
+  if (!dailyTraffic.users) {
+    dailyTraffic.users = [];
+  }
+
+  if (!dailyTraffic.users.includes(user._id)) {
+    dailyTraffic.loginCount += 1;
+    dailyTraffic.users.push(user._id);
+    await dailyTraffic.save();
+  }
+
+  // update monthly active users
+
+  const currentMonth = moment().subtract(1, "month").format("MM YYYY");
+ let monthlyActive = await monthlyActiveUsers.findOne({ month: currentMonth });
+
+ if (!monthlyActive) {
+   monthlyActive = new monthlyActiveUsers({
+     month: currentMonth,
+     activeUserCount: 0,
+     users: [],
+   });
+ }
+
+ if (!monthlyActive.users.includes(user._id)) {
+   monthlyActive.activeUserCount += 1;
+   monthlyActive.users.push(user._id);
+   await monthlyActive.save();
+ }
+
+    
   const token = generateToken({ email: user.email });
   const { password: userPassword, ...usersDetails } = user.toObject();
   return { token, user: usersDetails };

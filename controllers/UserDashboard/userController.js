@@ -1,5 +1,5 @@
 import {
-  observerToVolunteerService,
+  volunteerToObserverService,
   updateUserService,
   verifyUserEmail,
   resendTokenService,
@@ -9,9 +9,9 @@ import upload from "../../config/multer.js";
 
 
 
-// observer to volunteer
+// volunteer to observer
 
-export const ObserverToVolunteer = [
+export const volunteerToObserver = [
   upload.single("governmentId"),
   async (req, res) => {
     try {
@@ -30,23 +30,23 @@ export const ObserverToVolunteer = [
       if (!file) {
         return res
           .status(400)
-          .json({ message: "Government ID is required to be a volunteer" });
+          .json({ message: "Government ID is required to be an observer" });
       }
 
-      const updatedUser = await observerToVolunteerService({
+      const updatedUser = await volunteerToObserverService({
         email: user.email,
         details,
         file,
       });
 
       res.status(200).json({
-        message: "Observer updated to volunteer successfully",
+        message: "Volunteer updated to Observer successfully",
         user: updatedUser,
       });
     } catch (err) {
-      console.error("Error updating user to volunteer:", err);
+      console.error("Error updating user to Observer:", err);
       res.status(500).json({
-        message: "An error occurred while updating user to volunteer",
+        message: "An error occurred while updating user to Observer",
       });
     }
   },

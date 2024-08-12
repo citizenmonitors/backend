@@ -7,7 +7,7 @@ import User from "../../models/User.js";
 
 // bug
 // observer to volunteer
-export const observerToVolunteerService = async ({ email, details, file }) => {
+export const volunteerToObserverService = async ({ email, details, file }) => {
   const user = await CompletedUser.findOne({ email });
 
   if (!user) {
@@ -17,17 +17,15 @@ export const observerToVolunteerService = async ({ email, details, file }) => {
   if (file) {
     const ext = path.extname(file.originalname).toLowerCase();
     if (![".jpg", ".jpeg", "pdf", ".png"].includes(ext)) {
-      throw new Error(
-        "Only images are allowed. Please upload a jpg, jpeg, pdf, or png file."
-      );
+      throw new Error("Please upload a jpg, jpeg, pdf, or png file.");
     }
     details.governmentId = file.path;
   } else {
-    throw new Error("Government ID is required for volunteers");
+    throw new Error("Government ID is required for observers");
   }
 
   Object.assign(user, details);
-  user.role = "volunteer";
+  user.role = "observer";
 
   await user.save();
 

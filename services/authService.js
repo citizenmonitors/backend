@@ -145,9 +145,9 @@ export const submitRoleFormDetails = async ({ email, role, details, file }) => {
     throw new Error("User has not selected a role");
   }
 
-   if (role === "volunteer") {
+   if (role === "observer") {
      if (!file) {
-       throw new Error("Government ID is required for volunteers");
+       throw new Error("Government ID is required for observers");
      }
 
      const ext = path.extname(file.originalname).toLowerCase();

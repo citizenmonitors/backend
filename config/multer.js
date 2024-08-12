@@ -30,11 +30,7 @@ const fileFilter = (req, file, cb) => {
   if (allowedTypes.includes(ext)) {
     cb(null, true);
   } else {
-    cb(
-      new Error(
-        "Only images (png, jpg, pdf, jpeg) and videos (mp4) are allowed"
-      )
-    );
+    cb(new Error("Please upload a jpg, jpeg, pdf, png or mp4 file."));
   }
 };
 

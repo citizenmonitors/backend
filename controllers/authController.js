@@ -10,7 +10,6 @@ import {
   validateTokenService,
 } from "../services/authService.js";
 import upload from "../config/multer.js";
-import CompletedUser from '../models/CompletedUser.js';
 
 
 export const register = async (req, res) => {
@@ -71,10 +70,10 @@ export const submitRoleForm = [
         return res.status(400).json({ message: "Role is required" });
       }
 
-      if (role === "volunteer" && !file) {
+      if (role === "observer" && !file) {
         return res
           .status(400)
-          .json({ message: "Government ID is required for volunteers" });
+          .json({ message: "Government ID is required for observers" });
       }
 
       const { token, user } = await submitRoleFormDetails({

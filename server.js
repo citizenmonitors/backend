@@ -12,7 +12,7 @@ import locations from "./routes/locations.js";
 import locationRoutes from "./routes/Location/locationRoutes.js";
 import bankRoutes from "./routes/bankRoutes.js";
 import userRoutes from "./routes/userDashboard/userRoutes.js";
-import adminRoutes from "./routes/adminRoutes/adminElectionRoutes.js"
+import adminRoutes from "./routes/adminRoutes/adminElectionRoutes.js";
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -23,7 +23,6 @@ app.use(cors());
 
 connectDB();
 
-
 app.use("/api/auth", authRoutes);
 app.use("/api/elections", electionRoutes);
 app.use("/api", locations);
@@ -33,7 +32,7 @@ app.use("/api", userRoutes);
 app.use("/api", adminRoutes);
 
 app.use("/governmentid", express.static(path.join(__dirname, "governmentId")));
-app.use("/profileimage", express.static(path.join(__dirname, "profileImages")));
+app.use("/profileimage", express.static(path.join(__dirname, "profileImage")));
 
 app.use((err, req, res, next) => {
   res.status(500).json({ message: err.message });

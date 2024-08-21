@@ -88,50 +88,6 @@ export const submitRoleForm = [
     }
   },
 ];
-// export const submitRoleForm = [
-//   upload.single("governmentId"),
-//   async (req, res) => {
-//     try {
-//       const { email, role, ...details } = req.body;
-//       const file = req.file;
-
-//       // console.log("Request body:", req.body); 
-//       // console.log("Uploaded file:", req.file); 
-
-//       if (!email) {
-//         return res.status(400).json({ message: "Email is required" });
-//       }
-
-//       if (!role) {
-//         return res.status(400).json({ message: "Role is required" });
-//       }
-
-//       if (role === "observer" && !file) {
-//         return res
-//           .status(400)
-//           .json({ message: "Government ID is required for observers" });
-//       }
-
-//       const { token, user } = await submitRoleFormDetails({
-//         email,
-//         role,
-//         details,
-//         file,
-//       });
-
-//       res.status(200).json({
-//         message:
-//           "Details submitted successfully. You can now login to your account.",
-//         token,
-//         user,
-//       });
-//     } catch (err) {
-//       console.error(err); 
-//       res.status(400).json({ message: err.message });
-//     }
-//   },
-// ];
-
 export const signIn = async (req, res) => {
   try {
     const { token, user } = await authenticateUser(req.body);

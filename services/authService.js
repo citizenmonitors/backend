@@ -206,7 +206,7 @@ export const submitRoleFormDetails = async ({ email, role, details, files }) => 
   return { token, user: usersDetails };
  
 };
-// export const submitRoleFormDetails = async ({ email, role, details, files }) => {
+
 //   // console.log("Searching for user with email:", email); 
 //   const user = await User.findOne({ email });
 

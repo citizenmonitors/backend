@@ -158,7 +158,7 @@ export const submitRoleFormDetails = async ({ email, role, details, files }) => 
    }
 
    if(files.profileImage){
-     profileImageUrl = `/profileImages/${path.basename(files.profileImage[0].path)}`;
+     profileImageUrl = `/profileImage/${path.basename(files.profileImage[0].path)}`;
    }
 
    details.governmentId = governmentIdUrl;

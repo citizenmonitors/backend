@@ -10,6 +10,8 @@ import { generateToken } from "../utils/generateToken.js";
 import { hashPassword } from "../utils/hashPassword.js";
 import moment from "moment";
 import path from "path";
+import fs from "fs";
+
 
 const BASE_URL = process.env.BASE_URL;
 
@@ -128,7 +130,7 @@ export const selectUserRole = async (email, role) => {
   // return true;
 };
 
-export const submitRoleFormDetails = async ({ email, role, details, file }) => {
+export const submitRoleFormDetails = async ({ email, role, details, files }) => {
   // console.log("Searching for user with email:", email); 
   const user = await User.findOne({ email });
 
@@ -145,29 +147,30 @@ export const submitRoleFormDetails = async ({ email, role, details, file }) => {
     throw new Error("User has not selected a role");
   }
 
-   if (role === "observer") {
-     if (!file) {
+   let governmentIdUrl;
+   let profileImageUrl;
+
+   if (role === "observer" && files.governmentId) {
+      governmentIdUrl = `/governmentId/${path.basename(files.governmentId[0].path)}`;
+     if (!files || !files.governmentId) {
        throw new Error("Government ID is required for observers");
      }
-
-     const ext = path.extname(file.originalname).toLowerCase();
-     if (![".jpg", ".jpeg", "pdf", ".png"].includes(ext)) {
-       throw new Error(
-         "Only images are allowed. Please upload a jpg, jpeg, pdf, or png file."
-       );
-     }
-     details.governmentId = file.path;
    }
+
+   if(files.profileImage){
+     profileImageUrl = `/profileImages/${path.basename(files.profileImage[0].path)}`;
+   }
+
+   details.governmentId = governmentIdUrl;
+   details.profileImage = profileImageUrl;
+
 
   //  user details
   Object.assign(user, details);
   user.role = role;
   user.isVerified = true; 
 
-//  console.log("User Details:", details); 
-//  if (file) {
-//    console.log("File Path:", file.path); 
-//  }
+
 
   // Move user data to Completed User db
   const completedUserData = {
@@ -185,6 +188,7 @@ export const submitRoleFormDetails = async ({ email, role, details, file }) => {
     isPoliticalPartyMember: user.isPoliticalPartyMember,
     isElectionWitnessReady: user.isElectionWitnessReady,
     isOpenToSurvey: user.isOpenToSurvey,
+    profileImage: details.profileImage,
     governmentId: details.governmentId,
     phoneNumber: user.phoneNumber,
     bankName: user.bankName,
@@ -202,6 +206,81 @@ export const submitRoleFormDetails = async ({ email, role, details, file }) => {
   return { token, user: usersDetails };
  
 };
+// export const submitRoleFormDetails = async ({ email, role, details, files }) => {
+//   // console.log("Searching for user with email:", email); 
+//   const user = await User.findOne({ email });
+
+//   if (!user) {
+//     // console.log("No account found with email:", email);
+//     throw new Error("No account found with this email address");
+//   }
+
+//   if (!user.isVerified) {
+//     throw new Error("User has not verified their account");
+//   }
+
+//   if (!user.role) {
+//     throw new Error("User has not selected a role");
+//   }
+
+//    if (role === "observer") {
+//      if (!files || !files.governmentId) {
+//        throw new Error("Government ID is required for observers");
+//      }
+
+//      const ext = path.extname(file.originalname).toLowerCase();
+//      if (![".jpg", ".jpeg", "pdf", ".png"].includes(ext)) {
+//        throw new Error(
+//          "Only images are allowed. Please upload a jpg, jpeg, pdf, or png file."
+//        );
+//      }
+//      details.governmentId = file.path;
+//     //  detaails.profileImage = 
+//    }
+
+//   //  user details
+//   Object.assign(user, details);
+//   user.role = role;
+//   user.isVerified = true; 
+
+// //  console.log("User Details:", details); 
+// //  if (file) {
+// //    console.log("File Path:", file.path); 
+// //  }
+
+//   // Move user data to Completed User db
+//   const completedUserData = {
+//     role: role,
+//     email: user.email,
+//     firstName: user.firstName,
+//     lastName: user.lastName,
+//     gender: user.gender,
+//     dateOfBirth: user.dateOfBirth,
+//     state: user.state,
+//     lga: user.lga,
+//     ward: user.ward,
+//     pollingUnit: user.pollingUnit,
+//     isRegisteredVoter: user.isRegisteredVoter,
+//     isPoliticalPartyMember: user.isPoliticalPartyMember,
+//     isElectionWitnessReady: user.isElectionWitnessReady,
+//     isOpenToSurvey: user.isOpenToSurvey,
+//     governmentId: details.governmentId,
+//     phoneNumber: user.phoneNumber,
+//     bankName: user.bankName,
+//     bankAccountNumber: user.bankAccountNumber,
+//     bankAccountName: user.bankAccountName,
+//     password: user.password,
+//   };
+
+//   const completedUser = new CompletedUser(completedUserData);
+//   await completedUser.save();
+//   await user.deleteOne();
+
+//   const token = generateToken({ email: user.email });
+//   const { password, ...usersDetails } = completedUser.toObject();
+//   return { token, user: usersDetails };
+ 
+// };
 export const authenticateUser = async ({ email, password }) => {
   const user = await CompletedUser.findOne({ email });
   if (!user) {

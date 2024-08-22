@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import { governmentIdSchema } from "./GovernmentIds/GovernmentIdModel.js";
+import { profileImageSchema } from "./UserProfileImage/ProfileImageModel.js";
 
 const completedUserSchema = new mongoose.Schema({
   role: { type: String, enum: ["observer", "volunteer", "admin"] },
@@ -7,7 +9,7 @@ const completedUserSchema = new mongoose.Schema({
   lastName: String,
   gender: String,
   dateOfBirth: String,
-  profileImage: String,
+  profileImage: profileImageSchema,
   state: String,
   lga: String,
   ward: String,
@@ -21,7 +23,7 @@ const completedUserSchema = new mongoose.Schema({
   isActive: Boolean,
   lastLogin: Date,
   // Volunteer specific fields
-  governmentId: String,
+  governmentId: governmentIdSchema,
   phoneNumber: String,
   bankName: String,
   bankAccountNumber: String,

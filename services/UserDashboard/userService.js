@@ -4,8 +4,14 @@ import bcrypt from "bcryptjs";
 import moment from "moment";
 import transporter from "../../config/email.js";
 import User from "../../models/User.js";
+import fs from "fs";
+import profileImageModel from "../../models/UserProfileImage/ProfileImageModel.js";
+import { fileURLToPath } from "url";
 
-// bug
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const BASE_URL = process.env.BASE_URL || "http://localhost:5040";
+
 // observer to volunteer
 export const volunteerToObserverService = async ({ email, details, file }) => {
   const user = await CompletedUser.findOne({ email });
@@ -33,11 +39,11 @@ export const volunteerToObserverService = async ({ email, details, file }) => {
   return userDetails;
 };
 
-// Update user details
 export const updateUserService = async (
   userId,
   updateData,
   currentPassword,
+  file
 ) => {
   try {
     const user = await CompletedUser.findById(userId);
@@ -47,18 +53,15 @@ export const updateUserService = async (
 
     // If password update is requested
     if (updateData.password) {
-      // Verify the current password
       const isMatch = await bcrypt.compare(currentPassword, user.password);
       if (!isMatch) {
         throw new Error("Current password is incorrect");
       }
 
-      // Check if new password and confirm password match
       if (updateData.password !== updateData.confirmPassword) {
         throw new Error("New password and confirm password do not match");
       }
 
-      // Hash the new password
       const salt = await bcrypt.genSalt(10);
       updateData.password = await bcrypt.hash(updateData.password, salt);
       delete updateData.confirmPassword;
@@ -66,12 +69,8 @@ export const updateUserService = async (
 
     let updatedEmail = false;
 
-    // if updated email is required
-
     if (updateData.email && updateData.email !== user.email) {
       updatedEmail = true;
-
-      // Check if the new email already exists
 
       const emailExistsInCompletedUser = await CompletedUser.findOne({
         email: updateData.email,
@@ -79,9 +78,9 @@ export const updateUserService = async (
       const emailExistsInUser = await User.findOne({ email: updateData.email });
 
       if (emailExistsInCompletedUser || emailExistsInUser) {
-        throw new Error("This email already use.");
+        throw new Error("This email is already in use.");
       }
-      // Generate verification code
+
       const verificationCode = Math.floor(
         100000 + Math.random() * 900000
       ).toString();
@@ -89,7 +88,6 @@ export const updateUserService = async (
       updateData.verificationCode = verificationCode;
       updateData.verificationCodeExpires = moment().add(10, "minutes").toDate();
 
-      // Send verification emial
       await transporter.sendMail({
         to: updateData.email,
         subject: "Verify your email",
@@ -97,6 +95,46 @@ export const updateUserService = async (
       });
     }
 
+    // Handle profile image update
+    let profileImageFile;
+    if (file && file.profileImage) {
+      if (user.profileImage && user.profileImage.location) {
+        const oldImagePath = path.join(
+          __dirname,
+          "../../",
+          user.profileImage.location
+        );
+        console.log("Attempting to delete old profile image at:", oldImagePath);
+
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlink(oldImagePath, (err) => {
+            if (err) {
+              console.error("Error deleting old profile image:", err);
+            } else {
+              console.log("Old profile image deleted successfully");
+            }
+          });
+        } else {
+          console.log("Old profile image not found:", oldImagePath);
+        }
+      }
+
+      // Save the new profile image
+      const profileImagePath = `/profileimage/${path.basename(
+        file.profileImage[0].path
+      )}`;
+      profileImageFile = await profileImageModel.create({
+        location: profileImagePath,
+        name: file.profileImage[0].originalname,
+        type: file.profileImage[0].mimetype,
+        size: file.profileImage[0].size,
+        url: `${BASE_URL}${profileImagePath}`,
+      });
+
+      updateData.profileImage = profileImageFile; // Update with the new image
+    }
+
+    // Update user data in the database
     const updatedUser = await CompletedUser.findByIdAndUpdate(
       userId,
       updateData,
@@ -120,6 +158,7 @@ export const updateUserService = async (
     throw new Error(`Error updating user details: ${error.message}`);
   }
 };
+
 
 export const verifyUserEmail = async (email, verificationCode) => {
   const user = await CompletedUser.findOne({ email });

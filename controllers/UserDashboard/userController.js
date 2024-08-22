@@ -54,7 +54,9 @@ export const volunteerToObserver = [
 
 
 // Update user details
-export const updateUser = async (req, res) => {
+export const updateUser = [ 
+  upload.single('profileImage'),
+  async (req, res) => {
  try {
    const userId = req.user._id;
    const { currentPassword, ...updateData } = req.body;
@@ -66,10 +68,14 @@ export const updateUser = async (req, res) => {
        .json({ message: "Please confirm your new password" });
    }
 
+    // Pass the files to the service if there's an uploaded profile image
+    const file = req.file ? { profileImage: [req.file] } : null;
+
    const result = await updateUserService(
      userId,
      updateData,
-     currentPassword
+     currentPassword,
+     file
    );
   if (result.message){ 
     return res.status(200).json(result);
@@ -81,7 +87,7 @@ export const updateUser = async (req, res) => {
      .status(500)
      .json({ message: "Error updating user details", error: error.message });
  }
-};
+}];
 
 // Send verification email
 export const verifyEmail = async (req, res) => {

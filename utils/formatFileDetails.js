@@ -3,4 +3,5 @@ export const formatFileDetails = (file) => ({
   name: file.originalname,
   type: file.mimetype,
   size: file.size,
+  url: file.url,
 });

@@ -10,7 +10,7 @@ import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const BASE_URL = process.env.BASE_URL || "http://localhost:5040";
+const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5040";
 
 // observer to volunteer
 export const volunteerToObserverService = async ({ email, details, file }) => {
@@ -128,7 +128,7 @@ export const updateUserService = async (
         name: file.profileImage[0].originalname,
         type: file.profileImage[0].mimetype,
         size: file.profileImage[0].size,
-        url: `${BASE_URL}${profileImagePath}`,
+        url: `${BACKEND_URL}${profileImagePath}`,
       });
 
       updateData.profileImage = profileImageFile; // Update with the new image

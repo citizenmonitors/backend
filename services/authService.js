@@ -13,7 +13,8 @@ import path from "path";
 import ProfileImageModel from "../models/UserProfileImage/ProfileImageModel.js";
 import GovernmentIdModel from "../models/GovernmentIds/GovernmentIdModel.js";
 
-const BASE_URL = process.env.BASE_URL || "http://localhost:5040";
+const FRONTEND_URL = process.env.FRONTEND_URL;
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export const registerUser = async ({ email, password, confirmPassword }) => {
   if (password !== confirmPassword) {
@@ -173,7 +174,7 @@ export const submitRoleFormDetails = async ({
       name: files.governmentId[0].originalname,
       type: files.governmentId[0].mimetype,
       size: files.governmentId[0].size,
-      url: `${BASE_URL}${governmentIdPath}`, 
+      url: `${BACKEND_URL}${governmentIdPath}`, 
     });
 
     details.governmentId = governmentIdFile;
@@ -191,7 +192,7 @@ export const submitRoleFormDetails = async ({
       name: files.profileImage[0].originalname,
       type: files.profileImage[0].mimetype,
       size: files.profileImage[0].size,
-      url: `${BASE_URL}${profileImagePath}`,
+      url: `${BACKEND_URL}${profileImagePath}`,
     });
 
     details.profileImage = profileImageFile;
@@ -377,7 +378,7 @@ export const generateResetToken = async (email) => {
   user.resetPasswordExpires = moment().add(10, "minutes").toDate();
   await user.save();
 
-  const resetUrl = `${BASE_URL}/auth/reset-password?token=${resetToken}`;
+  const resetUrl = `${FRONTEND_URL}/auth/reset-password?token=${resetToken}`;
 
   await transporter.sendMail({
     to: email,

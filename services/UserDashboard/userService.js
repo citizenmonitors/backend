@@ -7,10 +7,11 @@ import User from "../../models/User.js";
 import fs from "fs";
 import profileImageModel from "../../models/UserProfileImage/ProfileImageModel.js";
 import { fileURLToPath } from "url";
+import governmentIdModel from "../../models/GovernmentIds/GovernmentIdModel.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5040";
+const BACKEND_URL = process.env.BACKEND_URL;
 
 // observer to volunteer
 export const volunteerToObserverService = async ({ email, details, file }) => {
@@ -20,24 +21,37 @@ export const volunteerToObserverService = async ({ email, details, file }) => {
     throw new Error("No account found with this email address");
   }
 
-  if (file) {
-    const ext = path.extname(file.originalname).toLowerCase();
-    if (![".jpg", ".jpeg", "pdf", ".png"].includes(ext)) {
-      throw new Error("Please upload a jpg, jpeg, pdf, or png file.");
-    }
-    details.governmentId = file.path;
-  } else {
+  if (!file) {
     throw new Error("Government ID is required for observers");
   }
 
+  // Process the government ID file
+  const governmentIdPath = `/governmentid/${path.basename(file.path)}`;
+
+  // Create a new File entry for government ID
+  const governmentIdFile = await governmentIdModel.create({
+    location: governmentIdPath,
+    name: file.originalname,
+    type: file.mimetype,
+    size: file.size,
+    url: `${BACKEND_URL}${governmentIdPath}`,
+  });
+
+  
+  details.governmentId = governmentIdFile;
+
+  // Update user details and change role to "observer"
   Object.assign(user, details);
   user.role = "observer";
 
+  // Save the updated user to the database
   await user.save();
 
+  // Exclude password from the response
   const { password, ...userDetails } = user.toObject();
   return userDetails;
 };
+
 
 export const updateUserService = async (
   userId,
@@ -51,7 +65,7 @@ export const updateUserService = async (
       throw new Error("User not found");
     }
 
-    // If password update is requested
+    // Handle password update
     if (updateData.password) {
       const isMatch = await bcrypt.compare(currentPassword, user.password);
       if (!isMatch) {
@@ -64,11 +78,12 @@ export const updateUserService = async (
 
       const salt = await bcrypt.genSalt(10);
       updateData.password = await bcrypt.hash(updateData.password, salt);
-      delete updateData.confirmPassword;
+      delete updateData.confirmPassword; // Clean up the updateData object
     }
 
     let updatedEmail = false;
 
+    // Handle email update
     if (updateData.email && updateData.email !== user.email) {
       updatedEmail = true;
 
@@ -118,16 +133,17 @@ export const updateUserService = async (
           console.log("Old profile image not found:", oldImagePath);
         }
       }
+      
 
       // Save the new profile image
       const profileImagePath = `/profileimage/${path.basename(
-        file.profileImage[0].path
+        file.profileImage.path
       )}`;
       profileImageFile = await profileImageModel.create({
         location: profileImagePath,
-        name: file.profileImage[0].originalname,
-        type: file.profileImage[0].mimetype,
-        size: file.profileImage[0].size,
+        name: file.profileImage.originalname,
+        type: file.profileImage.mimetype,
+        size: file.profileImage.size,
         url: `${BACKEND_URL}${profileImagePath}`,
       });
 
@@ -148,7 +164,7 @@ export const updateUserService = async (
       throw new Error("User not found");
     }
 
-    // If email was updated, return a message to check the new email for verification
+    // Return a message if email was updated, else return updated user details
     if (updatedEmail) {
       return { message: "Please verify your new email address" };
     }
@@ -158,7 +174,6 @@ export const updateUserService = async (
     throw new Error(`Error updating user details: ${error.message}`);
   }
 };
-
 
 export const verifyUserEmail = async (email, verificationCode) => {
   const user = await CompletedUser.findOne({ email });

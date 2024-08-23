@@ -12,20 +12,12 @@ import upload from "../../config/multer.js";
 // volunteer to observer
 
 export const volunteerToObserver = [
-  upload.single("governmentId"),
+  upload.single("governmentId"), 
   async (req, res) => {
     try {
       const user = req.user;
       const { ...details } = req.body;
-      const file = req.file;
-
-      // if (!email) {
-      //   return res.status(400).json({ message: "Email is required" });
-      // }
-
-      // if (role === "volunteer") {
-      //   return res.status(400).json({ message: "User is a volunteer" });
-      // }
+      const file = req.file; 
 
       if (!file) {
         return res
@@ -36,7 +28,7 @@ export const volunteerToObserver = [
       const updatedUser = await volunteerToObserverService({
         email: user.email,
         details,
-        file,
+        file, 
       });
 
       res.status(200).json({
@@ -54,40 +46,44 @@ export const volunteerToObserver = [
 
 
 // Update user details
-export const updateUser = [ 
-  upload.single('profileImage'),
+export const updateUser = [
+  upload.single("profileImage"),
   async (req, res) => {
- try {
-   const userId = req.user._id;
-   const { currentPassword, ...updateData } = req.body;
+    try {
+      const userId = req.user._id;
+      const { currentPassword, ...updateData } = req.body;
 
-   // Validate new password confirmation if provided
-   if (updateData.password && !updateData.confirmPassword) {
-     return res
-       .status(400)
-       .json({ message: "Please confirm your new password" });
-   }
+      // Validate new password confirmation if provided
+      if (updateData.password && !updateData.confirmPassword) {
+        return res
+          .status(400)
+          .json({ message: "Please confirm your new password" });
+      }
 
-    // Pass the files to the service if there's an uploaded profile image
-    const file = req.file ? { profileImage: [req.file] } : null;
+      // Pass the file to the service if there's an uploaded profile image
+      const file = req.file ? { profileImage: req.file } : null;
 
-   const result = await updateUserService(
-     userId,
-     updateData,
-     currentPassword,
-     file
-   );
-  if (result.message){ 
-    return res.status(200).json(result);
-  };
+      const result = await updateUserService(
+        userId,
+        updateData,
+        currentPassword,
+        file
+      );
 
-  res.status(200).json(result);
- } catch (error) {
-   res
-     .status(500)
-     .json({ message: "Error updating user details", error: error.message });
- }
-}];
+      if (result.message) {
+        return res.status(200).json(result);
+      }
+
+      res.status(200).json(result);
+    } catch (error) {
+      console.error("Error updating user details:", error);
+      res.status(500).json({
+        message: "Error updating user details",
+        error: error.message,
+      });
+    }
+  },
+];
 
 // Send verification email
 export const verifyEmail = async (req, res) => {

@@ -622,6 +622,304 @@ export const deleteIncidentReportDataService = async (electionId) => {
   }
 };
 
+
+export const getUserElectionResultsAndReports = async (userId) => {
+  try {
+    // Fetch election results by user
+    const electionResults = await ElectionData.find({ user: userId })
+      .populate("election", "electionType startDate endDate")
+      .lean();
+
+    // Fetch incident reports by user
+    const incidentReports = await IncidentReport.find({ user: userId })
+      .populate("election", "electionType startDate endDate")
+      .lean();
+
+    return { electionResults, incidentReports };
+  } catch (error) {
+    console.error(
+      `Error fetching election results and incident reports: ${error.message}`
+    );
+    throw new Error(
+      `Failed to fetch election results and incident reports: ${error.message}`
+    );
+  }
+};
+
+
+// const aggregateResults = (results) => {
+//   const aggregated = {};
+
+//   results.forEach((result) => {
+//     const {
+//       state,
+//       lga,
+//       ward,
+//       pollingUnit,
+//       partiesVotes,
+//       otherPartiesVotes,
+//       voterIntimidation,
+//       voteBuying,
+//       voteRating,
+//       resultPictures,
+//       resultVideos,
+//     } = result;
+
+//     if (!aggregated[state]) {
+//       aggregated[state] = { totalVotes: 0, localGovernments: {} };
+//     }
+
+//     if (!aggregated[state].localGovernments[lga]) {
+//       aggregated[state].localGovernments[lga] = { totalVotes: 0, wards: {} };
+//     }
+
+//     if (!aggregated[state].localGovernments[lga].wards[ward]) {
+//       aggregated[state].localGovernments[lga].wards[ward] = {
+//         totalVotes: 0,
+//         pollingUnits: {},
+//       };
+//     }
+
+//     if (
+//       !aggregated[state].localGovernments[lga].wards[ward].pollingUnits[
+//         pollingUnit
+//       ]
+//     ) {
+//       aggregated[state].localGovernments[lga].wards[ward].pollingUnits[
+//         pollingUnit
+//       ] = {
+//         totalVotes: 0,
+//         partiesVotes: {},
+//         otherPartiesVotes: {},
+//         voterIntimidation: 0,
+//         voteBuying: 0,
+//         goodRating: 0,
+//         okayRating: 0,
+//         poorRating: 0,
+//         resultPictures: 0,
+//         resultVideos: 0,
+//       };
+//     }
+
+//     const pollingUnitData =
+//       aggregated[state].localGovernments[lga].wards[ward].pollingUnits[
+//         pollingUnit
+//       ];
+
+//     // Count parties votes
+//     if (partiesVotes) {
+//       for (const { party, count } of partiesVotes) {
+//         if (!pollingUnitData.partiesVotes[party]) {
+//           pollingUnitData.partiesVotes[party] = 0;
+//         }
+//         pollingUnitData.partiesVotes[party] += count;
+//         pollingUnitData.totalVotes += count;
+//       }
+//     }
+
+//     // Count other parties votes
+//     if (otherPartiesVotes) {
+//       for (const { party, count } of otherPartiesVotes) {
+//         if (!pollingUnitData.otherPartiesVotes[party]) {
+//           pollingUnitData.otherPartiesVotes[party] = 0;
+//         }
+//         pollingUnitData.otherPartiesVotes[party] += count;
+//         pollingUnitData.totalVotes += count;
+//       }
+//     }
+
+//     // Count boolean fields
+//     if (voterIntimidation === "yes") {
+//       pollingUnitData.voterIntimidation++;
+//     }
+//     if (voteBuying === "yes") {
+//       pollingUnitData.voteBuying++;
+//     }
+
+//     // Count rating fields
+//     if (voteRating === "good") {
+//       pollingUnitData.goodRating++;
+//     } else if (voteRating === "okay") {
+//       pollingUnitData.okayRating++;
+//     } else if (voteRating === "poor") {
+//       pollingUnitData.poorRating++;
+//     }
+
+//     // Count result pictures and videos
+//     pollingUnitData.resultPictures += (resultPictures || []).length;
+//     pollingUnitData.resultVideos += (resultVideos || []).length;
+
+//     aggregated[state].totalVotes += pollingUnitData.totalVotes;
+//     aggregated[state].localGovernments[lga].totalVotes +=
+//       pollingUnitData.totalVotes;
+//     aggregated[state].localGovernments[lga].wards[ward].totalVotes +=
+//       pollingUnitData.totalVotes;
+//   });
+
+//   return formatAggregatedResults(aggregated);
+// };
+
+// const aggregateIncidents = (incidents) => {
+//   const aggregated = {};
+
+//   incidents.forEach((incident) => {
+//     const { state, lga, ward, selectIncident } = incident;
+
+//     if (!aggregated[state]) {
+//       aggregated[state] = { totalIncidents: 0, localGovernments: {} };
+//     }
+
+//     if (!aggregated[state].localGovernments[lga]) {
+//       aggregated[state].localGovernments[lga] = {
+//         totalIncidents: 0,
+//         wards: {},
+//       };
+//     }
+
+//     if (!aggregated[state].localGovernments[lga].wards[ward]) {
+//       aggregated[state].localGovernments[lga].wards[ward] = {
+//         totalIncidents: 0,
+//         incidentTypes: {},
+//       };
+//     }
+
+//     const wardData = aggregated[state].localGovernments[lga].wards[ward];
+
+//     if (!wardData.incidentTypes[selectIncident]) {
+//       wardData.incidentTypes[selectIncident] = 0;
+//     }
+//     wardData.incidentTypes[selectIncident]++;
+
+//     aggregated[state].totalIncidents++;
+//     aggregated[state].localGovernments[lga].totalIncidents++;
+//     wardData.totalIncidents++;
+//   });
+
+//   return formatAggregatedIncidents(aggregated);
+// };
+
+// const formatAggregatedResults = (aggregated) => {
+//   const formattedResults = [];
+
+//   for (const state in aggregated) {
+//     const stateData = {
+//       state,
+//       totalVotes: aggregated[state].totalVotes,
+//       localGovernments: [],
+//     };
+
+//     for (const lga in aggregated[state].localGovernments) {
+//       const lgaData = {
+//         localGovernment: lga,
+//         totalVotes: aggregated[state].localGovernments[lga].totalVotes,
+//         wards: [],
+//       };
+
+//       for (const ward in aggregated[state].localGovernments[lga].wards) {
+//         const wardData = {
+//           ward,
+//           totalVotes:
+//             aggregated[state].localGovernments[lga].wards[ward].totalVotes,
+//           pollingUnits: [],
+//         };
+
+//         for (const pollingUnit in aggregated[state].localGovernments[lga].wards[
+//           ward
+//         ].pollingUnits) {
+//           const {
+//             totalVotes,
+//             partiesVotes,
+//             otherPartiesVotes,
+//             voterIntimidation,
+//             voteBuying,
+//             goodRating,
+//             okayRating,
+//             poorRating,
+//             resultPictures,
+//             resultVideos,
+//           } =
+//             aggregated[state].localGovernments[lga].wards[ward].pollingUnits[
+//               pollingUnit
+//             ];
+
+//           const pollingUnitData = {
+//             pollingUnit,
+//             totalVotes,
+//             partiesVotes: formatVoteCounts(partiesVotes),
+//             otherPartiesVotes: formatVoteCounts(otherPartiesVotes),
+//             voterIntimidation,
+//             voteBuying,
+//             goodRating,
+//             okayRating,
+//             poorRating,
+//             resultPictures,
+//             resultVideos,
+//           };
+
+//           wardData.pollingUnits.push(pollingUnitData);
+//         }
+
+//         lgaData.wards.push(wardData);
+//       }
+
+//       stateData.localGovernments.push(lgaData);
+//     }
+
+//     formattedResults.push(stateData);
+//   }
+
+//   return formattedResults;
+// };
+
+// const formatAggregatedIncidents = (aggregated) => {
+//   const formattedIncidents = [];
+
+//   for (const state in aggregated) {
+//     const stateData = {
+//       state,
+//       totalIncidents: aggregated[state].totalIncidents,
+//       localGovernments: [],
+//     };
+
+//     for (const lga in aggregated[state].localGovernments) {
+//       const lgaData = {
+//         localGovernment: lga,
+//         totalIncidents: aggregated[state].localGovernments[lga].totalIncidents,
+//         wards: [],
+//       };
+
+//       for (const ward in aggregated[state].localGovernments[lga].wards) {
+//         const wardData = {
+//           ward,
+//           totalIncidents:
+//             aggregated[state].localGovernments[lga].wards[ward].totalIncidents,
+//           incidentTypes: formatIncidentCounts(
+//             aggregated[state].localGovernments[lga].wards[ward].incidentTypes
+//           ),
+//         };
+
+//         lgaData.wards.push(wardData);
+//       }
+
+//       stateData.localGovernments.push(lgaData);
+//     }
+
+//     formattedIncidents.push(stateData);
+//   }
+
+//   return formattedIncidents;
+// };
+
+// const formatVoteCounts = (votes) => {
+//   return Object.entries(votes).map(([party, count]) => ({ party, count }));
+// };
+
+// const formatIncidentCounts = (incidents) => {
+//   return Object.entries(incidents).map(([type, count]) => ({ type, count }));
+// };
+
+
+
 const aggregateResults = (results) => {
   const aggregated = {};
 
@@ -632,7 +930,6 @@ const aggregateResults = (results) => {
       ward,
       pollingUnit,
       partiesVotes,
-      otherPartiesVotes,
       voterIntimidation,
       voteBuying,
       voteRating,
@@ -665,7 +962,6 @@ const aggregateResults = (results) => {
       ] = {
         totalVotes: 0,
         partiesVotes: {},
-        otherPartiesVotes: {},
         voterIntimidation: 0,
         voteBuying: 0,
         goodRating: 0,
@@ -684,21 +980,8 @@ const aggregateResults = (results) => {
     // Count parties votes
     if (partiesVotes) {
       for (const { party, count } of partiesVotes) {
-        if (!pollingUnitData.partiesVotes[party]) {
-          pollingUnitData.partiesVotes[party] = 0;
-        }
-        pollingUnitData.partiesVotes[party] += count;
-        pollingUnitData.totalVotes += count;
-      }
-    }
-
-    // Count other parties votes
-    if (otherPartiesVotes) {
-      for (const { party, count } of otherPartiesVotes) {
-        if (!pollingUnitData.otherPartiesVotes[party]) {
-          pollingUnitData.otherPartiesVotes[party] = 0;
-        }
-        pollingUnitData.otherPartiesVotes[party] += count;
+        pollingUnitData.partiesVotes[party] =
+          (pollingUnitData.partiesVotes[party] || 0) + count;
         pollingUnitData.totalVotes += count;
       }
     }
@@ -774,115 +1057,52 @@ const aggregateIncidents = (incidents) => {
 };
 
 const formatAggregatedResults = (aggregated) => {
-  const formattedResults = [];
-
-  for (const state in aggregated) {
-    const stateData = {
-      state,
-      totalVotes: aggregated[state].totalVotes,
-      localGovernments: [],
-    };
-
-    for (const lga in aggregated[state].localGovernments) {
-      const lgaData = {
+  return Object.entries(aggregated).map(([state, stateData]) => ({
+    state,
+    totalVotes: stateData.totalVotes,
+    localGovernments: Object.entries(stateData.localGovernments).map(
+      ([lga, lgaData]) => ({
         localGovernment: lga,
-        totalVotes: aggregated[state].localGovernments[lga].totalVotes,
-        wards: [],
-      };
-
-      for (const ward in aggregated[state].localGovernments[lga].wards) {
-        const wardData = {
+        totalVotes: lgaData.totalVotes,
+        wards: Object.entries(lgaData.wards).map(([ward, wardData]) => ({
           ward,
-          totalVotes:
-            aggregated[state].localGovernments[lga].wards[ward].totalVotes,
-          pollingUnits: [],
-        };
-
-        for (const pollingUnit in aggregated[state].localGovernments[lga].wards[
-          ward
-        ].pollingUnits) {
-          const {
-            totalVotes,
-            partiesVotes,
-            otherPartiesVotes,
-            voterIntimidation,
-            voteBuying,
-            goodRating,
-            okayRating,
-            poorRating,
-            resultPictures,
-            resultVideos,
-          } =
-            aggregated[state].localGovernments[lga].wards[ward].pollingUnits[
-              pollingUnit
-            ];
-
-          const pollingUnitData = {
-            pollingUnit,
-            totalVotes,
-            partiesVotes: formatVoteCounts(partiesVotes),
-            otherPartiesVotes: formatVoteCounts(otherPartiesVotes),
-            voterIntimidation,
-            voteBuying,
-            goodRating,
-            okayRating,
-            poorRating,
-            resultPictures,
-            resultVideos,
-          };
-
-          wardData.pollingUnits.push(pollingUnitData);
-        }
-
-        lgaData.wards.push(wardData);
-      }
-
-      stateData.localGovernments.push(lgaData);
-    }
-
-    formattedResults.push(stateData);
-  }
-
-  return formattedResults;
+          totalVotes: wardData.totalVotes,
+          pollingUnits: Object.entries(wardData.pollingUnits).map(
+            ([pollingUnit, pollingUnitData]) => ({
+              pollingUnit,
+              totalVotes: pollingUnitData.totalVotes,
+              partiesVotes: formatVoteCounts(pollingUnitData.partiesVotes),
+              voterIntimidation: pollingUnitData.voterIntimidation,
+              voteBuying: pollingUnitData.voteBuying,
+              goodRating: pollingUnitData.goodRating,
+              okayRating: pollingUnitData.okayRating,
+              poorRating: pollingUnitData.poorRating,
+              resultPictures: pollingUnitData.resultPictures,
+              resultVideos: pollingUnitData.resultVideos,
+            })
+          ),
+        })),
+      })
+    ),
+  }));
 };
 
 const formatAggregatedIncidents = (aggregated) => {
-  const formattedIncidents = [];
-
-  for (const state in aggregated) {
-    const stateData = {
-      state,
-      totalIncidents: aggregated[state].totalIncidents,
-      localGovernments: [],
-    };
-
-    for (const lga in aggregated[state].localGovernments) {
-      const lgaData = {
+  return Object.entries(aggregated).map(([state, stateData]) => ({
+    state,
+    totalIncidents: stateData.totalIncidents,
+    localGovernments: Object.entries(stateData.localGovernments).map(
+      ([lga, lgaData]) => ({
         localGovernment: lga,
-        totalIncidents: aggregated[state].localGovernments[lga].totalIncidents,
-        wards: [],
-      };
-
-      for (const ward in aggregated[state].localGovernments[lga].wards) {
-        const wardData = {
+        totalIncidents: lgaData.totalIncidents,
+        wards: Object.entries(lgaData.wards).map(([ward, wardData]) => ({
           ward,
-          totalIncidents:
-            aggregated[state].localGovernments[lga].wards[ward].totalIncidents,
-          incidentTypes: formatIncidentCounts(
-            aggregated[state].localGovernments[lga].wards[ward].incidentTypes
-          ),
-        };
-
-        lgaData.wards.push(wardData);
-      }
-
-      stateData.localGovernments.push(lgaData);
-    }
-
-    formattedIncidents.push(stateData);
-  }
-
-  return formattedIncidents;
+          totalIncidents: wardData.totalIncidents,
+          incidentTypes: formatIncidentCounts(wardData.incidentTypes),
+        })),
+      })
+    ),
+  }));
 };
 
 const formatVoteCounts = (votes) => {

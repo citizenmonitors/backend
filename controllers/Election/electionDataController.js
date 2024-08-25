@@ -13,6 +13,7 @@ import {
   getAllElectionsService,
   deleteIncidentReportDataService,
   getLiveElectionById,
+  getUserElectionResultsAndReports,
 } from "../../services/Election/electionService.js";
 
 export const createElection = async (req, res) => {
@@ -227,5 +228,22 @@ export const deleteIncidentReportData = async (req, res) => {
   }
 };
 
+export const getUserElectionResultsAndReportsCon = async (req, res) => {
+  try {
+    const userId = req.user._id;
 
+    const data = await getUserElectionResultsAndReports(userId);
+
+    res.status(200).json({
+      message: "Election results and incident reports fetched successfully",
+      data,
+    });
+  } catch (error) {
+    console.error(`Error fetching user election data: ${error.message}`);
+    res.status(500).json({
+      message: "Failed to fetch election results and incident reports",
+      error: error.message,
+    });
+  }
+};
 

@@ -176,48 +176,46 @@ export const updateUserService = async (
 };
 
 export const updateUserEmail = async (userId, newEmail) => {
-  try {
-    const user = await CompletedUser.findOne(userId);
-      if(!user){
-        throw new Error("User not found");
-      }
+ try {
+   const user = await CompletedUser.findById(userId);
+   if (!user) {
+     throw new Error("User not found");
+   }
 
-      // Check if the user already exists
+   // Check if the new email is already in use
+   const emailExistsInCompletedUser = await CompletedUser.findOne({
+     email: newEmail,
+   });
+   const emailExistsInUser = await User.findOne({ email: newEmail });
 
-      const emailExistsInCompletedUser = await CompletedUser.findOne({ email: newEmail});
-      const emailExistsInUser = await User.findOne.findOne({email: newEmail});
+   if (emailExistsInCompletedUser || emailExistsInUser) {
+     throw new Error("This email is already in use.");
+   }
 
-      if (emailExistsInCompletedUser || emailExistsInUser){
-        throw new Error("This email is already in use");
-      }
+   // Generate verification code and expiration time
+   const verificationCode = Math.floor(
+     100000 + Math.random() * 900000
+   ).toString();
 
-      // Generate verification code and expiration time
+   user.email = newEmail;
+   user.verificationCode = verificationCode;
+   user.verificationCodeExpires = moment().add(10, "minutes").toDate();
 
-      const verificationCode = Math.floor(
-        100000 + Math.random() * 90000
-      ).toString();
+   // Send verification email
+   await transporter.sendMail({
+     to: newEmail,
+     subject: "Verify your new email address",
+     html: `<p>Your verification code is: ${verificationCode}</p>`,
+   });
 
-      user.email = newEmail;
-      user.verificationCode = verificationCode;
-      user.verificationCodeExpires = moment().add(10, 'minutes').toDate();
+   await user.save();
 
-      // Send verification email
-
-      await transporter.sendEmail({
-        to: newEmail,
-        subject: 'Verify your new email address',
-        html: `<p> Your verification code is: ${verificationCode}</p>`,
-      });
-
-      await user.save();
-      return {
-        message:
-          "Verification code sent. Please verify your new email address.",
-      };
-    
-  } catch (error) {
-    throw new Error(`Error updating email: ${error.message}`);
-  }
+   return {
+     message: "Verification code sent. Please verify your new email address.",
+   };
+ } catch (error) {
+   throw new Error(`Error updating email: ${error.message}`);
+ }
 };
 
 export const verifyUserEmail = async (email, verificationCode) => {

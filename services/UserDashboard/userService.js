@@ -222,7 +222,7 @@ export const updateUserEmail = async (userId, newEmail) => {
  }
 };
 
-export const verifyUserEmail = async (email, verificationCode) => {
+export const verifyUserEmail = async (userId, verificationCode) => {
   try {
     const user = await CompletedUser.findById(userId);
     if (!user) {

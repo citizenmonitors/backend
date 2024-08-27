@@ -109,7 +109,7 @@ export const updateUserEmailCon = async (req, res) => {
 // Send verification email
 export const verifyEmail = async (req, res) => {
   try {
-    const userId = req.user._id; // Assuming the user is authenticated
+    const userId = req.user._id; 
     const { verificationCode, newEmail } = req.body;
 
     if (!verificationCode || !newEmail) {

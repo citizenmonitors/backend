@@ -206,15 +206,15 @@ export const updateUserEmail = async (userId, newEmail) => {
 
    // Send verification email
    await transporter.sendMail({
-     to: newEmail,
-     subject: "Verify your new email address",
+     to: email,
+     subject: "Verify your email address",
      html: `<p>Your verification code is: ${verificationCode}</p>`,
    });
 
    await user.save();
 
    return {
-     message: "Verification code sent. Please verify your new email address.",
+     message: "Verification code sent to your  email address.",
    };
  } catch (error) {
    throw new Error(`Error generating verification code: ${error.message}`);

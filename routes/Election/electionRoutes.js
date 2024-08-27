@@ -137,7 +137,7 @@ router.put(
 );
 
 router.get(
-  "/user-election-datas",
+  "/user-election-data",
   authMiddleware,
   getUserElectionResultsAndReportsCon
 );

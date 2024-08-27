@@ -109,11 +109,29 @@ export const updateUserEmailCon = async (req, res) => {
 // Send verification email
 export const verifyEmail = async (req, res) => {
   try {
-    const { email, verificationCode } = req.body;
-    await verifyUserEmail(email,verificationCode)
-    res.status(200).json({ message: "Email verified successfully." });
+    const userId = req.user._id; // Assuming the user is authenticated
+    const { verificationCode, newEmail } = req.body;
+
+    if (!verificationCode || !newEmail) {
+      return res
+        .status(400)
+        .json({
+          message: "Verification code and new email address are required",
+        });
+    }
+
+    const result = await verifyEmailCodeAndUpdateService(
+      userId,
+      verificationCode,
+      newEmail
+    );
+
+    res.status(200).json(result);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(500).json({
+      message: "Error verifying code",
+      error: error.message,
+    });
   }
 };
 

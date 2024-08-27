@@ -15,7 +15,7 @@ router.put("/volunteer-to-observer", authMiddleware, volunteerToObserver);
 
 // Update user details
 router.put("/user", authMiddleware, updateUser);
-router.post("/user/update-email", authMiddleware, updateUserEmailCon)
+router.put("/user/update-email", authMiddleware, updateUserEmailCon)
 router.post("/user/verify-email", authMiddleware, verifyEmail)
 router.post("/user/resend-token", authMiddleware, resendToken)
 

@@ -120,11 +120,7 @@ export const verifyEmail = async (req, res) => {
         });
     }
 
-    const result = await verifyEmailCodeAndUpdateService(
-      userId,
-      verificationCode,
-      newEmail
-    );
+    const result = await verifyUserEmail(userId, verificationCode, newEmail);
 
     res.status(200).json(result);
   } catch (error) {

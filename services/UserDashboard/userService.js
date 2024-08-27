@@ -175,6 +175,51 @@ export const updateUserService = async (
   }
 };
 
+export const updateUserEmail = async (userId, newEmail) => {
+  try {
+    const user = await CompletedUser.findOne(userId);
+      if(!user){
+        throw new Error("User not found");
+      }
+
+      // Check if the user already exists
+
+      const emailExistsInCompletedUser = await CompletedUser.findOne({ email: newEmail});
+      const emailExistsInUser = await User.findOne.findOne({email: newEmail});
+
+      if (emailExistsInCompletedUser || emailExistsInUser){
+        throw new Error("This email is already in use");
+      }
+
+      // Generate verification code and expiration time
+
+      const verificationCode = Math.floor(
+        100000 + Math.random() * 90000
+      ).toString();
+
+      user.email = newEmail;
+      user.verificationCode = verificationCode;
+      user.verificationCodeExpires = moment().add(10, 'minutes').toDate();
+
+      // Send verification email
+
+      await transporter.sendEmail({
+        to: newEmail,
+        subject: 'Verify your new email address',
+        html: `<p> Your verification code is: ${verificationCode}</p>`,
+      });
+
+      await user.save();
+      return {
+        message:
+          "Verification code sent. Please verify your new email address.",
+      };
+    
+  } catch (error) {
+    throw new Error(`Error updating email: ${error.message}`);
+  }
+};
+
 export const verifyUserEmail = async (email, verificationCode) => {
   const user = await CompletedUser.findOne({ email });
   if (!user) {

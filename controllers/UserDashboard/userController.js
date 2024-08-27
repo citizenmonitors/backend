@@ -85,6 +85,25 @@ export const updateUser = [
   },
 ];
 
+export const updateUserEmailCon = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const {newEmail} = req.body;
+
+    if(!newEmail){
+      return res.status(400).json({message: "New email address is required"});
+    }
+
+    const result = await verifyUserEmail(userId, newEmail);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({
+      message: "Error updating email",
+      error: error.message,
+    });
+  }
+};
+
 // Send verification email
 export const verifyEmail = async (req, res) => {
   try {

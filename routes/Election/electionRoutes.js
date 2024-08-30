@@ -56,7 +56,7 @@ router.delete(
 );
 
 router.get(
-  "/user-election-data",
+  "/user-election-datas",
   authMiddleware,
   getUserElectionDataController
 );

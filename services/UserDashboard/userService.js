@@ -53,6 +53,128 @@ export const volunteerToObserverService = async ({ email, details, file }) => {
 };
 
 
+// export const updateUserService = async (
+//   userId,
+//   updateData,
+//   currentPassword,
+//   file
+// ) => {
+//   try {
+//     const user = await CompletedUser.findById(userId);
+//     if (!user) {
+//       throw new Error("User not found");
+//     }
+
+//     // Handle password update
+//     if (updateData.password) {
+//       const isMatch = await bcrypt.compare(currentPassword, user.password);
+//       if (!isMatch) {
+//         throw new Error("Current password is incorrect");
+//       }
+
+//       if (updateData.password !== updateData.confirmPassword) {
+//         throw new Error("New password and confirm password do not match");
+//       }
+
+//       const salt = await bcrypt.genSalt(10);
+//       updateData.password = await bcrypt.hash(updateData.password, salt);
+//       delete updateData.confirmPassword; // Clean up the updateData object
+//     }
+
+//     let updatedEmail = false;
+
+//     // Handle email update
+//     if (updateData.email && updateData.email !== user.email) {
+//       updatedEmail = true;
+
+//       const emailExistsInCompletedUser = await CompletedUser.findOne({
+//         email: updateData.email,
+//       });
+//       const emailExistsInUser = await User.findOne({ email: updateData.email });
+
+//       if (emailExistsInCompletedUser || emailExistsInUser) {
+//         throw new Error("This email is already in use.");
+//       }
+
+//       const verificationCode = Math.floor(
+//         100000 + Math.random() * 900000
+//       ).toString();
+
+//       updateData.verificationCode = verificationCode;
+//       updateData.verificationCodeExpires = moment().add(10, "minutes").toDate();
+
+//       await transporter.sendMail({
+//         to: updateData.email,
+//         subject: "Verify your email",
+//         html: `<p>Your verification code is: ${verificationCode}</p>`,
+//       });
+//     }
+
+//     // Handle profile image update
+//     let profileImageFile;
+//     if (file && file.profileImage) {
+//       if (user.profileImage && user.profileImage.location) {
+//         const oldImagePath = path.join(
+//           __dirname,
+//           "../../",
+//           user.profileImage.location
+//         );
+//         console.log("Attempting to delete old profile image at:", oldImagePath);
+
+//         if (fs.existsSync(oldImagePath)) {
+//           fs.unlink(oldImagePath, (err) => {
+//             if (err) {
+//               console.error("Error deleting old profile image:", err);
+//             } else {
+//               console.log("Old profile image deleted successfully");
+//             }
+//           });
+//         } else {
+//           console.log("Old profile image not found:", oldImagePath);
+//         }
+//       }
+      
+
+//       // Save the new profile image
+//       const profileImagePath = `/profileimage/${path.basename(
+//         file.profileImage.path
+//       )}`;
+//       profileImageFile = await profileImageModel.create({
+//         location: profileImagePath,
+//         name: file.profileImage.originalname,
+//         type: file.profileImage.mimetype,
+//         size: file.profileImage.size,
+//         url: `${BACKEND_URL}${profileImagePath}`,
+//       });
+
+//       updateData.profileImage = profileImageFile; // Update with the new image
+//     }
+
+//     // Update user data in the database
+//     const updatedUser = await CompletedUser.findByIdAndUpdate(
+//       userId,
+//       updateData,
+//       {
+//         new: true,
+//         runValidators: true,
+//       }
+//     );
+
+//     if (!updatedUser) {
+//       throw new Error("User not found");
+//     }
+
+//     // Return a message if email was updated, else return updated user details
+//     if (updatedEmail) {
+//       return { message: "Please verify your new email address" };
+//     }
+
+//     return updatedUser;
+//   } catch (error) {
+//     throw new Error(`Error updating user details: ${error.message}`);
+//   }
+// };
+
 export const updateUserService = async (
   userId,
   updateData,
@@ -60,6 +182,7 @@ export const updateUserService = async (
   file
 ) => {
   try {
+    // Find the user by ID
     const user = await CompletedUser.findById(userId);
     if (!user) {
       throw new Error("User not found");
@@ -78,36 +201,7 @@ export const updateUserService = async (
 
       const salt = await bcrypt.genSalt(10);
       updateData.password = await bcrypt.hash(updateData.password, salt);
-      delete updateData.confirmPassword; // Clean up the updateData object
-    }
-
-    let updatedEmail = false;
-
-    // Handle email update
-    if (updateData.email && updateData.email !== user.email) {
-      updatedEmail = true;
-
-      const emailExistsInCompletedUser = await CompletedUser.findOne({
-        email: updateData.email,
-      });
-      const emailExistsInUser = await User.findOne({ email: updateData.email });
-
-      if (emailExistsInCompletedUser || emailExistsInUser) {
-        throw new Error("This email is already in use.");
-      }
-
-      const verificationCode = Math.floor(
-        100000 + Math.random() * 900000
-      ).toString();
-
-      updateData.verificationCode = verificationCode;
-      updateData.verificationCodeExpires = moment().add(10, "minutes").toDate();
-
-      await transporter.sendMail({
-        to: updateData.email,
-        subject: "Verify your email",
-        html: `<p>Your verification code is: ${verificationCode}</p>`,
-      });
+      delete updateData.confirmPassword; 
     }
 
     // Handle profile image update
@@ -133,7 +227,6 @@ export const updateUserService = async (
           console.log("Old profile image not found:", oldImagePath);
         }
       }
-      
 
       // Save the new profile image
       const profileImagePath = `/profileimage/${path.basename(
@@ -164,98 +257,200 @@ export const updateUserService = async (
       throw new Error("User not found");
     }
 
-    // Return a message if email was updated, else return updated user details
-    if (updatedEmail) {
-      return { message: "Please verify your new email address" };
-    }
-
+    // Return updated user details
     return updatedUser;
   } catch (error) {
     throw new Error(`Error updating user details: ${error.message}`);
   }
 };
+// export const updateUserEmail = async (userId, newEmail) => {
+//  try {
+//    const user = await CompletedUser.findById(userId);
+//    if (!user) {
+//      throw new Error("User not found");
+//    }
+
+//    if (newEmail === user.email) {
+//      throw new Error("New email cannot be the same as the current email.");
+//    }
+
+//    // Check if the new email is already in use
+//    const emailExistsInCompletedUser = await CompletedUser.findOne({
+//      email: newEmail,
+//    });
+//    const emailExistsInUser = await User.findOne({ email: newEmail });
+
+//    if (emailExistsInCompletedUser || emailExistsInUser) {
+//      throw new Error("This email is already in use.");
+//    }
+
+//    // Generate a verification code and set expiration time
+//    const verificationCode = Math.floor(
+//      100000 + Math.random() * 900000
+//    ).toString();
+
+//    user.verificationCode = verificationCode;
+//    user.verificationCodeExpires = moment().add(10, "minutes").toDate();
+
+//    // Send verification email to the original email address
+//    await transporter.sendMail({
+//      to: user.email,
+//      subject: "Verify your email change request",
+//      html: `<p>You have requested to change your email to ${newEmail}. Your verification code is: ${verificationCode}</p>`,
+//    });
+
+//    await user.save();
+
+//    return {
+//      message:
+//        "Verification code sent to your current email address. Please verify to confirm the change.",
+//    };
+//  } catch (error) {
+//    throw new Error(`Error generating verification code: ${error.message}`);
+//  }
+// };
 
 export const updateUserEmail = async (userId, newEmail) => {
- try {
-   const user = await CompletedUser.findById(userId);
-   if (!user) {
-     throw new Error("User not found");
-   }
-
-   if (newEmail === user.email) {
-     throw new Error("New email cannot be the same as the current email.");
-   }
-
-   // Check if the new email is already in use
-   const emailExistsInCompletedUser = await CompletedUser.findOne({
-     email: newEmail,
-   });
-   const emailExistsInUser = await User.findOne({ email: newEmail });
-
-   if (emailExistsInCompletedUser || emailExistsInUser) {
-     throw new Error("This email is already in use.");
-   }
-
-   // Generate a verification code and set expiration time
-   const verificationCode = Math.floor(
-     100000 + Math.random() * 900000
-   ).toString();
-
-   user.verificationCode = verificationCode;
-   user.verificationCodeExpires = moment().add(10, "minutes").toDate();
-
-   // Send verification email to the original email address
-   await transporter.sendMail({
-     to: user.email,
-     subject: "Verify your email change request",
-     html: `<p>You have requested to change your email to ${newEmail}. Your verification code is: ${verificationCode}</p>`,
-   });
-
-   await user.save();
-
-   return {
-     message:
-       "Verification code sent to your current email address. Please verify to confirm the change.",
-   };
- } catch (error) {
-   throw new Error(`Error generating verification code: ${error.message}`);
- }
-};
-
-export const verifyUserEmail = async (userId, verificationCode, newEmail) => {
   try {
     const user = await CompletedUser.findById(userId);
     if (!user) {
-      throw new Error("User not found");
+      throw new Error("User not found. Please make sure you are logged in.");
     }
 
-    // Check if the verification code is correct and not expired
-    if (user.verificationCode !== verificationCode) {
-      throw new Error("Invalid verification code");
+    if (newEmail === user.email) {
+      throw new Error(
+        "The new email address cannot be the same as your current email address."
+      );
     }
 
-    if (moment().isAfter(user.verificationCodeExpires)) {
-      throw new Error("Verification code has expired");
-    }
-
-    // Before updating, verify that the new email is still not in use
+    // Check if the new email is already in use
     const emailExistsInCompletedUser = await CompletedUser.findOne({
       email: newEmail,
     });
     const emailExistsInUser = await User.findOne({ email: newEmail });
 
     if (emailExistsInCompletedUser || emailExistsInUser) {
-      throw new Error("This email is already in use.");
+      throw new Error(
+        "The new email address is already in use by another account. Please use a different email address."
+      );
     }
 
-    // Update the user's email
-    user.email = newEmail;
-    user.verificationCode = undefined;
-    user.verificationCodeExpires = undefined;
+    // Generate a verification code and set expiration time
+    const verificationCode = Math.floor(
+      100000 + Math.random() * 900000
+    ).toString();
+
+    user.verificationCode = verificationCode;
+    user.verificationCodeExpires = moment().add(10, "minutes").toDate();
+    user.pendingEmail = newEmail; // Store the new email temporarily
+
+    // Send notification to the current email
+    await transporter.sendMail({
+      to: user.email,
+      subject: "Email Change Request",
+      html: `<p>You have requested to change your email to ${newEmail}. Please check ${newEmail} for the verification code to confirm the change.</p>`,
+    });
+
+    // Send verification code to the new email
+    await transporter.sendMail({
+      to: newEmail,
+      subject: "Verify Your New Email Address",
+      html: `<p>Your verification code is: ${verificationCode}</p>`,
+    });
 
     await user.save();
 
-    return { message: "Email address updated successfully." };
+    return {
+      message:
+        "A verification code has been sent to your new email address. Please check your email and follow the instructions to confirm the change.",
+    };
+  } catch (error) {
+    throw new Error(`Error processing email update: ${error.message}`);
+  }
+};
+
+// export const verifyUserEmail = async (userId, verificationCode, newEmail) => {
+//   try {
+//     const user = await CompletedUser.findById(userId);
+//     if (!user) {
+//       throw new Error("User not found");
+//     }
+
+//     // Check if the verification code is correct and not expired
+//     if (user.verificationCode !== verificationCode) {
+//       throw new Error("Invalid verification code");
+//     }
+
+//     if (moment().isAfter(user.verificationCodeExpires)) {
+//       throw new Error("Verification code has expired");
+//     }
+
+//     // Before updating, verify that the new email is still not in use
+//     const emailExistsInCompletedUser = await CompletedUser.findOne({
+//       email: newEmail,
+//     });
+//     const emailExistsInUser = await User.findOne({ email: newEmail });
+
+//     if (emailExistsInCompletedUser || emailExistsInUser) {
+//       throw new Error("This email is already in use.");
+//     }
+
+//     // Update the user's email
+//     user.email = newEmail;
+//     user.verificationCode = undefined;
+//     user.verificationCodeExpires = undefined;
+
+//     await user.save();
+
+//     return { message: "Email address updated successfully." };
+//   } catch (error) {
+//     throw new Error(
+//       `Error verifying code and updating email: ${error.message}`
+//     );
+//   }
+// };
+
+export const verifyUserEmail = async (userId, verificationCode) => {
+  try {
+    const user = await CompletedUser.findById(userId);
+    if (!user) {
+      throw new Error("User not found. Please make sure you are logged in.");
+    }
+
+    // Check if the verification code is correct and not expired
+    if (user.verificationCode !== verificationCode) {
+      throw new Error(
+        "The verification code you entered is incorrect. Please check your email and try again."
+      );
+    }
+
+    if (moment().isAfter(user.verificationCodeExpires)) {
+      throw new Error(
+        "The verification code has expired. Please request a new code."
+      );
+    }
+
+    // Check if the new email is still not in use
+    const emailExistsInCompletedUser = await CompletedUser.findOne({
+      email: user.pendingEmail,
+    });
+    const emailExistsInUser = await User.findOne({ email: user.pendingEmail });
+
+    if (emailExistsInCompletedUser || emailExistsInUser) {
+      throw new Error(
+        "The new email address is already in use by another account. Please use a different email address."
+      );
+    }
+
+    // Update the user's email
+    user.email = user.pendingEmail;
+    user.pendingEmail = undefined; // Clear pending email
+    user.verificationCode = undefined; // Clear verification code
+    user.verificationCodeExpires = undefined; // Clear verification expiry
+
+    await user.save();
+
+    return { message: "Your email address has been successfully updated." };
   } catch (error) {
     throw new Error(
       `Error verifying code and updating email: ${error.message}`
@@ -263,29 +458,67 @@ export const verifyUserEmail = async (userId, verificationCode, newEmail) => {
   }
 };
 
-export const resendTokenService = async (email) => {
-  const user = await CompletedUser.findOne({ email });
-  if (!user) {
-    throw new Error("User not found");
-  }
+// export const resendTokenService = async (email) => {
+//   const user = await CompletedUser.findOne({ email });
+//   if (!user) {
+//     throw new Error("User not found");
+//   }
 
-  const verificationCode = Math.floor(
-    100000 + Math.random() * 900000
-  ).toString();
-  user.verificationCode = verificationCode;
-  user.verificationCodeExpires = moment().add(10, "minutes").toDate();
-  await user.save();
+//   const verificationCode = Math.floor(
+//     100000 + Math.random() * 900000
+//   ).toString();
+//   user.verificationCode = verificationCode;
+//   user.verificationCodeExpires = moment().add(10, "minutes").toDate();
+//   await user.save();
 
-  await transporter.sendMail({
-    to: email,
-    subject: "Verify your email",
-    html: `<p>Your verification code is: ${verificationCode}</p>`,
-  });
+//   await transporter.sendMail({
+//     to: email,
+//     subject: "Verify your email",
+//     html: `<p>Your verification code is: ${verificationCode}</p>`,
+//   });
 
-  return true;
-};
+//   return true;
+// };
 
 // Delete user account
+
+export const resendTokenService = async (userId) => {
+  try {
+    const user = await CompletedUser.findById(userId);
+    if (!user) {
+      throw new Error("User not found. Please make sure you are logged in.");
+    }
+
+    if (!user.pendingEmail) {
+      throw new Error(
+        "There is no pending email change request. Please initiate an email update first."
+      );
+    }
+
+    const verificationCode = Math.floor(
+      100000 + Math.random() * 900000
+    ).toString();
+
+    user.verificationCode = verificationCode;
+    user.verificationCodeExpires = moment().add(10, "minutes").toDate();
+    await user.save();
+
+    // Resend verification code to the new email
+    await transporter.sendMail({
+      to: user.pendingEmail,
+      subject: "Resend Verification Code",
+      html: `<p>Your verification code is: ${verificationCode}</p>`,
+    });
+
+    return {
+      message:
+        "A new verification code has been sent to your pending email address. Please check your email and follow the instructions to verify your email.",
+    };
+  } catch (error) {
+    throw new Error(`Error resending verification code: ${error.message}`);
+  }
+};
+
 export const deleteUserService = async (userId) => {
   try {
     const deletedUser = await CompletedUser.findByIdAndDelete(userId);

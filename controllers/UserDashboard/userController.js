@@ -86,59 +86,130 @@ export const updateUser = [
   },
 ];
 
+// export const updateUserEmailCon = async (req, res) => {
+//   try {
+//     const userId = req.user._id; 
+//     const { newEmail } = req.body;
+
+//     if (!newEmail) {
+//       return res.status(400).json({ message: "New email address is required" });
+//     }
+
+//     const result = await updateUserEmail(userId, newEmail);
+
+//     res.status(200).json(result);
+//   } catch (error) {
+//     res.status(500).json({
+//       message: "Error updating email",
+//       error: error.message,
+//     });
+//   }
+// };
+
+// Send verification email
+
 export const updateUserEmailCon = async (req, res) => {
   try {
-    const userId = req.user._id; 
+    const userId = req.user._id;
     const { newEmail } = req.body;
 
     if (!newEmail) {
-      return res.status(400).json({ message: "New email address is required" });
+      return res
+        .status(400)
+        .json({ message: "New email address is required." });
     }
 
     const result = await updateUserEmail(userId, newEmail);
 
     res.status(200).json(result);
   } catch (error) {
+    console.error("Error updating email:", error.message);
     res.status(500).json({
-      message: "Error updating email",
+      message:
+        "There was an error while attempting to update your email. Please try again later.",
       error: error.message,
     });
   }
 };
+// export const verifyEmail = async (req, res) => {
+//   try {
+//     const userId = req.user._id; 
+//     const { verificationCode, newEmail } = req.body;
 
-// Send verification email
+//     if (!verificationCode || !newEmail) {
+//       return res
+//         .status(400)
+//         .json({
+//           message: "Verification code and new email address are required",
+//         });
+//     }
+
+//     const result = await verifyUserEmail(userId, verificationCode, newEmail);
+
+//     res.status(200).json(result);
+//   } catch (error) {
+//     res.status(500).json({
+//       message: "Error verifying code",
+//       error: error.message,
+//     });
+//   }
+// };
+
 export const verifyEmail = async (req, res) => {
   try {
-    const userId = req.user._id; 
-    const { verificationCode, newEmail } = req.body;
+    const userId = req.user._id;
+    const { verificationCode } = req.body; // No need for newEmail since it's stored in the user's pendingEmail field
 
-    if (!verificationCode || !newEmail) {
-      return res
-        .status(400)
-        .json({
-          message: "Verification code and new email address are required",
-        });
+    if (!verificationCode) {
+      return res.status(400).json({
+        message:
+          "Verification code is required to verify your new email address.",
+      });
     }
 
-    const result = await verifyUserEmail(userId, verificationCode, newEmail);
+    const result = await verifyUserEmail(userId, verificationCode);
 
     res.status(200).json(result);
   } catch (error) {
+    console.error("Error verifying email:", error.message);
     res.status(500).json({
-      message: "Error verifying code",
+      message:
+        "There was an error while attempting to verify your email. Please try again later.",
       error: error.message,
     });
   }
 };
 
 // Resend verification token
+// export const resendToken = async (req, res) => {
+//   try {
+//     const { email } = req.body;
+//     await resendTokenService(email);
+//     res.status(200).json({ message: "Verification code resent successfully" });
+//   } catch (error) {
+//     res.status(400).json({ error: error.message });
+//   }
+// };
+
 export const resendToken = async (req, res) => {
   try {
-    const { email } = req.body;
-    await resendTokenService(email);
-    res.status(200).json({ message: "Verification code resent successfully" });
+    const userId = req.user._id; // Get user ID from the authenticated session
+
+    await resendTokenService(userId);
+
+    res
+      .status(200)
+      .json({
+        message:
+          "Verification code has been resent to your new email address successfully.",
+      });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    console.error("Error resending verification code:", error.message);
+    res.status(500).json({
+      message:
+        "There was an error while attempting to resend the verification code. Please try again later.",
+      error: error.message,
+    });
   }
 };
 
@@ -154,3 +225,4 @@ export const deleteUser = async (req, res) => {
        .json({ message: "Error deleting user account", error: error.message });
    }
 };
+

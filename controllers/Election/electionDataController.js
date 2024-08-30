@@ -232,7 +232,7 @@ export const getUserElectionResultsAndReportsCon = async (req, res) => {
   try {
     const userId = req.user._id;
 
-    const data = await getUserElectionResultsAndReports(userId);
+    const { data } = await getUserElectionResultsAndReports(userId);
 
     res.status(200).json({
       message: "Election results and incident reports fetched successfully",

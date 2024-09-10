@@ -51,6 +51,13 @@ const ElectionDataSchema = new mongoose.Schema(
       type: String,
       enum: ["yes", "no"],
     },
+    actions: [
+      {
+        userId: { type: mongoose.Schema.Types.ObjectId,
+        ref: "CompletedUser" },
+        action: { type: String, enum: ["agree", "disagree"], required: true },
+      },
+    ],
   },
   {
     timestamps: true,

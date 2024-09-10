@@ -678,6 +678,135 @@ export const getUserElectionResultsAndReports = async (userId) => {
   }
 };
 
+export const getResultsByPollingUnitAndRole = async (userId) => {
+  // Fetch user to get polling unit
+  const user = await CompletedUser.findById(userId).lean();
+  if (!user || !user.pollingUnit) {
+    throw new Error("User not found or polling unit is missing");
+  }
+
+  const pollingUnit = user.pollingUnit;
+
+  // Fetch all observers in the same polling unit
+  const observers = await CompletedUser.find({
+    pollingUnit,
+    role: "observer",
+  }).lean();
+
+  // Collect observer IDs
+  const observerIds = observers.map((observer) => observer._id);
+
+  // Fetch election results uploaded by observers in the polling unit
+  const electionResults = await ElectionData.find({
+    pollingUnit,
+    user: { $in: observerIds },
+  })
+    .populate({
+      path: "election",
+      select: "electionType startDate endDate", // Include election type and date
+    })
+    .lean();
+
+  // Fetch incident reports uploaded by observers in the polling unit
+  const incidentReports = await IncidentReport.find({
+    pollingUnit,
+    user: { $in: observerIds },
+  })
+    .populate({
+      path: "election",
+      select: "electionType startDate endDate", // Include election type and date
+    })
+    .lean();
+
+  // Prepare election result data
+  const resultData = electionResults.map((result) => ({
+    electionId: result._id,
+    electionType: result.election.electionType,
+    pollingUnit: result.pollingUnit,
+    electionYear: result.election.startDate.substring(0, 4), // Extract year
+    uploadedAt: result.createdAt,
+    partiesVotes: result.partiesVotes,
+    voteRating: result.voteRating,
+    voterIntimidation: result.voterIntimidation,
+    voteBuying: result.voteBuying,
+    resultPicture: result.resultPicture,
+    resultVideo: result.resultVideo,
+  }));
+
+  // Prepare incident report data
+  const reportData = incidentReports.map((report) => ({
+    electionId: report._id,
+    electionType: report.election.electionType,
+    pollingUnit: report.pollingUnit,
+    electionYear: report.election.startDate.substring(0, 4), // Extract year
+    uploadedAt: report.createdAt,
+    selectIncident: report.selectIncident,
+    incidentNote: report.incidentNote,
+    electionRating: report.electionRating,
+    incidentPictures: report.incidentPictures,
+    incidentVideo: report.incidentVideo,
+  }));
+
+  
+  return {
+    results: resultData,
+    incidentReports: reportData,
+  };
+};
+
+export const userActionOnResultService = async (
+  userId,
+  electionDataId,
+  action,
+  dataType
+) => {
+  if (!electionDataId || !action) {
+    throw new Error("Election data ID and action are required");
+  }
+
+  if (!["agree", "disagree"].includes(action)) {
+    throw new Error("Invalid action. It must be 'agree' or 'disagree'.");
+  }
+
+  let dataModel;
+  if (dataType === "election") {
+    dataModel = ElectionData;
+  } else if (dataType === "incident") {
+    dataModel = IncidentReport;
+  } else {
+    throw new Error("Invalid data type. It must be 'election' or 'incident'.");
+  }
+
+  // Find the election data or incident report by electionDataId
+  const data = await dataModel.findById(electionDataId);
+  if (!data) {
+    throw new Error(
+      `${
+        dataType === "election" ? "Election result" : "Incident report"
+      } not found`
+    );
+  }
+
+
+  // Check if user already took action
+  const existingAction = data.actions.find(
+    (a) => a.userId.toString() === userId.toString()
+  );
+
+  if (existingAction) {
+    // Update existing action
+    existingAction.action = action;
+  } else {
+    // Add new action to the actions array
+    data.actions.push({ userId, action });
+  }
+
+  // Save the updated election result or incident report
+  await data.save();
+
+  return { message: "Action recorded successfully" };
+};
+
 const aggregateResults = (results) => {
   const aggregated = {};
 

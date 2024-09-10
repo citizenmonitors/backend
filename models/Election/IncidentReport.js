@@ -45,6 +45,13 @@ const incidentReportSchema = new mongoose.Schema(
     electionRating: { type: String },
     incidentPictures: [fileSchema],
     incidentVideo: fileSchema,
+    actions: [
+      {
+        userId: { type: mongoose.Schema.Types.ObjectId,
+                  ref: "CompletedUser" },
+        action: { type: String, enum: ["agree", "disagree"], required: true },
+      },
+    ],
   },
   {
     timestamps: true,

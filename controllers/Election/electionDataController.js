@@ -14,6 +14,8 @@ import {
   deleteIncidentReportDataService,
   getLiveElectionById,
   getUserElectionResultsAndReports,
+  getResultsByPollingUnitAndRole,
+  userActionOnResultService,
 } from "../../services/Election/electionService.js";
 
 export const createElection = async (req, res) => {
@@ -52,10 +54,6 @@ export const getAllElections = async (req, res) => {
     res.status(500).json({ message: "Error fetching elections", error });
   }
 };
-// new ObjectId('6666a337fec60b167dbe9ccf')
-
-// "user": "6666a337fec60b167dbe9ccf"
-//  "user": "669024850bd09db106796cb4"
 
 export const getElectionResultByIdCont = async (req, res) => {
   try {
@@ -245,5 +243,66 @@ export const getUserElectionResultsAndReportsCon = async (req, res) => {
       error: error.message,
     });
   }
+};
+
+export const getResultByUserPollingUnit = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const { results, incidentReports } = await getResultsByPollingUnitAndRole(
+      userId
+    );
+
+    // If no results or reports are found, return a 404
+    if (results.length === 0 && incidentReports.length === 0) {
+      return res.status(404).json({
+        message: "No results or incident reports found for this polling unit",
+      });
+    }
+
+    // Return both election results and incident reports
+    return res.status(200).json({
+      results,
+      incidentReports,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Error fetching election data",
+      error: error.message,
+    });
+  }
+};
+
+export const userActionOnResult = async (req, res) => {
+ try {
+   const { electionId } = req.params; // Get electionDataId from URL params (this refers to ElectionData or IncidentReport ID)
+   const { action, dataType } = req.body; // Expecting action ('agree' or 'disagree') and dataType ('election' or 'incident') in request body
+   const userId = req.user._id;
+
+   if (!action || !dataType) {
+     return res
+       .status(400)
+       .json({
+         message:
+           "Action and data type ('election' or 'incident') are required",
+       });
+   }
+
+   // Call the service to handle user action
+   const result = await userActionOnResultService(
+     userId,
+     electionId,
+     action,
+     dataType
+   );
+
+   return res.status(200).json(result);
+ } catch (error) {
+   console.error(error);
+   return res
+     .status(500)
+     .json({ message: "Error processing action", error: error.message });
+ }
 };
 

@@ -12,6 +12,7 @@ import moment from "moment";
 import path from "path";
 import ProfileImageModel from "../models/UserProfileImage/ProfileImageModel.js";
 import GovernmentIdModel from "../models/GovernmentIds/GovernmentIdModel.js";
+import { uploadFileToGCS } from "./GoogleCloud/gcsService.js";
 
 const FRONTEND_URL = process.env.FRONTEND_URL;
 const BACKEND_URL = process.env.BACKEND_URL;
@@ -64,6 +65,7 @@ export const registerUser = async ({ email, password, confirmPassword }) => {
   return true;
 };
 
+
 export const verifyUserEmail = async (email, verificationCode) => {
   const user = await User.findOne({ email });
   if (!user) {
@@ -110,6 +112,7 @@ export const resendTokenService = async (email) => {
 
   return true;
 };
+
 
 export const selectUserRole = async (email, role) => {
   if (!["observer", "volunteer"].includes(role)) {
@@ -174,7 +177,7 @@ export const submitRoleFormDetails = async ({
       name: files.governmentId[0].originalname,
       type: files.governmentId[0].mimetype,
       size: files.governmentId[0].size,
-      url: `${BACKEND_URL}${governmentIdPath}`, 
+      url: `${BACKEND_URL}${governmentIdPath}`,
     });
 
     details.governmentId = governmentIdFile;
@@ -237,11 +240,14 @@ export const submitRoleFormDetails = async ({
   return { token, user: usersDetails };
 };
 
-//   // console.log("Searching for user with email:", email);
+// export const submitRoleFormDetails = async ({
+//   email,
+//   role,
+//   details,
+//   files,
+// }) => {
 //   const user = await User.findOne({ email });
-
 //   if (!user) {
-//     // console.log("No account found with email:", email);
 //     throw new Error("No account found with this email address");
 //   }
 
@@ -253,34 +259,72 @@ export const submitRoleFormDetails = async ({
 //     throw new Error("User has not selected a role");
 //   }
 
-//    if (role === "observer") {
-//      if (!files || !files.governmentId) {
-//        throw new Error("Government ID is required for observers");
-//      }
+//   let governmentIdFile;
+//   let profileImageFile;
 
-//      const ext = path.extname(file.originalname).toLowerCase();
-//      if (![".jpg", ".jpeg", "pdf", ".png"].includes(ext)) {
-//        throw new Error(
-//          "Only images are allowed. Please upload a jpg, jpeg, pdf, or png file."
-//        );
-//      }
-//      details.governmentId = file.path;
-//     //  detaails.profileImage =
-//    }
+//   // Handle government ID for observers
+//   if (role === "observer") {
+//     if (!files || !files.governmentId || !files.governmentId[0]) {
+//       throw new Error("Government ID is required for observers");
+//     }
 
-//   //  user details
+//     const governmentIdFileObj = files.governmentId[0]; // Ensure the file object exists
+//     const governmentIdFilePath = governmentIdFileObj.path;
+
+//     // Upload to GCS
+//     const governmentIdGCSUrl = await uploadFileToGCS(
+//       governmentIdFileObj,
+//       "governmentId"
+//     );
+
+//     // Create a new File entry for government ID, storing both local path and GCS URL
+//     governmentIdFile = await GovernmentIdModel.create({
+//       location: governmentIdFilePath,
+//       name: governmentIdFileObj.originalname,
+//       type: governmentIdFileObj.mimetype,
+//       size: governmentIdFileObj.size,
+//       url: governmentIdGCSUrl, // Store GCS URL
+//     });
+
+//     details.governmentId = governmentIdFile;
+
+//     // Optionally remove local file after successful upload
+//     await fs.unlink(governmentIdFilePath);
+//   }
+
+//   // Handle profile image for both observers and volunteers
+//   if (files && files.profileImage && files.profileImage[0]) {
+//     const profileImageFileObj = files.profileImage[0]; // Ensure the file object exists
+//     const profileImageFilePath = profileImageFileObj.path;
+
+//     // Upload to GCS
+//     const profileImageGCSUrl = await uploadFileToGCS(
+//       profileImageFileObj,
+//       "profileImage"
+//     );
+
+//     // Create a new File entry for profile image, storing both local path and GCS URL
+//     profileImageFile = await ProfileImageModel.create({
+//       location: profileImageFilePath,
+//       name: profileImageFileObj.originalname,
+//       type: profileImageFileObj.mimetype,
+//       size: profileImageFileObj.size,
+//       url: profileImageGCSUrl, // Store the GCS URL instead of the local URL
+//     });
+
+//     details.profileImage = profileImageFile;
+
+//     // Optionally remove local file after successful upload
+//     await fs.unlink(profileImageFilePath);
+//   }
+
+//   // Update the user's details and move them to the CompletedUser collection
 //   Object.assign(user, details);
 //   user.role = role;
 //   user.isVerified = true;
 
-// //  console.log("User Details:", details);
-// //  if (file) {
-// //    console.log("File Path:", file.path);
-// //  }
-
-//   // Move user data to Completed User db
 //   const completedUserData = {
-//     role: role,
+//     role,
 //     email: user.email,
 //     firstName: user.firstName,
 //     lastName: user.lastName,
@@ -294,7 +338,8 @@ export const submitRoleFormDetails = async ({
 //     isPoliticalPartyMember: user.isPoliticalPartyMember,
 //     isElectionWitnessReady: user.isElectionWitnessReady,
 //     isOpenToSurvey: user.isOpenToSurvey,
-//     governmentId: details.governmentId,
+//     profileImage: details.profileImage, // Contains the GCS URL
+//     governmentId: details.governmentId, // Contains the GCS URL
 //     phoneNumber: user.phoneNumber,
 //     bankName: user.bankName,
 //     bankAccountNumber: user.bankAccountNumber,
@@ -304,13 +349,17 @@ export const submitRoleFormDetails = async ({
 
 //   const completedUser = new CompletedUser(completedUserData);
 //   await completedUser.save();
+
+//   // Delete the original user from the User collection
 //   await user.deleteOne();
 
+//   // Generate a token and return the user details (excluding the password)
 //   const token = generateToken({ email: user.email });
 //   const { password, ...usersDetails } = completedUser.toObject();
-//   return { token, user: usersDetails };
 
+//   return { token, user: usersDetails };
 // };
+
 export const authenticateUser = async ({ email, password }) => {
   const user = await CompletedUser.findOne({ email });
   if (!user) {

@@ -678,7 +678,7 @@ export const getUserElectionResultsAndReports = async (userId) => {
   }
 };
 
-export const getResultsByPollingUnitAndRole = async (userId) => {
+export const getResultsAndPerformAction = async (userId, actionData) => {
   // Fetch user to get polling unit
   const user = await CompletedUser.findById(userId).lean();
   if (!user || !user.pollingUnit) {
@@ -692,8 +692,6 @@ export const getResultsByPollingUnitAndRole = async (userId) => {
     pollingUnit,
     role: "observer",
   }).lean();
-
-  // Collect observer IDs
   const observerIds = observers.map((observer) => observer._id);
 
   // Fetch election results uploaded by observers in the polling unit
@@ -718,6 +716,62 @@ export const getResultsByPollingUnitAndRole = async (userId) => {
     })
     .lean();
 
+  // If actionData is provided, perform the action
+  if (
+    actionData &&
+    actionData.electionId &&
+    actionData.action &&
+    actionData.dataType
+  ) {
+    let dataModel;
+
+    // Determine the model based on the data type
+    if (actionData.dataType === "election") {
+      dataModel = ElectionData;
+    } else if (actionData.dataType === "incident") {
+      dataModel = IncidentReport;
+    } else {
+      throw new Error(
+        "Invalid data type. It must be 'election' or 'incident'."
+      );
+    }
+
+    // Find the election result or incident report by electionId
+    const data = await dataModel.findById(actionData.electionId);
+    if (!data) {
+      throw new Error(
+        `${
+          actionData.dataType === "election"
+            ? "Election result"
+            : "Incident report"
+        } not found`
+      );
+    }
+
+    // Handle user action
+    const existingAction = data.actions.find(
+      (a) => a.userId.toString() === userId.toString()
+    );
+
+    if (existingAction) {
+      // Update existing action
+      existingAction.action = actionData.action;
+      data.agreed = actionData.action === "agree";
+      data.disagreed = actionData.action === "disagree";
+    } else {
+      // Add new action to the actions array
+      data.actions.push({
+        userId,
+        action: actionData.action,
+      });
+      data.agreed = actionData.action === "agree";
+      data.disagreed = actionData.action === "disagree";
+    }
+
+    // Save the updated election result or incident report
+    await data.save();
+  }
+
   // Prepare election result data
   const resultData = electionResults.map((result) => ({
     electionId: result._id,
@@ -731,6 +785,9 @@ export const getResultsByPollingUnitAndRole = async (userId) => {
     voteBuying: result.voteBuying,
     resultPicture: result.resultPicture,
     resultVideo: result.resultVideo,
+    agreed: result.agreed || false,
+    disagreed: result.disagreed || false,
+    actions: result.actions, // Include actions for each result
   }));
 
   // Prepare incident report data
@@ -745,66 +802,15 @@ export const getResultsByPollingUnitAndRole = async (userId) => {
     electionRating: report.electionRating,
     incidentPictures: report.incidentPictures,
     incidentVideo: report.incidentVideo,
+    agreed: report.agreed || false,
+    disagreed: report.disagreed || false,
+    actions: report.actions, // Include actions for each report
   }));
 
-  
   return {
     results: resultData,
     incidentReports: reportData,
   };
-};
-
-export const userActionOnResultService = async (
-  userId,
-  electionDataId,
-  action,
-  dataType
-) => {
-  if (!electionDataId || !action) {
-    throw new Error("Election data ID and action are required");
-  }
-
-  if (!["agree", "disagree"].includes(action)) {
-    throw new Error("Invalid action. It must be 'agree' or 'disagree'.");
-  }
-
-  let dataModel;
-  if (dataType === "election") {
-    dataModel = ElectionData;
-  } else if (dataType === "incident") {
-    dataModel = IncidentReport;
-  } else {
-    throw new Error("Invalid data type. It must be 'election' or 'incident'.");
-  }
-
-  // Find the election data or incident report by electionDataId
-  const data = await dataModel.findById(electionDataId);
-  if (!data) {
-    throw new Error(
-      `${
-        dataType === "election" ? "Election result" : "Incident report"
-      } not found`
-    );
-  }
-
-
-  // Check if user already took action
-  const existingAction = data.actions.find(
-    (a) => a.userId.toString() === userId.toString()
-  );
-
-  if (existingAction) {
-    // Update existing action
-    existingAction.action = action;
-  } else {
-    // Add new action to the actions array
-    data.actions.push({ userId, action });
-  }
-
-  // Save the updated election result or incident report
-  await data.save();
-
-  return { message: "Action recorded successfully" };
 };
 
 const aggregateResults = (results) => {

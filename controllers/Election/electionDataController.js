@@ -14,8 +14,7 @@ import {
   deleteIncidentReportDataService,
   getLiveElectionById,
   getUserElectionResultsAndReports,
-  getResultsByPollingUnitAndRole,
-  userActionOnResultService,
+  getResultsAndPerformAction,
 } from "../../services/Election/electionService.js";
 
 export const createElection = async (req, res) => {
@@ -245,64 +244,29 @@ export const getUserElectionResultsAndReportsCon = async (req, res) => {
   }
 };
 
-export const getResultByUserPollingUnit = async (req, res) => {
+export const getResultsAndPerformActionController = async (req, res) => {
   try {
     const userId = req.user._id;
+    const { electionId, action, dataType } = req.body;
 
-    const { results, incidentReports } = await getResultsByPollingUnitAndRole(
-      userId
-    );
+    const results = await getResultsAndPerformAction(userId, {
+      electionId,
+      action,
+      dataType,
+    });
 
-    // If no results or reports are found, return a 404
-    if (results.length === 0 && incidentReports.length === 0) {
-      return res.status(404).json({
-        message: "No results or incident reports found for this polling unit",
-      });
-    }
-
-    // Return both election results and incident reports
     return res.status(200).json({
+      message: "Election results and incident reports fetched successfully",
       results,
-      incidentReports,
     });
   } catch (error) {
-    console.error(error);
+    console.error(
+      "Error fetching election results and performing action:",
+      error
+    );
     return res.status(500).json({
-      message: "Error fetching election data",
+      message: "Failed to fetch election results or perform action",
       error: error.message,
     });
   }
 };
-
-export const userActionOnResult = async (req, res) => {
- try {
-   const { electionId } = req.params; // Get electionDataId from URL params (this refers to ElectionData or IncidentReport ID)
-   const { action, dataType } = req.body; // Expecting action ('agree' or 'disagree') and dataType ('election' or 'incident') in request body
-   const userId = req.user._id;
-
-   if (!action || !dataType) {
-     return res
-       .status(400)
-       .json({
-         message:
-           "Action and data type ('election' or 'incident') are required",
-       });
-   }
-
-   // Call the service to handle user action
-   const result = await userActionOnResultService(
-     userId,
-     electionId,
-     action,
-     dataType
-   );
-
-   return res.status(200).json(result);
- } catch (error) {
-   console.error(error);
-   return res
-     .status(500)
-     .json({ message: "Error processing action", error: error.message });
- }
-};
-

@@ -15,8 +15,7 @@ import {
   deleteIncidentReportData,
   getLiveElectionByIdCont,
   getUserElectionResultsAndReportsCon,
-  getResultByUserPollingUnit,
-  userActionOnResult,
+  getResultsAndPerformActionController,
 } from "../../controllers/Election/electionDataController.js";
 import { authMiddleware } from "../../middleware/authMiddleware.js";
 import {
@@ -143,7 +142,9 @@ router.get(
   authMiddleware,
   getUserElectionResultsAndReportsCon
 );
-router.get("/user-polling-result", authMiddleware, getResultByUserPollingUnit);
-router.post("/user-action/:electionId", authMiddleware, userActionOnResult);
+router.post(
+  "/user-action",
+  authMiddleware,
+  getResultsAndPerformActionController);
 
 export default router;

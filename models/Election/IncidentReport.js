@@ -47,11 +47,25 @@ const incidentReportSchema = new mongoose.Schema(
     incidentVideo: fileSchema,
     actions: [
       {
-        userId: { type: mongoose.Schema.Types.ObjectId,
-                  ref: "CompletedUser" },
-        action: { type: String, enum: ["agree", "disagree"], required: true },
+        userId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "CompletedUser",
+        },
+        action: {
+          type: String,
+          enum: ["agree", "disagree"],
+          required: true,
+        },
       },
     ],
+    agreed: {
+      type: Boolean,
+      default: false,
+    },
+    disagreed: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

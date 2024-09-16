@@ -12,7 +12,7 @@ import moment from "moment";
 import path from "path";
 import ProfileImageModel from "../models/UserProfileImage/ProfileImageModel.js";
 import GovernmentIdModel from "../models/GovernmentIds/GovernmentIdModel.js";
-import { uploadFileToGCS } from "./GoogleCloud/gcsService.js";
+// import { uploadFileToGCS } from "./GoogleCloud/gcsService.js";
 
 const FRONTEND_URL = process.env.FRONTEND_URL;
 const BACKEND_URL = process.env.BACKEND_URL;

@@ -984,7 +984,7 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
     incidentNote: report.incidentNote,
     electionRating: report.electionRating,
     incidentPictures: report.incidentPictures,
-    incidentVideo: report.incidentVideo,
+    incidentVideos: report.incidentVideos,
     agreed: report.agreed || false,
     disagreed: report.disagreed || false,
     actions: report.actions, // Include actions for each report

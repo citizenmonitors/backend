@@ -72,6 +72,12 @@ const ElectionDataSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    timeBegan: {
+      type: String,
+    },
+    accreditedVoters: {
+      type: Number,
+    },
   },
   {
     timestamps: true,

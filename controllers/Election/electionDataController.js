@@ -243,6 +243,31 @@ export const getUserElectionResultsAndReportsCon = async (req, res) => {
     });
   }
 };
+//   try {
+//     const userId = req.user._id;
+//     const { electionId, action, dataType } = req.body;
+
+//     const results = await getResultsAndPerformAction(userId, {
+//       electionId,
+//       action,
+//       dataType,
+//     });
+
+//     return res.status(200).json({
+//       message: "Election results and incident reports fetched successfully",
+//       results,
+//     });
+//   } catch (error) {
+//     console.error(
+//       "Error fetching election results and performing action:",
+//       error
+//     );
+//     return res.status(500).json({
+//       message: "Failed to fetch election results or perform action",
+//       error: error.message,
+//     });
+//   }
+// };
 
 export const getResultsAndPerformActionController = async (req, res) => {
   try {
@@ -256,8 +281,8 @@ export const getResultsAndPerformActionController = async (req, res) => {
     });
 
     return res.status(200).json({
-      message: "Election results and incident reports fetched successfully",
-      results,
+      message: "Election results and incident reports updated successfully",
+      results, // Return the updated results immediately
     });
   } catch (error) {
     console.error(
@@ -270,3 +295,4 @@ export const getResultsAndPerformActionController = async (req, res) => {
     });
   }
 };
+

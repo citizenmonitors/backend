@@ -44,7 +44,7 @@ const incidentReportSchema = new mongoose.Schema(
     incidentNote: { type: String },
     electionRating: { type: String },
     incidentPictures: [fileSchema],
-    incidentVideo: fileSchema,
+    incidentVideos: [fileSchema],
     actions: [
       {
         userId: {

@@ -866,6 +866,7 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
       select: "electionType startDate endDate", // Include election type and date
     })
     .lean();
+    
 
   // Fetch incident reports uploaded by observers in the polling unit
   const incidentReports = await IncidentReport.find({
@@ -886,6 +887,7 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
     actionData.dataType
   ) {
     let dataModel;
+
 
     // Determine the model based on the data type
     if (actionData.dataType === "election") {
@@ -960,7 +962,7 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
     electionId: result._id,
     electionType: result.election.electionType,
     pollingUnit: result.pollingUnit,
-    electionYear: result.election.startDate.substring(0, 4), // Extract year
+    electionYear: result.election.startDate.substring(0, 4),
     uploadedAt: result.createdAt,
     partiesVotes: result.partiesVotes,
     voteRating: result.voteRating,
@@ -970,7 +972,8 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
     resultVideo: result.resultVideo,
     agreed: result.agreed || false,
     disagreed: result.disagreed || false,
-    actions: result.actions, // Include actions for each result
+    actions: result.actions,
+    timeBegan: result.timeBegan,
   }));
 
   // Prepare incident report data
@@ -978,7 +981,7 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
     electionId: report._id,
     electionType: report.election.electionType,
     pollingUnit: report.pollingUnit,
-    electionYear: report.election.startDate.substring(0, 4), // Extract year
+    electionYear: report.election.startDate.substring(0, 4),
     uploadedAt: report.createdAt,
     selectIncident: report.selectIncident,
     incidentNote: report.incidentNote,
@@ -995,6 +998,7 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
     incidentReports: reportData,
   };
 };
+
 
 
 const aggregateResults = (results) => {

@@ -24,12 +24,16 @@ const storage = multer.diskStorage({
   },
 });
 
-const allowedExtensions = [".png", ".jpg", ".jpeg", ".svg", ".mp4"];
+const allowedExtensions = [".png", ".jpg", ".jpeg", ".svg", ".mp4", ".avi", ".mov", ".webm", ".wmv"];
 const allowedMimeTypes = [
   "image/png",
   "image/jpeg",
   "image/svg+xml",
   "video/mp4",
+  "video/avi",
+  "video/mov",
+  "video/webm",
+  "video/wmv",
 ];
 
 const fileFilter = (req, file, cb) => {

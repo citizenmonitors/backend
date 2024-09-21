@@ -990,7 +990,7 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
     incidentVideos: report.incidentVideos,
     agreed: report.agreed || false,
     disagreed: report.disagreed || false,
-    actions: report.actions, // Include actions for each report
+    actions: report.actions,
   }));
 
   return {

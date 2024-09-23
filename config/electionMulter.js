@@ -30,10 +30,10 @@ const allowedMimeTypes = [
   "image/jpeg",
   "image/svg+xml",
   "video/mp4",
-  "x-msvideo/avi",
-  "quicktime/mov",
+  "video/x-msvideo",
+  "video/quicktime",
   "video/webm",
-  "x-ms-wmv/wmv",
+  "video/x-ms-wmv",
 ];
 
 const fileFilter = (req, file, cb) => {

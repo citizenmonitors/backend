@@ -30,10 +30,10 @@ const allowedMimeTypes = [
   "image/jpeg",
   "image/svg+xml",
   "video/mp4",
-  "video/avi",
-  "video/mov",
+  "x-msvideo/avi",
+  "quicktime/mov",
   "video/webm",
-  "video/wmv",
+  "x-ms-wmv/wmv",
 ];
 
 const fileFilter = (req, file, cb) => {
@@ -55,7 +55,7 @@ const fileFilter = (req, file, cb) => {
   } else {
     cb(
       new Error(
-        "Only images (png, jpg, jpeg, svg) and videos (mp4) are allowed"
+        "Only images (png, jpg, jpeg, svg) and videos are allowed"
       )
     );
   }

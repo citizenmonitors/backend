@@ -22,6 +22,7 @@ const completedUserSchema = new mongoose.Schema({
   verificationCode: String,
   verificationCodeExpires: Date,
   isObserverInPollingUnit: Boolean,
+  pendingObserverVerification: Boolean,
   isActive: Boolean,
   lastLogin: Date,
   // Volunteer specific fields

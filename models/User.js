@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema({
   isElectionWitnessReady: Boolean,
   isOpenToSurvey: Boolean,
   isObserverInPollingUnit: Boolean,
+  pendingObserverVerification: Boolean,
   // Volunteer specific fields
   governmentId: String,
   phoneNumber: String,

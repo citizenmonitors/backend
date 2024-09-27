@@ -8,6 +8,7 @@ import {
   generateResetToken,
   resetUserPassword,
   validateTokenService,
+  submitObserverDetails,
 } from "../services/authService.js";
 import upload from "../config/multer.js";
 
@@ -51,61 +52,16 @@ export const pickRole = async (req, res) => {
   }
 };
 
-export const submitRoleForm = [
-  upload.fields([
-    { name: "governmentId", maxCount: 1 },
-    { name: "profileImage", maxCount: 1 },
-  ]),
-  async (req, res) => {
-    try {
-      const { email, role, ...details } = req.body;
-      const files = req.files;
-
-      if (!email) {
-        return res.status(400).json({ message: "Email is required" });
-      }
-
-      if (!role) {
-        return res.status(400).json({ message: "Role is required" });
-      }
-
-      const { token, user } = await submitRoleFormDetails({
-        email,
-        role,
-        details,
-        files,
-      });
-
-      res.status(200).json({
-        message:
-          "Details submitted successfully. You can now login to your account.",
-        token,
-        user,
-      });
-    } catch (err) {
-      console.error(err);
-      res.status(400).json({ message: err.message });
-    }
-  },
-];
-
 // export const submitRoleForm = [
-//   // Multer middleware to handle file upload
 //   upload.fields([
 //     { name: "governmentId", maxCount: 1 },
 //     { name: "profileImage", maxCount: 1 },
 //   ]),
-
 //   async (req, res) => {
 //     try {
 //       const { email, role, ...details } = req.body;
 //       const files = req.files;
 
-//       // Log the files and details for debugging
-//       console.log("Files:", files);
-//       console.log("Details:", details);
-
-//       // Check if required fields are provided
 //       if (!email) {
 //         return res.status(400).json({ message: "Email is required" });
 //       }
@@ -114,14 +70,6 @@ export const submitRoleForm = [
 //         return res.status(400).json({ message: "Role is required" });
 //       }
 
-//       // Check if governmentId is required for observers
-//       if (role === "observer" && (!files || !files.governmentId)) {
-//         return res
-//           .status(400)
-//           .json({ message: "Government ID is required for observers" });
-//       }
-
-//       // Call the service function to handle the logic
 //       const { token, user } = await submitRoleFormDetails({
 //         email,
 //         role,
@@ -129,19 +77,86 @@ export const submitRoleForm = [
 //         files,
 //       });
 
-//       // Send the response with token and user details
 //       res.status(200).json({
 //         message:
-//           "Details submitted successfully. You can now log in to your account.",
+//           "Details submitted successfully. You can now login to your account.",
 //         token,
 //         user,
 //       });
 //     } catch (err) {
-//       console.error("Error during form submission:", err);
+//       console.error(err);
 //       res.status(400).json({ message: err.message });
 //     }
 //   },
 // ];
+
+export const submitRoleForm = [
+  upload.single("profileImage"),
+  async (req, res) => {
+    try {
+      const { email, ...details } = req.body;
+      const file = req.file;
+
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+
+      const { token, user, isObserverInPollingUnit } =
+        await submitRoleFormDetails({
+          email,
+          details,
+          file,
+        });
+
+      res.status(200).json({
+        message:
+          "Details submitted successfully. You can now select your role.",
+        token,
+        user,
+        isObserverInPollingUnit,
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(400).json({ message: err.message });
+    }
+  },
+];
+
+export const submitObserverDetailsController = [
+  upload.single("governmentId"),
+  async (req, res) => {
+    try {
+      const {
+        email,
+        phoneNumber,
+        bankName,
+        bankAccountNumber,
+        bankAccountName,
+      } = req.body;
+      const governmentIdFile = req.file; 
+
+      const result = await submitObserverDetails({
+        email,
+        governmentIdFile,
+        phoneNumber,
+        bankName,
+        bankAccountNumber,
+        bankAccountName,
+      });
+
+      return res.status(200).json({
+        message: result.message,
+        user: result.user, 
+        isObserverInPollingUnit: result.isObserverInPollingUnit,
+        pendingObserverVerification: result.pendingObserverVerification,
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(400).json({ message: err.message });
+    }
+  },
+];
+
 
 export const signIn = async (req, res) => {
   try {

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { profileImageSchema } from "./UserProfileImage/ProfileImageModel.js";
 
 const userSchema = new mongoose.Schema({
   role: { type: String, enum: ["observer", "volunteer"] },
@@ -7,7 +8,7 @@ const userSchema = new mongoose.Schema({
   lastName: String,
   gender: String,
   dateOfBirth: String,
-  profileImage: String,
+  profileImage: profileImageSchema,
   state: String,
   lga: String,
   ward: String,
@@ -16,6 +17,7 @@ const userSchema = new mongoose.Schema({
   isPoliticalPartyMember: Boolean,
   isElectionWitnessReady: Boolean,
   isOpenToSurvey: Boolean,
+  isObserverInPollingUnit: Boolean,
   // Volunteer specific fields
   governmentId: String,
   phoneNumber: String,

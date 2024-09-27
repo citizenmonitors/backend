@@ -21,6 +21,7 @@ const completedUserSchema = new mongoose.Schema({
   isOpenToSurvey: Boolean,
   verificationCode: String,
   verificationCodeExpires: Date,
+  isObserverInPollingUnit: Boolean,
   isActive: Boolean,
   lastLogin: Date,
   // Volunteer specific fields

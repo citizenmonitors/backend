@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema({
   bankAccountName: String,
   password: { type: String, required: true },
   isVerified: { type: Boolean, default: false },
-  verificationToken: { type: String },
+  // verificationToken: { type: String },
   verificationCode: { type: String },
   verificationCodeExpires: { type: Date, required: false },
 });

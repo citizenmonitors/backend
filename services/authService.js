@@ -436,7 +436,6 @@ export const submitObserverDetails = async ({
   };
 };
 
-
 export const authenticateUser = async ({ email, password }) => {
   const user = await CompletedUser.findOne({ email });
   if (!user) {

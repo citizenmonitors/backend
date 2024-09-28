@@ -444,9 +444,9 @@ export const verifyUserEmail = async (userId, verificationCode) => {
 
     // Update the user's email
     user.email = user.pendingEmail;
-    user.pendingEmail = undefined; // Clear pending email
-    user.verificationCode = undefined; // Clear verification code
-    user.verificationCodeExpires = undefined; // Clear verification expiry
+    user.pendingEmail = undefined;
+    user.verificationCode = undefined;
+    user.verificationCodeExpires = undefined;
 
     await user.save();
 

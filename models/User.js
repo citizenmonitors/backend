@@ -4,7 +4,7 @@ import { profileImageSchema } from "./UserProfileImage/ProfileImageModel.js";
 const userSchema = new mongoose.Schema({
   role: { type: String, enum: ["observer", "volunteer"] },
   email: { type: String, required: true, unique: true },
-  pendingEmail: String,
+  pendingEmail: String, 
   firstName: String,
   lastName: String,
   gender: String,
@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
   isOpenToSurvey: Boolean,
   isObserverInPollingUnit: Boolean,
   pendingObserverVerification: Boolean,
-  // Volunteer specific fields
+  // Observer specific fields
   governmentId: String,
   phoneNumber: String,
   bankName: String,

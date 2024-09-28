@@ -25,7 +25,7 @@ const completedUserSchema = new mongoose.Schema({
   pendingObserverVerification: { type: Boolean, default: true },
   isActive: Boolean,
   lastLogin: Date,
-  // Volunteer specific fields
+  // Observer specific fields
   governmentId: governmentIdSchema,
   phoneNumber: String,
   bankName: String,

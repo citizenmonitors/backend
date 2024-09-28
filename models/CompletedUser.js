@@ -5,7 +5,7 @@ import { profileImageSchema } from "./UserProfileImage/ProfileImageModel.js";
 const completedUserSchema = new mongoose.Schema({
   role: { type: String, enum: ["observer", "volunteer", "admin"] },
   email: { type: String, required: true, unique: true },
-  pendingEmail: { type: String, unique: true },
+  pendingEmail: { type: String },
   firstName: String,
   lastName: String,
   gender: String,
@@ -21,8 +21,8 @@ const completedUserSchema = new mongoose.Schema({
   isOpenToSurvey: Boolean,
   verificationCode: String,
   verificationCodeExpires: Date,
-  isObserverInPollingUnit: Boolean,
-  pendingObserverVerification: Boolean,
+  isObserverInPollingUnit: { type: Boolean, default: false },
+  pendingObserverVerification: { type: Boolean, default: true },
   isActive: Boolean,
   lastLogin: Date,
   // Volunteer specific fields

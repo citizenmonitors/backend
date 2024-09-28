@@ -364,24 +364,33 @@ export const submitObserverDetails = async ({
   if (user.role !== "observer") {
     throw new Error("User is not an observer.");
   }
-  
 
-  // Upload government ID file (assuming a file is being uploaded)
-  let governmentId;
-  if (governmentIdFile) {
-    const governmentIdPath = `/governmentid/${path.basename(
-      governmentIdFile.path
-    )}`;
-    governmentId = await GovernmentIdModel.create({
-      location: governmentIdPath,
-      name: governmentIdFile.originalname,
-      type: governmentIdFile.mimetype,
-      size: governmentIdFile.size,
-      url: `${process.env.BACKEND_URL}${governmentIdPath}`,
-    });
+  // Validate the required details
+  if (!phoneNumber || !bankName || !bankAccountNumber || !bankAccountName) {
+    throw new Error(
+      "Please provide all the required details: phone number, bank name, bank account number, and bank account name."
+    );
   }
 
-  // Move the observer details to CompletedUser and set `pendingObserverVerification` and `isObserverInPollingUnit`
+  // Ensure that the government ID file is provided
+  if (!governmentIdFile) {
+    throw new Error("Government ID is required for observers.");
+  }
+
+  // Handle government ID upload
+  let governmentId = null;
+  const governmentIdPath = `/governmentid/${path.basename(
+    governmentIdFile.path
+  )}`;
+  governmentId = await GovernmentIdModel.create({
+    location: governmentIdPath,
+    name: governmentIdFile.originalname,
+    type: governmentIdFile.mimetype,
+    size: governmentIdFile.size,
+    url: `${process.env.BACKEND_URL}${governmentIdPath}`,
+  });
+
+  // Prepare the observer details for CompletedUser
   const completedUserData = {
     email: user.email,
     firstName: user.firstName,
@@ -398,29 +407,32 @@ export const submitObserverDetails = async ({
     isElectionWitnessReady: user.isElectionWitnessReady,
     isOpenToSurvey: user.isOpenToSurvey,
     profileImage: user.profileImage,
-    governmentId,
+    governmentId, 
     phoneNumber,
     bankName,
     bankAccountNumber,
     bankAccountName,
     password: user.password,
+    isObserverInPollingUnit: false, 
+    pendingObserverVerification: true, 
   };
 
+  // Save the CompletedUser
   const completedUser = new CompletedUser(completedUserData);
   await completedUser.save();
 
-  // Remove the original user entry
+  // Remove the original user from the User collection
   await user.deleteOne();
 
-  // Return the completed user data
-  const { password, ...userDetails } = completedUser.toObject(); 
+  // Return the user details, excluding the password
+  const { password, ...userDetails } = completedUser.toObject();
 
   return {
     message:
       "Observer details submitted successfully, pending admin verification.",
     user: userDetails,
-    isObserverInPollingUnit: false,
-    pendingObserverVerification: true,
+    // isObserverInPollingUnit: false,
+    // pendingObserverVerification: true,
   };
 };
 

@@ -4,7 +4,7 @@ import { profileImageSchema } from "./UserProfileImage/ProfileImageModel.js";
 const userSchema = new mongoose.Schema({
   role: { type: String, enum: ["observer", "volunteer"] },
   email: { type: String, required: true, unique: true },
-  pendingEmail: { type: String },
+  pendingEmail: String,
   firstName: String,
   lastName: String,
   gender: String,

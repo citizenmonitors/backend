@@ -414,7 +414,7 @@ export const uploadResultDataService = async (
     const electionData = new ElectionData({
       election: electionId,
       user: userId,
-      role: user.role,
+      userRole: user.role,
       state: user.state,
       lga: user.lga,
       ward: user.ward,
@@ -904,7 +904,7 @@ export const uploadIncidentReportDataService = async (
     const incidentReport = new IncidentReport({
       election: electionId,
       user: userId,
-      role: user.role,
+      userRole: user.role,
       state: user.state,
       lga: user.lga,
       ward: user.ward,

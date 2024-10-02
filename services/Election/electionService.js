@@ -5,6 +5,7 @@ import { politicalParties } from "../../models/Election/PoliticalParty.js";
 import IncidentReport from "../../models/Election/IncidentReport.js";
 import File from "../../models/file.js";
 import path from "path";
+import mongoose from "mongoose";
 
 export const createElectionService = async (data) => {
   const { electionType, electionName, startDate, endDate } = data;

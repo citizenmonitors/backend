@@ -1,5 +1,8 @@
 import path from "path";
 import CompletedUser from "../../models/CompletedUser.js";
+import IncidentReport from "../../models/Election/IncidentReport.js";
+import ElectionData from "../../models/Election/ElectionData.js";
+import Election from "../../models/Election/Election.js";
 import bcrypt from "bcryptjs";
 import moment from "moment";
 import transporter from "../../config/email.js";
@@ -13,32 +16,123 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const BACKEND_URL = process.env.BACKEND_URL;
 
-// observer to volunteer
-export const volunteerToObserverService = async ({ email, details, file }) => {
+//  volunteer to observer
+
+// export const volunteerToObserverService = async ({ email, details, file }) => {
+//   const user = await CompletedUser.findOne({ email });
+
+//   if (!user) {
+//     throw new Error("No account found with this email address");
+//   }
+
+//   if (!file) {
+//     throw new Error("Government ID is required for observers");
+//   }
+
+//   // Process the government ID file
+//   const governmentIdPath = `/governmentid/${path.basename(file.path)}`;
+
+//   // Create a new File entry for government ID
+//   const governmentIdFile = await governmentIdModel.create({
+//     location: governmentIdPath,
+//     name: file.originalname,
+//     type: file.mimetype,
+//     size: file.size,
+//     url: `${BACKEND_URL}${governmentIdPath}`,
+//   });
+
+  
+//   details.governmentId = governmentIdFile;
+
+//   // Update user details and change role to "observer"
+//   Object.assign(user, details);
+//   user.role = "observer";
+
+//   // Save the updated user to the database
+//   await user.save();
+
+//   // Exclude password from the response
+//   const { password, ...userDetails } = user.toObject();
+//   return userDetails;
+// };
+
+export const volunteerToObserverService = async ({ email, details, files }) => {
   const user = await CompletedUser.findOne({ email });
 
   if (!user) {
     throw new Error("No account found with this email address");
   }
 
-  if (!file) {
-    throw new Error("Government ID is required for observers");
+  if (!files || files.length !== 2) {
+    throw new Error("Two government ID files are required for observers");
   }
 
-  // Process the government ID file
-  const governmentIdPath = `/governmentid/${path.basename(file.path)}`;
-
-  // Create a new File entry for government ID
-  const governmentIdFile = await governmentIdModel.create({
-    location: governmentIdPath,
-    name: file.originalname,
-    type: file.mimetype,
-    size: file.size,
-    url: `${BACKEND_URL}${governmentIdPath}`,
+  // Check if there is already an observer in the user's polling unit
+  const existingObserver = await CompletedUser.findOne({
+    pollingUnit: user.pollingUnit,
+    isObserverInPollingUnit: true,
   });
 
-  
-  details.governmentId = governmentIdFile;
+  if (existingObserver) {
+    throw new Error("An observer already exists in your polling unit.");
+  }
+
+  // Check for ongoing elections
+  const ongoingElections = await Election.find({
+    startDate: { $lte: new Date() },
+    endDate: { $gte: new Date() },
+  });
+
+  if (ongoingElections.length > 0) {
+    // Check if the user has submitted results or incidents for ongoing elections
+    const hasSubmittedResults = await ElectionData.findOne({
+      user: user._id,
+      election: { $in: ongoingElections.map((election) => election._id) },
+    });
+
+    const hasSubmittedIncidents = await IncidentReport.findOne({
+      user: user._id,
+      election: { $in: ongoingElections.map((election) => election._id) },
+    });
+
+    if (hasSubmittedResults || hasSubmittedIncidents) {
+      throw new Error(
+        "You cannot change your role to observer because you have already submitted results or incidents for ongoing elections."
+      );
+    }
+  }
+
+  // Check if today is the election day
+  const isElectionDay = ongoingElections.some((election) => {
+    const today = new Date().toDateString();
+    const electionDay = election.startDate.toDateString();
+    return today === electionDay;
+  });
+
+  if (isElectionDay) {
+    throw new Error("You cannot change your role to observer on election day.");
+  }
+
+  // Process the government ID files (two files)
+  const governmentIdFiles = await Promise.all(
+    files.map(async (file) => {
+      const governmentIdPath = `/governmentid/${path.basename(file.path)}`;
+      const governmentIdFile = await governmentIdModel.create({
+        location: governmentIdPath,
+        name: file.originalname,
+        type: file.mimetype,
+        size: file.size,
+        url: `${BACKEND_URL}${governmentIdPath}`,
+      });
+      return governmentIdFile;
+    })
+  );
+
+  details.governmentId = governmentIdFiles;
+
+  // Set isObserverInPollingUnit to false and pendingObserverVerification to true
+  details.isObserverInPollingUnit = false;
+  details.pendingObserverVerification = true;
 
   // Update user details and change role to "observer"
   Object.assign(user, details);
@@ -52,7 +146,6 @@ export const volunteerToObserverService = async ({ email, details, file }) => {
   return userDetails;
 };
 
-
 // export const updateUserService = async (
 //   userId,
 //   updateData,
@@ -60,6 +153,7 @@ export const volunteerToObserverService = async ({ email, details, file }) => {
 //   file
 // ) => {
 //   try {
+//     // Find the user by ID
 //     const user = await CompletedUser.findById(userId);
 //     if (!user) {
 //       throw new Error("User not found");
@@ -78,36 +172,7 @@ export const volunteerToObserverService = async ({ email, details, file }) => {
 
 //       const salt = await bcrypt.genSalt(10);
 //       updateData.password = await bcrypt.hash(updateData.password, salt);
-//       delete updateData.confirmPassword; // Clean up the updateData object
-//     }
-
-//     let updatedEmail = false;
-
-//     // Handle email update
-//     if (updateData.email && updateData.email !== user.email) {
-//       updatedEmail = true;
-
-//       const emailExistsInCompletedUser = await CompletedUser.findOne({
-//         email: updateData.email,
-//       });
-//       const emailExistsInUser = await User.findOne({ email: updateData.email });
-
-//       if (emailExistsInCompletedUser || emailExistsInUser) {
-//         throw new Error("This email is already in use.");
-//       }
-
-//       const verificationCode = Math.floor(
-//         100000 + Math.random() * 900000
-//       ).toString();
-
-//       updateData.verificationCode = verificationCode;
-//       updateData.verificationCodeExpires = moment().add(10, "minutes").toDate();
-
-//       await transporter.sendMail({
-//         to: updateData.email,
-//         subject: "Verify your email",
-//         html: `<p>Your verification code is: ${verificationCode}</p>`,
-//       });
+//       delete updateData.confirmPassword; 
 //     }
 
 //     // Handle profile image update
@@ -133,7 +198,6 @@ export const volunteerToObserverService = async ({ email, details, file }) => {
 //           console.log("Old profile image not found:", oldImagePath);
 //         }
 //       }
-      
 
 //       // Save the new profile image
 //       const profileImagePath = `/profileimage/${path.basename(
@@ -164,11 +228,7 @@ export const volunteerToObserverService = async ({ email, details, file }) => {
 //       throw new Error("User not found");
 //     }
 
-//     // Return a message if email was updated, else return updated user details
-//     if (updatedEmail) {
-//       return { message: "Please verify your new email address" };
-//     }
-
+//     // Return updated user details
 //     return updatedUser;
 //   } catch (error) {
 //     throw new Error(`Error updating user details: ${error.message}`);
@@ -201,7 +261,7 @@ export const updateUserService = async (
 
       const salt = await bcrypt.genSalt(10);
       updateData.password = await bcrypt.hash(updateData.password, salt);
-      delete updateData.confirmPassword; 
+      delete updateData.confirmPassword;
     }
 
     // Handle profile image update
@@ -243,6 +303,65 @@ export const updateUserService = async (
       updateData.profileImage = profileImageFile; // Update with the new image
     }
 
+    // Check for ongoing elections
+    const ongoingElections = await Election.find({
+      startDate: { $lte: new Date() },
+      endDate: { $gte: new Date() },
+    });
+
+    if (ongoingElections.length > 0) {
+      // Check if the user has submitted results for an ongoing election
+      const hasSubmittedResults = await ElectionData.findOne({
+        user: user._id,
+        election: { $in: ongoingElections.map((election) => election._id) },
+      });
+
+      if (hasSubmittedResults) {
+        throw new Error(
+          "You cannot change your coverage details because you have already submitted results for an ongoing election."
+        );
+      }
+    }
+
+    // Check if today is the election day
+    const isElectionDay = ongoingElections.some((election) => {
+      const today = new Date().toDateString();
+      const electionDay = election.startDate.toDateString();
+      return today === electionDay;
+    });
+
+    if (isElectionDay) {
+      throw new Error(
+        "You cannot change your coverage details on election day."
+      );
+    }
+
+    // Observers cannot change coverage details, downgrade if attempted
+    const coverageFields = [
+      "state",
+      "lga",
+      "ward",
+      "pollingUnit",
+      "isRegisteredVoter",
+      "isPoliticalPartyMember",
+      "isElectionWitnessReady",
+      "isOpenToSurvey",
+    ];
+
+    const isChangingCoverageDetails = coverageFields.some((field) =>
+      Object.keys(updateData).includes(field)
+    );
+
+    if (user.role === "observer" && isChangingCoverageDetails) {
+      // Downgrade the observer to a volunteer if they attempt to change coverage details
+      updateData.role = "volunteer";
+      updateData.isObserverInPollingUnit = false;
+      updateData.pendingObserverVerification = false;
+      console.log(
+        "Observer downgraded to volunteer for changing coverage details."
+      );
+    }
+
     // Update user data in the database
     const updatedUser = await CompletedUser.findByIdAndUpdate(
       userId,
@@ -263,52 +382,7 @@ export const updateUserService = async (
     throw new Error(`Error updating user details: ${error.message}`);
   }
 };
-// export const updateUserEmail = async (userId, newEmail) => {
-//  try {
-//    const user = await CompletedUser.findById(userId);
-//    if (!user) {
-//      throw new Error("User not found");
-//    }
 
-//    if (newEmail === user.email) {
-//      throw new Error("New email cannot be the same as the current email.");
-//    }
-
-//    // Check if the new email is already in use
-//    const emailExistsInCompletedUser = await CompletedUser.findOne({
-//      email: newEmail,
-//    });
-//    const emailExistsInUser = await User.findOne({ email: newEmail });
-
-//    if (emailExistsInCompletedUser || emailExistsInUser) {
-//      throw new Error("This email is already in use.");
-//    }
-
-//    // Generate a verification code and set expiration time
-//    const verificationCode = Math.floor(
-//      100000 + Math.random() * 900000
-//    ).toString();
-
-//    user.verificationCode = verificationCode;
-//    user.verificationCodeExpires = moment().add(10, "minutes").toDate();
-
-//    // Send verification email to the original email address
-//    await transporter.sendMail({
-//      to: user.email,
-//      subject: "Verify your email change request",
-//      html: `<p>You have requested to change your email to ${newEmail}. Your verification code is: ${verificationCode}</p>`,
-//    });
-
-//    await user.save();
-
-//    return {
-//      message:
-//        "Verification code sent to your current email address. Please verify to confirm the change.",
-//    };
-//  } catch (error) {
-//    throw new Error(`Error generating verification code: ${error.message}`);
-//  }
-// };
 
 export const updateUserEmail = async (userId, newEmail) => {
   try {
@@ -369,47 +443,6 @@ export const updateUserEmail = async (userId, newEmail) => {
   }
 };
 
-// export const verifyUserEmail = async (userId, verificationCode, newEmail) => {
-//   try {
-//     const user = await CompletedUser.findById(userId);
-//     if (!user) {
-//       throw new Error("User not found");
-//     }
-
-//     // Check if the verification code is correct and not expired
-//     if (user.verificationCode !== verificationCode) {
-//       throw new Error("Invalid verification code");
-//     }
-
-//     if (moment().isAfter(user.verificationCodeExpires)) {
-//       throw new Error("Verification code has expired");
-//     }
-
-//     // Before updating, verify that the new email is still not in use
-//     const emailExistsInCompletedUser = await CompletedUser.findOne({
-//       email: newEmail,
-//     });
-//     const emailExistsInUser = await User.findOne({ email: newEmail });
-
-//     if (emailExistsInCompletedUser || emailExistsInUser) {
-//       throw new Error("This email is already in use.");
-//     }
-
-//     // Update the user's email
-//     user.email = newEmail;
-//     user.verificationCode = undefined;
-//     user.verificationCodeExpires = undefined;
-
-//     await user.save();
-
-//     return { message: "Email address updated successfully." };
-//   } catch (error) {
-//     throw new Error(
-//       `Error verifying code and updating email: ${error.message}`
-//     );
-//   }
-// };
-
 export const verifyUserEmail = async (userId, verificationCode) => {
   try {
     const user = await CompletedUser.findById(userId);
@@ -457,30 +490,6 @@ export const verifyUserEmail = async (userId, verificationCode) => {
     );
   }
 };
-
-// export const resendTokenService = async (email) => {
-//   const user = await CompletedUser.findOne({ email });
-//   if (!user) {
-//     throw new Error("User not found");
-//   }
-
-//   const verificationCode = Math.floor(
-//     100000 + Math.random() * 900000
-//   ).toString();
-//   user.verificationCode = verificationCode;
-//   user.verificationCodeExpires = moment().add(10, "minutes").toDate();
-//   await user.save();
-
-//   await transporter.sendMail({
-//     to: email,
-//     subject: "Verify your email",
-//     html: `<p>Your verification code is: ${verificationCode}</p>`,
-//   });
-
-//   return true;
-// };
-
-// Delete user account
 
 export const resendTokenService = async (userId) => {
   try {

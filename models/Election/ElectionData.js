@@ -59,8 +59,11 @@ const ElectionDataSchema = new mongoose.Schema(
         },
         action: {
           type: String,
-          enum: ["agree", "disagree"],
+          enum: ["agree", "flag"],
           required: true,
+        },
+        flagReason: {
+          type: String,
         },
       },
     ],
@@ -68,7 +71,11 @@ const ElectionDataSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    disagreed: {
+    flagged: {
+      type: Boolean,
+      default: false,
+    },
+    isApproved: {
       type: Boolean,
       default: false,
     },
@@ -76,6 +83,9 @@ const ElectionDataSchema = new mongoose.Schema(
       type: String,
     },
     accreditedVoters: {
+      type: Number,
+    },
+    rejectedVoters: {
       type: Number,
     },
   },

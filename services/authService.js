@@ -277,7 +277,6 @@ export const submitRoleFormDetails = async ({ email, details, file }) => {
   };
 };
 
-
 export const selectUserRole = async (email, role) => {
   // Check if the selected role is valid
   if (!["observer", "volunteer"].includes(role)) {
@@ -316,7 +315,8 @@ export const selectUserRole = async (email, role) => {
       isPoliticalPartyMember: user.isPoliticalPartyMember,
       isElectionWitnessReady: user.isElectionWitnessReady,
       isOpenToSurvey: user.isOpenToSurvey,
-      profileImage: user.profileImage, 
+      profileImage: user.profileImage,
+      pendingObserverVerification: false,
       password: user.password,
     };
 

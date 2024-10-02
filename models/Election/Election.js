@@ -4,13 +4,10 @@ const ElectionSchema = new mongoose.Schema(
   {
     electionType: {
       type: String,
-      enum: [
-        "presidential",
-        "senatorial",
-        "gubernatorial",
-        "house-of-representatives",
-        "state-house-of-assembly",
-      ],
+      required: true,
+    },
+    electionName: {
+      type: String,
       required: true,
     },
     startDate: {

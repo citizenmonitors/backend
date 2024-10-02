@@ -272,17 +272,26 @@ export const getUserElectionResultsAndReportsCon = async (req, res) => {
 export const getResultsAndPerformActionController = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { electionId, action, dataType } = req.body;
+    const { electionId, action, dataType, flagReason } = req.body;
 
+    // Check if flagReason is provided when action is "flag"
+    if (action === "flag" && !flagReason) {
+      return res.status(400).json({ message: "Flag reason is required." });
+    }
+
+    // Call the service, passing action data
     const results = await getResultsAndPerformAction(userId, {
       electionId,
       action,
       dataType,
+      flagReason, 
     });
 
     return res.status(200).json({
-      message: "Election results and incident reports updated successfully",
-      results, // Return the updated results immediately
+      message: action
+        ? "Election results and incident reports updated successfully"
+        : "Fetched election results and incident reports",
+      results,
     });
   } catch (error) {
     console.error(
@@ -295,4 +304,5 @@ export const getResultsAndPerformActionController = async (req, res) => {
     });
   }
 };
+
 

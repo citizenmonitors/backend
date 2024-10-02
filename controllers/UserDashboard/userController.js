@@ -12,24 +12,59 @@ import upload from "../../config/multer.js";
 
 // volunteer to observer
 
+// export const volunteerToObserver = [
+//   upload.fields("governmentId"), 
+//   async (req, res) => {
+//     try {
+//       const user = req.user;
+//       const { ...details } = req.body;
+//       const file = req.file; 
+
+//       if (!files) {
+//         return res
+//           .status(400)
+//           .json({ message: "Government ID is required to be an observer" });
+//       }
+
+//       const updatedUser = await volunteerToObserverService({
+//         email: user.email,
+//         details,
+//         files, 
+//       });
+
+//       res.status(200).json({
+//         message: "Volunteer updated to Observer successfully",
+//         user: updatedUser,
+//       });
+//     } catch (err) {
+//       console.error("Error updating user to Observer:", err);
+//       res.status(500).json({
+//         message: "An error occurred while updating user to Observer",
+//       });
+//     }
+//   },
+// ];
+
 export const volunteerToObserver = [
-  upload.single("governmentId"), 
+  upload.fields([{ name: "governmentId", maxCount: 2 }]),
   async (req, res) => {
     try {
       const user = req.user;
       const { ...details } = req.body;
-      const file = req.file; 
+      const files = req.files; 
 
-      if (!file) {
+      if (!files || !files.governmentId || files.governmentId.length !== 2) {
         return res
           .status(400)
-          .json({ message: "Government ID is required to be an observer" });
+          .json({
+            message: "Two government ID files are required to be an observer",
+          });
       }
 
       const updatedUser = await volunteerToObserverService({
         email: user.email,
         details,
-        file, 
+        files: files.governmentId, 
       });
 
       res.status(200).json({
@@ -86,28 +121,6 @@ export const updateUser = [
   },
 ];
 
-// export const updateUserEmailCon = async (req, res) => {
-//   try {
-//     const userId = req.user._id; 
-//     const { newEmail } = req.body;
-
-//     if (!newEmail) {
-//       return res.status(400).json({ message: "New email address is required" });
-//     }
-
-//     const result = await updateUserEmail(userId, newEmail);
-
-//     res.status(200).json(result);
-//   } catch (error) {
-//     res.status(500).json({
-//       message: "Error updating email",
-//       error: error.message,
-//     });
-//   }
-// };
-
-// Send verification email
-
 export const updateUserEmailCon = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -131,29 +144,6 @@ export const updateUserEmailCon = async (req, res) => {
     });
   }
 };
-// export const verifyEmail = async (req, res) => {
-//   try {
-//     const userId = req.user._id; 
-//     const { verificationCode, newEmail } = req.body;
-
-//     if (!verificationCode || !newEmail) {
-//       return res
-//         .status(400)
-//         .json({
-//           message: "Verification code and new email address are required",
-//         });
-//     }
-
-//     const result = await verifyUserEmail(userId, verificationCode, newEmail);
-
-//     res.status(200).json(result);
-//   } catch (error) {
-//     res.status(500).json({
-//       message: "Error verifying code",
-//       error: error.message,
-//     });
-//   }
-// };
 
 export const verifyEmail = async (req, res) => {
   try {
@@ -179,17 +169,6 @@ export const verifyEmail = async (req, res) => {
     });
   }
 };
-
-// Resend verification token
-// export const resendToken = async (req, res) => {
-//   try {
-//     const { email } = req.body;
-//     await resendTokenService(email);
-//     res.status(200).json({ message: "Verification code resent successfully" });
-//   } catch (error) {
-//     res.status(400).json({ error: error.message });
-//   }
-// };
 
 export const resendToken = async (req, res) => {
   try {

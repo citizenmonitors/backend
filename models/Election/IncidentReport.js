@@ -53,8 +53,11 @@ const incidentReportSchema = new mongoose.Schema(
         },
         action: {
           type: String,
-          enum: ["agree", "disagree"],
+          enum: ["agree", "flag"], 
           required: true,
+        },
+        flagReason: {
+          type: String, 
         },
       },
     ],
@@ -62,7 +65,7 @@ const incidentReportSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    disagreed: {
+    flagged: {
       type: Boolean,
       default: false,
     },

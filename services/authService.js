@@ -322,7 +322,7 @@ export const submitObserverDetails = async ({
     isElectionWitnessReady: user.isElectionWitnessReady,
     isOpenToSurvey: user.isOpenToSurvey,
     profileImage: user.profileImage,
-    observerId, // Store the array of files for observerId
+    observerId, 
     phoneNumber,
     bankName,
     bankAccountNumber,
@@ -348,8 +348,6 @@ export const submitObserverDetails = async ({
     user: userDetails,
   };
 };
-
-
 
 export const authenticateUser = async ({ email, password }) => {
   const user = await CompletedUser.findOne({ email });

@@ -108,7 +108,6 @@ export const volunteerToObserverService = async ({ email, details, files }) => {
   return userDetails;
 };
 
-
 // export const updateUserService = async (
 //   userId,
 //   updateData,
@@ -177,6 +176,65 @@ export const volunteerToObserverService = async ({ email, details, files }) => {
 //       updateData.profileImage = profileImageFile; // Update with the new image
 //     }
 
+//     // Check for ongoing elections
+//     const ongoingElections = await Election.find({
+//       startDate: { $lte: new Date() },
+//       endDate: { $gte: new Date() },
+//     });
+
+//     if (ongoingElections.length > 0) {
+//       // Check if the user has submitted results for an ongoing election
+//       const hasSubmittedResults = await ElectionData.findOne({
+//         user: user._id,
+//         election: { $in: ongoingElections.map((election) => election._id) },
+//       });
+
+//       if (hasSubmittedResults) {
+//         throw new Error(
+//           "You cannot change your coverage details because you have already submitted results for an ongoing election."
+//         );
+//       }
+//     }
+
+//     // Check if today is the election day
+//     const isElectionDay = ongoingElections.some((election) => {
+//       const today = new Date().toDateString();
+//       const electionDay = election.startDate.toString();
+//       return today === electionDay;
+//     });
+
+//     if (isElectionDay) {
+//       throw new Error(
+//         "You cannot change your coverage details on election day."
+//       );
+//     }
+
+//     // Observers cannot change coverage details, downgrade if attempted
+//     const coverageFields = [
+//       "state",
+//       "lga",
+//       "ward",
+//       "pollingUnit",
+//       "isRegisteredVoter",
+//       "isPoliticalPartyMember",
+//       "isElectionWitnessReady",
+//       "isOpenToSurvey",
+//     ];
+
+//     const isChangingCoverageDetails = coverageFields.some((field) =>
+//       Object.keys(updateData).includes(field)
+//     );
+
+//     if (user.role === "observer" && isChangingCoverageDetails) {
+//       // Downgrade the observer to a volunteer if they attempt to change coverage details
+//       updateData.role = "volunteer";
+//       updateData.isObserverInPollingUnit = false;
+//       updateData.pendingObserverVerification = false;
+//       console.log(
+//         "Observer downgraded to volunteer for changing coverage details."
+//       );
+//     }
+
 //     // Update user data in the database
 //     const updatedUser = await CompletedUser.findByIdAndUpdate(
 //       userId,
@@ -191,12 +249,32 @@ export const volunteerToObserverService = async ({ email, details, files }) => {
 //       throw new Error("User not found");
 //     }
 
-//     // Return updated user details
-//     return updatedUser;
+//     // Exclude observer-specific and sensitive details if the role is downgraded to volunteer
+//     let userDetails = updatedUser.toObject();
+//     if (userDetails.role === "volunteer") {
+//       const fieldsToExclude = [
+//         "observerId",
+//         "isObserverInPollingUnit",
+//         "pendingObserverVerification",
+//         "phoneNumber",
+//         "bankName",
+//         "bankAccountNumber",
+//         "bankAccountName",
+//       ];
+//       fieldsToExclude.forEach((field) => delete userDetails[field]);
+//     }
+
+//     // Exclude the password from the response
+//     delete userDetails.password;
+
+//     // Return the updated user details
+//     return userDetails;
 //   } catch (error) {
 //     throw new Error(`Error updating user details: ${error.message}`);
 //   }
 // };
+
+
 
 export const updateUserService = async (
   userId,
@@ -266,14 +344,30 @@ export const updateUserService = async (
       updateData.profileImage = profileImageFile; // Update with the new image
     }
 
-    // Check for ongoing elections
+    // Check for ongoing elections using moment.js
     const ongoingElections = await Election.find({
       startDate: { $lte: new Date() },
       endDate: { $gte: new Date() },
     });
 
     if (ongoingElections.length > 0) {
-      // Check if the user has submitted results for an ongoing election
+      const today = moment();
+
+      // Prevent changes if the current date is within any election period
+      const isWithinOngoingElection = ongoingElections.some((election) => {
+        const electionStart = moment(election.startDate);
+        const electionEnd = moment(election.endDate);
+        return today.isBetween(electionStart, electionEnd, "day", "[]");
+      });
+
+      if (isWithinOngoingElection) {
+        throw new Error(
+          "You cannot change your coverage details during an ongoing election."
+        );
+      }
+    
+      
+      // Check if the user has submitted results for any ongoing election
       const hasSubmittedResults = await ElectionData.findOne({
         user: user._id,
         election: { $in: ongoingElections.map((election) => election._id) },
@@ -284,19 +378,6 @@ export const updateUserService = async (
           "You cannot change your coverage details because you have already submitted results for an ongoing election."
         );
       }
-    }
-
-    // Check if today is the election day
-    const isElectionDay = ongoingElections.some((election) => {
-      const today = new Date().toDateString();
-      const electionDay = election.startDate.toDateString();
-      return today === electionDay;
-    });
-
-    if (isElectionDay) {
-      throw new Error(
-        "You cannot change your coverage details on election day."
-      );
     }
 
     // Observers cannot change coverage details, downgrade if attempted

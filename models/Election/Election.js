@@ -11,11 +11,11 @@ const ElectionSchema = new mongoose.Schema(
       required: true,
     },
     startDate: {
-      type: String,
+      type: Date,
       required: true,
     },
     endDate: {
-      type: String,
+      type: Date,
       required: true,
     },
     results: [{ type: mongoose.Schema.Types.ObjectId, ref: "ElectionData" }],
@@ -28,8 +28,8 @@ const ElectionSchema = new mongoose.Schema(
     },
     politicalParties: [
       {
-        name: { type: String, },
-        code: { type: String, },
+        name: { type: String },
+        code: { type: String },
       },
     ],
   },

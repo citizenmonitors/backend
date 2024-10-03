@@ -127,7 +127,7 @@ export const submitRoleForm = [
 
 export const submitObserverDetailsController = [
   upload.fields([
-    { name: "observerId", maxCount: 2 }, 
+    { name: "observerId[]", maxCount: 2 }, 
   ]),
   async (req, res) => {
     try {
@@ -140,7 +140,7 @@ export const submitObserverDetailsController = [
       } = req.body;
 
       // Collect the two observer ID files (PVC front and back)
-      const observerIdFiles = req.files["observerId"];
+      const observerIdFiles = req.files["observerId[]"];
 
       if (!observerIdFiles || observerIdFiles.length !== 2) {
         return res.status(400).json({

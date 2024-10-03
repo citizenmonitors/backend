@@ -91,23 +91,25 @@ export const pickRole = async (req, res) => {
 // ];
 
 export const submitRoleForm = [
-  upload.single("profileImage"),
+  upload.single("profileImage"), 
   async (req, res) => {
     try {
       const { email, ...details } = req.body;
-      const file = req.file;
+      const file = req.file; 
 
       if (!email) {
         return res.status(400).json({ message: "Email is required" });
       }
 
+      // Call the service with the email, details, and the file
       const { token, user, isObserverInPollingUnit } =
         await submitRoleFormDetails({
           email,
           details,
-          file,
+          file, 
         });
 
+      // Send response
       res.status(200).json({
         message:
           "Details submitted successfully. You can now select your role.",
@@ -122,8 +124,11 @@ export const submitRoleForm = [
   },
 ];
 
+
 export const submitObserverDetailsController = [
-  upload.single("governmentId"),
+  upload.fields([
+    { name: "observerId", maxCount: 2 }, 
+  ]),
   async (req, res) => {
     try {
       const {
@@ -133,22 +138,30 @@ export const submitObserverDetailsController = [
         bankAccountNumber,
         bankAccountName,
       } = req.body;
-      const governmentIdFile = req.file; 
 
+      // Collect the two observer ID files (PVC front and back)
+      const observerIdFiles = req.files["observerId"];
+
+      if (!observerIdFiles || observerIdFiles.length !== 2) {
+        return res.status(400).json({
+          message: "Both front and back of the PVC are required.",
+        });
+      }
+
+      // Call the service and pass the observerIdFiles
       const result = await submitObserverDetails({
         email,
-        governmentIdFile,
+        observerIdFiles, 
         phoneNumber,
         bankName,
         bankAccountNumber,
         bankAccountName,
       });
 
+      // Send response
       return res.status(200).json({
         message: result.message,
-        user: result.user, 
-        isObserverInPollingUnit: result.isObserverInPollingUnit,
-        pendingObserverVerification: result.pendingObserverVerification,
+        user: result.user,
       });
     } catch (err) {
       console.error(err);
@@ -156,6 +169,7 @@ export const submitObserverDetailsController = [
     }
   },
 ];
+
 
 
 export const signIn = async (req, res) => {

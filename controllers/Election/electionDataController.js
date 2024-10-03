@@ -88,8 +88,8 @@ export const getLiveElectionByIdCont = async (req, res) => {
 
 export const uploadResultData = async (req, res) => {
   try {
-     console.log("Body received:", req.body);
-     console.log("Files received:", req.files);
+    //  console.log("Body received:", req.body);
+    //  console.log("Files received:", req.files);
 
     const { electionId } = req.params;
     const userId = req.user._id;
@@ -111,8 +111,8 @@ export const uploadResultData = async (req, res) => {
 
 
 export const updateResultData = async (req, res) => {
-   console.log("Body received:", req.body);
-   console.log("Files received:", req.files);
+  //  console.log("Body received:", req.body);
+  //  console.log("Files received:", req.files);
  try {
    const { electionId } = req.params;
    const userId = req.user._id;
@@ -144,8 +144,8 @@ export const getAllElectionResultsController = async (req, res) => {
 
 
 export const uploadIncidentReportData = async (req, res) => {
-  console.log("Body received:", req.body);
-  console.log("Files received:", req.files);
+  // console.log("Body received:", req.body);
+  // console.log("Files received:", req.files);
   try {
     const { electionId } = req.params;
     const report = await uploadIncidentReportDataService(
@@ -163,9 +163,10 @@ export const uploadIncidentReportData = async (req, res) => {
     });
   }
 };
+
 export const updateIncidentReportData = async (req, res) => {
-    console.log("Body received:", req.body);
-    console.log("Files received:", req.files);
+  // console.log("Body received:", req.body);
+  // console.log("Files received:", req.files);
   try {
     const { electionId } = req.params;
     const userId = req.user._id;
@@ -179,14 +180,14 @@ export const updateIncidentReportData = async (req, res) => {
 
     res.status(200).json(report);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Error updating incident report data",
-        error: error.message,
-      });
+    console.error("Error updating incident report data", error);
+    res.status(500).json({
+      message: "Error updating incident report data",
+      error: error.message,
+    });
   }
 };
+
 
 export const getUserElectionDataController = async (req, res) => {
   try {

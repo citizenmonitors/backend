@@ -14,6 +14,10 @@ const ElectionDataSchema = new mongoose.Schema(
       ref: "CompletedUser",
       required: true,
     },
+    userRole: {
+      type: String,
+      required: true,
+    },
     state: {
       type: String,
       required: true,

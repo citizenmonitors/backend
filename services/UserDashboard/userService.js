@@ -10,51 +10,12 @@ import User from "../../models/User.js";
 import fs from "fs";
 import profileImageModel from "../../models/UserProfileImage/ProfileImageModel.js";
 import { fileURLToPath } from "url";
-import governmentIdModel from "../../models/GovernmentIds/GovernmentIdModel.js";
+import observerIdModel from "../../models/observerIds/observerIdModel.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const BACKEND_URL = process.env.BACKEND_URL;
 
-//  volunteer to observer
-
-// export const volunteerToObserverService = async ({ email, details, file }) => {
-//   const user = await CompletedUser.findOne({ email });
-
-//   if (!user) {
-//     throw new Error("No account found with this email address");
-//   }
-
-//   if (!file) {
-//     throw new Error("Government ID is required for observers");
-//   }
-
-//   // Process the government ID file
-//   const governmentIdPath = `/governmentid/${path.basename(file.path)}`;
-
-//   // Create a new File entry for government ID
-//   const governmentIdFile = await governmentIdModel.create({
-//     location: governmentIdPath,
-//     name: file.originalname,
-//     type: file.mimetype,
-//     size: file.size,
-//     url: `${BACKEND_URL}${governmentIdPath}`,
-//   });
-
-  
-//   details.governmentId = governmentIdFile;
-
-//   // Update user details and change role to "observer"
-//   Object.assign(user, details);
-//   user.role = "observer";
-
-//   // Save the updated user to the database
-//   await user.save();
-
-//   // Exclude password from the response
-//   const { password, ...userDetails } = user.toObject();
-//   return userDetails;
-// };
 
 export const volunteerToObserverService = async ({ email, details, files }) => {
   const user = await CompletedUser.findOne({ email });
@@ -63,11 +24,12 @@ export const volunteerToObserverService = async ({ email, details, files }) => {
     throw new Error("No account found with this email address");
   }
 
+  // Check if the required files (two observer ID files) are provided
   if (!files || files.length !== 2) {
-    throw new Error("Two government ID files are required for observers");
+    throw new Error("Two observer ID files are required for observers.");
   }
 
-  // Check if there is already an observer in the user's polling unit
+  // Check if an observer already exists in the user's polling unit
   const existingObserver = await CompletedUser.findOne({
     pollingUnit: user.pollingUnit,
     isObserverInPollingUnit: true,
@@ -84,7 +46,7 @@ export const volunteerToObserverService = async ({ email, details, files }) => {
   });
 
   if (ongoingElections.length > 0) {
-    // Check if the user has submitted results or incidents for ongoing elections
+    // Check if the user has already submitted results or incidents for ongoing elections
     const hasSubmittedResults = await ElectionData.findOne({
       user: user._id,
       election: { $in: ongoingElections.map((election) => election._id) },
@@ -102,7 +64,7 @@ export const volunteerToObserverService = async ({ email, details, files }) => {
     }
   }
 
-  // Check if today is the election day
+  // Check if today is an election day
   const isElectionDay = ongoingElections.some((election) => {
     const today = new Date().toDateString();
     const electionDay = election.startDate.toDateString();
@@ -113,38 +75,39 @@ export const volunteerToObserverService = async ({ email, details, files }) => {
     throw new Error("You cannot change your role to observer on election day.");
   }
 
-  // Process the government ID files (two files)
-  const governmentIdFiles = await Promise.all(
+  // Process the observer ID files (two files)
+  const observerIdFiles = await Promise.all(
     files.map(async (file) => {
-      const governmentIdPath = `/governmentid/${path.basename(file.path)}`;
-      const governmentIdFile = await governmentIdModel.create({
-        location: governmentIdPath,
+      const observerIdPath = `/observerid/${path.basename(file.path)}`;
+      const observerIdFile = await observerIdModel.create({
+        location: observerIdPath,
         name: file.originalname,
         type: file.mimetype,
         size: file.size,
-        url: `${BACKEND_URL}${governmentIdPath}`,
+        url: `${process.env.BACKEND_URL}${observerIdPath}`,
       });
-      return governmentIdFile;
+      return observerIdFile;
     })
   );
 
-  details.governmentId = governmentIdFiles;
+  details.observerId = observerIdFiles;
 
   // Set isObserverInPollingUnit to false and pendingObserverVerification to true
   details.isObserverInPollingUnit = false;
   details.pendingObserverVerification = true;
 
-  // Update user details and change role to "observer"
+  // Update the user details and change role to "observer"
   Object.assign(user, details);
   user.role = "observer";
 
   // Save the updated user to the database
   await user.save();
 
-  // Exclude password from the response
+  // Exclude the password from the response
   const { password, ...userDetails } = user.toObject();
   return userDetails;
 };
+
 
 // export const updateUserService = async (
 //   userId,
@@ -172,7 +135,7 @@ export const volunteerToObserverService = async ({ email, details, files }) => {
 
 //       const salt = await bcrypt.genSalt(10);
 //       updateData.password = await bcrypt.hash(updateData.password, salt);
-//       delete updateData.confirmPassword; 
+//       delete updateData.confirmPassword;
 //     }
 
 //     // Handle profile image update
@@ -376,8 +339,26 @@ export const updateUserService = async (
       throw new Error("User not found");
     }
 
-    // Return updated user details
-    return updatedUser;
+    // Exclude observer-specific and sensitive details if the role is downgraded to volunteer
+    let userDetails = updatedUser.toObject();
+    if (userDetails.role === "volunteer") {
+      const fieldsToExclude = [
+        "observerId",
+        "isObserverInPollingUnit",
+        "pendingObserverVerification",
+        "phoneNumber",
+        "bankName",
+        "bankAccountNumber",
+        "bankAccountName",
+      ];
+      fieldsToExclude.forEach((field) => delete userDetails[field]);
+    }
+
+    // Exclude the password from the response
+    delete userDetails.password;
+
+    // Return the updated user details
+    return userDetails;
   } catch (error) {
     throw new Error(`Error updating user details: ${error.message}`);
   }

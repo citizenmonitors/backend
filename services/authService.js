@@ -11,7 +11,7 @@ import { hashPassword } from "../utils/hashPassword.js";
 import moment from "moment";
 import path from "path";
 import ProfileImageModel from "../models/UserProfileImage/ProfileImageModel.js";
-import GovernmentIdModel from "../models/GovernmentIds/GovernmentIdModel.js";
+import observerIdModel from "../models/observerIds/observerIdModel.js";
 // import { uploadFileToGCS } from "./GoogleCloud/gcsService.js";
 
 const FRONTEND_URL = process.env.FRONTEND_URL;
@@ -117,112 +117,6 @@ export const resendTokenService = async (email) => {
   return { message: "New verification code sent." };
 };
 
-// export const submitRoleFormDetails = async ({
-//   email,
-//   role,
-//   details,
-//   files,
-// }) => {
-//   // console.log("Searching for user with email:", email);
-//   const user = await User.findOne({ email });
-
-//   if (!user) {
-//     // console.log("No account found with email:", email);
-//     throw new Error("No account found with this email address");
-//   }
-
-//   if (!user.isVerified) {
-//     throw new Error("User has not verified their account");
-//   }
-
-//   if (!user.role) {
-//     throw new Error("User has not selected a role");
-//   }
-
-//   let governmentIdFile;
-//   let profileImageFile;
-
-//   // Handle government ID for observers
-//   if (role === "observer") {
-//     if (!files || !files.governmentId) {
-//       throw new Error("Government ID is required for observers");
-//     }
-
-//     const governmentIdPath = `/governmentid/${path.basename(
-//       files.governmentId[0].path
-//     )}`;
-
-//     // Create a new File entry for government ID
-//     governmentIdFile = await GovernmentIdModel.create({
-//       location: governmentIdPath,
-//       name: files.governmentId[0].originalname,
-//       type: files.governmentId[0].mimetype,
-//       size: files.governmentId[0].size,
-//       url: `${BACKEND_URL}${governmentIdPath}`,
-//     });
-
-//     details.governmentId = governmentIdFile;
-//   }
-
-//   // Handle profile image for both observers and volunteers
-//   if (files && files.profileImage) {
-//     const profileImagePath = `/profileimage/${path.basename(
-//       files.profileImage[0].path
-//     )}`;
-
-//     // Create a new File entry for profile image
-//     profileImageFile = await ProfileImageModel.create({
-//       location: profileImagePath,
-//       name: files.profileImage[0].originalname,
-//       type: files.profileImage[0].mimetype,
-//       size: files.profileImage[0].size,
-//       url: `${BACKEND_URL}${profileImagePath}`,
-//     });
-
-//     details.profileImage = profileImageFile;
-//   }
-
-//   //  user details
-//   Object.assign(user, details);
-//   user.role = role;
-//   user.isVerified = true;
-
-//   // Move user data to Completed User db
-//   const completedUserData = {
-//     role: role,
-//     email: user.email,
-//     firstName: user.firstName,
-//     lastName: user.lastName,
-//     gender: user.gender,
-//     dateOfBirth: user.dateOfBirth,
-//     state: user.state,
-//     lga: user.lga,
-//     ward: user.ward,
-//     pollingUnit: user.pollingUnit,
-//     isRegisteredVoter: user.isRegisteredVoter,
-//     isPoliticalPartyMember: user.isPoliticalPartyMember,
-//     isElectionWitnessReady: user.isElectionWitnessReady,
-//     isOpenToSurvey: user.isOpenToSurvey,
-//     profileImage: details.profileImage,
-
-//     governmentId: details.governmentId,
-//     phoneNumber: user.phoneNumber,
-//     bankName: user.bankName,
-//     bankAccountNumber: user.bankAccountNumber,
-//     bankAccountName: user.bankAccountName,
-
-//     password: user.password,
-//   };
-
-//   const completedUser = new CompletedUser(completedUserData);
-//   await completedUser.save();
-//   await user.deleteOne();
-
-//   const token = generateToken({ email: user.email });
-//   const { password, ...usersDetails } = completedUser.toObject();
-//   return { token, user: usersDetails };
-// };
-
 export const submitRoleFormDetails = async ({ email, details, file }) => {
   // Fetch the user by email
   const user = await User.findOne({ email });
@@ -241,21 +135,25 @@ export const submitRoleFormDetails = async ({ email, details, file }) => {
     isObserverInPollingUnit: true,
   });
 
-  // Handle profile image for the user
-  let profileImageFile;
+  // Handle profile image for the user (only one image, not an array)
   if (file) {
     const profileImagePath = `/profileimage/${path.basename(file.path)}`;
 
     // Create the profileImage object
-    profileImageFile = {
+    const profileImageFile = await ProfileImageModel.create({
       location: profileImagePath,
       name: file.originalname,
       type: file.mimetype,
       size: file.size,
-      url: `${process.env.BACKEND_URL}${profileImagePath}`,
-    };
+      url: `${BACKEND_URL}${profileImagePath}`,
+    });
 
-    details.profileImage = profileImageFile; // Set profile image as an embedded document
+    // console.log("Profile image saved:", profileImageFile); 
+
+    details.profileImage = profileImageFile; 
+  } else {
+    // Handle the case where no profile image is provided
+    // console.log("No profile image provided or invalid format.");
   }
 
   // Assign general details to the user
@@ -265,17 +163,30 @@ export const submitRoleFormDetails = async ({ email, details, file }) => {
   // Save the user with updated details
   await user.save();
 
+  // console.log("User details after saving:", user); 
+
   // Generate a token for the user after the form submission
   const token = generateToken({ email: user.email });
+
+  // Destructure the user to exclude the password
   const { password, ...userDetails } = user.toObject();
+
+  // Include the profile image in the response if it exists
+  const response = {
+    ...userDetails,
+    profileImage: userDetails.profileImage || details.profileImage,
+  };
+
+  // console.log("Final response:", response); 
 
   // Return the token, user details, and observer status in the polling unit
   return {
     token,
-    user: userDetails,
+    user: response,
     isObserverInPollingUnit: !!isObserverInPollingUnit,
   };
 };
+ 
 
 export const selectUserRole = async (email, role) => {
   // Check if the selected role is valid
@@ -348,7 +259,7 @@ export const selectUserRole = async (email, role) => {
 
 export const submitObserverDetails = async ({
   email,
-  governmentIdFile,
+  observerIdFiles,
   phoneNumber,
   bankName,
   bankAccountNumber,
@@ -372,23 +283,27 @@ export const submitObserverDetails = async ({
     );
   }
 
-  // Ensure that the government ID file is provided
-  if (!governmentIdFile) {
-    throw new Error("Government ID is required for observers.");
+  // Ensure that two files are provided (PVC front and back)
+  if (!observerIdFiles || observerIdFiles.length !== 2) {
+    throw new Error("Both PVC front and back are required for observers.");
   }
 
-  // Handle government ID upload
-  let governmentId = null;
-  const governmentIdPath = `/governmentid/${path.basename(
-    governmentIdFile.path
-  )}`;
-  governmentId = await GovernmentIdModel.create({
-    location: governmentIdPath,
-    name: governmentIdFile.originalname,
-    type: governmentIdFile.mimetype,
-    size: governmentIdFile.size,
-    url: `${process.env.BACKEND_URL}${governmentIdPath}`,
-  });
+  // Handle observer ID uploads (saving both PVC front and back)
+  const observerId = await Promise.all(
+    observerIdFiles.map(async (file) => {
+      const observerIdPath = `/observerid/${path.basename(file.path)}`;
+
+      const createdFile = await observerIdModel.create({
+        location: observerIdPath,
+        name: file.originalname,
+        type: file.mimetype,
+        size: file.size,
+        url: `${process.env.BACKEND_URL}${observerIdPath}`,
+      });
+
+      return createdFile;
+    })
+  );
 
   // Prepare the observer details for CompletedUser
   const completedUserData = {
@@ -407,14 +322,14 @@ export const submitObserverDetails = async ({
     isElectionWitnessReady: user.isElectionWitnessReady,
     isOpenToSurvey: user.isOpenToSurvey,
     profileImage: user.profileImage,
-    governmentId, 
+    observerId, // Store the array of files for observerId
     phoneNumber,
     bankName,
     bankAccountNumber,
     bankAccountName,
     password: user.password,
-    isObserverInPollingUnit: false, 
-    pendingObserverVerification: true, 
+    isObserverInPollingUnit: false,
+    pendingObserverVerification: true,
   };
 
   // Save the CompletedUser
@@ -431,10 +346,10 @@ export const submitObserverDetails = async ({
     message:
       "Observer details submitted successfully, pending admin verification.",
     user: userDetails,
-    // isObserverInPollingUnit: false,
-    // pendingObserverVerification: true,
   };
 };
+
+
 
 export const authenticateUser = async ({ email, password }) => {
   const user = await CompletedUser.findOne({ email });

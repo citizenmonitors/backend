@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { governmentIdSchema } from "./GovernmentIds/GovernmentIdModel.js";
+import { observerIdSchema } from "./observerIds/observerIdModel.js";
 import { profileImageSchema } from "./UserProfileImage/ProfileImageModel.js";
 
 const completedUserSchema = new mongoose.Schema({
@@ -26,7 +26,7 @@ const completedUserSchema = new mongoose.Schema({
   isActive: Boolean,
   lastLogin: Date,
   // Observer specific fields
-  governmentId: governmentIdSchema,
+  observerId: [observerIdSchema],
   phoneNumber: String,
   bankName: String,
   bankAccountNumber: String,

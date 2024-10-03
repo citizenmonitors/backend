@@ -322,28 +322,46 @@ export const uploadResultDataService = async (
   data,
   files
 ) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
   try {
-    const {
+    let {
       partiesVotes,
       voterIntimidation,
       voteBuying,
       voteRating,
       timeBegan,
       accreditedVoters,
-      rejectedVoters,
+      rejectedVoters, // Include rejectedVoters in data
     } = data;
 
-    // Find election by ID
-    const election = await Election.findById(electionId).session(session);
+    // Ensure that partiesVotes is properly parsed as JSON
+    if (typeof partiesVotes === "string") {
+      try {
+        partiesVotes = JSON.parse(partiesVotes);
+      } catch (error) {
+        throw new Error(
+          "Invalid format for partiesVotes. It should be a JSON array."
+        );
+      }
+    }
+
+    // Convert accreditedVoters and rejectedVoters to numbers
+    accreditedVoters = Number(accreditedVoters);
+    rejectedVoters = Number(rejectedVoters);
+
+    if (isNaN(accreditedVoters) || isNaN(rejectedVoters)) {
+      throw new Error(
+        "accreditedVoters and rejectedVoters must be valid numbers."
+      );
+    }
+
+    // Find the election by its ID
+    const election = await Election.findById(electionId);
     if (!election) {
       throw new Error("Election not found");
     }
 
-    // Find user by ID
-    const user = await CompletedUser.findById(userId).session(session);
+    // Find the user by ID
+    const user = await CompletedUser.findById(userId);
     if (!user) {
       throw new Error("User not found");
     }
@@ -352,17 +370,18 @@ export const uploadResultDataService = async (
     const existingResult = await ElectionData.findOne({
       election: electionId,
       user: userId,
-    }).session(session);
+    });
 
     if (existingResult) {
-      return existingResult; // Return existing result if found
+      return existingResult; // If result already exists, return it
     }
 
+    // Convert partiesVotes.count to numbers
+    const totalVotes = partiesVotes.reduce((sum, partyVote) => {
+      return sum + Number(partyVote.count);
+    }, 0);
+
     // Validate that the sum of partiesVotes and rejectedVoters equals accreditedVoters
-    const totalVotes = partiesVotes.reduce(
-      (sum, partyVote) => sum + partyVote.count,
-      0
-    );
     if (totalVotes + rejectedVoters !== accreditedVoters) {
       throw new Error(
         "The total of partiesVotes plus rejectedVoters must equal accreditedVoters"
@@ -373,42 +392,30 @@ export const uploadResultDataService = async (
     let resultPicture = null;
     let resultVideo = null;
 
-    // Concurrently create resultPicture and resultVideo if provided
-    const filePromises = [];
-
+    // Handle the picture file upload (if provided)
     if (files.resultPicture && files.resultPicture.length > 0) {
-      filePromises.push(
-        File.create({
-          location: files.resultPicture[0].path,
-          name: files.resultPicture[0].originalname,
-          type: files.resultPicture[0].mimetype,
-          size: files.resultPicture[0].size,
-        }).then((file) => {
-          resultPicture = file;
-        })
-      );
+      resultPicture = await File.create({
+        location: files.resultPicture[0].path,
+        name: files.resultPicture[0].originalname,
+        type: files.resultPicture[0].mimetype,
+        size: files.resultPicture[0].size,
+      });
     }
 
+    // Handle the video file upload (if provided)
     if (files.resultVideo && files.resultVideo.length > 0) {
-      filePromises.push(
-        File.create({
-          location: files.resultVideo[0].path,
-          name: files.resultVideo[0].originalname,
-          type: files.resultVideo[0].mimetype,
-          size: files.resultVideo[0].size,
-        }).then((file) => {
-          resultVideo = file;
-        })
-      );
+      resultVideo = await File.create({
+        location: files.resultVideo[0].path,
+        name: files.resultVideo[0].originalname,
+        type: files.resultVideo[0].mimetype,
+        size: files.resultVideo[0].size,
+      });
     }
 
-    // Wait for all file operations to complete
-    await Promise.all(filePromises);
-
-    // Determine if the result should be marked as "isApproved" based on observer status
+    // Determine if the result should include "isApproved"
     let isApproved = null;
     if (user.role === "observer" && user.isObserverInPollingUnit) {
-      isApproved = false; // Set to false for observers in the polling unit
+      isApproved = false; // Mark as false if observer in the polling unit
     }
 
     // Create the election data document
@@ -428,118 +435,33 @@ export const uploadResultDataService = async (
       voteRating,
       timeBegan,
       accreditedVoters,
-      rejectedVoters,
-      ...(isApproved !== null && { isApproved }), // Add the isApproved field only if it's set
+      rejectedVoters, // Include rejectedVoters field
+      ...(isApproved !== null && { isApproved }), // Conditionally include isApproved
     });
 
-    // Save election data
-    const savedResultData = await electionData.save({ session });
+    // Save the election result data
+    const savedResultData = await electionData.save();
 
-    // Update election document
+    // Update the election document with the new result
     election.results.push(savedResultData);
-    election.resultsCount += 1; // Increment results count
-    await election.save({ session });
+    election.resultsCount += 1; // Increment the results count
+    await election.save();
 
-    // Commit the transaction
-    await session.commitTransaction();
-    session.endSession();
-
-    // Return the result without the isApproved field if it's not present
+    // Convert to a plain object and remove isApproved if not applicable
     const resultData = savedResultData.toObject();
     if (isApproved === null) {
-      delete resultData.isApproved; // Ensure isApproved is not returned for volunteers and other observers
+      delete resultData.isApproved; // Remove isApproved if it's not set
     }
 
+    // Return the saved result data
     return resultData;
   } catch (error) {
-    // Abort transaction in case of error
-    await session.abortTransaction();
-    session.endSession();
-
+    console.error("Error saving election data:", error);
     throw new Error(`Error saving election data: ${error.message}`);
   }
 };
 
 
-
-// export const updateResultDataService = async (
-//   electionId,
-//   userId,
-//   data,
-//   files
-// ) => {
-//   try {
-//     const {
-//       partiesVotes,
-//       voterIntimidation,
-//       voteBuying,
-//       voteRating,
-//       timeBegan,
-//       accreditedVoters,
-//     } = data;
-
-//     // Check if the election exists
-//     const electionExists = await Election.findById(electionId);
-//     if (!electionExists) {
-//       throw new Error("Election not found");
-//     }
-
-//     // Check if the user exists
-//     const userExists = await CompletedUser.findById(userId);
-//     if (!userExists) {
-//       throw new Error("User not found or unauthorized");
-//     }
-
-//     // Find the result data
-//     const result = await ElectionData.findOne({
-//       election: electionId,
-//       user: userId,
-//     });
-
-//     if (!result) {
-//       throw new Error("Result data not found or unauthorized");
-//     }
-
-//     // Helper function to format file details
-//     const formatFileDetails = (file) => ({
-//       location: file.path,
-//       name: file.originalname,
-//       type: file.mimetype,
-//       size: file.size,
-//     });
-
-//     result.partiesVotes = partiesVotes ? partiesVotes : result.partiesVotes;
-//     result.voterIntimidation = voterIntimidation !== undefined ? voterIntimidation : result.voterIntimidation;
-//     result.voteBuying =
-//       voteBuying !== undefined ? voteBuying : result.voteBuying;
-//     result.voteRating =
-//       voteRating !== undefined ? voteRating : result.voteRating;
-//     result.timeBegan = timeBegan !== undefined ? timeBegan : result.timeBegan;
-//     result.accreditedVoters =
-//       accreditedVoters !== undefined
-//         ? accreditedVoters
-//         : result.accreditedVoters;
-
-//     if (files.resultPicture) {
-//       result.resultPicture = await File.create(
-//         formatFileDetails(files.resultPicture[0])
-//       );
-//     }
-//     if (files.resultVideo) {
-//       result.resultVideo = await File.create(
-//         formatFileDetails(files.resultVideo[0])
-//       );
-//     }
-
-//     console.log(files);
-
-//     const updatedResult = await result.save();
-//     return updatedResult;
-//   } catch (error) {
-//     console.error(`Error: ${error.message}`);
-//     throw new Error(`Failed to update result data: ${error.message}`);
-//   }
-// };
 
 export const updateResultDataService = async (
   electionId,
@@ -547,11 +469,8 @@ export const updateResultDataService = async (
   data,
   files
 ) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
   try {
-    const {
+    let {
       partiesVotes,
       voterIntimidation,
       voteBuying,
@@ -561,14 +480,31 @@ export const updateResultDataService = async (
       rejectedVoters,
     } = data;
 
+    // Ensure partiesVotes is properly parsed if sent as a string
+    if (typeof partiesVotes === "string") {
+      try {
+        partiesVotes = JSON.parse(partiesVotes);
+      } catch (error) {
+        throw new Error(
+          "Invalid format for partiesVotes. It should be a JSON array."
+        );
+      }
+    }
+
+    // Convert accreditedVoters and rejectedVoters to numbers if provided
+    accreditedVoters =
+      accreditedVoters !== undefined ? Number(accreditedVoters) : undefined;
+    rejectedVoters =
+      rejectedVoters !== undefined ? Number(rejectedVoters) : undefined;
+
     // Check if the election exists
-    const electionExists = await Election.findById(electionId).session(session);
+    const electionExists = await Election.findById(electionId);
     if (!electionExists) {
       throw new Error("Election not found");
     }
 
     // Check if the user exists
-    const userExists = await CompletedUser.findById(userId).session(session);
+    const userExists = await CompletedUser.findById(userId);
     if (!userExists) {
       throw new Error("User not found or unauthorized");
     }
@@ -577,26 +513,21 @@ export const updateResultDataService = async (
     const result = await ElectionData.findOne({
       election: electionId,
       user: userId,
-    }).session(session);
+    });
 
     if (!result) {
       throw new Error("Result data not found or unauthorized");
     }
 
-    // Helper function to format file details
-    const formatFileDetails = (file) => ({
-      location: file.path,
-      name: file.originalname,
-      type: file.mimetype,
-      size: file.size,
-    });
-
-    // Validate that the sum of partiesVotes and rejectedVoters equals accreditedVoters if these fields are being updated
+    // Validate that the sum of partiesVotes and rejectedVoters equals accreditedVoters
     if (partiesVotes || rejectedVoters || accreditedVoters) {
       const totalVotes = partiesVotes
-        ? partiesVotes.reduce((sum, partyVote) => sum + partyVote.count, 0)
+        ? partiesVotes.reduce(
+            (sum, partyVote) => sum + Number(partyVote.count),
+            0
+          )
         : result.partiesVotes.reduce(
-            (sum, partyVote) => sum + partyVote.count,
+            (sum, partyVote) => sum + Number(partyVote.count),
             0
           );
 
@@ -638,7 +569,12 @@ export const updateResultDataService = async (
 
     if (files.resultPicture && files.resultPicture.length > 0) {
       filePromises.push(
-        File.create(formatFileDetails(files.resultPicture[0])).then((file) => {
+        File.create({
+          location: files.resultPicture[0].path,
+          name: files.resultPicture[0].originalname,
+          type: files.resultPicture[0].mimetype,
+          size: files.resultPicture[0].size,
+        }).then((file) => {
           result.resultPicture = file;
         })
       );
@@ -646,7 +582,12 @@ export const updateResultDataService = async (
 
     if (files.resultVideo && files.resultVideo.length > 0) {
       filePromises.push(
-        File.create(formatFileDetails(files.resultVideo[0])).then((file) => {
+        File.create({
+          location: files.resultVideo[0].path,
+          name: files.resultVideo[0].originalname,
+          type: files.resultVideo[0].mimetype,
+          size: files.resultVideo[0].size,
+        }).then((file) => {
           result.resultVideo = file;
         })
       );
@@ -656,21 +597,14 @@ export const updateResultDataService = async (
     await Promise.all(filePromises);
 
     // Save the updated result data
-    const updatedResult = await result.save({ session });
-
-    // Commit the transaction
-    await session.commitTransaction();
-    session.endSession();
+    const updatedResult = await result.save();
 
     return updatedResult;
   } catch (error) {
-    // Abort transaction in case of error
-    await session.abortTransaction();
-    session.endSession();
-
     throw new Error(`Failed to update result data: ${error.message}`);
   }
 };
+
 
 
 export const deleteElectionResultDataService = async (electionId) => {
@@ -753,129 +687,40 @@ export const getAllElectionResults = async () => {
   }
 };
 
-// export const uploadIncidentReportDataService = async (
-//   electionId,
-//   userId,
-//   data,
-//   files
-// ) => {
-//   try {
-//     const { selectIncident, incidentNote, electionRating } = data;
-
-//     // Check election existence
-//     const election = await Election.findById(electionId);
-//     if (!election) throw new Error("Election not found");
-
-//     // Check user existence
-//     const user = await CompletedUser.findById(userId);
-//     if (!user) throw new Error("User not found");
-
-//     // Check if incident report exists
-//     const existingReport = await IncidentReport.findOne({
-//       election: electionId,
-//       user: userId,
-//     });
-//     if (existingReport) return existingReport;
-
-//     // Validate files
-//     const validateFile = (file, allowedExtensions) => {
-//       const ext = path.extname(file.originalname).toLowerCase();
-//       if (!allowedExtensions.includes(ext)) {
-//         throw new Error(
-//           `Invalid file type. Please upload one of the following: ${allowedExtensions.join(
-//             ", "
-//           )}`
-//         );
-//       }
-//       return {
-//         location: file.path,
-//         name: file.originalname,
-//         type: file.mimetype,
-//         size: file.size,
-//       };
-//     };
-
-//     // Process incident videos and pictures
-//     const incidentVideos =
-//       files["incidentVideos[]"]?.map((file) =>
-//         validateFile(file, [".mp4", ".avi", ".mov", ".webm", ".wmv"])
-//       ) || [];
-
-//     const incidentPictures =
-//       files["incidentPictures[]"]?.map((file) =>
-//         validateFile(file, [".jpg", ".jpeg", ".png", ".svg"])
-//       ) || [];
-
-//     // Create incident report
-//     const incidentReport = new IncidentReport({
-//       election: electionId,
-//       user: userId,
-//       role: user.role,
-//       state: user.state,
-//       lga: user.lga,
-//       ward: user.ward,
-//       pollingUnit: user.pollingUnit,
-//       selectIncident,
-//       incidentNote,
-//       electionRating,
-//       incidentPictures: await File.insertMany(incidentPictures),
-//       incidentVideos: await File.insertMany(incidentVideos),
-//     });
-
-//     // Save and return
-//     const savedReport = await incidentReport.save();
-//     election.incidentReports.push(savedReport);
-//     await election.save();
-
-//     return savedReport;
-//   } catch (error) {
-//     console.error("Error uploading incident report data", error);
-//     throw new Error(`Error saving election incident: ${error.message}`);
-//   }
-// };
-
-// Service for updating incident report with multiple videos and pictures
-
 export const uploadIncidentReportDataService = async (
   electionId,
   userId,
   data,
   files
 ) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
   try {
     const { selectIncident, incidentNote, electionRating } = data;
 
-    // Validation for required fields
-    if (!selectIncident || !incidentNote) {
-      throw new Error(
-        "Missing required fields: selectIncident or incidentNote"
-      );
+    // Check election existence
+    const election = await Election.findById(electionId);
+    if (!election) {
+      throw new Error("Election not found");
     }
 
-    // Check election existence
-    const election = await Election.findById(electionId).session(session);
-    if (!election) throw new Error("Election not found");
-
     // Check user existence
-    const user = await CompletedUser.findById(userId).session(session);
-    if (!user) throw new Error("User not found");
+    const user = await CompletedUser.findById(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
 
     // Check if incident report exists
     const existingReport = await IncidentReport.findOne({
       election: electionId,
       user: userId,
-    }).session(session);
+    });
     if (existingReport) return existingReport;
 
-    // Helper function to validate and format files
+    // Validate file types
     const validateFile = (file, allowedExtensions) => {
       const ext = path.extname(file.originalname).toLowerCase();
       if (!allowedExtensions.includes(ext)) {
         throw new Error(
-          `Invalid file type. Allowed: ${allowedExtensions.join(", ")}`
+          `Invalid file type. Allowed types: ${allowedExtensions.join(", ")}`
         );
       }
       return {
@@ -886,20 +731,27 @@ export const uploadIncidentReportDataService = async (
       };
     };
 
-    // Process incident videos and pictures
-    const incidentVideos =
-      files["incidentVideos[]"]?.map((file) =>
-        validateFile(file, [".mp4", ".avi", ".mov", ".webm", ".wmv"])
-      ) || [];
+    // Process and validate incident videos
+    const incidentVideos = files?.incidentVideos?.length
+      ? files.incidentVideos.map((file) =>
+          validateFile(file, [".mp4", ".avi", ".mov", ".webm", ".wmv"])
+        )
+      : [];
 
-    const incidentPictures =
-      files["incidentPictures[]"]?.map((file) =>
-        validateFile(file, [".jpg", ".jpeg", ".png", ".svg"])
-      ) || [];
+    // Process and validate incident pictures
+    const incidentPictures = files?.incidentPictures?.length
+      ? files.incidentPictures.map((file) =>
+          validateFile(file, [".jpg", ".jpeg", ".png", ".svg"])
+        )
+      : [];
 
-    // Insert files into the database
-    const insertedPictures = await File.insertMany(incidentPictures);
-    const insertedVideos = await File.insertMany(incidentVideos);
+    // Insert files if any are provided
+    const insertedPictures = incidentPictures.length
+      ? await File.insertMany(incidentPictures)
+      : [];
+    const insertedVideos = incidentVideos.length
+      ? await File.insertMany(incidentVideos)
+      : [];
 
     // Create incident report
     const incidentReport = new IncidentReport({
@@ -917,96 +769,19 @@ export const uploadIncidentReportDataService = async (
       incidentVideos: insertedVideos,
     });
 
-    // Save and return the report
-    const savedReport = await incidentReport.save({ session });
+    const savedReport = await incidentReport.save();
 
-    // Update the election with the new incident report
+    // Link the incident report to the election
     election.incidentReports.push(savedReport);
-    await election.save({ session });
-
-    // Commit the transaction
-    await session.commitTransaction();
-    session.endSession();
+    await election.save();
 
     return savedReport;
   } catch (error) {
-    // Abort transaction in case of error
-    await session.abortTransaction();
-    session.endSession();
     console.error("Error uploading incident report data:", error);
     throw new Error(`Error saving election incident: ${error.message}`);
   }
 };
 
-// export const updateIncidentReportDataService = async (
-//   electionId,
-//   userId,
-//   data,
-//   files
-// ) => {
-//   try {
-//     const {
-//       selectIncident,
-//       incidentNote,
-//       electionRating,
-//       previousIncidentPictures,
-//       previousIncidentVideos,
-//     } = data;
-
-//     // Check if the election exists
-//     const electionExists = await Election.findById(electionId);
-//     if (!electionExists) throw new Error("Election not found");
-
-//     // Check if the incident report exists and belongs to the user
-//     const report = await IncidentReport.findOne({
-//       election: electionId,
-//       user: userId,
-//     });
-//     if (!report) throw new Error("Incident report not found or unauthorized");
-
-//     // Helper function to format file details
-//     const formatFileDetails = (file) => ({
-//       location: file.path,
-//       name: file.originalname,
-//       type: file.mimetype,
-//       size: file.size,
-//     });
-
-//     // Update report data
-//     report.selectIncident =
-//       selectIncident !== undefined ? selectIncident : report.selectIncident;
-//     report.incidentNote =
-//       incidentNote !== undefined ? incidentNote : report.incidentNote;
-//     report.electionRating =
-//       electionRating !== undefined ? electionRating : report.electionRating;
-
-//     // Merge old and new videos
-//     const previousIncidentVideoFiles = await File.find({
-//       _id: { $in: previousIncidentVideos },
-//     });
-//     const newIncidentVideoFiles =
-//       files["incidentVideos[]"]?.map((file) => formatFileDetails(file)) || [];
-//     const newVideos = await File.insertMany(newIncidentVideoFiles);
-
-//     report.incidentVideos = [...previousIncidentVideoFiles, ...newVideos];
-
-//     // Merge old and new pictures
-//     const previousIncidentPictureFiles = await File.find({
-//       _id: { $in: previousIncidentPictures },
-//     });
-//     const newIncidentPictureFiles =
-//       files["incidentPictures[]"]?.map((file) => formatFileDetails(file)) || [];
-//     const newPictures = await File.insertMany(newIncidentPictureFiles);
-
-//     report.incidentPictures = [...previousIncidentPictureFiles, ...newPictures];
-
-//     // Save the updated report
-//     return await report.save();
-//   } catch (error) {
-//     console.error("Error updating incident report data", error);
-//     throw new Error(`Failed to update incident report data: ${error.message}`);
-//   }
-// };
 
 export const updateIncidentReportDataService = async (
   electionId,
@@ -1014,27 +789,24 @@ export const updateIncidentReportDataService = async (
   data,
   files
 ) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
   try {
     const {
       selectIncident,
       incidentNote,
       electionRating,
-      previousIncidentPictures,
-      previousIncidentVideos,
+      previousIncidentPictures = [], 
+      previousIncidentVideos = [],
     } = data;
 
     // Check if the election exists
-    const electionExists = await Election.findById(electionId).session(session);
+    const electionExists = await Election.findById(electionId);
     if (!electionExists) throw new Error("Election not found");
 
     // Check if the incident report exists and belongs to the user
     const report = await IncidentReport.findOne({
       election: electionId,
       user: userId,
-    }).session(session);
+    });
     if (!report) throw new Error("Incident report not found or unauthorized");
 
     // Helper function to format file details
@@ -1045,7 +817,7 @@ export const updateIncidentReportDataService = async (
       size: file.size,
     });
 
-    // Update report data if provided
+    // Update report data fields if provided
     report.selectIncident =
       selectIncident !== undefined ? selectIncident : report.selectIncident;
     report.incidentNote =
@@ -1053,42 +825,42 @@ export const updateIncidentReportDataService = async (
     report.electionRating =
       electionRating !== undefined ? electionRating : report.electionRating;
 
-    // Handle previous and new incident videos
-    const previousIncidentVideoFiles = await File.find({
-      _id: { $in: previousIncidentVideos },
-    }).session(session);
-    const newIncidentVideoFiles =
-      files["incidentVideos[]"]?.map((file) => formatFileDetails(file)) || [];
-    const newVideos = await File.insertMany(newIncidentVideoFiles);
+    // Handle video files
+    const previousIncidentVideoFiles = previousIncidentVideos.length
+      ? await File.find({ _id: { $in: previousIncidentVideos } })
+      : [];
+    const newIncidentVideoFiles = files?.incidentVideos?.length
+      ? files.incidentVideos.map((file) => formatFileDetails(file))
+      : [];
+    const newVideos = newIncidentVideoFiles.length
+      ? await File.insertMany(newIncidentVideoFiles)
+      : [];
 
+    // Merge old and new videos
     report.incidentVideos = [...previousIncidentVideoFiles, ...newVideos];
 
-    // Handle previous and new incident pictures
-    const previousIncidentPictureFiles = await File.find({
-      _id: { $in: previousIncidentPictures },
-    }).session(session);
-    const newIncidentPictureFiles =
-      files["incidentPictures[]"]?.map((file) => formatFileDetails(file)) || [];
-    const newPictures = await File.insertMany(newIncidentPictureFiles);
+    // Handle picture files
+    const previousIncidentPictureFiles = previousIncidentPictures.length
+      ? await File.find({ _id: { $in: previousIncidentPictures } })
+      : [];
+    const newIncidentPictureFiles = files?.incidentPictures?.length
+      ? files.incidentPictures.map((file) => formatFileDetails(file))
+      : [];
+    const newPictures = newIncidentPictureFiles.length
+      ? await File.insertMany(newIncidentPictureFiles)
+      : [];
 
+    // Merge old and new pictures
     report.incidentPictures = [...previousIncidentPictureFiles, ...newPictures];
 
     // Save the updated report
-    const updatedReport = await report.save({ session });
-
-    // Commit the transaction
-    await session.commitTransaction();
-    session.endSession();
-
-    return updatedReport;
+    return await report.save();
   } catch (error) {
-    // Abort transaction in case of error
-    await session.abortTransaction();
-    session.endSession();
-    console.error("Error updating incident report data:", error);
+    console.error("Error updating incident report data", error);
     throw new Error(`Failed to update incident report data: ${error.message}`);
   }
 };
+
 
 export const deleteIncidentReportDataService = async (electionId) => {
   try {

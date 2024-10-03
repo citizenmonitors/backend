@@ -14,6 +14,10 @@ const incidentReportSchema = new mongoose.Schema(
       ref: "CompletedUser",
       required: true,
     },
+    userRole: {
+      type: String,
+      required: true,
+    },
     state: {
       type: String,
       required: true,
@@ -53,11 +57,11 @@ const incidentReportSchema = new mongoose.Schema(
         },
         action: {
           type: String,
-          enum: ["agree", "flag"], 
+          enum: ["agree", "flag"],
           required: true,
         },
         flagReason: {
-          type: String, 
+          type: String,
         },
       },
     ],

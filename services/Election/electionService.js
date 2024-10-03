@@ -1286,7 +1286,7 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
   const electionResults = await ElectionData.find({
     pollingUnit,
     user: { $in: observerIds },
-    isApproved: { $exists: true }, // Filter for results where isApproved field exists
+   
   })
     .populate({
       path: "election",

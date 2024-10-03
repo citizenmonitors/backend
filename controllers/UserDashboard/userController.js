@@ -82,7 +82,6 @@ export const volunteerToObserver = [
   },
 ];
 
-
 // Update user details
 export const updateUser = [
   upload.single("profileImage"),

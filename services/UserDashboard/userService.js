@@ -16,7 +16,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const BACKEND_URL = process.env.BACKEND_URL;
 
-
 export const volunteerToObserverService = async ({ email, details, files }) => {
   const user = await CompletedUser.findOne({ email });
 

@@ -685,6 +685,208 @@ export const getAllElectionResults = async () => {
   }
 };
 
+// export const uploadIncidentReportDataService = async (
+//   electionId,
+//   userId,
+//   data,
+//   files
+// ) => {
+//   try {
+//     const { selectIncident, incidentNote, electionRating } = data;
+
+//     // Check election existence
+//     const election = await Election.findById(electionId);
+//     if (!election) {
+//       throw new Error("Election not found");
+//     }
+
+//     // Check user existence
+//     const user = await CompletedUser.findById(userId);
+//     if (!user) {
+//       throw new Error("User not found");
+//     }
+
+//     // Check if an incident report already exists
+//     const existingReport = await IncidentReport.findOne({
+//       election: electionId,
+//       user: userId,
+//     });
+//     if (existingReport) return existingReport;
+
+//     // Validate file types
+//     const validateFile = (file, allowedExtensions) => {
+//       const ext = path.extname(file.originalname).toLowerCase();
+//       if (!allowedExtensions.includes(ext)) {
+//         throw new Error(
+//           `Invalid file type. Allowed types: ${allowedExtensions.join(", ")}`
+//         );
+//       }
+//       return {
+//         location: file.path,
+//         name: file.originalname,
+//         type: file.mimetype,
+//         size: file.size,
+//       };
+//     };
+
+//     // Process and validate incident videos
+//     const incidentVideos = files?.["incidentVideos"]?.length
+//       ? files["incidentVideos[]"].map((file) =>
+//           validateFile(file, [".mp4", ".avi", ".mov", ".webm", ".wmv"])
+//         )
+//       : [];
+
+//     // Process and validate incident pictures
+//     const incidentPictures = files?.["incidentPictures"]?.length
+//       ? files["incidentPictures[]"].map((file) =>
+//           validateFile(file, [".jpg", ".jpeg", ".png", ".svg"])
+//         )
+//       : [];
+
+//     // Insert files if any are provided
+//     const insertedPictures = incidentPictures.length
+//       ? await File.insertMany(incidentPictures)
+//       : [];
+//     const insertedVideos = incidentVideos.length
+//       ? await File.insertMany(incidentVideos)
+//       : [];
+
+//     // Create and save the incident report
+//     const incidentReport = new IncidentReport({
+//       election: electionId,
+//       user: userId,
+//       userRole: user.role,
+//       state: user.state,
+//       lga: user.lga,
+//       ward: user.ward,
+//       pollingUnit: user.pollingUnit,
+//       selectIncident,
+//       incidentNote,
+//       electionRating,
+//       incidentPictures: insertedPictures,
+//       incidentVideos: insertedVideos,
+//     });
+
+//     const savedReport = await incidentReport.save();
+
+//     // Link the incident report to the election
+//     election.incidentReports.push(savedReport);
+//     await election.save();
+
+//     return savedReport;
+//   } catch (error) {
+//     console.error("Error uploading incident report data:", error);
+//     throw new Error(`Error saving election incident: ${error.message}`);
+//   }
+// };
+
+
+// export const uploadIncidentReportDataService = async (
+//   electionId,
+//   userId,
+//   data,
+//   files
+// ) => {
+//   try {
+//     const { selectIncident, incidentNote, electionRating } = data;
+
+//     // Rename files if they are sent without `[]` in Postman or frontend
+//     if (files?.incidentPictures) {
+//       files["incidentPictures[]"] = files.incidentPictures;
+//       delete files.incidentPictures;
+//     }
+
+//     if (files?.incidentVideos) {
+//       files["incidentVideos[]"] = files.incidentVideos;
+//       delete files.incidentVideos;
+//     }
+
+//     // Check if the election exists
+//     const election = await Election.findById(electionId);
+//     if (!election) {
+//       throw new Error("Election not found");
+//     }
+
+//     // Check if the user exists
+//     const user = await CompletedUser.findById(userId);
+//     if (!user) {
+//       throw new Error("User not found");
+//     }
+
+//     // Check if an incident report already exists
+//     const existingReport = await IncidentReport.findOne({
+//       election: electionId,
+//       user: userId,
+//     });
+//     if (existingReport) return existingReport;
+
+//     // Helper function to validate file types
+//     const validateFile = (file, allowedExtensions) => {
+//       const ext = path.extname(file.originalname).toLowerCase();
+//       if (!allowedExtensions.includes(ext)) {
+//         throw new Error(
+//           `Invalid file type. Allowed types: ${allowedExtensions.join(", ")}`
+//         );
+//       }
+//       return {
+//         location: file.path,
+//         name: file.originalname,
+//         type: file.mimetype,
+//         size: file.size,
+//       };
+//     };
+
+//     // Process and validate incident videos
+//     const incidentVideos = files?.["incidentVideos[]"]?.length
+//       ? files["incidentVideos[]"].map((file) =>
+//           validateFile(file, [".mp4", ".avi", ".mov", ".webm", ".wmv"])
+//         )
+//       : [];
+
+//     // Process and validate incident pictures
+//     const incidentPictures = files?.["incidentPictures[]"]?.length
+//       ? files["incidentPictures[]"].map((file) =>
+//           validateFile(file, [".jpg", ".jpeg", ".png", ".svg"])
+//         )
+//       : [];
+
+//     // Insert files if any are provided
+//     const insertedPictures = incidentPictures.length
+//       ? await File.insertMany(incidentPictures)
+//       : [];
+//     const insertedVideos = incidentVideos.length
+//       ? await File.insertMany(incidentVideos)
+//       : [];
+
+//     // Create and save the incident report
+//     const incidentReport = new IncidentReport({
+//       election: electionId,
+//       user: userId,
+//       userRole: user.role,
+//       state: user.state,
+//       lga: user.lga,
+//       ward: user.ward,
+//       pollingUnit: user.pollingUnit,
+//       selectIncident,
+//       incidentNote,
+//       electionRating,
+//       incidentPictures: insertedPictures,
+//       incidentVideos: insertedVideos,
+//     });
+
+//     const savedReport = await incidentReport.save();
+
+//     // Link the incident report to the election
+//     election.incidentReports.push(savedReport);
+//     await election.save();
+
+//     return savedReport;
+//   } catch (error) {
+//     console.error("Error uploading incident report data:", error);
+//     throw new Error(`Error saving election incident: ${error.message}`);
+//   }
+// };
+
 export const uploadIncidentReportDataService = async (
   electionId,
   userId,
@@ -696,29 +898,27 @@ export const uploadIncidentReportDataService = async (
 
     // Check election existence
     const election = await Election.findById(electionId);
-    if (!election) {
-      throw new Error("Election not found");
-    }
+    if (!election) throw new Error("Election not found");
 
     // Check user existence
     const user = await CompletedUser.findById(userId);
-    if (!user) {
-      throw new Error("User not found");
-    }
+    if (!user) throw new Error("User not found");
 
-    // Check if an incident report already exists
+    // Check if incident report exists
     const existingReport = await IncidentReport.findOne({
       election: electionId,
       user: userId,
     });
     if (existingReport) return existingReport;
 
-    // Validate file types
+    // Validate files
     const validateFile = (file, allowedExtensions) => {
       const ext = path.extname(file.originalname).toLowerCase();
       if (!allowedExtensions.includes(ext)) {
         throw new Error(
-          `Invalid file type. Allowed types: ${allowedExtensions.join(", ")}`
+          `Invalid file type. Please upload one of the following: ${allowedExtensions.join(
+            ", "
+          )}`
         );
       }
       return {
@@ -729,29 +929,18 @@ export const uploadIncidentReportDataService = async (
       };
     };
 
-    // Process and validate incident videos
-    const incidentVideos = files?.["incidentVideos"]?.length
-      ? files["incidentVideos[]"].map((file) =>
-          validateFile(file, [".mp4", ".avi", ".mov", ".webm", ".wmv"])
-        )
-      : [];
+    // Process incident videos and pictures
+    const incidentVideos =
+      files["incidentVideos[]"]?.map((file) =>
+        validateFile(file, [".mp4", ".avi", ".mov", ".webm", ".wmv"])
+      ) || [];
 
-    // Process and validate incident pictures
-    const incidentPictures = files?.["incidentPictures"]?.length
-      ? files["incidentPictures[]"].map((file) =>
-          validateFile(file, [".jpg", ".jpeg", ".png", ".svg"])
-        )
-      : [];
+    const incidentPictures =
+      files["incidentPictures[]"]?.map((file) =>
+        validateFile(file, [".jpg", ".jpeg", ".png", ".svg"])
+      ) || [];
 
-    // Insert files if any are provided
-    const insertedPictures = incidentPictures.length
-      ? await File.insertMany(incidentPictures)
-      : [];
-    const insertedVideos = incidentVideos.length
-      ? await File.insertMany(incidentVideos)
-      : [];
-
-    // Create and save the incident report
+    // Create incident report
     const incidentReport = new IncidentReport({
       election: electionId,
       user: userId,
@@ -763,23 +952,21 @@ export const uploadIncidentReportDataService = async (
       selectIncident,
       incidentNote,
       electionRating,
-      incidentPictures: insertedPictures,
-      incidentVideos: insertedVideos,
+      incidentPictures: await File.insertMany(incidentPictures),
+      incidentVideos: await File.insertMany(incidentVideos),
     });
 
+    // Save and return
     const savedReport = await incidentReport.save();
-
-    // Link the incident report to the election
     election.incidentReports.push(savedReport);
     await election.save();
 
     return savedReport;
   } catch (error) {
-    console.error("Error uploading incident report data:", error);
+    console.error("Error uploading incident report data", error);
     throw new Error(`Error saving election incident: ${error.message}`);
   }
 };
-
 
 export const updateIncidentReportDataService = async (
   electionId,
@@ -858,7 +1045,6 @@ export const updateIncidentReportDataService = async (
     throw new Error(`Failed to update incident report data: ${error.message}`);
   }
 };
-
 
 export const deleteIncidentReportDataService = async (electionId) => {
   try {

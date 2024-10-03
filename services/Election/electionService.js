@@ -462,7 +462,6 @@ export const uploadResultDataService = async (
 };
 
 
-
 export const updateResultDataService = async (
   electionId,
   userId,
@@ -606,7 +605,6 @@ export const updateResultDataService = async (
 };
 
 
-
 export const deleteElectionResultDataService = async (electionId) => {
   try {
     // Find and delete the result data
@@ -708,7 +706,7 @@ export const uploadIncidentReportDataService = async (
       throw new Error("User not found");
     }
 
-    // Check if incident report exists
+    // Check if an incident report already exists
     const existingReport = await IncidentReport.findOne({
       election: electionId,
       user: userId,
@@ -732,15 +730,15 @@ export const uploadIncidentReportDataService = async (
     };
 
     // Process and validate incident videos
-    const incidentVideos = files?.incidentVideos?.length
-      ? files.incidentVideos.map((file) =>
+    const incidentVideos = files?.["incidentVideos"]?.length
+      ? files["incidentVideos[]"].map((file) =>
           validateFile(file, [".mp4", ".avi", ".mov", ".webm", ".wmv"])
         )
       : [];
 
     // Process and validate incident pictures
-    const incidentPictures = files?.incidentPictures?.length
-      ? files.incidentPictures.map((file) =>
+    const incidentPictures = files?.["incidentPictures"]?.length
+      ? files["incidentPictures[]"].map((file) =>
           validateFile(file, [".jpg", ".jpeg", ".png", ".svg"])
         )
       : [];
@@ -753,7 +751,7 @@ export const uploadIncidentReportDataService = async (
       ? await File.insertMany(incidentVideos)
       : [];
 
-    // Create incident report
+    // Create and save the incident report
     const incidentReport = new IncidentReport({
       election: electionId,
       user: userId,

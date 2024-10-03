@@ -283,12 +283,12 @@ export const submitObserverDetails = async ({
     );
   }
 
-  // Ensure that two files are provided (PVC front and back)
-  if (!observerIdFiles || observerIdFiles.length !== 2) {
-    throw new Error("Both PVC front and back are required for observers.");
+  // Ensure that at least one observer ID file is provided
+  if (!observerIdFiles || observerIdFiles.length === 0) {
+    throw new Error("At least one PVC file is required for observers.");
   }
 
-  // Handle observer ID uploads (saving both PVC front and back)
+  // Handle observer ID uploads (saving one or more files)
   const observerId = await Promise.all(
     observerIdFiles.map(async (file) => {
       const observerIdPath = `/observerid/${path.basename(file.path)}`;
@@ -348,6 +348,7 @@ export const submitObserverDetails = async ({
     user: userDetails,
   };
 };
+
 
 export const authenticateUser = async ({ email, password }) => {
   const user = await CompletedUser.findOne({ email });

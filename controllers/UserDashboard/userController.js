@@ -46,7 +46,7 @@ import upload from "../../config/multer.js";
 // ];
 
 export const volunteerToObserver = [
-  upload.fields([{ name: "observerId[]", maxCount: 2 }]), // Handle two files for observer ID
+  upload.fields([{ name: "observerId", maxCount: 2 }]), 
   async (req, res) => {
     try {
       const user = req.user;
@@ -64,7 +64,7 @@ export const volunteerToObserver = [
       const updatedUser = await volunteerToObserverService({
         email: user.email,
         details,
-        files: files.observerId, // Pass the two observer ID files
+        files: files.observerId, 
       });
 
       // Return success response

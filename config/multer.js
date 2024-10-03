@@ -26,7 +26,7 @@ ensureDirectoryExist(profileImageDir);
 // Configure multer storage to save files in the correct directory based on the field name
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    if(file.fieldname === "observerId[]"){
+    if(file.fieldname === "observerId"){
       cb(null, observerIdDir);
     } else if (file.fieldname === "profileImage"){
       cb(null, profileImageDir);

@@ -20,13 +20,15 @@ if (!fs.existsSync(dir)) {
 }
 }
 
+
+
 ensureDirectoryExist(observerIdDir);
 ensureDirectoryExist(profileImageDir);
 
 // Configure multer storage to save files in the correct directory based on the field name
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    if(file.fieldname === "observerId"){
+    if(file.fieldname === "observerId[]"){
       cb(null, observerIdDir);
     } else if (file.fieldname === "profileImage"){
       cb(null, profileImageDir);
@@ -46,6 +48,7 @@ const fileFilter = (req, file, cb) => {
     cb(new Error("Please upload a jpg, jpeg, pdf, png, or svg file."));
   }
 };
+
 
 const upload = multer({
   storage,

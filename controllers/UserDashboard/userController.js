@@ -46,25 +46,28 @@ import upload from "../../config/multer.js";
 // ];
 
 export const volunteerToObserver = [
-  upload.fields([{ name: "observerId", maxCount: 2 }]), 
+  upload.fields([{ name: "observerId[]", maxCount: 2 }]), 
   async (req, res) => {
+    
     try {
       const user = req.user;
       const { ...details } = req.body;
       const files = req.files;
 
+console.log(files)
+
       // Check if the correct number of observer ID files are provided
-      if (!files || !files.observerId || files.observerId.length !== 2) {
-        return res.status(400).json({
-          message: "Two observer ID files are required to be an observer",
-        });
-      }
+      // if (!files || !files.observerId || files.observerId.length === 0) {
+      //   return res.status(400).json({
+      //     message: "Two observer ID files are required to be an observer",
+      //   });
+      // }
 
       // Call the service to update the volunteer to observer
       const updatedUser = await volunteerToObserverService({
         email: user.email,
         details,
-        files: files.observerId, 
+        files,
       });
 
       // Return success response

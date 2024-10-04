@@ -8,11 +8,12 @@ import path from "path";
 import mongoose from "mongoose";
 
 export const createElectionService = async (data) => {
-  const { electionType, electionName, startDate, endDate } = data;
+  const { electionType, electionName, electionLocation, startDate, endDate } = data;
 
   const existingElection = await Election.findOne({
     electionType,
     electionName,
+    electionLocation,
     startDate,
     endDate,
   });
@@ -25,7 +26,7 @@ export const createElectionService = async (data) => {
   }
 
   try{
-  const election = new Election({ electionType, electionName, startDate, endDate });
+  const election = new Election({ electionType, electionName, electionLocation, startDate, endDate });
 
   const savedElection = await election.save();
 
@@ -979,8 +980,8 @@ export const updateIncidentReportDataService = async (
       selectIncident,
       incidentNote,
       electionRating,
-      previousIncidentPictures = [], 
-      previousIncidentVideos = [],
+      previousIncidentPictures,
+      previousIncidentVideos,
     } = data;
 
     // Check if the election exists
@@ -1010,12 +1011,16 @@ export const updateIncidentReportDataService = async (
     report.electionRating =
       electionRating !== undefined ? electionRating : report.electionRating;
 
+      const incidentVideos = files["incidentVideos[]"]
+      const incidentPictures = files["incidentPictures[]"]
+
+      console.log(incidentVideos, incidentPictures)
     // Handle video files
-    const previousIncidentVideoFiles = previousIncidentVideos.length
+    const previousIncidentVideoFiles = previousIncidentVideos?.length
       ? await File.find({ _id: { $in: previousIncidentVideos } })
       : [];
-    const newIncidentVideoFiles = files?.incidentVideos?.length
-      ? files.incidentVideos.map((file) => formatFileDetails(file))
+    const newIncidentVideoFiles = incidentVideos?.length
+      ? incidentVideos.map((file) => formatFileDetails(file))
       : [];
     const newVideos = newIncidentVideoFiles.length
       ? await File.insertMany(newIncidentVideoFiles)
@@ -1025,11 +1030,11 @@ export const updateIncidentReportDataService = async (
     report.incidentVideos = [...previousIncidentVideoFiles, ...newVideos];
 
     // Handle picture files
-    const previousIncidentPictureFiles = previousIncidentPictures.length
+    const previousIncidentPictureFiles = previousIncidentPictures?.length
       ? await File.find({ _id: { $in: previousIncidentPictures } })
       : [];
-    const newIncidentPictureFiles = files?.incidentPictures?.length
-      ? files.incidentPictures.map((file) => formatFileDetails(file))
+    const newIncidentPictureFiles = incidentPictures?.length
+      ? incidentPictures.map((file) => formatFileDetails(file))
       : [];
     const newPictures = newIncidentPictureFiles.length
       ? await File.insertMany(newIncidentPictureFiles)
@@ -1044,6 +1049,7 @@ export const updateIncidentReportDataService = async (
     console.error("Error updating incident report data", error);
     throw new Error(`Failed to update incident report data: ${error.message}`);
   }
+
 };
 
 export const deleteIncidentReportDataService = async (electionId) => {
@@ -1278,14 +1284,14 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
   const observers = await CompletedUser.find({
     pollingUnit,
     role: "observer",
-    isObserverInPollingUnit: true,
+    // isObserverInPollingUnit: true,
   }).lean();
-  const observerIds = observers.map((observer) => observer._id);
+  // const observerIds = observers.map((observer) => observer._id);
 
   // Fetch election results uploaded by observers in the polling unit with isApproved field
   const electionResults = await ElectionData.find({
     pollingUnit,
-    user: { $in: observerIds },
+    // user: { $in: observerIds },
    
   })
     .populate({

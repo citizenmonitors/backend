@@ -22,11 +22,13 @@ export const volunteerToObserverService = async ({ email, details, files }) => {
   if (!user) {
     throw new Error("No account found with this email address");
   }
+  console.log(files);
 
   // Check if at least one observer ID file is provided
-  if (!files || !files.observerId || files.observerId.length === 0) {
+  if (!files || !files["observerId[]"] || files["observerId[]"].length === 0) {
     throw new Error("At least one observer ID file is required for observers.");
   }
+
 
   // Check if an observer already exists in the user's polling unit
   const existingObserver = await CompletedUser.findOne({
@@ -76,7 +78,7 @@ export const volunteerToObserverService = async ({ email, details, files }) => {
 
   // Process the observer ID files (one or more files)
   const observerIdFiles = await Promise.all(
-    files.observerId.map(async (file) => {
+    files["observerId[]"].map(async (file) => {
       const observerIdPath = `/observerid/${path.basename(file.path)}`;
       const observerIdFile = await observerIdModel.create({
         location: observerIdPath,
@@ -362,7 +364,7 @@ export const updateUserService = async (
 
       if (isWithinOngoingElection) {
         throw new Error(
-          "You cannot change your coverage details during an ongoing election."
+          "Your coverage cannot be updated when elections are currently holding. Please try again later."
         );
       }
     

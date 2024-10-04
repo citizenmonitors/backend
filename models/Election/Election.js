@@ -10,6 +10,10 @@ const ElectionSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    electionLocation: {
+      type: String,
+      // required: true,
+    },
     startDate: {
       type: Date,
       required: true,

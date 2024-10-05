@@ -352,36 +352,6 @@ export const updateUserService = async (
       endDate: { $gte: new Date() },
     });
 
-    if (ongoingElections.length > 0) {
-      const today = moment();
-
-      // Prevent changes if the current date is within any election period
-      const isWithinOngoingElection = ongoingElections.some((election) => {
-        const electionStart = moment(election.startDate);
-        const electionEnd = moment(election.endDate);
-        return today.isBetween(electionStart, electionEnd, "day", "[]");
-      });
-
-      if (isWithinOngoingElection) {
-        throw new Error(
-          "Your coverage cannot be updated when elections are currently holding. Please try again later."
-        );
-      }
-    
-      
-      // Check if the user has submitted results for any ongoing election
-      const hasSubmittedResults = await ElectionData.findOne({
-        user: user._id,
-        election: { $in: ongoingElections.map((election) => election._id) },
-      });
-
-      if (hasSubmittedResults) {
-        throw new Error(
-          "You cannot change your coverage details because you have already submitted results for an ongoing election."
-        );
-      }
-    }
-
     // Observers cannot change coverage details, downgrade if attempted
     const coverageFields = [
       "state",
@@ -397,6 +367,35 @@ export const updateUserService = async (
     const isChangingCoverageDetails = coverageFields.some((field) =>
       Object.keys(updateData).includes(field)
     );
+
+    if (ongoingElections.length > 0) {
+      const today = moment();
+
+      // Prevent changes if the current date is within any election period
+      const isWithinOngoingElection = ongoingElections.some((election) => {
+        const electionStart = moment(election.startDate);
+        const electionEnd = moment(election.endDate);
+        return today.isBetween(electionStart, electionEnd, "day", "[]");
+      });
+
+      if (isWithinOngoingElection && isChangingCoverageDetails ) {
+        throw new Error(
+          "Your coverage cannot be updated when elections are currently holding. Please try again later."
+        );
+      }
+
+      // Check if the user has submitted results for any ongoing election
+      const hasSubmittedResults = await ElectionData.findOne({
+        user: user._id,
+        election: { $in: ongoingElections.map((election) => election._id) },
+      });
+
+      if (hasSubmittedResults && isChangingCoverageDetails) {
+        throw new Error(
+          "You cannot change your coverage details because you have already submitted results for an ongoing election."
+        );
+      }
+    }
 
     if (user.role === "observer" && isChangingCoverageDetails) {
       // Downgrade the observer to a volunteer if they attempt to change coverage details

@@ -6,6 +6,7 @@ import IncidentReport from "../../models/Election/IncidentReport.js";
 import File from "../../models/file.js";
 import path from "path";
 import mongoose from "mongoose";
+import moment from "moment";
 
 export const createElectionService = async (data) => {
   const { electionType, electionName, electionLocation, startDate, endDate } = data;
@@ -1281,35 +1282,11 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
   const pollingUnit = user.pollingUnit;
 
   // Fetch all observers in the same polling unit
-  const observers = await CompletedUser.find({
-    pollingUnit,
-    role: "observer",
-    // isObserverInPollingUnit: true,
-  }).lean();
-  // const observerIds = observers.map((observer) => observer._id);
-
-  // Fetch election results uploaded by observers in the polling unit with isApproved field
-  const electionResults = await ElectionData.find({
-    pollingUnit,
-    // user: { $in: observerIds },
-   
-  })
-    .populate({
-      path: "election",
-      select: "electionType electionName startDate endDate",
-    })
-    .lean();
-
-  // Fetch incident reports uploaded by observers in the polling unit
-  const incidentReports = await IncidentReport.find({
-    pollingUnit,
-    user: { $in: observerIds },
-  })
-    .populate({
-      path: "election",
-      select: "electionType electionName startDate endDate",
-    })
-    .lean();
+  // const observers = await CompletedUser.find({
+  //   pollingUnit,
+  //   role: "observer",
+  //   // isObserverInPollingUnit: true,
+  // }).lean();
 
   // If actionData is provided, perform the action
   if (
@@ -1403,12 +1380,35 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
     await data.save();
   }
 
+  const electionResults = await ElectionData.find({
+    pollingUnit,
+    // user: { $in: observerIds },
+  })
+    .populate({
+      path: "election",
+      select: "electionType electionName electionLocation startDate endDate",
+    })
+    .lean();
+
+  // Fetch incident reports uploaded by observers in the polling unit
+  const incidentReports = await IncidentReport.find({
+    pollingUnit,
+    // user: { $in: observerIds },
+  })
+    .populate({
+      path: "election",
+      select: "electionType electionName electionLocation startDate endDate",
+    })
+    .lean();
+
+  console.log(incidentReports, electionResults);
+
   // Prepare election result data
   const resultData = electionResults.map((result) => ({
     electionId: result._id,
     electionType: result.election.electionType,
     pollingUnit: result.pollingUnit,
-    electionYear: result.election.startDate.substring(0, 4),
+    electionYear: moment(result.election.startDate).format('YYYY'),
     uploadedAt: result.createdAt,
     partiesVotes: result.partiesVotes,
     voteRating: result.voteRating,
@@ -1420,7 +1420,8 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
     flagged: result.flagged || false,
     actions: result.actions,
     timeBegan: result.timeBegan,
-    isApproved: result.isApproved, // Include the isApproved field
+    isApproved: result.isApproved,
+    election: result.election
   }));
 
   // Prepare incident report data
@@ -1428,7 +1429,7 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
     electionId: report._id,
     electionType: report.election.electionType,
     pollingUnit: report.pollingUnit,
-    electionYear: report.election.startDate.substring(0, 4),
+    electionYear: moment(report.election.startDate).format("YYYY"),
     uploadedAt: report.createdAt,
     selectIncident: report.selectIncident,
     incidentNote: report.incidentNote,
@@ -1438,6 +1439,7 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
     agreed: report.agreed || false,
     flagged: report.flagged || false,
     actions: report.actions,
+    election: report.election,
   }));
 
   return {

@@ -439,6 +439,7 @@ export const getSentimentAnalysis = async (req, res) => {
         break;
       case "senatorial":
       case "house-of-representatives":
+      case "house-of-assembly":
       case "gubernatorial":
       case "lga":
         groupBy = "ward";

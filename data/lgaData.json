@@ -1,0 +1,3858 @@
+[
+  {
+    "name": "ABA NORTH",
+    "senatorial_district": "Abia South",
+    "house_of_representatives": "Aba North/Aba South"
+  },
+  {
+    "name": "ABA SOUTH",
+    "senatorial_district": "Abia South",
+    "house_of_representatives": "Aba North/Aba South"
+  },
+  {
+    "name": "AROCHUKWU",
+    "senatorial_district": "Abia North",
+    "house_of_representatives": "Arochukwu/Ohafia"
+  },
+  {
+    "name": "BENDE",
+    "senatorial_district": "Abia North",
+    "house_of_representatives": "Bende"
+  },
+  {
+    "name": "IKWUANO",
+    "senatorial_district": "Abia Central",
+    "house_of_representatives": "Ikwuano/Umuahia"
+  },
+  {
+    "name": "ISIALA NGWA NORTH",
+    "senatorial_district": "Abia Central",
+    "house_of_representatives": "Isiala Ngwa North/South"
+  },
+  {
+    "name": "ISIALA NGWA SOUTH",
+    "senatorial_district": "Abia Central",
+    "house_of_representatives": "Isiala Ngwa North/South"
+  },
+  {
+    "name": "ISUIKWUATO",
+    "senatorial_district": "Abia North",
+    "house_of_representatives": "Isuikwuato/Umunneochi"
+  },
+  {
+    "name": "OBINGWA",
+    "senatorial_district": "Abia South",
+    "house_of_representatives": "Obingwa/Ugwunagbo/Osisioma"
+  },
+  {
+    "name": "OHAFIA",
+    "senatorial_district": "Abia North",
+    "house_of_representatives": "Arochukwu/Ohafia"
+  },
+  {
+    "name": "OSISIOMA",
+    "senatorial_district": "Abia South",
+    "house_of_representatives": "Obingwa/Ugwunagbo/Osisioma"
+  },
+  {
+    "name": "UGWUNAGBO",
+    "senatorial_district": "Abia South",
+    "house_of_representatives": "Obingwa/Ugwunagbo/Osisioma"
+  },
+  {
+    "name": "UKWA EAST",
+    "senatorial_district": "Abia South",
+    "house_of_representatives": "Ukwa East/West"
+  },
+  {
+    "name": "UKWA WEST",
+    "senatorial_district": "Abia South",
+    "house_of_representatives": "Ukwa East/West"
+  },
+  {
+    "name": "UMUAHIA NORTH",
+    "senatorial_district": "Abia Central",
+    "house_of_representatives": "Ikwuano/Umuahia"
+  },
+  {
+    "name": "UMUAHIA SOUTH",
+    "senatorial_district": "Abia Central",
+    "house_of_representatives": "Ikwuano/Umuahia"
+  },
+  {
+    "name": "UMU-NNEOCHI",
+    "senatorial_district": "Abia North",
+    "house_of_representatives": "Isuikwuato/Umunneochi"
+  },
+  {
+    "name": "DEMSA",
+    "senatorial_district": "Adamawa South",
+    "house_of_representatives": "Demsa/Numan/Lamurde"
+  },
+  {
+    "name": "FUFORE",
+    "senatorial_district": "Adamawa Central",
+    "house_of_representatives": "Fufore/Song"
+  },
+  {
+    "name": "GANYE",
+    "senatorial_district": "Adamawa South",
+    "house_of_representatives": "Ganye/Jada/Toungo"
+  },
+  {
+    "name": "GIRE 1",
+    "senatorial_district": "Adamawa Central",
+    "house_of_representatives": "Yola North/Yola South/Girei"
+  },
+  {
+    "name": "GOMBI",
+    "senatorial_district": "Adamawa North",
+    "house_of_representatives": "Gombi/Hong"
+  },
+  {
+    "name": "GUYUK",
+    "senatorial_district": "Adamawa South",
+    "house_of_representatives": "Guyuk/Shelleng"
+  },
+  {
+    "name": "HONG",
+    "senatorial_district": "Adamawa North",
+    "house_of_representatives": "Gombi/Hong"
+  },
+  {
+    "name": "JADA",
+    "senatorial_district": "Adamawa South",
+    "house_of_representatives": "Ganye/Jada/Toungo"
+  },
+  {
+    "name": "LAMURDE",
+    "senatorial_district": "Adamawa South",
+    "house_of_representatives": "Demsa/Numan/Lamurde"
+  },
+  {
+    "name": "MADAGALI",
+    "senatorial_district": "Adamawa North",
+    "house_of_representatives": "Madagali/Michika"
+  },
+  {
+    "name": "MAIHA",
+    "senatorial_district": "Adamawa North",
+    "house_of_representatives": "Mubi North/Mubi South/Maiha"
+  },
+  {
+    "name": "MAYO - BELWA",
+    "senatorial_district": "Adamawa South",
+    "house_of_representatives": "Mayo-Belwa/Jada/Ganye/Toungo"
+  },
+  {
+    "name": "MICHIKA",
+    "senatorial_district": "Adamawa North",
+    "house_of_representatives": "Michika/Madagali"
+  },
+  {
+    "name": "MUBI NORTH",
+    "senatorial_district": "Adamawa North",
+    "house_of_representatives": "Mubi North/Mubi South/Maiha"
+  },
+  {
+    "name": "MUBI SOUTH",
+    "senatorial_district": "Adamawa North",
+    "house_of_representatives": "Mubi North/Mubi South/Maiha"
+  },
+  {
+    "name": "NUMAN",
+    "senatorial_district": "Adamawa South",
+    "house_of_representatives": "Demsa/Numan/Lamurde"
+  },
+  {
+    "name": "SHELLENG",
+    "senatorial_district": "Adamawa South",
+    "house_of_representatives": "Guyuk/Shelleng"
+  },
+  {
+    "name": "SONG",
+    "senatorial_district": "Adamawa North",
+    "house_of_representatives": "Fufore/Song"
+  },
+  {
+    "name": "TOUNGO",
+    "senatorial_district": "Adamawa South",
+    "house_of_representatives": "Ganye/Jada/Toungo"
+  },
+  {
+    "name": "YOLA NORTH",
+    "senatorial_district": "Adamawa Central",
+    "house_of_representatives": "Yola North/Yola South/Girei"
+  },
+  {
+    "name": "YOLA SOUTH",
+    "senatorial_district": "Adamawa Central",
+    "house_of_representatives": "Yola North/Yola South/Girei"
+  },
+  {
+    "name": "ABAK",
+    "senatorial_district": "Akwa Ibom North West",
+    "house_of_representatives": "Abak/Etim Ekpo/Ika"
+  },
+  {
+    "name": "EASTERN OBOLO",
+    "senatorial_district": "Akwa Ibom South",
+    "house_of_representatives": "Ikot Abasi/Eastern Obolo"
+  },
+  {
+    "name": "EKET",
+    "senatorial_district": "Akwa Ibom South",
+    "house_of_representatives": "Eket/Esit Eket/Ibeno/Onna"
+  },
+  {
+    "name": "ESIT EKET",
+    "senatorial_district": "Akwa Ibom South",
+    "house_of_representatives": "Eket/Esit Eket/Ibeno/Onna"
+  },
+  {
+    "name": "ESSIEN UDIM",
+    "senatorial_district": "Akwa Ibom North West",
+    "house_of_representatives": "Ikot Ekpene/Essien Udim/Obot Akara"
+  },
+  {
+    "name": "ETIM EKPO",
+    "senatorial_district": "Akwa Ibom North West",
+    "house_of_representatives": "Abak/Etim Ekpo/Ika"
+  },
+  {
+    "name": "ETINAN",
+    "senatorial_district": "Akwa Ibom North East",
+    "house_of_representatives": "Etinan/Nsit Ubium/Nsit Ibom"
+  },
+  {
+    "name": "IBENO",
+    "senatorial_district": "Akwa Ibom South",
+    "house_of_representatives": "Eket/Esit Eket/Ibeno/Onna"
+  },
+  {
+    "name": "IBESIKPO ASUTAN",
+    "senatorial_district": "Akwa Ibom North East",
+    "house_of_representatives": "Uyo/Ibesikpo Asutan/Uruan/Nsit Atai"
+  },
+  {
+    "name": "IBIONO IBOM",
+    "senatorial_district": "Akwa Ibom North East",
+    "house_of_representatives": "Itu/Ibiono Ibom"
+  },
+  {
+    "name": "IKA",
+    "senatorial_district": "Akwa Ibom North West",
+    "house_of_representatives": "Abak/Etim Ekpo/Ika"
+  },
+  {
+    "name": "IKONO",
+    "senatorial_district": "Akwa Ibom North West",
+    "house_of_representatives": "Ikono/Ini"
+  },
+  {
+    "name": "IKOT ABASI",
+    "senatorial_district": "Akwa Ibom South",
+    "house_of_representatives": "Ikot Abasi/Eastern Obolo"
+  },
+  {
+    "name": "IKOT EKPENE",
+    "senatorial_district": "Akwa Ibom North West",
+    "house_of_representatives": "Ikot Ekpene/Essien Udim/Obot Akara"
+  },
+  {
+    "name": "INI",
+    "senatorial_district": "Akwa Ibom North West",
+    "house_of_representatives": "Ikono/Ini"
+  },
+  {
+    "name": "ITU",
+    "senatorial_district": "Akwa Ibom North East",
+    "house_of_representatives": "Itu/Ibiono Ibom"
+  },
+  {
+    "name": "MBO",
+    "senatorial_district": "Akwa Ibom South",
+    "house_of_representatives": "Oron/Mbo/Okobo/Udung Uko/Urue Offong Oruko"
+  },
+  {
+    "name": "MKPAT ENIN",
+    "senatorial_district": "Akwa Ibom South",
+    "house_of_representatives": "Ikot Abasi/Eastern Obolo"
+  },
+  {
+    "name": "NSIT ATAI",
+    "senatorial_district": "Akwa Ibom North East",
+    "house_of_representatives": "Uyo/Ibesikpo Asutan/Uruan/Nsit Atai"
+  },
+  {
+    "name": "NSIT IBOM",
+    "senatorial_district": "Akwa Ibom North East",
+    "house_of_representatives": "Etinan/Nsit Ubium/Nsit Ibom"
+  },
+  {
+    "name": "NSIT UBIUM",
+    "senatorial_district": "Akwa Ibom North East",
+    "house_of_representatives": "Etinan/Nsit Ubium/Nsit Ibom"
+  },
+  {
+    "name": "OBOT AKARA",
+    "senatorial_district": "Akwa Ibom North West",
+    "house_of_representatives": "Ikot Ekpene/Essien Udim/Obot Akara"
+  },
+  {
+    "name": "OKOBO",
+    "senatorial_district": "Akwa Ibom South",
+    "house_of_representatives": "Oron/Mbo/Okobo/Udung Uko/Urue Offong Oruko"
+  },
+  {
+    "name": "ONNA",
+    "senatorial_district": "Akwa Ibom South",
+    "house_of_representatives": "Eket/Esit Eket/Ibeno/Onna"
+  },
+  {
+    "name": "ORON",
+    "senatorial_district": "Akwa Ibom South",
+    "house_of_representatives": "Oron/Mbo/Okobo/Udung Uko/Urue Offong Oruko"
+  },
+  {
+    "name": "ORUK ANAM",
+    "senatorial_district": "Akwa Ibom South",
+    "house_of_representatives": "Ukanafun/Oruk Anam"
+  },
+  {
+    "name": "UDUNG UKO",
+    "senatorial_district": "Akwa Ibom South",
+    "house_of_representatives": "Oron/Mbo/Okobo/Udung Uko/Urue Offong Oruko"
+  },
+  {
+    "name": "UKANAFUN",
+    "senatorial_district": "Akwa Ibom South",
+    "house_of_representatives": "Ukanafun/Oruk Anam"
+  },
+  {
+    "name": "URUAN",
+    "senatorial_district": "Akwa Ibom North East",
+    "house_of_representatives": "Uyo/Ibesikpo Asutan/Uruan/Nsit Atai"
+  },
+  {
+    "name": "URUE OFFONG/ORUKO",
+    "senatorial_district": "Akwa Ibom South",
+    "house_of_representatives": "Oron/Mbo/Okobo/Udung Uko/Urue Offong Oruko"
+  },
+  {
+    "name": "UYO",
+    "senatorial_district": "Akwa Ibom North East",
+    "house_of_representatives": "Uyo/Ibesikpo Asutan/Uruan/Nsit Atai"
+  },
+    {
+      "name": "AGUATA",
+      "senatorial_district": "Anambra South",
+      "house_of_representatives": "Aguata"
+    },
+    {
+      "name": "AYAMELUM",
+      "senatorial_district": "Anambra North",
+      "house_of_representatives": "Oyi/Ayamelum"
+    },
+    {
+      "name": "ANAMBRA EAST",
+      "senatorial_district": "Anambra North",
+      "house_of_representatives": "Anambra East/West"
+    },
+    {
+      "name": "ANAMBRA WEST",
+      "senatorial_district": "Anambra North",
+      "house_of_representatives": "Anambra East/West"
+    },
+    {
+      "name": "ANAOCHA",
+      "senatorial_district": "Anambra Central",
+      "house_of_representatives": "Anaocha/Njikoka/Dunukofia"
+    },
+    {
+      "name": "AWKA NORTH",
+      "senatorial_district": "Anambra Central",
+      "house_of_representatives": "Awka North/South"
+    },
+    {
+      "name": "AWKA SOUTH",
+      "senatorial_district": "Anambra Central",
+      "house_of_representatives": "Awka North/South"
+    },
+    {
+      "name": "DUNUKOFIA",
+      "senatorial_district": "Anambra Central",
+      "house_of_representatives": "Anaocha/Njikoka/Dunukofia"
+    },
+    {
+      "name": "EKWUSIGO",
+      "senatorial_district": "Anambra South",
+      "house_of_representatives": "Nnewi North/South/Ekwusigo"
+    },
+    {
+      "name": "IDEMILI NORTH",
+      "senatorial_district": "Anambra Central",
+      "house_of_representatives": "Idemili North/South"
+    },
+    {
+      "name": "IDEMILI-SOUTH",
+      "senatorial_district": "Anambra Central",
+      "house_of_representatives": "Idemili North/South"
+    },
+    {
+      "name": "IHALA",
+      "senatorial_district": "Anambra South",
+      "house_of_representatives": "Ihiala"
+    },
+    {
+      "name": "NJIKOKA",
+      "senatorial_district": "Anambra Central",
+      "house_of_representatives": "Anaocha/Njikoka/Dunukofia"
+    },
+    {
+      "name": "NNEWI NORTH",
+      "senatorial_district": "Anambra South",
+      "house_of_representatives": "Nnewi North/South/Ekwusigo"
+    },
+    {
+      "name": "NNEWI SOUTH",
+      "senatorial_district": "Anambra South",
+      "house_of_representatives": "Nnewi North/South/Ekwusigo"
+    },
+    {
+      "name": "OGBARU",
+      "senatorial_district": "Anambra North",
+      "house_of_representatives": "Ogbaru"
+    },
+    {
+      "name": "ONITSHA-NORTH",
+      "senatorial_district": "Anambra North",
+      "house_of_representatives": "Onitsha North/South"
+    },
+    {
+      "name": "ONITSHA-SOUTH",
+      "senatorial_district": "Anambra North",
+      "house_of_representatives": "Onitsha North/South"
+    },
+    {
+      "name": "ORUMBA NORTH",
+      "senatorial_district": "Anambra South",
+      "house_of_representatives": "Orumba North/South"
+    },
+    {
+      "name": "ORUMBA SOUTH",
+      "senatorial_district": "Anambra South",
+      "house_of_representatives": "Orumba North/South"
+    },
+    {
+      "name": "OYI",
+      "senatorial_district": "Anambra North",
+      "house_of_representatives": "Oyi/Ayamelum"
+    },
+    {
+      "name": "ALKALERI",
+      "senatorial_district": "Bauchi South",
+      "house_of_representatives": "Alkaleri/Kirfi"
+    },
+    {
+      "name": "BAUCHI",
+      "senatorial_district": "Bauchi South",
+      "house_of_representatives": "Bauchi"
+    },
+    {
+      "name": "BOGORO",
+      "senatorial_district": "Bauchi South",
+      "house_of_representatives": "Bogoro/Dass/Tafawa Balewa"
+    },
+    {
+      "name": "DAMBAM",
+      "senatorial_district": "Bauchi North",
+      "house_of_representatives": "Darazo/Ganjuwa"
+    },
+    {
+      "name": "DARAZO",
+      "senatorial_district": "Bauchi North",
+      "house_of_representatives": "Darazo/Ganjuwa"
+    },
+    {
+      "name": "DASS",
+      "senatorial_district": "Bauchi South",
+      "house_of_representatives": "Bogoro/Dass/Tafawa Balewa"
+    },
+    {
+      "name": "GAMAWA",
+      "senatorial_district": "Bauchi North",
+      "house_of_representatives": "Zaki/Gamawa"
+    },
+    {
+      "name": "GANJUWA",
+      "senatorial_district": "Bauchi North",
+      "house_of_representatives": "Darazo/Ganjuwa"
+    },
+    {
+      "name": "GIADE",
+      "senatorial_district": "Bauchi North",
+      "house_of_representatives": "Shira/Giade"
+    },
+    {
+      "name": "ITAS/GADAU",
+      "senatorial_district": "Bauchi North",
+      "house_of_representatives": "Jama'are/Itas Gadau"
+    },
+    {
+      "name": "JAMA'ARE",
+      "senatorial_district": "Bauchi North",
+      "house_of_representatives": "Jama'are/Itas Gadau"
+    },
+    {
+      "name": "KATAGUM",
+      "senatorial_district": "Bauchi North",
+      "house_of_representatives": "Katagum"
+    },
+    {
+      "name": "KIRFI",
+      "senatorial_district": "Bauchi South",
+      "house_of_representatives": "Alkaleri/Kirfi"
+    },
+    {
+      "name": "MISAU",
+      "senatorial_district": "Bauchi North",
+      "house_of_representatives": "Misau/Dambam"
+    },
+    {
+      "name": "NINGI",
+      "senatorial_district": "Bauchi Central",
+      "house_of_representatives": "Ningi/Warji"
+    },
+    {
+      "name": "SHIRA",
+      "senatorial_district": "Bauchi North",
+      "house_of_representatives": "Shira/Giade"
+    },
+    {
+      "name": "TAFAWA BALEWA",
+      "senatorial_district": "Bauchi South",
+      "house_of_representatives": "Bogoro/Dass/Tafawa Balewa"
+    },
+    {
+      "name": "TORO",
+      "senatorial_district": "Bauchi Central",
+      "house_of_representatives": "Toro"
+    },
+    {
+      "name": "WARJI",
+      "senatorial_district": "Bauchi Central",
+      "house_of_representatives": "Ningi/Warji"
+    },
+    {
+      "name": "ZAKI",
+      "senatorial_district": "Bauchi North",
+      "house_of_representatives": "Zaki/Gamawa"
+    },
+  {
+    "name": "BRASS",
+    "senatorial_district": "Bayelsa East",
+    "house_of_representatives": "Brass/Nembe"
+  },
+  {
+    "name": "EKEREMOR",
+    "senatorial_district": "Bayelsa West",
+    "house_of_representatives": "Sagbama/Ekeremor"
+  },
+  {
+    "name": "KOLOKUMA/OPOKUMA",
+    "senatorial_district": "Bayelsa Central",
+    "house_of_representatives": "Yenagoa/Kolokuma/Opokuma"
+  },
+  {
+    "name": "NEMBE",
+    "senatorial_district": "Bayelsa East",
+    "house_of_representatives": "Brass/Nembe"
+  },
+  {
+    "name": "OGBIA",
+    "senatorial_district": "Bayelsa East",
+    "house_of_representatives": "Ogbia"
+  },
+  {
+    "name": "SAGBAMA",
+    "senatorial_district": "Bayelsa West",
+    "house_of_representatives": "Sagbama/Ekeremor"
+  },
+  {
+    "name": "SOUTHERN IJAW",
+    "senatorial_district": "Bayelsa Central",
+    "house_of_representatives": "Southern Ijaw"
+  },
+  {
+    "name": "YENAGOA",
+    "senatorial_district": "Bayelsa Central",
+    "house_of_representatives": "Yenagoa/Kolokuma/Opokuma"
+  },
+  {
+    "name": "ADO",
+    "senatorial_district": "Benue South",
+    "house_of_representatives": "Ado/Okpokwu/Ogbadibo"
+  },
+  {
+    "name": "AGATU",
+    "senatorial_district": "Benue South",
+    "house_of_representatives": "Agatu/Apa"
+  },
+  {
+    "name": "APA",
+    "senatorial_district": "Benue South",
+    "house_of_representatives": "Agatu/Apa"
+  },
+  {
+    "name": "BURUKU",
+    "senatorial_district": "Benue North West",
+    "house_of_representatives": "Buruku"
+  },
+  {
+    "name": "GBOKO",
+    "senatorial_district": "Benue North West",
+    "house_of_representatives": "Gboko/Tarka"
+  },
+  {
+    "name": "GUMA",
+    "senatorial_district": "Benue North West",
+    "house_of_representatives": "Makurdi/Guma"
+  },
+  {
+    "name": "GWER EAST",
+    "senatorial_district": "Benue North East",
+    "house_of_representatives": "Gwer East/Gwer West"
+  },
+  {
+    "name": "GWER WEST",
+    "senatorial_district": "Benue North East",
+    "house_of_representatives": "Gwer East/Gwer West"
+  },
+  {
+    "name": "KATSINA-ALA",
+    "senatorial_district": "Benue North East",
+    "house_of_representatives": "Katsina-Ala/Ukum/Logo"
+  },
+  {
+    "name": "KONSHISHA",
+    "senatorial_district": "Benue North East",
+    "house_of_representatives": "Vandeikya/Konshisha"
+  },
+  {
+    "name": "KWANDE",
+    "senatorial_district": "Benue North East",
+    "house_of_representatives": "Kwande/Ushongo"
+  },
+  {
+    "name": "LOGO",
+    "senatorial_district": "Benue North East",
+    "house_of_representatives": "Katsina-Ala/Ukum/Logo"
+  },
+  {
+    "name": "MAKURDI",
+    "senatorial_district": "Benue North West",
+    "house_of_representatives": "Makurdi/Guma"
+  },
+  {
+    "name": "OBI",
+    "senatorial_district": "Benue South",
+    "house_of_representatives": "Oju/Obi"
+  },
+  {
+    "name": "OGBADIBO",
+    "senatorial_district": "Benue South",
+    "house_of_representatives": "Ado/Okpokwu/Ogbadibo"
+  },
+  {
+    "name": "OJU",
+    "senatorial_district": "Benue South",
+    "house_of_representatives": "Oju/Obi"
+  },
+  {
+    "name": "OHIMINI",
+    "senatorial_district": "Benue South",
+    "house_of_representatives": "Ohimini/Otukpo"
+  },
+  {
+    "name": "OKPOKWU",
+    "senatorial_district": "Benue South",
+    "house_of_representatives": "Ado/Okpokwu/Ogbadibo"
+  },
+  {
+    "name": "OTUKPO",
+    "senatorial_district": "Benue South",
+    "house_of_representatives": "Ohimini/Otukpo"
+  },
+  {
+    "name": "TARKA",
+    "senatorial_district": "Benue North West",
+    "house_of_representatives": "Gboko/Tarka"
+  },
+  {
+    "name": "UKUM",
+    "senatorial_district": "Benue North East",
+    "house_of_representatives": "Katsina-Ala/Ukum/Logo"
+  },
+  {
+    "name": "USHONGO",
+    "senatorial_district": "Benue North East",
+    "house_of_representatives": "Kwande/Ushongo"
+  },
+  {
+    "name": "VANDEIKYA",
+    "senatorial_district": "Benue North East",
+    "house_of_representatives": "Vandeikya/Konshisha"
+  },
+  {
+    "name": "ABADAM",
+    "senatorial_district": "Borno North",
+    "house_of_representatives": "Mobbar/Abadam/Guzamala"
+  },
+  {
+    "name": "ASKIRA / UBA",
+    "senatorial_district": "Borno South",
+    "house_of_representatives": "Askira Uba"
+  },
+  {
+    "name": "BAMA",
+    "senatorial_district": "Borno Central",
+    "house_of_representatives": "Bama/Ngala/Kala-Balge"
+  },
+  {
+    "name": "BAYO",
+    "senatorial_district": "Borno North",
+    "house_of_representatives": "Biu/Bayo/Kwaya Kusar/Shani"
+  },
+  {
+    "name": "BIU",
+    "senatorial_district": "Borno South",
+    "house_of_representatives": "Biu/Bayo/Kwaya Kusar/Shani"
+  },
+  {
+    "name": "CHIBOK",
+    "senatorial_district": "Borno South",
+    "house_of_representatives": "Damboa/Gwoza/Chibok"
+  },
+  {
+    "name": "DAMBOA",
+    "senatorial_district": "Borno South",
+    "house_of_representatives": "Damboa/Gwoza/Chibok"
+  },
+  {
+    "name": "DIKWA",
+    "senatorial_district": "Borno Central",
+    "house_of_representatives": "Bama/Ngala/Kala-Balge"
+  },
+  {
+    "name": "GUBIO",
+    "senatorial_district": "Borno North",
+    "house_of_representatives": "Gubio/Magumeri/Kaga"
+  },
+  {
+    "name": "GUZAMALA",
+    "senatorial_district": "Borno North",
+    "house_of_representatives": "Mobbar/Abadam/Guzamala"
+  },
+  {
+    "name": "GWOZA",
+    "senatorial_district": "Borno South",
+    "house_of_representatives": "Damboa/Gwoza/Chibok"
+  },
+  {
+    "name": "HAWUL",
+    "senatorial_district": "Borno South",
+    "house_of_representatives": "Askira Uba"
+  },
+  {
+    "name": "JERE",
+    "senatorial_district": "Borno Central",
+    "house_of_representatives": "Jere"
+  },
+  {
+    "name": "KAGA",
+    "senatorial_district": "Borno North",
+    "house_of_representatives": "Gubio/Magumeri/Kaga"
+  },
+  {
+    "name": "KALA BALGE",
+    "senatorial_district": "Borno Central",
+    "house_of_representatives": "Bama/Ngala/Kala-Balge"
+  },
+  {
+    "name": "KONDUGA",
+    "senatorial_district": "Borno Central",
+    "house_of_representatives": "Kaga/Kukawa/Magumeri"
+  },
+  {
+    "name": "KUKAWA",
+    "senatorial_district": "Borno North",
+    "house_of_representatives": "Kukawa/Mobbar/Abadam"
+  },
+  {
+    "name": "KWAYA / KUSAR",
+    "senatorial_district": "Borno South",
+    "house_of_representatives": "Biu/Bayo/Kwaya Kusar/Shani"
+  },
+  {
+    "name": "MAFA",
+    "senatorial_district": "Borno Central",
+    "house_of_representatives": "Mafa/Dikwa/Konduga"
+  },
+  {
+    "name": "MAGUMERI",
+    "senatorial_district": "Borno North",
+    "house_of_representatives": "Gubio/Magumeri/Kaga"
+  },
+  {
+    "name": "MAIDUGURI M. C.",
+    "senatorial_district": "Borno Central",
+    "house_of_representatives": "Maiduguri Metropolitan Council"
+  },
+  {
+    "name": "MARTE",
+    "senatorial_district": "Borno Central",
+    "house_of_representatives": "Mafa/Dikwa/Marte"
+  },
+  {
+    "name": "MOBBAR",
+    "senatorial_district": "Borno North",
+    "house_of_representatives": "Mobbar/Abadam/Guzamala"
+  },
+  {
+    "name": "MONGUNO",
+    "senatorial_district": "Borno North",
+    "house_of_representatives": "Monguno/Nganzai/Marte"
+  },
+  {
+    "name": "NGALA",
+    "senatorial_district": "Borno Central",
+    "house_of_representatives": "Bama/Ngala/Kala-Balge"
+  },
+  {
+    "name": "NGANZAI",
+    "senatorial_district": "Borno North",
+    "house_of_representatives": "Monguno/Nganzai/Marte"
+  },
+  {
+    "name": "SHANI",
+    "senatorial_district": "Borno South",
+    "house_of_representatives": "Biu/Bayo/Kwaya Kusar/Shani"
+  },
+  {
+    "name": "ABI",
+    "senatorial_district": "Cross River Central",
+    "house_of_representatives": "Abi/Yakurr"
+  },
+  {
+    "name": "AKAMKPA",
+    "senatorial_district": "Cross River South",
+    "house_of_representatives": "Akpabuyo/Bakassi/Calabar South"
+  },
+  {
+    "name": "AKPABUYO",
+    "senatorial_district": "Cross River South",
+    "house_of_representatives": "Akpabuyo/Bakassi/Calabar South"
+  },
+  {
+    "name": "BAKASSI",
+    "senatorial_district": "Cross River South",
+    "house_of_representatives": "Akpabuyo/Bakassi/Calabar South"
+  },
+  {
+    "name": "BEKWARRA",
+    "senatorial_district": "Cross River North",
+    "house_of_representatives": "Obudu/Obanliku/Bekwarra"
+  },
+  {
+    "name": "BIASE",
+    "senatorial_district": "Cross River South",
+    "house_of_representatives": "Akamkpa/Biase"
+  },
+  {
+    "name": "BOKI",
+    "senatorial_district": "Cross River North",
+    "house_of_representatives": "Boki/Ikom"
+  },
+  {
+    "name": "CALABAR MUNICIPALITY",
+    "senatorial_district": "Cross River South",
+    "house_of_representatives": "Calabar Municipal/Odukpani"
+  },
+  {
+    "name": "CALABAR SOUTH",
+    "senatorial_district": "Cross River South",
+    "house_of_representatives": "Akpabuyo/Bakassi/Calabar South"
+  },
+  {
+    "name": "ETUNG",
+    "senatorial_district": "Cross River Central",
+    "house_of_representatives": "Ikom/Etung"
+  },
+  {
+    "name": "IKOM",
+    "senatorial_district": "Cross River Central",
+    "house_of_representatives": "Boki/Ikom"
+  },
+  {
+    "name": "OBANLIKU",
+    "senatorial_district": "Cross River North",
+    "house_of_representatives": "Obudu/Obanliku/Bekwarra"
+  },
+  {
+    "name": "OBUBRA",
+    "senatorial_district": "Cross River Central",
+    "house_of_representatives": "Obubra/Etung"
+  },
+  {
+    "name": "OBUDU",
+    "senatorial_district": "Cross River North",
+    "house_of_representatives": "Obudu/Obanliku/Bekwarra"
+  },
+  {
+    "name": "ODUKPANI",
+    "senatorial_district": "Cross River South",
+    "house_of_representatives": "Calabar Municipal/Odukpani"
+  },
+  {
+    "name": "OGOJA",
+    "senatorial_district": "Cross River North",
+    "house_of_representatives": "Ogoja/Yala"
+  },
+  {
+    "name": "YAKURR",
+    "senatorial_district": "Cross River Central",
+    "house_of_representatives": "Abi/Yakurr"
+  },
+  {
+    "name": "YALA",
+    "senatorial_district": "Cross River North",
+    "house_of_representatives": "Ogoja/Yala"
+  },
+  {
+    "name": "ANIOCHA NORTH",
+    "senatorial_district": "Delta North",
+    "house_of_representatives": "Aniocha/Oshimili"
+  },
+  {
+    "name": "ANIOCHA SOUTH",
+    "senatorial_district": "Delta North",
+    "house_of_representatives": "Aniocha/Oshimili"
+  },
+  {
+    "name": "BOMADI",
+    "senatorial_district": "Delta South",
+    "house_of_representatives": "Bomadi/Patani"
+  },
+  {
+    "name": "BURUTU",
+    "senatorial_district": "Delta South",
+    "house_of_representatives": "Burutu"
+  },
+  {
+    "name": "ETHIOPE EAST",
+    "senatorial_district": "Delta Central",
+    "house_of_representatives": "Ethiope East/Ethiope West"
+  },
+  {
+    "name": "ETHIOPE WEST",
+    "senatorial_district": "Delta Central",
+    "house_of_representatives": "Ethiope East/Ethiope West"
+  },
+  {
+    "name": "IKA NORTH EAST",
+    "senatorial_district": "Delta North",
+    "house_of_representatives": "Ika North East/Ika South"
+  },
+  {
+    "name": "IKA SOUTH",
+    "senatorial_district": "Delta North",
+    "house_of_representatives": "Ika North East/Ika South"
+  },
+  {
+    "name": "ISOKO NORTH",
+    "senatorial_district": "Delta South",
+    "house_of_representatives": "Isoko North/Isoko South"
+  },
+  {
+    "name": "ISOKO SOUTH",
+    "senatorial_district": "Delta South",
+    "house_of_representatives": "Isoko North/Isoko South"
+  },
+  {
+    "name": "NDOKWA EAST",
+    "senatorial_district": "Delta North",
+    "house_of_representatives": "Ndokwa East/Ndokwa West/Ukwuani"
+  },
+  {
+    "name": "NDOKWA WEST",
+    "senatorial_district": "Delta North",
+    "house_of_representatives": "Ndokwa East/Ndokwa West/Ukwuani"
+  },
+  {
+    "name": "OKPE",
+    "senatorial_district": "Delta Central",
+    "house_of_representatives": "Okpe/Sapele/Uvwie"
+  },
+  {
+    "name": "OSHIMILI NORTH",
+    "senatorial_district": "Delta North",
+    "house_of_representatives": "Aniocha/Oshimili"
+  },
+  {
+    "name": "OSHIMILI SOUTH",
+    "senatorial_district": "Delta North",
+    "house_of_representatives": "Aniocha/Oshimili"
+  },
+  {
+    "name": "PATANI",
+    "senatorial_district": "Delta South",
+    "house_of_representatives": "Bomadi/Patani"
+  },
+  {
+    "name": "SAPELE",
+    "senatorial_district": "Delta Central",
+    "house_of_representatives": "Okpe/Sapele/Uvwie"
+  },
+  {
+    "name": "UDU",
+    "senatorial_district": "Delta Central",
+    "house_of_representatives": "Ughelli North/Ughelli South/Udu"
+  },
+  {
+    "name": "UGHELLI NORTH",
+    "senatorial_district": "Delta Central",
+    "house_of_representatives": "Ughelli North/Ughelli South/Udu"
+  },
+  {
+    "name": "UGHELLI SOUTH",
+    "senatorial_district": "Delta Central",
+    "house_of_representatives": "Ughelli North/Ughelli South/Udu"
+  },
+  {
+    "name": "UKWUANI",
+    "senatorial_district": "Delta North",
+    "house_of_representatives": "Ndokwa East/Ndokwa West/Ukwuani"
+  },
+  {
+    "name": "UVWIE",
+    "senatorial_district": "Delta Central",
+    "house_of_representatives": "Okpe/Sapele/Uvwie"
+  },
+  {
+    "name": "WARRI NORTH",
+    "senatorial_district": "Delta South",
+    "house_of_representatives": "Warri North/Warri South/Warri South West"
+  },
+  {
+    "name": "WARRI SOUTH",
+    "senatorial_district": "Delta South",
+    "house_of_representatives": "Warri North/Warri South/Warri South West"
+  },
+  {
+    "name": "WARRI SOUTH WEST",
+    "senatorial_district": "Delta South",
+    "house_of_representatives": "Warri North/Warri South/Warri South West"
+  },
+  {
+    "name": "ABAKALIKI",
+    "senatorial_district": "Ebonyi North",
+    "house_of_representatives": "Abakaliki/Izzi"
+  },
+  {
+    "name": "AFIKPO NORTH",
+    "senatorial_district": "Ebonyi South",
+    "house_of_representatives": "Afikpo North/Afikpo South"
+  },
+  {
+    "name": "AFIKPO SOUTH",
+    "senatorial_district": "Ebonyi South",
+    "house_of_representatives": "Afikpo North/Afikpo South"
+  },
+  {
+    "name": "EBONYI",
+    "senatorial_district": "Ebonyi Central",
+    "house_of_representatives": "Ezza North/Ishielu"
+  },
+  {
+    "name": "EZZA NORTH",
+    "senatorial_district": "Ebonyi Central",
+    "house_of_representatives": "Ezza North/Ishielu"
+  },
+  {
+    "name": "EZZA SOUTH",
+    "senatorial_district": "Ebonyi Central",
+    "house_of_representatives": "Ezza South/Ikwo"
+  },
+  {
+    "name": "IKWO",
+    "senatorial_district": "Ebonyi Central",
+    "house_of_representatives": "Ezza South/Ikwo"
+  },
+  {
+    "name": "ISHIELU",
+    "senatorial_district": "Ebonyi Central",
+    "house_of_representatives": "Ezza North/Ishielu"
+  },
+  {
+    "name": "IVO",
+    "senatorial_district": "Ebonyi South",
+    "house_of_representatives": "Ohaozara/Ivo"
+  },
+  {
+    "name": "IZZI",
+    "senatorial_district": "Ebonyi North",
+    "house_of_representatives": "Abakaliki/Izzi"
+  },
+  {
+    "name": "OHAOZARA",
+    "senatorial_district": "Ebonyi South",
+    "house_of_representatives": "Ohaozara/Ivo"
+  },
+  {
+    "name": "OHAUKWU",
+    "senatorial_district": "Ebonyi North",
+    "house_of_representatives": "Ohaukwu/Ebonyi"
+  },
+  {
+    "name": "ONICHA",
+    "senatorial_district": "Ebonyi South",
+    "house_of_representatives": "Ohaozara/Onicha/Ivo"
+  },
+  {
+    "name": "AKOKO EDO",
+    "senatorial_district": "Edo North",
+    "house_of_representatives": "Akoko-Edo"
+  },
+  {
+    "name": "EGOR",
+    "senatorial_district": "Edo South",
+    "house_of_representatives": "Egor/Ikpoba-Okha"
+  },
+  {
+    "name": "ESAN CENTRAL",
+    "senatorial_district": "Edo Central",
+    "house_of_representatives": "Esan Central/Esan West/Igueben"
+  },
+  {
+    "name": "ESAN NORTH EAST",
+    "senatorial_district": "Edo Central",
+    "house_of_representatives": "Esan North East/Esan South East"
+  },
+  {
+    "name": "ESAN SOUTH EAST",
+    "senatorial_district": "Edo Central",
+    "house_of_representatives": "Esan North East/Esan South East"
+  },
+  {
+    "name": "ESAN WEST",
+    "senatorial_district": "Edo Central",
+    "house_of_representatives": "Esan Central/Esan West/Igueben"
+  },
+  {
+    "name": "ETSAKO CENTRAL",
+    "senatorial_district": "Edo North",
+    "house_of_representatives": "Etsako East/Etsako West/Etsako Central"
+  },
+  {
+    "name": "ETSAKO EAST",
+    "senatorial_district": "Edo North",
+    "house_of_representatives": "Etsako East/Etsako West/Etsako Central"
+  },
+  {
+    "name": "ETSAKO WEST",
+    "senatorial_district": "Edo North",
+    "house_of_representatives": "Etsako East/Etsako West/Etsako Central"
+  },
+  {
+    "name": "IGUEBEN",
+    "senatorial_district": "Edo Central",
+    "house_of_representatives": "Esan Central/Esan West/Igueben"
+  },
+  {
+    "name": "IKPOBA/OKHA",
+    "senatorial_district": "Edo South",
+    "house_of_representatives": "Egor/Ikpoba-Okha"
+  },
+  {
+    "name": "OREDO",
+    "senatorial_district": "Edo South",
+    "house_of_representatives": "Oredo"
+  },
+  {
+    "name": "ORHIONMWON",
+    "senatorial_district": "Edo South",
+    "house_of_representatives": "Orhionmwon/Uhunmwonde"
+  },
+  {
+    "name": "OVIA NORTH EAST",
+    "senatorial_district": "Edo South",
+    "house_of_representatives": "Ovia North East/Ovia South West"
+  },
+  {
+    "name": "OVIA SOUTH WEST",
+    "senatorial_district": "Edo South",
+    "house_of_representatives": "Ovia North East/Ovia South West"
+  },
+  {
+    "name": "OWAN EAST",
+    "senatorial_district": "Edo North",
+    "house_of_representatives": "Owan East/Owan West"
+  },
+  {
+    "name": "OWAN WEST",
+    "senatorial_district": "Edo North",
+    "house_of_representatives": "Owan East/Owan West"
+  },
+  {
+    "name": "UHUNMWODE",
+    "senatorial_district": "Edo South",
+    "house_of_representatives": "Orhionmwon/Uhunmwonde"
+  },
+  {
+    "name": "ADO EKITI",
+    "senatorial_district": "Ekiti Central",
+    "house_of_representatives": "Ado Ekiti/Ifelodun/Irepodun"
+  },
+  {
+    "name": "EFON",
+    "senatorial_district": "Ekiti Central",
+    "house_of_representatives": "Efon/Ijero/Ekiti West"
+  },
+  {
+    "name": "EKITI EAST",
+    "senatorial_district": "Ekiti South",
+    "house_of_representatives": "Ekiti East/Gbonyin/Emure"
+  },
+  {
+    "name": "EKITI WEST",
+    "senatorial_district": "Ekiti Central",
+    "house_of_representatives": "Efon/Ijero/Ekiti West"
+  },
+  {
+    "name": "EKITI SOUTH WEST",
+    "senatorial_district": "Ekiti South",
+    "house_of_representatives": "Ekiti South West/Ikere/Ise-Orun"
+  },
+  {
+    "name": "EMURE",
+    "senatorial_district": "Ekiti South",
+    "house_of_representatives": "Ekiti East/Gbonyin/Emure"
+  },
+  {
+    "name": "GBONYIN",
+    "senatorial_district": "Ekiti South",
+    "house_of_representatives": "Ekiti East/Gbonyin/Emure"
+  },
+  {
+    "name": "IDO / OSI",
+    "senatorial_district": "Ekiti North",
+    "house_of_representatives": "Ido-Osi/Ilejemeje/Moba"
+  },
+  {
+    "name": "IJERO",
+    "senatorial_district": "Ekiti Central",
+    "house_of_representatives": "Efon/Ijero/Ekiti West"
+  },
+  {
+    "name": "IKERE",
+    "senatorial_district": "Ekiti South",
+    "house_of_representatives": "Ekiti South West/Ikere/Ise-Orun"
+  },
+  {
+    "name": "IKOLE",
+    "senatorial_district": "Ekiti North",
+    "house_of_representatives": "Ikole/Oye"
+  },
+  {
+    "name": "ILEJEMEJE",
+    "senatorial_district": "Ekiti North",
+    "house_of_representatives": "Ido-Osi/Ilejemeje/Moba"
+  },
+  {
+    "name": "IREPODUN / IFELODUN",
+    "senatorial_district": "Ekiti Central",
+    "house_of_representatives": "Ado Ekiti/Ifelodun/Irepodun"
+  },
+  {
+    "name": "ISE / ORUN",
+    "senatorial_district": "Ekiti South",
+    "house_of_representatives": "Ekiti South West/Ikere/Ise-Orun"
+  },
+  {
+    "name": "MOBA",
+    "senatorial_district": "Ekiti North",
+    "house_of_representatives": "Ido-Osi/Ilejemeje/Moba"
+  },
+  {
+    "name": "OYE",
+    "senatorial_district": "Ekiti North",
+    "house_of_representatives": "Ikole/Oye"
+  },
+  {
+    "name": "ANINRI",
+    "senatorial_district": "Enugu West",
+    "house_of_representatives": "Aninri/Awgu/Oji River"
+  },
+  {
+    "name": "AWGU",
+    "senatorial_district": "Enugu West",
+    "house_of_representatives": "Aninri/Awgu/Oji River"
+  },
+  {
+    "name": "ENUGU EAST",
+    "senatorial_district": "Enugu East",
+    "house_of_representatives": "Enugu North/Enugu South/Enugu East"
+  },
+  {
+    "name": "ENUGU NORTH",
+    "senatorial_district": "Enugu East",
+    "house_of_representatives": "Enugu North/Enugu South/Enugu East"
+  },
+  {
+    "name": "ENUGU SOUTH",
+    "senatorial_district": "Enugu East",
+    "house_of_representatives": "Enugu North/Enugu South/Enugu East"
+  },
+  {
+    "name": "EZEAGU",
+    "senatorial_district": "Enugu West",
+    "house_of_representatives": "Udi/Ezeagu"
+  },
+  {
+    "name": "IGBO ETITI",
+    "senatorial_district": "Enugu North",
+    "house_of_representatives": "Igbo-Etiti/Uzo-Uwani"
+  },
+  {
+    "name": "IGBO EZE NORTH",
+    "senatorial_district": "Enugu North",
+    "house_of_representatives": "Igbo-Eze North/Udenu"
+  },
+  {
+    "name": "IGBO EZE SOUTH",
+    "senatorial_district": "Enugu North",
+    "house_of_representatives": "Nsukka/Igbo-Eze South"
+  },
+  {
+    "name": "ISI UZO",
+    "senatorial_district": "Enugu East",
+    "house_of_representatives": "Enugu East/Isi-Uzo"
+  },
+  {
+    "name": "NKANU EAST",
+    "senatorial_district": "Enugu East",
+    "house_of_representatives": "Nkanu East/Nkanu West"
+  },
+  {
+    "name": "NKANU WEST",
+    "senatorial_district": "Enugu East",
+    "house_of_representatives": "Nkanu East/Nkanu West"
+  },
+  {
+    "name": "NSUKKA",
+    "senatorial_district": "Enugu North",
+    "house_of_representatives": "Nsukka/Igbo-Eze South"
+  },
+  {
+    "name": "OJI-RIVER",
+    "senatorial_district": "Enugu West",
+    "house_of_representatives": "Aninri/Awgu/Oji River"
+  },
+  {
+    "name": "UDENU",
+    "senatorial_district": "Enugu North",
+    "house_of_representatives": "Igbo-Eze North/Udenu"
+  },
+  {
+    "name": "UDI",
+    "senatorial_district": "Enugu West",
+    "house_of_representatives": "Udi/Ezeagu"
+  },
+  {
+    "name": "UZO-UWANI",
+    "senatorial_district": "Enugu North",
+    "house_of_representatives": "Igbo-Etiti/Uzo-Uwani"
+  },
+  {
+    "name": "AKKO",
+    "senatorial_district": "Gombe Central",
+    "house_of_representatives": "Akko"
+  },
+  {
+    "name": "BALANGA",
+    "senatorial_district": "Gombe South",
+    "house_of_representatives": "Balanga/Billiri"
+  },
+  {
+    "name": "BILLIRI",
+    "senatorial_district": "Gombe South",
+    "house_of_representatives": "Balanga/Billiri"
+  },
+  {
+    "name": "DUKKU",
+    "senatorial_district": "Gombe North",
+    "house_of_representatives": "Dukku/Nafada"
+  },
+  {
+    "name": "FUNAKAYE",
+    "senatorial_district": "Gombe North",
+    "house_of_representatives": "Gombe/Kwami/Funakaye"
+  },
+  {
+    "name": "GOMBE",
+    "senatorial_district": "Gombe North",
+    "house_of_representatives": "Gombe/Kwami/Funakaye"
+  },
+  {
+    "name": "KALTUNGO",
+    "senatorial_district": "Gombe South",
+    "house_of_representatives": "Shongom/Kaltungo"
+  },
+  {
+    "name": "KWAMI",
+    "senatorial_district": "Gombe North",
+    "house_of_representatives": "Gombe/Kwami/Funakaye"
+  },
+  {
+    "name": "NAFADA",
+    "senatorial_district": "Gombe North",
+    "house_of_representatives": "Dukku/Nafada"
+  },
+  {
+    "name": "SHONGOM",
+    "senatorial_district": "Gombe South",
+    "house_of_representatives": "Shongom/Kaltungo"
+  },
+  {
+    "name": "YALMALTU/DEBA",
+    "senatorial_district": "Gombe Central",
+    "house_of_representatives": "Yalmaltu/Deba"
+  },
+  {
+    "name": "ABOH MBAISE",
+    "senatorial_district": "Imo East",
+    "house_of_representatives": "Aboh Mbaise/Ngor Okpala"
+  },
+  {
+    "name": "AHIAZU MBAISE",
+    "senatorial_district": "Imo East",
+    "house_of_representatives": "Ahiazu/Ezinihitte"
+  },
+  {
+    "name": "EHIME MBANO",
+    "senatorial_district": "Imo North",
+    "house_of_representatives": "Okigwe North (Ehime Mbano/Onuimo/Isiala Mbano)"
+  },
+  {
+    "name": "EZINIHITTE MBAISE",
+    "senatorial_district": "Imo East",
+    "house_of_representatives": "Ahiazu/Ezinihitte"
+  },
+  {
+    "name": "IDEATO NORTH",
+    "senatorial_district": "Imo West",
+    "house_of_representatives": "Ideato North/Ideato South"
+  },
+  {
+    "name": "IDEATO SOUTH",
+    "senatorial_district": "Imo West",
+    "house_of_representatives": "Ideato North/Ideato South"
+  },
+  {
+    "name": "IHITTE/UBOMA",
+    "senatorial_district": "Imo North",
+    "house_of_representatives": "Okigwe South (Ihitte Uboma/Obowo/Ehime Mbano)"
+  },
+  {
+    "name": "IKEDURU",
+    "senatorial_district": "Imo East",
+    "house_of_representatives": "Mbaitoli/Ikeduru"
+  },
+  {
+    "name": "ISIALA MBANO",
+    "senatorial_district": "Imo North",
+    "house_of_representatives": "Okigwe North (Ehime Mbano/Onuimo/Isiala Mbano)"
+  },
+  {
+    "name": "ISU",
+    "senatorial_district": "Imo West",
+    "house_of_representatives": "Nkwere/Isu/Njaba/Nwangele"
+  },
+  {
+    "name": "MBAITOLI",
+    "senatorial_district": "Imo East",
+    "house_of_representatives": "Mbaitoli/Ikeduru"
+  },
+  {
+    "name": "NGOR OKPALA",
+    "senatorial_district": "Imo East",
+    "house_of_representatives": "Aboh Mbaise/Ngor Okpala"
+  },
+  {
+    "name": "NJABA",
+    "senatorial_district": "Imo West",
+    "house_of_representatives": "Nkwere/Isu/Njaba/Nwangele"
+  },
+  {
+    "name": "NKWERRE",
+    "senatorial_district": "Imo West",
+    "house_of_representatives": "Nkwere/Isu/Njaba/Nwangele"
+  },
+  {
+    "name": "NWANGELE",
+    "senatorial_district": "Imo West",
+    "house_of_representatives": "Nkwere/Isu/Njaba/Nwangele"
+  },
+  {
+    "name": "OBOWO",
+    "senatorial_district": "Imo North",
+    "house_of_representatives": "Okigwe South (Ihitte Uboma/Obowo/Ehime Mbano)"
+  },
+  {
+    "name": "OGUTA",
+    "senatorial_district": "Imo West",
+    "house_of_representatives": "Ohaji Egbema/Oguta/Oru West"
+  },
+  {
+    "name": "OHAJI/EGBEMA",
+    "senatorial_district": "Imo West",
+    "house_of_representatives": "Ohaji Egbema/Oguta/Oru West"
+  },
+  {
+    "name": "OKIGWE",
+    "senatorial_district": "Imo North",
+    "house_of_representatives": "Okigwe South (Ihitte Uboma/Obowo/Ehime Mbano)"
+  },
+  {
+    "name": "ONUIMO",
+    "senatorial_district": "Imo North",
+    "house_of_representatives": "Okigwe North (Ehime Mbano/Onuimo/Isiala Mbano)"
+  },
+  {
+    "name": "ORLU",
+    "senatorial_district": "Imo West",
+    "house_of_representatives": "Orlu/Orsu/Oru East"
+  },
+  {
+    "name": "ORSU",
+    "senatorial_district": "Imo West",
+    "house_of_representatives": "Orlu/Orsu/Oru East"
+  },
+  {
+    "name": "ORU EAST",
+    "senatorial_district": "Imo West",
+    "house_of_representatives": "Orlu/Orsu/Oru East"
+  },
+  {
+    "name": "ORU WEST",
+    "senatorial_district": "Imo West",
+    "house_of_representatives": "Ohaji Egbema/Oguta/Oru West"
+  },
+  {
+    "name": "OWERRI MUNICIPAL",
+    "senatorial_district": "Imo East",
+    "house_of_representatives": "Owerri Municipal/North/West"
+  },
+  {
+    "name": "OWERRI NORTH",
+    "senatorial_district": "Imo East",
+    "house_of_representatives": "Owerri Municipal/North/West"
+  },
+  {
+    "name": "OWERRI WEST",
+    "senatorial_district": "Imo East",
+    "house_of_representatives": "Owerri Municipal/North/West"
+  },
+  {
+    "name": "AUYO",
+    "senatorial_district": "Jigawa North East",
+    "house_of_representatives": "Hadejia/Kafin Hausa/Auyo"
+  },
+  {
+    "name": "BABURA",
+    "senatorial_district": "Jigawa North West",
+    "house_of_representatives": "Babura/Garki"
+  },
+  {
+    "name": "BIRNIN KUDU",
+    "senatorial_district": "Jigawa South West",
+    "house_of_representatives": "Birnin Kudu/Buji"
+  },
+  {
+    "name": "BIRNIWA",
+    "senatorial_district": "Jigawa North East",
+    "house_of_representatives": "Machina/Birniwa/Guri"
+  },
+  {
+    "name": "BUJI",
+    "senatorial_district": "Jigawa South West",
+    "house_of_representatives": "Birnin Kudu/Buji"
+  },
+  {
+    "name": "DUTSE",
+    "senatorial_district": "Jigawa Central",
+    "house_of_representatives": "Dutse/Kiyawa"
+  },
+  {
+    "name": "GARKI",
+    "senatorial_district": "Jigawa North West",
+    "house_of_representatives": "Babura/Garki"
+  },
+  {
+    "name": "GAGARAWA",
+    "senatorial_district": "Jigawa North East",
+    "house_of_representatives": "Gagarawa/Gumel/Maigatari/Sule Tankarkar"
+  },
+  {
+    "name": "GUMEL",
+    "senatorial_district": "Jigawa North West",
+    "house_of_representatives": "Gagarawa/Gumel/Maigatari/Sule Tankarkar"
+  },
+  {
+    "name": "GURI",
+    "senatorial_district": "Jigawa North East",
+    "house_of_representatives": "Machina/Birniwa/Guri"
+  },
+  {
+    "name": "GWARAM",
+    "senatorial_district": "Jigawa South West",
+    "house_of_representatives": "Gwaram"
+  },
+  {
+    "name": "GWIWA",
+    "senatorial_district": "Jigawa North West",
+    "house_of_representatives": "Kazaure/Roni/Gwiwa/Yankwashi"
+  },
+  {
+    "name": "HADEJIA",
+    "senatorial_district": "Jigawa North East",
+    "house_of_representatives": "Hadejia/Kafin Hausa/Auyo"
+  },
+  {
+    "name": "JAHUN",
+    "senatorial_district": "Jigawa South West",
+    "house_of_representatives": "Jahun/Miga"
+  },
+  {
+    "name": "KAFIN HAUSA",
+    "senatorial_district": "Jigawa North East",
+    "house_of_representatives": "Hadejia/Kafin Hausa/Auyo"
+  },
+  {
+    "name": "KAUGAMA",
+    "senatorial_district": "Jigawa North East",
+    "house_of_representatives": "Hadejia/Kafin Hausa/Auyo"
+  },
+  {
+    "name": "KAZAURE",
+    "senatorial_district": "Jigawa North West",
+    "house_of_representatives": "Kazaure/Roni/Gwiwa/Yankwashi"
+  },
+  {
+    "name": "KIRIKA SAMMA",
+    "senatorial_district": "Jigawa North East",
+    "house_of_representatives": "Hadejia/Kafin Hausa/Auyo"
+  },
+  {
+    "name": "KIYAWA",
+    "senatorial_district": "Jigawa Central",
+    "house_of_representatives": "Dutse/Kiyawa"
+  },
+  {
+    "name": "MAIGATARI",
+    "senatorial_district": "Jigawa North West",
+    "house_of_representatives": "Gagarawa/Gumel/Maigatari/Sule Tankarkar"
+  },
+  {
+    "name": "MALAM MADORI",
+    "senatorial_district": "Jigawa North East",
+    "house_of_representatives": "Hadejia/Kafin Hausa/Auyo"
+  },
+  {
+    "name": "MIGA",
+    "senatorial_district": "Jigawa South West",
+    "house_of_representatives": "Jahun/Miga"
+  },
+  {
+    "name": "RINGIM",
+    "senatorial_district": "Jigawa Central",
+    "house_of_representatives": "Ringim/Taura"
+  },
+  {
+    "name": "RONI",
+    "senatorial_district": "Jigawa North West",
+    "house_of_representatives": "Kazaure/Roni/Gwiwa/Yankwashi"
+  },
+  {
+    "name": "SULE-TANKARKAR",
+    "senatorial_district": "Jigawa North West",
+    "house_of_representatives": "Gagarawa/Gumel/Maigatari/Sule Tankarkar"
+  },
+  {
+    "name": "TAURA",
+    "senatorial_district": "Jigawa Central",
+    "house_of_representatives": "Ringim/Taura"
+  },
+  {
+    "name": "YANKWASHI",
+    "senatorial_district": "Jigawa North West",
+    "house_of_representatives": "Kazaure/Roni/Gwiwa/Yankwashi"
+  },
+  {
+    "name": "BIRNIN GWARI",
+    "senatorial_district": "Kaduna North",
+    "house_of_representatives": "Birnin Gwari/Giwa"
+  },
+  {
+    "name": "CHIKUN",
+    "senatorial_district": "Kaduna Central",
+    "house_of_representatives": "Chikun/Kajuru"
+  },
+  {
+    "name": "GIWA",
+    "senatorial_district": "Kaduna North",
+    "house_of_representatives": "Birnin Gwari/Giwa"
+  },
+  {
+    "name": "IGABI",
+    "senatorial_district": "Kaduna Central",
+    "house_of_representatives": "Igabi"
+  },
+  {
+    "name": "IKARA",
+    "senatorial_district": "Kaduna North",
+    "house_of_representatives": "Ikara/Kubau"
+  },
+  {
+    "name": "JABA",
+    "senatorial_district": "Kaduna South",
+    "house_of_representatives": "Jaba/Zangon Kataf"
+  },
+  {
+    "name": "JEMA'A",
+    "senatorial_district": "Kaduna South",
+    "house_of_representatives": "Jema'a/Sanga"
+  },
+  {
+    "name": "KACHIA",
+    "senatorial_district": "Kaduna South",
+    "house_of_representatives": "Kachia/Kagarko"
+  },
+  {
+    "name": "KADUNA NORTH",
+    "senatorial_district": "Kaduna Central",
+    "house_of_representatives": "Kaduna North"
+  },
+  {
+    "name": "KADUNA SOUTH",
+    "senatorial_district": "Kaduna Central",
+    "house_of_representatives": "Kaduna South"
+  },
+  {
+    "name": "KAGARKO",
+    "senatorial_district": "Kaduna South",
+    "house_of_representatives": "Kachia/Kagarko"
+  },
+  {
+    "name": "KAJURU",
+    "senatorial_district": "Kaduna Central",
+    "house_of_representatives": "Chikun/Kajuru"
+  },
+  {
+    "name": "KAURA",
+    "senatorial_district": "Kaduna South",
+    "house_of_representatives": "Kaura"
+  },
+  {
+    "name": "KAURU",
+    "senatorial_district": "Kaduna North",
+    "house_of_representatives": "Kauru"
+  },
+  {
+    "name": "KUBAU",
+    "senatorial_district": "Kaduna North",
+    "house_of_representatives": "Ikara/Kubau"
+  },
+  {
+    "name": "KUDAN",
+    "senatorial_district": "Kaduna North",
+    "house_of_representatives": "Makarfi/Kudan"
+  },
+  {
+    "name": "LERE",
+    "senatorial_district": "Kaduna North",
+    "house_of_representatives": "Lere"
+  },
+  {
+    "name": "MAKARFI",
+    "senatorial_district": "Kaduna North",
+    "house_of_representatives": "Makarfi/Kudan"
+  },
+  {
+    "name": "SABON GARI",
+    "senatorial_district": "Kaduna North",
+    "house_of_representatives": "Sabon Gari"
+  },
+  {
+    "name": "SANGA",
+    "senatorial_district": "Kaduna South",
+    "house_of_representatives": "Jema'a/Sanga"
+  },
+  {
+    "name": "SOBA",
+    "senatorial_district": "Kaduna North",
+    "house_of_representatives": "Soba"
+  },
+  {
+    "name": "ZANGON KATAF",
+    "senatorial_district": "Kaduna South",
+    "house_of_representatives": "Jaba/Zangon Kataf"
+  },
+  {
+    "name": "ZARIA",
+    "senatorial_district": "Kaduna North",
+    "house_of_representatives": "Zaria"
+  },
+  {
+    "name": "AJINGI",
+    "senatorial_district": "Kano South",
+    "house_of_representatives": "Albasu/Ajingi/Gaya"
+  },
+  {
+    "name": "ALBASU",
+    "senatorial_district": "Kano South",
+    "house_of_representatives": "Albasu/Ajingi/Gaya"
+  },
+  {
+    "name": "BAGWAI",
+    "senatorial_district": "Kano North",
+    "house_of_representatives": "Bagwai/Shanono"
+  },
+  {
+    "name": "BEBEJI",
+    "senatorial_district": "Kano South",
+    "house_of_representatives": "Bebeji/Kiru"
+  },
+  {
+    "name": "BICHI",
+    "senatorial_district": "Kano North",
+    "house_of_representatives": "Bichi"
+  },
+  {
+    "name": "BUNKURE",
+    "senatorial_district": "Kano South",
+    "house_of_representatives": "Bunkure/Rano/Kibiya"
+  },
+  {
+    "name": "DALA",
+    "senatorial_district": "Kano Central",
+    "house_of_representatives": "Dala"
+  },
+  {
+    "name": "DANBATA",
+    "senatorial_district": "Kano North",
+    "house_of_representatives": "Dambatta/Makoda"
+  },
+  {
+    "name": "DAWAKI KUDU",
+    "senatorial_district": "Kano North",
+    "house_of_representatives": "Dawaki Kudu/Warawa"
+  },
+  {
+    "name": "DAWAKI TOFA",
+    "senatorial_district": "Kano North",
+    "house_of_representatives": "Dawaki Tofa/Tofa/Rimin Gado"
+  },
+  {
+    "name": "DOGUWA",
+    "senatorial_district": "Kano South",
+    "house_of_representatives": "Doguwa/Tudun Wada"
+  },
+  {
+    "name": "FAGGE",
+    "senatorial_district": "Kano Central",
+    "house_of_representatives": "Fagge"
+  },
+  {
+    "name": "GABASAWA",
+    "senatorial_district": "Kano North",
+    "house_of_representatives": "Gabasawa/Gezawa"
+  },
+  {
+    "name": "GARKO",
+    "senatorial_district": "Kano South",
+    "house_of_representatives": "Takai/Sumaila"
+  },
+  {
+    "name": "GARUN MALAM",
+    "senatorial_district": "Kano South",
+    "house_of_representatives": "Bunkure/Rano/Kibiya"
+  },
+  {
+    "name": "GAYA",
+    "senatorial_district": "Kano South",
+    "house_of_representatives": "Albasu/Ajingi/Gaya"
+  },
+  {
+    "name": "GEZAWA",
+    "senatorial_district": "Kano North",
+    "house_of_representatives": "Gabasawa/Gezawa"
+  },
+  {
+    "name": "GWALE",
+    "senatorial_district": "Kano Central",
+    "house_of_representatives": "Gwale"
+  },
+  {
+    "name": "GWARZO",
+    "senatorial_district": "Kano North",
+    "house_of_representatives": "Gwarzo/Kabo"
+  },
+  {
+    "name": "KABO",
+    "senatorial_district": "Kano North",
+    "house_of_representatives": "Gwarzo/Kabo"
+  },
+    {
+      "name": "KANO MUNICIPAL",
+      "senatorial_district": "Kano Central",
+      "house_of_representatives": "Kano Municipal"
+    },
+    {
+      "name": "KARAYE",
+      "senatorial_district": "Kano North",
+      "house_of_representatives": "Karaye/Rogo"
+    },
+    {
+      "name": "KIBIYA",
+      "senatorial_district": "Kano South",
+      "house_of_representatives": "Bunkure/Rano/Kibiya"
+    },
+    {
+      "name": "KIRU",
+      "senatorial_district": "Kano South",
+      "house_of_representatives": "Bebeji/Kiru"
+    },
+    {
+      "name": "KUMBOTSO",
+      "senatorial_district": "Kano Central",
+      "house_of_representatives": "Kumbotso"
+    },
+    {
+      "name": "KUNCHI",
+      "senatorial_district": "Kano North",
+      "house_of_representatives": "Dambatta/Makoda"
+    },
+    {
+      "name": "KURA",
+      "senatorial_district": "Kano South",
+      "house_of_representatives": "Garun Malam/Kura/Madobi"
+    },
+    {
+      "name": "MADOBI",
+      "senatorial_district": "Kano South",
+      "house_of_representatives": "Garun Malam/Kura/Madobi"
+    },
+    {
+      "name": "MAKODA",
+      "senatorial_district": "Kano North",
+      "house_of_representatives": "Dambatta/Makoda"
+    },
+    {
+      "name": "MINJIBIR",
+      "senatorial_district": "Kano North",
+      "house_of_representatives": "Minjibir/Ungogo"
+    },
+    {
+      "name": "NASARAWA",
+      "senatorial_district": "Kano Central",
+      "house_of_representatives": "Nasarawa"
+    },
+    {
+      "name": "RANO",
+      "senatorial_district": "Kano South",
+      "house_of_representatives": "Bunkure/Rano/Kibiya"
+    },
+    {
+      "name": "RIMIN GADO",
+      "senatorial_district": "Kano North",
+      "house_of_representatives": "Dawaki Tofa/Tofa/Rimin Gado"
+    },
+    {
+      "name": "ROGO",
+      "senatorial_district": "Kano North",
+      "house_of_representatives": "Karaye/Rogo"
+    },
+    {
+      "name": "SHANONO",
+      "senatorial_district": "Kano North",
+      "house_of_representatives": "Bagwai/Shanono"
+    },
+    {
+      "name": "SUMAILA",
+      "senatorial_district": "Kano South",
+      "house_of_representatives": "Takai/Sumaila"
+    },
+    {
+      "name": "TAKAI",
+      "senatorial_district": "Kano South",
+      "house_of_representatives": "Takai/Sumaila"
+    },
+    {
+      "name": "TARAUNI",
+      "senatorial_district": "Kano Central",
+      "house_of_representatives": "Tarauni"
+    },
+    {
+      "name": "TOFA",
+      "senatorial_district": "Kano North",
+      "house_of_representatives": "Dawaki Tofa/Tofa/Rimin Gado"
+    },
+    {
+      "name": "TSANYAWA",
+      "senatorial_district": "Kano North",
+      "house_of_representatives": "Kunchi/Tsanyawa"
+    },
+    {
+      "name": "TUDUN WADA",
+      "senatorial_district": "Kano South",
+      "house_of_representatives": "Doguwa/Tudun Wada"
+    },
+    {
+      "name": "UNGOGO",
+      "senatorial_district": "Kano Central",
+      "house_of_representatives": "Minjibir/Ungogo"
+    },
+    {
+      "name": "WARAWA",
+      "senatorial_district": "Kano North",
+      "house_of_representatives": "Dawaki Kudu/Warawa"
+    },
+    {
+      "name": "WUDIL",
+      "senatorial_district": "Kano South",
+      "house_of_representatives": "Wudil/Garko"
+    },
+    {
+      "name": "BAKORI",
+      "senatorial_district": "Katsina South",
+      "house_of_representatives": "Funtua/Dandume"
+    },
+    {
+      "name": "BATAGARAWA",
+      "senatorial_district": "Katsina Central",
+      "house_of_representatives": "Batagarawa/Rimi/Charanchi"
+    },
+    {
+      "name": "BATSARI",
+      "senatorial_district": "Katsina North",
+      "house_of_representatives": "Batsari/Dan Musa/Safana"
+    },
+    {
+      "name": "BAURE",
+      "senatorial_district": "Katsina North",
+      "house_of_representatives": "Zango/Baure"
+    },
+    {
+      "name": "BINDAWA",
+      "senatorial_district": "Katsina Central",
+      "house_of_representatives": "Bindawa/Mani"
+    },
+    {
+      "name": "CHARANCHI",
+      "senatorial_district": "Katsina Central",
+      "house_of_representatives": "Batagarawa/Rimi/Charanchi"
+    },
+    {
+      "name": "DANDUME",
+      "senatorial_district": "Katsina South",
+      "house_of_representatives": "Funtua/Dandume"
+    },
+    {
+      "name": "DANJA",
+      "senatorial_district": "Katsina South",
+      "house_of_representatives": "Danja/Kafur"
+    },
+    {
+      "name": "DAN MUSA",
+      "senatorial_district": "Katsina North",
+      "house_of_representatives": "Batsari/Dan Musa/Safana"
+    },
+    {
+      "name": "DAURA",
+      "senatorial_district": "Katsina North",
+      "house_of_representatives": "Daura/Mai'Adua/Sandamu"
+    },
+    {
+      "name": "DUTSI",
+      "senatorial_district": "Katsina North",
+      "house_of_representatives": "Dutsi/Mashi"
+    },
+    {
+      "name": "DUTSIN-MA",
+      "senatorial_district": "Katsina Central",
+      "house_of_representatives": "Dutsin-Ma/Kurfi"
+    },
+    {
+      "name": "FASKARI",
+      "senatorial_district": "Katsina South",
+      "house_of_representatives": "Faskari/Kankara/Sabuwa"
+    },
+    {
+      "name": "FUNTUA",
+      "senatorial_district": "Katsina South",
+      "house_of_representatives": "Funtua/Dandume"
+    },
+    {
+      "name": "INGAWA",
+      "senatorial_district": "Katsina North",
+      "house_of_representatives": "Ingawa/Kusada/Kankia"
+    },
+    {
+      "name": "JIBIA",
+      "senatorial_district": "Katsina North",
+      "house_of_representatives": "Jibia/Kaita"
+    },
+    {
+      "name": "KAFUR",
+      "senatorial_district": "Katsina South",
+      "house_of_representatives": "Danja/Kafur"
+    },
+    {
+      "name": "KAITA",
+      "senatorial_district": "Katsina North",
+      "house_of_representatives": "Jibia/Kaita"
+    },
+    {
+      "name": "KANKARA",
+      "senatorial_district": "Katsina South",
+      "house_of_representatives": "Faskari/Kankara/Sabuwa"
+    },
+    {
+      "name": "KANKIA",
+      "senatorial_district": "Katsina North",
+      "house_of_representatives": "Ingawa/Kusada/Kankia"
+    },
+    {
+      "name": "KATSINA",
+      "senatorial_district": "Katsina Central",
+      "house_of_representatives": "Katsina"
+    },
+    {
+      "name": "KURFI",
+      "senatorial_district": "Katsina Central",
+      "house_of_representatives": "Dutsin-Ma/Kurfi"
+    },
+    {
+      "name": "KUSADA",
+      "senatorial_district": "Katsina North",
+      "house_of_representatives": "Ingawa/Kusada/Kankia"
+    },
+    {
+      "name": "MAI'ADUA",
+      "senatorial_district": "Katsina North",
+      "house_of_representatives": "Daura/Mai'Adua/Sandamu"
+    },
+    {
+      "name": "MALUFASHI",
+      "senatorial_district": "Katsina South",
+      "house_of_representatives": "Malufashi/Kafur"
+    },
+    {
+      "name": "MANI",
+      "senatorial_district": "Katsina Central",
+      "house_of_representatives": "Bindawa/Mani"
+    },
+    {
+      "name": "MASHI",
+      "senatorial_district": "Katsina North",
+      "house_of_representatives": "Dutsi/Mashi"
+    },
+    {
+      "name": "MATAZU",
+      "senatorial_district": "Katsina Central",
+      "house_of_representatives": "Matazu/Musawa"
+    },
+    {
+      "name": "MUSAWA",
+      "senatorial_district": "Katsina Central",
+      "house_of_representatives": "Matazu/Musawa"
+    },
+    {
+      "name": "RIMI",
+      "senatorial_district": "Katsina Central",
+      "house_of_representatives": "Batagarawa/Rimi/Charanchi"
+    },
+    {
+      "name": "SABUWA",
+      "senatorial_district": "Katsina South",
+      "house_of_representatives": "Faskari/Kankara/Sabuwa"
+    },
+    {
+      "name": "SAFANA",
+      "senatorial_district": "Katsina North",
+      "house_of_representatives": "Batsari/Dan Musa/Safana"
+    },
+    {
+      "name": "SANDAMU",
+      "senatorial_district": "Katsina North",
+      "house_of_representatives": "Daura/Mai'Adua/Sandamu"
+    },
+    {
+      "name": "ZANGO",
+      "senatorial_district": "Katsina North",
+      "house_of_representatives": "Zango/Baure"
+    },
+      {
+        "name": "ALIERO",
+        "senatorial_district": "Kebbi Central",
+        "house_of_representatives": "Jega/Aliero/Gwandu"
+      },
+      {
+        "name": "AREWA",
+        "senatorial_district": "Kebbi North",
+        "house_of_representatives": "Arewa/Dandi"
+      },
+      {
+        "name": "ARGUNGU",
+        "senatorial_district": "Kebbi North",
+        "house_of_representatives": "Argungu/Augie"
+      },
+      {
+        "name": "AUGIE",
+        "senatorial_district": "Kebbi North",
+        "house_of_representatives": "Argungu/Augie"
+      },
+      {
+        "name": "BAGUDO",
+        "senatorial_district": "Kebbi South",
+        "house_of_representatives": "Bagudo/Suru"
+      },
+      {
+        "name": "BIRNIN KEBBI",
+        "senatorial_district": "Kebbi Central",
+        "house_of_representatives": "Birnin Kebbi/Kalgo/Bunza"
+      },
+      {
+        "name": "BUNZA",
+        "senatorial_district": "Kebbi Central",
+        "house_of_representatives": "Birnin Kebbi/Kalgo/Bunza"
+      },
+      {
+        "name": "DANDI",
+        "senatorial_district": "Kebbi North",
+        "house_of_representatives": "Arewa/Dandi"
+      },
+      {
+        "name": "FAKAI",
+        "senatorial_district": "Kebbi South",
+        "house_of_representatives": "Zuru/Fakai/Sakaba/Danko-Wasagu"
+      },
+      {
+        "name": "GWANDU",
+        "senatorial_district": "Kebbi Central",
+        "house_of_representatives": "Jega/Aliero/Gwandu"
+      },
+      {
+        "name": "JEGA",
+        "senatorial_district": "Kebbi Central",
+        "house_of_representatives": "Jega/Aliero/Gwandu"
+      },
+      {
+        "name": "KALGO",
+        "senatorial_district": "Kebbi Central",
+        "house_of_representatives": "Birnin Kebbi/Kalgo/Bunza"
+      },
+      {
+        "name": "KOKO/BESSE",
+        "senatorial_district": "Kebbi North",
+        "house_of_representatives": "Koko-Besse/Maiyama"
+      },
+      {
+        "name": "MAIYAMA",
+        "senatorial_district": "Kebbi North",
+        "house_of_representatives": "Koko-Besse/Maiyama"
+      },
+      {
+        "name": "NGASKI",
+        "senatorial_district": "Kebbi South",
+        "house_of_representatives": "Shanga/Yauri/Ngaski"
+      },
+      {
+        "name": "SAKABA",
+        "senatorial_district": "Kebbi South",
+        "house_of_representatives": "Zuru/Fakai/Sakaba/Danko-Wasagu"
+      },
+      {
+        "name": "SHANGA",
+        "senatorial_district": "Kebbi South",
+        "house_of_representatives": "Shanga/Yauri/Ngaski"
+      },
+      {
+        "name": "SURU",
+        "senatorial_district": "Kebbi South",
+        "house_of_representatives": "Bagudo/Suru"
+      },
+      {
+        "name": "WASAGU/DANKO",
+        "senatorial_district": "Kebbi South",
+        "house_of_representatives": "Zuru/Fakai/Sakaba/Danko-Wasagu"
+      },
+      {
+        "name": "YAURI",
+        "senatorial_district": "Kebbi South",
+        "house_of_representatives": "Shanga/Yauri/Ngaski"
+      },
+      {
+        "name": "ZURU",
+        "senatorial_district": "Kebbi South",
+        "house_of_representatives": "Zuru/Fakai/Sakaba/Danko-Wasagu"
+      },
+      {
+        "name": "ADAVI",
+        "senatorial_district": "Kogi Central",
+        "house_of_representatives": "Adavi/Okehi"
+      },
+      {
+        "name": "AJAOKUTA",
+        "senatorial_district": "Kogi East",
+        "house_of_representatives": "Ajaokuta"
+      },
+      {
+        "name": "ANKPA",
+        "senatorial_district": "Kogi East",
+        "house_of_representatives": "Ankpa/Olamaboro/Omala"
+      },
+      {
+        "name": "BASSA",
+        "senatorial_district": "Kogi East",
+        "house_of_representatives": "Dekina/Bassa"
+      },
+      {
+        "name": "DEKINA",
+        "senatorial_district": "Kogi East",
+        "house_of_representatives": "Dekina/Bassa"
+      },
+      {
+        "name": "IBAJI",
+        "senatorial_district": "Kogi East",
+        "house_of_representatives": "Idah/Igalamela/Odolu/Ibaji"
+      },
+      {
+        "name": "IDAH",
+        "senatorial_district": "Kogi East",
+        "house_of_representatives": "Idah/Igalamela/Odolu/Ibaji"
+      },
+      {
+        "name": "IGALAMELA/ODOLU",
+        "senatorial_district": "Kogi East",
+        "house_of_representatives": "Idah/Igalamela/Odolu/Ibaji"
+      },
+      {
+        "name": "IJUMU",
+        "senatorial_district": "Kogi West",
+        "house_of_representatives": "Kabba/Bunu/Ijumu"
+      },
+      {
+        "name": "KABBA/BUNU",
+        "senatorial_district": "Kogi West",
+        "house_of_representatives": "Kabba/Bunu/Ijumu"
+      },
+      {
+        "name": "KOGI",
+        "senatorial_district": "Kogi West",
+        "house_of_representatives": "Lokoja/Kogi"
+      },
+      {
+        "name": "LOKOJA",
+        "senatorial_district": "Kogi West",
+        "house_of_representatives": "Lokoja/Kogi"
+      },
+      {
+        "name": "MOPA MORO",
+        "senatorial_district": "Kogi West",
+        "house_of_representatives": "Yagba East/Yagba West/Mopa-Muro"
+      },
+      {
+        "name": "OFU",
+        "senatorial_district": "Kogi East",
+        "house_of_representatives": "Ankpa/Olamaboro/Omala"
+      },
+      {
+        "name": "OGORI MANGOGO",
+        "senatorial_district": "Kogi Central",
+        "house_of_representatives": "Okene/Ogori-Mangogo"
+      },
+      {
+        "name": "OKEHI",
+        "senatorial_district": "Kogi Central",
+        "house_of_representatives": "Adavi/Okehi"
+      },
+      {
+        "name": "OKENE",
+        "senatorial_district": "Kogi Central",
+        "house_of_representatives": "Okene/Ogori-Mangogo"
+      },
+      {
+        "name": "OLAMABORO",
+        "senatorial_district": "Kogi East",
+        "house_of_representatives": "Ankpa/Olamaboro/Omala"
+      },
+      {
+        "name": "OMALA",
+        "senatorial_district": "Kogi East",
+        "house_of_representatives": "Ankpa/Olamaboro/Omala"
+      },
+      {
+        "name": "YAGBA EAST",
+        "senatorial_district": "Kogi West",
+        "house_of_representatives": "Yagba East/Yagba West/Mopa-Muro"
+      },
+      {
+        "name": "YAGBA WEST",
+        "senatorial_district": "Kogi West",
+        "house_of_representatives": "Yagba East/Yagba West/Mopa-Muro"
+      },
+      {
+        "name": "ASA",
+        "senatorial_district": "Kwara South",
+        "house_of_representatives": "Ilorin West/Asa"
+      },
+      {
+        "name": "BARUTEN",
+        "senatorial_district": "Kwara North",
+        "house_of_representatives": "Baruten/Kaiama"
+      },
+      {
+        "name": "EDU",
+        "senatorial_district": "Kwara North",
+        "house_of_representatives": "Edu/Moro/Patigi"
+      },
+      {
+        "name": "EKITI",
+        "senatorial_district": "Kwara South",
+        "house_of_representatives": "Ekiti/Irepodun/Isin/Oke-Ero"
+      },
+      {
+        "name": "IFELODUN",
+        "senatorial_district": "Kwara South",
+        "house_of_representatives": "Ekiti/Irepodun/Isin/Oke-Ero"
+      },
+      {
+        "name": "ILORIN EAST",
+        "senatorial_district": "Kwara Central",
+        "house_of_representatives": "Ilorin East/South"
+      },
+      {
+        "name": "ILORIN SOUTH",
+        "senatorial_district": "Kwara Central",
+        "house_of_representatives": "Ilorin East/South"
+      },
+      {
+        "name": "ILORIN WEST",
+        "senatorial_district": "Kwara Central",
+        "house_of_representatives": "Ilorin West/Asa"
+      },
+      {
+        "name": "IREPODUN",
+        "senatorial_district": "Kwara South",
+        "house_of_representatives": "Ekiti/Irepodun/Isin/Oke-Ero"
+      },
+      {
+        "name": "ISIN",
+        "senatorial_district": "Kwara South",
+        "house_of_representatives": "Ekiti/Irepodun/Isin/Oke-Ero"
+      },
+      {
+        "name": "KAIAMA",
+        "senatorial_district": "Kwara North",
+        "house_of_representatives": "Baruten/Kaiama"
+      },
+      {
+        "name": "MORO",
+        "senatorial_district": "Kwara North",
+        "house_of_representatives": "Edu/Moro/Patigi"
+      },
+      {
+        "name": "OFFA",
+        "senatorial_district": "Kwara South",
+        "house_of_representatives": "Offa/Oyun/Ifelodun"
+      },
+      {
+        "name": "OKE ERO",
+        "senatorial_district": "Kwara South",
+        "house_of_representatives": "Ekiti/Irepodun/Isin/Oke-Ero"
+      },
+      {
+        "name": "OYUN",
+        "senatorial_district": "Kwara South",
+        "house_of_representatives": "Offa/Oyun/Ifelodun"
+      },
+      {
+        "name": "PATIGI",
+        "senatorial_district": "Kwara North",
+        "house_of_representatives": "Edu/Moro/Patigi"
+      },
+      {
+        "name": "AGEGE",
+        "senatorial_district": "Lagos West",
+        "house_of_representatives": "Agege"
+      },
+      {
+        "name": "AJEROMI/IFELODUN",
+        "senatorial_district": "Lagos West",
+        "house_of_representatives": "Ajeromi/Ifelodun"
+      },
+      {
+        "name": "ALIMOSHO",
+        "senatorial_district": "Lagos West",
+        "house_of_representatives": "Alimosho"
+      },
+      {
+        "name": "AMUWO-ODOFIN",
+        "senatorial_district": "Lagos West",
+        "house_of_representatives": "Amuwo-Odofin"
+      },
+      {
+        "name": "APAPA",
+        "senatorial_district": "Lagos Central",
+        "house_of_representatives": "Apapa"
+      },
+      {
+        "name": "BADAGRY",
+        "senatorial_district": "Lagos West",
+        "house_of_representatives": "Badagry"
+      },
+      {
+        "name": "EPE",
+        "senatorial_district": "Lagos East",
+        "house_of_representatives": "Epe"
+      },
+      {
+        "name": "ETI-OSA",
+        "senatorial_district": "Lagos Central",
+        "house_of_representatives": "Eti-Osa"
+      },
+      {
+        "name": "IBEJU-LEKKI",
+        "senatorial_district": "Lagos East",
+        "house_of_representatives": "Ibeju-Lekki"
+      },
+      {
+        "name": "IFAKO-IJAYE",
+        "senatorial_district": "Lagos West",
+        "house_of_representatives": "Ifako-Ijaye"
+      },
+        {
+          "name": "IKEJA",
+          "senatorial_district": "Lagos West",
+          "house_of_representatives": "Ikeja"
+        },
+        {
+          "name": "IKORODU",
+          "senatorial_district": "Lagos East",
+          "house_of_representatives": "Ikorodu"
+        },
+        {
+          "name": "KOSOFE",
+          "senatorial_district": "Lagos East",
+          "house_of_representatives": "Kosofe"
+        },
+        {
+          "name": "LAGOS ISLAND",
+          "senatorial_district": "Lagos Central",
+          "house_of_representatives": "Lagos Island I"
+        },
+        {
+          "name": "LAGOS MAINLAND",
+          "senatorial_district": "Lagos Central",
+          "house_of_representatives": "Lagos Mainland"
+        },
+        {
+          "name": "MUSHIN",
+          "senatorial_district": "Lagos West",
+          "house_of_representatives": "Mushin I"
+        },
+        {
+          "name": "OJO",
+          "senatorial_district": "Lagos West",
+          "house_of_representatives": "Ojo"
+        },
+        {
+          "name": "OSHODI-ISOLO",
+          "senatorial_district": "Lagos West",
+          "house_of_representatives": "Oshodi-Isolo I"
+        },
+        {
+          "name": "SOMOLU",
+          "senatorial_district": "Lagos East",
+          "house_of_representatives": "Somolu"
+        },
+        {
+          "name": "SURULERE",
+          "senatorial_district": "Lagos Central",
+          "house_of_representatives": "Surulere I"
+        },
+        {
+          "name": "AKWANGA",
+          "senatorial_district": "Nasarawa North",
+          "house_of_representatives": "Akwanga/Nasarawa Eggon/Wamba"
+        },
+        {
+          "name": "AWE",
+          "senatorial_district": "Nasarawa South",
+          "house_of_representatives": "Doma/Awe/Keana"
+        },
+        {
+          "name": "DOMA",
+          "senatorial_district": "Nasarawa South",
+          "house_of_representatives": "Doma/Awe/Keana"
+        },
+        {
+          "name": "KARU",
+          "senatorial_district": "Nasarawa West",
+          "house_of_representatives": "Keffi/Karu/Kokona"
+        },
+        {
+          "name": "KEANA",
+          "senatorial_district": "Nasarawa South",
+          "house_of_representatives": "Doma/Awe/Keana"
+        },
+        {
+          "name": "KEFFI",
+          "senatorial_district": "Nasarawa West",
+          "house_of_representatives": "Keffi/Karu/Kokona"
+        },
+        {
+          "name": "KOKONA",
+          "senatorial_district": "Nasarawa West",
+          "house_of_representatives": "Keffi/Karu/Kokona"
+        },
+        {
+          "name": "LAFIA",
+          "senatorial_district": "Nasarawa South",
+          "house_of_representatives": "Lafia/Obi"
+        },
+        {
+          "name": "NASARAWA EGGON",
+          "senatorial_district": "Nasarawa North",
+          "house_of_representatives": "Akwanga/Nasarawa Eggon/Wamba"
+        },
+        {
+          "name": "TOTO",
+          "senatorial_district": "Nasarawa West",
+          "house_of_representatives": "Nasarawa/Toto"
+        },
+        {
+          "name": "WAMBA",
+          "senatorial_district": "Nasarawa North",
+          "house_of_representatives": "Akwanga/Nasarawa Eggon/Wamba"
+        },
+        {
+          "name": "NASARAWA",
+          "senatorial_district": "Nasarawa West",
+          "house_of_representatives": "Nasarawa/Toto"
+        },
+        {
+          "name": "OBI",
+          "senatorial_district": "Nasarawa South",
+          "house_of_representatives": "Lafia/Obi"
+        },
+        {
+          "name": "AGAIE",
+          "senatorial_district": "Niger South",
+          "house_of_representatives": "Agaie/Lapai"
+        },
+        {
+          "name": "AGWARA",
+          "senatorial_district": "Niger North",
+          "house_of_representatives": "Borgu/Agwara"
+        },
+        {
+          "name": "BIDA",
+          "senatorial_district": "Niger South",
+          "house_of_representatives": "Bida/Katcha/Gbako"
+        },
+        {
+          "name": "BORGU",
+          "senatorial_district": "Niger North",
+          "house_of_representatives": "Borgu/Agwara"
+        },
+        {
+          "name": "BOSSO",
+          "senatorial_district": "Niger East",
+          "house_of_representatives": "Bosso/Paikoro"
+        },
+        {
+          "name": "CHANCHAGA",
+          "senatorial_district": "Niger East",
+          "house_of_representatives": "Chanchaga"
+        },
+        {
+          "name": "EDATTI",
+          "senatorial_district": "Niger South",
+          "house_of_representatives": "Lapai/Ebatti"
+        },
+        {
+          "name": "GBAKO",
+          "senatorial_district": "Niger South",
+          "house_of_representatives": "Bida/Katcha/Gbako"
+        },
+        {
+          "name": "GURARA",
+          "senatorial_district": "Niger East",
+          "house_of_representatives": "Suleja/Gurara/Tafa"
+        },
+        {
+          "name": "KATCHA",
+          "senatorial_district": "Niger South",
+          "house_of_representatives": "Bida/Katcha/Gbako"
+        },
+        {
+          "name": "KONTAGORA",
+          "senatorial_district": "Niger North",
+          "house_of_representatives": "Kontagora/Wushishi/Mariga/Mashegu"
+        },
+        {
+          "name": "LAPAI",
+          "senatorial_district": "Niger South",
+          "house_of_representatives": "Lapai/Ebatti"
+        },
+        {
+          "name": "LAVUN",
+          "senatorial_district": "Niger South",
+          "house_of_representatives": "Lavun/Mokwa/Edati"
+        },
+        {
+          "name": "MAGAMA",
+          "senatorial_district": "Niger North",
+          "house_of_representatives": "Rijau/Magama"
+        },
+        {
+          "name": "MARIGA",
+          "senatorial_district": "Niger North",
+          "house_of_representatives": "Kontagora/Wushishi/Mariga/Mashegu"
+        },
+        {
+          "name": "MASHEGU",
+          "senatorial_district": "Niger North",
+          "house_of_representatives": "Kontagora/Wushishi/Mariga/Mashegu"
+        },
+        {
+          "name": "MOKWA",
+          "senatorial_district": "Niger South",
+          "house_of_representatives": "Lavun/Mokwa/Edati"
+        },
+        {
+          "name": "MUNYA",
+          "senatorial_district": "Niger East",
+          "house_of_representatives": "Shiroro/Rafi/Munya"
+        },
+        {
+          "name": "PAIKORO",
+          "senatorial_district": "Niger East",
+          "house_of_representatives": "Bosso/Paikoro"
+        },
+        {
+          "name": "RAFI",
+          "senatorial_district": "Niger East",
+          "house_of_representatives": "Shiroro/Rafi/Munya"
+        },
+        {
+          "name": "RIJAU",
+          "senatorial_district": "Niger North",
+          "house_of_representatives": "Rijau/Magama"
+        },
+        {
+          "name": "SHIRORO",
+          "senatorial_district": "Niger East",
+          "house_of_representatives": "Shiroro/Rafi/Munya"
+        },
+        {
+          "name": "SULEJA",
+          "senatorial_district": "Niger East",
+          "house_of_representatives": "Suleja/Gurara/Tafa"
+        },
+        {
+          "name": "TAFA",
+          "senatorial_district": "Niger East",
+          "house_of_representatives": "Suleja/Gurara/Tafa"
+        },
+        {
+          "name": "WUSHISHI",
+          "senatorial_district": "Niger North",
+          "house_of_representatives": "Kontagora/Wushishi/Mariga/Mashegu"
+        },
+        {
+          "name": "ABEOKUTA NORTH",
+          "senatorial_district": "Ogun Central",
+          "house_of_representatives": "Abeokuta North/Obafemi Owode/Odeda"
+        },
+        {
+          "name": "ABEOKUTA SOUTH",
+          "senatorial_district": "Ogun Central",
+          "house_of_representatives": "Abeokuta South"
+        },
+        {
+          "name": "ADO-ODO/OTA",
+          "senatorial_district": "Ogun West",
+          "house_of_representatives": "Ado-Odo/Ota"
+        },
+        {
+          "name": "EGBADO NORTH",
+          "senatorial_district": "Ogun West",
+          "house_of_representatives": "Yewa North/Imeko-Afon"
+        },
+        {
+          "name": "EGBADO SOUTH",
+          "senatorial_district": "Ogun West",
+          "house_of_representatives": "Yewa South/Ipokia"
+        },
+        {
+          "name": "EWEKORO",
+          "senatorial_district": "Ogun Central",
+          "house_of_representatives": "Ifo/Ewekoro"
+        },
+        {
+          "name": "IFO",
+          "senatorial_district": "Ogun Central",
+          "house_of_representatives": "Ifo/Ewekoro"
+        },
+        {
+          "name": "IJEBU EAST",
+          "senatorial_district": "Ogun East",
+          "house_of_representatives": "Ijebu North East/Ijebu East/Ogun Waterside"
+        },
+        {
+          "name": "IJEBU NORTH",
+          "senatorial_district": "Ogun East",
+          "house_of_representatives": "Ijebu North/Ijebu North East/Ogun Waterside"
+        },
+        {
+          "name": "IJEBU NORTH EAST",
+          "senatorial_district": "Ogun East",
+          "house_of_representatives": "Ijebu North East/Ijebu East/Ogun Waterside"
+        },
+        {
+          "name": "IJEBU ODE",
+          "senatorial_district": "Ogun East",
+          "house_of_representatives": "Ijebu Ode/Odogbolu/Ijebu North East"
+        },
+        {
+          "name": "IKENNE",
+          "senatorial_district": "Ogun East",
+          "house_of_representatives": "Remo North/Sagamu/Ikene"
+        },
+        {
+          "name": "IMEKO/AFON",
+          "senatorial_district": "Ogun West",
+          "house_of_representatives": "Yewa North/Imeko-Afon"
+        },
+        {
+          "name": "IPOKIA",
+          "senatorial_district": "Ogun West",
+          "house_of_representatives": "Yewa South/Ipokia"
+        },
+        {
+          "name": "OBAFEMI/OWODE",
+          "senatorial_district": "Ogun Central",
+          "house_of_representatives": "Abeokuta North/Obafemi Owode/Odeda"
+        },
+        {
+          "name": "ODEDA",
+          "senatorial_district": "Ogun Central",
+          "house_of_representatives": "Abeokuta North/Obafemi Owode/Odeda"
+        },
+        {
+          "name": "ODOGBOLU",
+          "senatorial_district": "Ogun East",
+          "house_of_representatives": "Ijebu Ode/Odogbolu/Ijebu North East"
+        },
+        {
+          "name": "OGUN WATERSIDE",
+          "senatorial_district": "Ogun East",
+          "house_of_representatives": "Ijebu North East/Ijebu East/Ogun Waterside"
+        },
+        {
+          "name": "REMO NORTH",
+          "senatorial_district": "Ogun East",
+          "house_of_representatives": "Remo North/Sagamu/Ikene"
+        },
+        {
+          "name": "SAGAMU",
+          "senatorial_district": "Ogun East",
+          "house_of_representatives": "Remo North/Sagamu/Ikene"
+        },
+  {
+    "name": "AKOKO NORTH EAST",
+    "senatorial_district": "Ondo North",
+    "house_of_representatives": "Akoko North East/Akoko North West"
+  },
+  {
+    "name": "AKOKO NORTH WEST",
+    "senatorial_district": "Ondo North",
+    "house_of_representatives": "Akoko North East/Akoko North West"
+  },
+  {
+    "name": "AKOKO SOUTH EAST",
+    "senatorial_district": "Ondo North",
+    "house_of_representatives": "Akoko South East/Akoko South West"
+  },
+  {
+    "name": "AKOKO SOUTH WEST",
+    "senatorial_district": "Ondo North",
+    "house_of_representatives": "Akoko South East/Akoko South West"
+  },
+  {
+    "name": "AKURE NORTH",
+    "senatorial_district": "Ondo Central",
+    "house_of_representatives": "Akure North/Akure South"
+  },
+  {
+    "name": "AKURE SOUTH",
+    "senatorial_district": "Ondo Central",
+    "house_of_representatives": "Akure North/Akure South"
+  },
+  {
+    "name": "ESE-ODO",
+    "senatorial_district": "Ondo South",
+    "house_of_representatives": "Ilaje/Ese-Odo"
+  },
+  {
+    "name": "IDANRE",
+    "senatorial_district": "Ondo Central",
+    "house_of_representatives": "Idanre/Ifedore"
+  },
+  {
+    "name": "IFEDORE",
+    "senatorial_district": "Ondo Central",
+    "house_of_representatives": "Idanre/Ifedore"
+  },
+  {
+    "name": "ILAJE",
+    "senatorial_district": "Ondo South",
+    "house_of_representatives": "Ilaje/Ese-Odo"
+  },
+  {
+    "name": "ILEOLUJI/OKEIGBO",
+    "senatorial_district": "Ondo South",
+    "house_of_representatives": "Ileoluji/Okeigbo/Odigbo"
+  },
+  {
+    "name": "IRELE",
+    "senatorial_district": "Ondo South",
+    "house_of_representatives": "Okitipupa/Irele"
+  },
+  {
+    "name": "ODIGBO",
+    "senatorial_district": "Ondo South",
+    "house_of_representatives": "Ileoluji/Okeigbo/Odigbo"
+  },
+  {
+    "name": "OKITIPUPA",
+    "senatorial_district": "Ondo South",
+    "house_of_representatives": "Okitipupa/Irele"
+  },
+  {
+    "name": "ONDO EAST",
+    "senatorial_district": "Ondo Central",
+    "house_of_representatives": "Ondo East/Ondo West"
+  },
+  {
+    "name": "ONDO WEST",
+    "senatorial_district": "Ondo Central",
+    "house_of_representatives": "Ondo East/Ondo West"
+  },
+  {
+    "name": "OSE",
+    "senatorial_district": "Ondo North",
+    "house_of_representatives": "Owo/Ose"
+  },
+  {
+    "name": "OWO",
+    "senatorial_district": "Ondo North",
+    "house_of_representatives": "Owo/Ose"
+  },
+  {
+    "name": "ATAKUMOSA EAST",
+    "senatorial_district": "Osun East",
+    "house_of_representatives": "Ijesa South"
+  },
+  {
+    "name": "ATAKUMOSA WEST",
+    "senatorial_district": "Osun East",
+    "house_of_representatives": "Ijesa South"
+  },
+  {
+    "name": "AYEDAADE",
+    "senatorial_district": "Osun West",
+    "house_of_representatives": "Irewole/Ayedire/Isokan"
+  },
+  {
+    "name": "AYEDIRE",
+    "senatorial_district": "Osun West",
+    "house_of_representatives": "Irewole/Ayedire/Isokan"
+  },
+  {
+    "name": "BOLUWADURO",
+    "senatorial_district": "Osun Central",
+    "house_of_representatives": "Ifedayo/Boluwaduro/Ila"
+  },
+  {
+    "name": "BORIPE",
+    "senatorial_district": "Osun Central",
+    "house_of_representatives": "Boripe/Ifelodun/Odo-Otin"
+  },
+  {
+    "name": "EDE NORTH",
+    "senatorial_district": "Osun West",
+    "house_of_representatives": "Ede North/Ede South/Egbedore/Ejigbo"
+  },
+  {
+    "name": "EDE SOUTH",
+    "senatorial_district": "Osun West",
+    "house_of_representatives": "Ede North/Ede South/Egbedore/Ejigbo"
+  },
+  {
+    "name": "EGBEDORE",
+    "senatorial_district": "Osun West",
+    "house_of_representatives": "Ede North/Ede South/Egbedore/Ejigbo"
+  },
+  {
+    "name": "EJIGBO",
+    "senatorial_district": "Osun West",
+    "house_of_representatives": "Ede North/Ede South/Egbedore/Ejigbo"
+  },
+  {
+    "name": "IFE CENTRAL",
+    "senatorial_district": "Osun East",
+    "house_of_representatives": "Ife Central/Ife East/Ife North/Ife South"
+  },
+  {
+    "name": "IFE EAST",
+    "senatorial_district": "Osun East",
+    "house_of_representatives": "Ife Central/Ife East/Ife North/Ife South"
+  },
+  {
+    "name": "IFE NORTH",
+    "senatorial_district": "Osun East",
+    "house_of_representatives": "Ife Central/Ife East/Ife North/Ife South"
+  },
+  {
+    "name": "IFE SOUTH",
+    "senatorial_district": "Osun East",
+    "house_of_representatives": "Ife Central/Ife East/Ife North/Ife South"
+  },
+  {
+    "name": "ILA",
+    "senatorial_district": "Osun Central",
+    "house_of_representatives": "Ifedayo/Boluwaduro/Ila"
+  },
+  {
+    "name": "ILESA EAST",
+    "senatorial_district": "Osun East",
+    "house_of_representatives": "Ijesa North"
+  },
+  {
+    "name": "ILESA WEST",
+    "senatorial_district": "Osun East",
+    "house_of_representatives": "Ijesa North"
+  },
+  {
+    "name": "IREWOLE",
+    "senatorial_district": "Osun West",
+    "house_of_representatives": "Irewole/Ayedire/Isokan"
+  },
+  {
+    "name": "ISOKAN",
+    "senatorial_district": "Osun West",
+    "house_of_representatives": "Irewole/Ayedire/Isokan"
+  },
+  {
+    "name": "IWO",
+    "senatorial_district": "Osun West",
+    "house_of_representatives": "Iwo/Ola-Oluwa/Ayedire"
+  },
+  {
+    "name": "OBOKUN",
+    "senatorial_district": "Osun East",
+    "house_of_representatives": "Ijesa South"
+  },
+  {
+    "name": "ODO-OTIN",
+    "senatorial_district": "Osun Central",
+    "house_of_representatives": "Boripe/Ifelodun/Odo-Otin"
+  },
+  {
+    "name": "OLA-OLUWA",
+    "senatorial_district": "Osun West",
+    "house_of_representatives": "Iwo/Ola-Oluwa/Ayedire"
+  },
+  {
+    "name": "OLORUNDA",
+    "senatorial_district": "Osun Central",
+    "house_of_representatives": "Osogbo/Olorunda/Irepodun/Orolu"
+  },
+  {
+    "name": "ORIADE",
+    "senatorial_district": "Osun East",
+    "house_of_representatives": "Ijesa North"
+  },
+  {
+    "name": "OROLU",
+    "senatorial_district": "Osun Central",
+    "house_of_representatives": "Osogbo/Olorunda/Irepodun/Orolu"
+  },
+  {
+    "name": "OSOGBO",
+    "senatorial_district": "Osun Central",
+    "house_of_representatives": "Osogbo/Olorunda/Irepodun/Orolu"
+  },
+  {
+    "name": "AFIJIO",
+    "senatorial_district": "Oyo Central",
+    "house_of_representatives": "Afijio/Atiba/Oyo East/Oyo West"
+  },
+  {
+    "name": "AKINYELE",
+    "senatorial_district": "Oyo North",
+    "house_of_representatives": "Lagelu/Akinyele"
+  },
+  {
+    "name": "ATIBA",
+    "senatorial_district": "Oyo Central",
+    "house_of_representatives": "Afijio/Atiba/Oyo East/Oyo West"
+  },
+  {
+    "name": "ATISBO",
+    "senatorial_district": "Oyo North",
+    "house_of_representatives": "Saki East/Saki West/Atisbo"
+  },
+  {
+    "name": "EGBEDA",
+    "senatorial_district": "Oyo Central",
+    "house_of_representatives": "Egbeda/Ona-Ara"
+  },
+  {
+    "name": "IBADAN NORTH",
+    "senatorial_district": "Oyo South",
+    "house_of_representatives": "Ibadan North"
+  },
+  {
+    "name": "IBADAN NORTH EAST",
+    "senatorial_district": "Oyo South",
+    "house_of_representatives": "Ibadan North East/Ibadan South East"
+  },
+  {
+    "name": "IBADAN NORTH WEST",
+    "senatorial_district": "Oyo South",
+    "house_of_representatives": "Ibadan North West/Ibadan South West"
+  },
+  {
+    "name": "IBADAN SOUTH EAST",
+    "senatorial_district": "Oyo South",
+    "house_of_representatives": "Ibadan North East/Ibadan South East"
+  },
+  {
+    "name": "IBADAN SOUTH WEST",
+    "senatorial_district": "Oyo South",
+    "house_of_representatives": "Ibadan North West/Ibadan South West"
+  },
+  {
+    "name": "IBARAPA CENTRAL",
+    "senatorial_district": "Oyo South",
+    "house_of_representatives": "Ibarapa Central/Ibarapa North"
+  },
+  {
+    "name": "IBARAPA EAST",
+    "senatorial_district": "Oyo South",
+    "house_of_representatives": "Ibarapa East/Ido"
+  },
+  {
+    "name": "IBARAPA NORTH",
+    "senatorial_district": "Oyo South",
+    "house_of_representatives": "Ibarapa Central/Ibarapa North"
+  },
+  {
+    "name": "IDO",
+    "senatorial_district": "Oyo South",
+    "house_of_representatives": "Ibarapa East/Ido"
+  },
+  {
+    "name": "IREPO",
+    "senatorial_district": "Oyo North",
+    "house_of_representatives": "Oorelope/Irepo/Olorunsogo"
+  },
+  {
+    "name": "ISEYIN",
+    "senatorial_district": "Oyo North",
+    "house_of_representatives": "Iseyin/Itesiwaju/Kajola/Iwajowa"
+  },
+  {
+    "name": "ITESIWAJU",
+    "senatorial_district": "Oyo North",
+    "house_of_representatives": "Iseyin/Itesiwaju/Kajola/Iwajowa"
+  },
+  {
+    "name": "IWAJOWA",
+    "senatorial_district": "Oyo North",
+    "house_of_representatives": "Iseyin/Itesiwaju/Kajola/Iwajowa"
+  },
+  {
+    "name": "KAJOLA",
+    "senatorial_district": "Oyo North",
+    "house_of_representatives": "Iseyin/Itesiwaju/Kajola/Iwajowa"
+  },
+  {
+    "name": "LAGELU",
+    "senatorial_district": "Oyo North",
+    "house_of_representatives": "Lagelu/Akinyele"
+  },
+  {
+    "name": "OGBOMOSO NORTH",
+    "senatorial_district": "Oyo North",
+    "house_of_representatives": "Ogbomosho North/Ogbomosho South/Orire"
+  },
+  {
+    "name": "OGBOMOSO SOUTH",
+    "senatorial_district": "Oyo North",
+    "house_of_representatives": "Ogbomosho North/Ogbomosho South/Orire"
+  },
+  {
+    "name": "OGO-OLUWA",
+    "senatorial_district": "Oyo Central",
+    "house_of_representatives": "Surulere/Ogo Oluwa"
+  },
+  {
+    "name": "OLORUNSOGO",
+    "senatorial_district": "Oyo North",
+    "house_of_representatives": "Oorelope/Irepo/Olorunsogo"
+  },
+  {
+    "name": "OLUYOLE",
+    "senatorial_district": "Oyo Central",
+    "house_of_representatives": "Oluyole"
+  },
+  {
+    "name": "ONA-ARA",
+    "senatorial_district": "Oyo Central",
+    "house_of_representatives": "Egbeda/Ona-Ara"
+  },
+  {
+    "name": "OORELOPE",
+    "senatorial_district": "Oyo North",
+    "house_of_representatives": "Oorelope/Irepo/Olorunsogo"
+  },
+  {
+    "name": "ORI IRE",
+    "senatorial_district": "Oyo North",
+    "house_of_representatives": "Ogbomosho North/Ogbomosho South/Orire"
+  },
+  {
+    "name": "OYO EAST",
+    "senatorial_district": "Oyo Central",
+    "house_of_representatives": "Afijio/Atiba/Oyo East/Oyo West"
+  },
+  {
+    "name": "OYO WEST",
+    "senatorial_district": "Oyo Central",
+    "house_of_representatives": "Afijio/Atiba/Oyo East/Oyo West"
+  },
+  {
+    "name": "SAKI EAST",
+    "senatorial_district": "Oyo North",
+    "house_of_representatives": "Saki East/Saki West/Atisbo"
+  },
+  {
+    "name": "SAKI WEST",
+    "senatorial_district": "Oyo North",
+    "house_of_representatives": "Saki East/Saki West/Atisbo"
+  },
+  {
+    "name": "SURULERE",
+    "senatorial_district": "Oyo Central",
+    "house_of_representatives": "Surulere/Ogo Oluwa"
+  },
+    {
+      "name": "BARIKIN LADI",
+      "senatorial_district": "Plateau North",
+      "house_of_representatives": "Barkin Ladi/Riyom"
+    },
+    {
+      "name": "BOKKOS",
+      "senatorial_district": "Plateau Central",
+      "house_of_representatives": "Mangu/Bokkos"
+    },
+    {
+      "name": "JOS EAST",
+      "senatorial_district": "Plateau North",
+      "house_of_representatives": "Jos East/Jos South"
+    },
+    {
+      "name": "JOS NORTH",
+      "senatorial_district": "Plateau North",
+      "house_of_representatives": "Jos North/Bassa"
+    },
+    {
+      "name": "JOS SOUTH",
+      "senatorial_district": "Plateau North",
+      "house_of_representatives": "Jos East/Jos South"
+    },
+    {
+      "name": "KANAM",
+      "senatorial_district": "Plateau Central",
+      "house_of_representatives": "Kanam/Kanke"
+    },
+    {
+      "name": "KANKE",
+      "senatorial_district": "Plateau Central",
+      "house_of_representatives": "Kanam/Kanke"
+    },
+    {
+      "name": "LANGTANG NORTH",
+      "senatorial_district": "Plateau South",
+      "house_of_representatives": "Langtang North/Langtang South"
+    },
+    {
+      "name": "LANGTANG SOUTH",
+      "senatorial_district": "Plateau South",
+      "house_of_representatives": "Langtang North/Langtang South"
+    },
+    {
+      "name": "MANGU",
+      "senatorial_district": "Plateau Central",
+      "house_of_representatives": "Mangu/Bokkos"
+    },
+    {
+      "name": "MIKANG",
+      "senatorial_district": "Plateau South",
+      "house_of_representatives": "Shendam/Mikang/Qua'an Pan"
+    },
+    {
+      "name": "PANKSHIN",
+      "senatorial_district": "Plateau Central",
+      "house_of_representatives": "Pankshin/Kanke/Kanam"
+    },
+    {
+      "name": "QUA'AN PAN",
+      "senatorial_district": "Plateau South",
+      "house_of_representatives": "Shendam/Mikang/Qua'an Pan"
+    },
+    {
+      "name": "RIYOM",
+      "senatorial_district": "Plateau North",
+      "house_of_representatives": "Barkin Ladi/Riyom"
+    },
+    {
+      "name": "SHENDAM",
+      "senatorial_district": "Plateau South",
+      "house_of_representatives": "Shendam/Mikang/Qua'an Pan"
+    },
+    {
+      "name": "WASE",
+      "senatorial_district": "Plateau South",
+      "house_of_representatives": "Wase"
+    },
+    {
+      "name": "BASSA",
+      "senatorial_district": "Plateau North",
+      "house_of_representatives": "Jos North/Bassa"
+    },
+    {
+      "name": "ABUA-ODUAL",
+      "senatorial_district": "Rivers West",
+      "house_of_representatives": "Abua-Odual/Ahoada East"
+    },
+    {
+      "name": "AHOADA EAST",
+      "senatorial_district": "Rivers West",
+      "house_of_representatives": "Abua-Odual/Ahoada East"
+    },
+    {
+      "name": "AHOADA WEST",
+      "senatorial_district": "Rivers West",
+      "house_of_representatives": "Ahoada West/Ogba/Egbema/Ndoni"
+    },
+    {
+      "name": "AKUKU TORU",
+      "senatorial_district": "Rivers West",
+      "house_of_representatives": "Akuku Toru/Asari Toru"
+    },
+    {
+      "name": "ANDONI",
+      "senatorial_district": "Rivers South East",
+      "house_of_representatives": "Andoni/Opobo/Nkoro"
+    },
+    {
+      "name": "ASARI-TORU",
+      "senatorial_district": "Rivers West",
+      "house_of_representatives": "Akuku Toru/Asari Toru"
+    },
+    {
+      "name": "BONNY",
+      "senatorial_district": "Rivers South East",
+      "house_of_representatives": "Bonny/Degema"
+    },
+    {
+      "name": "DEGEMA",
+      "senatorial_district": "Rivers West",
+      "house_of_representatives": "Bonny/Degema"
+    },
+    {
+      "name": "ELEME",
+      "senatorial_district": "Rivers South East",
+      "house_of_representatives": "Eleme/Oyigbo/Tai"
+    },
+    {
+      "name": "EMOHUA",
+      "senatorial_district": "Rivers East",
+      "house_of_representatives": "Ikwerre/Emohua"
+    },
+    {
+      "name": "ETCHE",
+      "senatorial_district": "Rivers East",
+      "house_of_representatives": "Etche/Omuma"
+    },
+    {
+      "name": "GOKANA",
+      "senatorial_district": "Rivers South East",
+      "house_of_representatives": "Khana/Gokana"
+    },
+    {
+      "name": "IKWERRE",
+      "senatorial_district": "Rivers East",
+      "house_of_representatives": "Ikwerre/Emohua"
+    },
+    {
+      "name": "KHANA",
+      "senatorial_district": "Rivers South East",
+      "house_of_representatives": "Khana/Gokana"
+    },
+    {
+      "name": "OBIO/AKPOR",
+      "senatorial_district": "Rivers East",
+      "house_of_representatives": "Obio/Akpor"
+    },
+    {
+      "name": "OGBA/EGBEMA/NDONI",
+      "senatorial_district": "Rivers West",
+      "house_of_representatives": "Ahoada West/Ogba/Egbema/Ndoni"
+    },
+    {
+      "name": "OGU/BOLO",
+      "senatorial_district": "Rivers East",
+      "house_of_representatives": "Okrika/Ogu-Bolo"
+    },
+    {
+      "name": "OKRIKA",
+      "senatorial_district": "Rivers East",
+      "house_of_representatives": "Okrika/Ogu-Bolo"
+    },
+    {
+      "name": "OMUMA",
+      "senatorial_district": "Rivers East",
+      "house_of_representatives": "Etche/Omuma"
+    },
+    {
+      "name": "OPOBO/NKORO",
+      "senatorial_district": "Rivers South East",
+      "house_of_representatives": "Andoni/Opobo/Nkoro"
+    },
+    {
+      "name": "OYIGBO",
+      "senatorial_district": "Rivers South East",
+      "house_of_representatives": "Eleme/Oyigbo/Tai"
+    },
+    {
+      "name": "PORT HARCOURT",
+      "senatorial_district": "Rivers East",
+      "house_of_representatives": "Port Harcourt I"
+    },
+    {
+      "name": "TAI",
+      "senatorial_district": "Rivers South East",
+      "house_of_representatives": "Eleme/Oyigbo/Tai"
+    },
+    {
+      "name": "BINJI",
+      "senatorial_district": "Sokoto West",
+      "house_of_representatives": "Binji/Silame"
+    },
+    {
+      "name": "BODINGA",
+      "senatorial_district": "Sokoto South",
+      "house_of_representatives": "Bodinga/Dange Shuni/Tureta"
+    },
+    {
+      "name": "DANGE/SHUNI",
+      "senatorial_district": "Sokoto South",
+      "house_of_representatives": "Bodinga/Dange Shuni/Tureta"
+    },
+    {
+      "name": "GADA",
+      "senatorial_district": "Sokoto East",
+      "house_of_representatives": "Gada/Goronyo"
+    },
+    {
+      "name": "GORONYO",
+      "senatorial_district": "Sokoto East",
+      "house_of_representatives": "Gada/Goronyo"
+    },
+    {
+      "name": "GUDU",
+      "senatorial_district": "Sokoto West",
+      "house_of_representatives": "Tangaza/Gudu"
+    },
+    {
+      "name": "GWADABAWA",
+      "senatorial_district": "Sokoto East",
+      "house_of_representatives": "Gwadabawa/Illela"
+    },
+    {
+      "name": "ILLELA",
+      "senatorial_district": "Sokoto East",
+      "house_of_representatives": "Gwadabawa/Illela"
+    },
+    {
+      "name": "ISA",
+      "senatorial_district": "Sokoto East",
+      "house_of_representatives": "Sabon Birni/Isa"
+    },
+    {
+      "name": "KWARE",
+      "senatorial_district": "Sokoto North",
+      "house_of_representatives": "Kware/Wamakko"
+    },
+    {
+      "name": "KEBBE",
+      "senatorial_district": "Sokoto South",
+      "house_of_representatives": "Tambuwal/Kebbe"
+    },
+    {
+      "name": "RABAH",
+      "senatorial_district": "Sokoto North",
+      "house_of_representatives": "Rabah/Wurno"
+    },
+    {
+      "name": "S/BIRNI",
+      "senatorial_district": "Sokoto East",
+      "house_of_representatives": "Sabon Birni/Isa"
+    },
+    {
+      "name": "SHAGARI",
+      "senatorial_district": "Sokoto South",
+      "house_of_representatives": "Shagari/Yabo"
+    },
+    {
+      "name": "SILAME",
+      "senatorial_district": "Sokoto West",
+      "house_of_representatives": "Binji/Silame"
+    },
+    {
+      "name": "SOKOTO NORTH",
+      "senatorial_district": "Sokoto North",
+      "house_of_representatives": "Sokoto North/Sokoto South"
+    },
+    {
+      "name": "SOKOTO SOUTH",
+      "senatorial_district": "Sokoto North",
+      "house_of_representatives": "Sokoto North/Sokoto South"
+    },
+    {
+      "name": "TAMBUWAL",
+      "senatorial_district": "Sokoto South",
+      "house_of_representatives": "Tambuwal/Kebbe"
+    },
+    {
+      "name": "TANGAZA",
+      "senatorial_district": "Sokoto West",
+      "house_of_representatives": "Tangaza/Gudu"
+    },
+    {
+      "name": "TURETA",
+      "senatorial_district": "Sokoto South",
+      "house_of_representatives": "Bodinga/Dange Shuni/Tureta"
+    },
+    {
+      "name": "WAMAKKO",
+      "senatorial_district": "Sokoto North",
+      "house_of_representatives": "Kware/Wamakko"
+    },
+    {
+      "name": "WURNO",
+      "senatorial_district": "Sokoto North",
+      "house_of_representatives": "Rabah/Wurno"
+    },
+    {
+      "name": "YABO",
+      "senatorial_district": "Sokoto South",
+      "house_of_representatives": "Shagari/Yabo"
+    },
+  {
+    "name": "ARDO - KOLA",
+    "senatorial_district": "Taraba Central",
+    "house_of_representatives": "Ardo-Kola/Lau/Karim-Lamido"
+  },
+  {
+    "name": "BALI",
+    "senatorial_district": "Taraba Central",
+    "house_of_representatives": "Gassol/Bali"
+  },
+  {
+    "name": "DONGA",
+    "senatorial_district": "Taraba South",
+    "house_of_representatives": "Donga/Ussa/Takum"
+  },
+  {
+    "name": "GASHAKA",
+    "senatorial_district": "Taraba North",
+    "house_of_representatives": "Kurmi/Sardauna"
+  },
+  {
+    "name": "GASSOL",
+    "senatorial_district": "Taraba Central",
+    "house_of_representatives": "Gassol/Bali"
+  },
+  {
+    "name": "IBI",
+    "senatorial_district": "Taraba South",
+    "house_of_representatives": "Wukari/Ibi"
+  },
+  {
+    "name": "JALINGO",
+    "senatorial_district": "Taraba North",
+    "house_of_representatives": "Jalingo/Yorro/Zing"
+  },
+  {
+    "name": "KARIM-LAMIDO",
+    "senatorial_district": "Taraba North",
+    "house_of_representatives": "Ardo-Kola/Lau/Karim-Lamido"
+  },
+  {
+    "name": "KURMI",
+    "senatorial_district": "Taraba South",
+    "house_of_representatives": "Kurmi/Sardauna"
+  },
+  {
+    "name": "LAU",
+    "senatorial_district": "Taraba North",
+    "house_of_representatives": "Ardo-Kola/Lau/Karim-Lamido"
+  },
+  {
+    "name": "SARDAUNA",
+    "senatorial_district": "Taraba North",
+    "house_of_representatives": "Kurmi/Sardauna"
+  },
+  {
+    "name": "TAKUM",
+    "senatorial_district": "Taraba South",
+    "house_of_representatives": "Donga/Ussa/Takum"
+  },
+  {
+    "name": "USSA",
+    "senatorial_district": "Taraba South",
+    "house_of_representatives": "Donga/Ussa/Takum"
+  },
+  {
+    "name": "WUKARI",
+    "senatorial_district": "Taraba South",
+    "house_of_representatives": "Wukari/Ibi"
+  },
+  {
+    "name": "YORRO",
+    "senatorial_district": "Taraba North",
+    "house_of_representatives": "Jalingo/Yorro/Zing"
+  },
+  {
+    "name": "ZING",
+    "senatorial_district": "Taraba North",
+    "house_of_representatives": "Jalingo/Yorro/Zing"
+  },
+  {
+    "name": "BADE",
+    "senatorial_district": "Yobe North",
+    "house_of_representatives": "Bade/Jakusko"
+  },
+  {
+    "name": "BURSARI",
+    "senatorial_district": "Yobe North",
+    "house_of_representatives": "Geidam/Bade/Bursari"
+  },
+  {
+    "name": "DAMATURU",
+    "senatorial_district": "Yobe East",
+    "house_of_representatives": "Damaturu/Gujba/Gulani/Tarmuwa"
+  },
+  {
+    "name": "FIKA",
+    "senatorial_district": "Yobe South",
+    "house_of_representatives": "Fika/Fune"
+  },
+  {
+    "name": "FUNE",
+    "senatorial_district": "Yobe South",
+    "house_of_representatives": "Fika/Fune"
+  },
+  {
+    "name": "GEIDAM",
+    "senatorial_district": "Yobe North",
+    "house_of_representatives": "Geidam/Bade/Bursari"
+  },
+  {
+    "name": "GUJBA",
+    "senatorial_district": "Yobe East",
+    "house_of_representatives": "Damaturu/Gujba/Gulani/Tarmuwa"
+  },
+  {
+    "name": "GULANI",
+    "senatorial_district": "Yobe East",
+    "house_of_representatives": "Damaturu/Gujba/Gulani/Tarmuwa"
+  },
+  {
+    "name": "JAKUSKO",
+    "senatorial_district": "Yobe North",
+    "house_of_representatives": "Bade/Jakusko"
+  },
+  {
+    "name": "KARASAWA",
+    "senatorial_district": "Yobe North",
+    "house_of_representatives": "Gashua/Bade/Jakusko"
+  },
+  {
+    "name": "MACHINA",
+    "senatorial_district": "Yobe North",
+    "house_of_representatives": "Nguru/Machina/Yusufari"
+  },
+  {
+    "name": "NANGERE",
+    "senatorial_district": "Yobe South",
+    "house_of_representatives": "Potiskum/Nangere"
+  },
+  {
+    "name": "NGURU",
+    "senatorial_district": "Yobe North",
+    "house_of_representatives": "Nguru/Machina/Yusufari"
+  },
+  {
+    "name": "POTISKUM",
+    "senatorial_district": "Yobe South",
+    "house_of_representatives": "Potiskum/Nangere"
+  },
+  {
+    "name": "TARMUWA",
+    "senatorial_district": "Yobe East",
+    "house_of_representatives": "Damaturu/Gujba/Gulani/Tarmuwa"
+  },
+  {
+    "name": "YUNUSARI",
+    "senatorial_district": "Yobe North",
+    "house_of_representatives": "Nguru/Machina/Yusufari"
+  },
+  {
+    "name": "YUSUFARI",
+    "senatorial_district": "Yobe North",
+    "house_of_representatives": "Nguru/Machina/Yusufari"
+  },
+  {
+    "name": "ANKA",
+    "senatorial_district": "Zamfara West",
+    "house_of_representatives": "Anka/Talata Mafara"
+  },
+  {
+    "name": "BAKURA",
+    "senatorial_district": "Zamfara West",
+    "house_of_representatives": "Bakura/Maradun"
+  },
+  {
+    "name": "BIRNIN MAGAJI",
+    "senatorial_district": "Zamfara North",
+    "house_of_representatives": "Shinkafi/Birnin Magaji"
+  },
+  {
+    "name": "BUKKUYUM",
+    "senatorial_district": "Zamfara West",
+    "house_of_representatives": "Gummi/Bukkuyum"
+  },
+  {
+    "name": "BUNGUDU",
+    "senatorial_district": "Zamfara Central",
+    "house_of_representatives": "Gusau/Tsafe"
+  },
+  {
+    "name": "GUMMI",
+    "senatorial_district": "Zamfara West",
+    "house_of_representatives": "Gummi/Bukkuyum"
+  },
+  {
+    "name": "GUSAU",
+    "senatorial_district": "Zamfara Central",
+    "house_of_representatives": "Gusau/Tsafe"
+  },
+  {
+    "name": "KAURA NAMODA",
+    "senatorial_district": "Zamfara North",
+    "house_of_representatives": "Kaura Namoda/Birnin Magaji"
+  },
+  {
+    "name": "MARADUN",
+    "senatorial_district": "Zamfara West",
+    "house_of_representatives": "Bakura/Maradun"
+  },
+  {
+    "name": "MARU",
+    "senatorial_district": "Zamfara West",
+    "house_of_representatives": "Maru/Bungudu"
+  },
+  {
+    "name": "SHINKAFI",
+    "senatorial_district": "Zamfara North",
+    "house_of_representatives": "Shinkafi/Birnin Magaji"
+  },
+  {
+    "name": "TALATA MAFARA",
+    "senatorial_district": "Zamfara West",
+    "house_of_representatives": "Anka/Talata Mafara"
+  },
+  {
+    "name": "TSAFE",
+    "senatorial_district": "Zamfara Central",
+    "house_of_representatives": "Gusau/Tsafe"
+  },
+  {
+    "name": "ZURMI",
+    "senatorial_district": "Zamfara North",
+    "house_of_representatives": "Zurmi/Shinkafi"
+  },
+  {
+    "name": "ABAJI",
+    "senatorial_district": "Federal Capital Territory",
+    "house_of_representatives": "Abaji/Gwagwalada/Kwali/Kuje"
+  },
+  {
+    "name": "BWARI",
+    "senatorial_district": "Federal Capital Territory",
+    "house_of_representatives": "Amac/Bwari"
+  },
+  {
+    "name": "GWAGWALADA",
+    "senatorial_district": "Federal Capital Territory",
+    "house_of_representatives": "Abaji/Gwagwalada/Kwali/Kuje"
+  },
+  {
+    "name": "KUJE",
+    "senatorial_district": "Federal Capital Territory",
+    "house_of_representatives": "Abaji/Gwagwalada/Kwali/Kuje"
+  },
+  {
+    "name": "KWALI",
+    "senatorial_district": "Federal Capital Territory",
+    "house_of_representatives": "Abaji/Gwagwalada/Kwali/Kuje"
+  },
+  {
+    "name": "MUNICIPAL",
+    "senatorial_district": "Federal Capital Territory",
+    "house_of_representatives": "Amac/Bwari"
+  }
+
+]

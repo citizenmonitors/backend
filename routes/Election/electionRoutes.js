@@ -16,6 +16,9 @@ import {
   getLiveElectionByIdCont,
   getUserElectionResultsAndReportsCon,
   getResultsAndPerformActionController,
+  getLiveElectionResults,
+  getLiveIncidentReport,
+  getSentimentAnalysis,
 } from "../../controllers/Election/electionDataController.js";
 import { authMiddleware } from "../../middleware/authMiddleware.js";
 import {
@@ -146,5 +149,16 @@ router.post(
   "/user-action",
   authMiddleware,
   getResultsAndPerformActionController);
+router.get("/live-results/:electionId", authMiddleware, getLiveElectionResults);
+router.get(
+  "/live-incident-report/:electionId",
+  authMiddleware,
+  getLiveIncidentReport
+);
+router.get(
+  "/sentiment-analysis/:electionId",
+  authMiddleware,
+  getSentimentAnalysis
+);
 
 export default router;

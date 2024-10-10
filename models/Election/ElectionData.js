@@ -16,7 +16,6 @@ const ElectionDataSchema = new mongoose.Schema(
     },
     userRole: {
       type: String,
-      // required: true,
     },
     state: {
       type: String,

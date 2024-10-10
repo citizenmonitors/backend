@@ -142,11 +142,6 @@ export const submitObserverDetailsController = [
       // Collect the two observer ID files (PVC front and back)
       const observerIdFiles = req.files["observerId[]"];
 
-      // if (!observerIdFiles || observerIdFiles.length !== 2) {
-      //   return res.status(400).json({
-      //     message: "Both front and back of the PVC are required.",
-      //   });
-      // }
 
       // Call the service and pass the observerIdFiles
       const result = await submitObserverDetails({

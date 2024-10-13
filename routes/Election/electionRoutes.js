@@ -16,16 +16,13 @@ import {
   getLiveElectionByIdCont,
   getUserElectionResultsAndReportsCon,
   getResultsAndPerformActionController,
-  getLiveElectionResults,
-  getLiveIncidentReport,
-  getSentimentAnalysis,
 } from "../../controllers/Election/electionDataController.js";
 import { authMiddleware } from "../../middleware/authMiddleware.js";
 import {
   uploadResultDataFiles,
   uploadReportDataFiles,
 } from "../../config/electionMulter.js";
-import { uploadIncidentDataFiles } from "../../config/incidentMulter.js";
+import { getLiveElectionDetails } from "../../controllers/Election/electionLive.js";
 
 const router = express.Router();
 
@@ -149,16 +146,6 @@ router.post(
   "/user-action",
   authMiddleware,
   getResultsAndPerformActionController);
-router.get("/live-results/:electionId", authMiddleware, getLiveElectionResults);
-router.get(
-  "/live-incident-report/:electionId",
-  authMiddleware,
-  getLiveIncidentReport
-);
-router.get(
-  "/sentiment-analysis/:electionId",
-  authMiddleware,
-  getSentimentAnalysis
-);
+router.get("/live-results/:electionId", authMiddleware, getLiveElectionDetails);
 
 export default router;

@@ -15,19 +15,6 @@ import {
   getLiveElectionById,
   getUserElectionResultsAndReports,
   getResultsAndPerformAction,
-  getNationalResults,
-  getSenatorialResults,
-  getHouseOfRepsResults,
-  getGubernatorialResults,
-  getLocalGovernmentResults,
-  getHouseOfAssemblyResults,
-  getNationalIncidentReports,
-  getSenatorialIncidentReports,
-  getHouseOfRepsIncidentReports,
-  getGubernatorialIncidentReports,
-  getLocalGovernmentIncidentReports,
-  getHouseOfAssIncidentReports,
-  getSentimentAnalysisService,
 } from "../../services/Election/electionService.js";
 import CompletedUser from "../../models/CompletedUser.js";
 import Election from "../../models/Election/Election.js";
@@ -323,147 +310,149 @@ export const getResultsAndPerformActionController = async (req, res) => {
 
 
 // Controller to fetch live election results
-export const getLiveElectionResults = async (req, res) => {
-  const { electionId } = req.params;
-  const userId = req.user._id; // Assuming userId is in the token payload
+// export const getLiveElectionResults = async (req, res) => {
+//   const { electionId } = req.params;
+//   const userId = req.user._id; // Assuming userId is in the token payload
 
-  try {
-    // Fetch the user details based on their userId (to get their location information)
-    const user = await CompletedUser.findById(userId).lean();
-    if (!user) throw new Error("User not found");
+//   try {
+//     // Fetch the user details based on their userId (to get their location information)
+//     const user = await CompletedUser.findById(userId).lean();
+//     if (!user) throw new Error("User not found");
 
-    // Fetch the election details based on the electionId
-    const election = await Election.findById(electionId).lean();
-    if (!election) throw new Error("Election not found");
+//     // Fetch the election details based on the electionId
+//     const election = await Election.findById(electionId).lean();
+//     if (!election) throw new Error("Election not found");
 
-    let resultData;
-    switch (election.electionType) {
-      case "national":
-        resultData = await getNationalResults(electionId);
-        break;
-      case "senatorial":
-        resultData = await getSenatorialResults(electionId, user);
-        break;
-      case "house-of-representatives":
-        resultData = await getHouseOfRepsResults(electionId, user);
-        break;
-      case "house-of-assembly":
-        resultData = await getHouseOfAssemblyResults(electionId, user);
-        break;
-      case "gubernatorial":
-        resultData = await getGubernatorialResults(electionId, user);
-        break;
-      case "lga":
-        resultData = await getLocalGovernmentResults(electionId, user);
-        break;
-      default:
-        throw new Error("Invalid election type");
-    }
+//     let resultData;
+//     switch (election.electionType) {
+//       case "national":
+//         resultData = await getNationalResults(electionId);
+//         break;
+//       case "senatorial":
+//         resultData = await getSenatorialResults(electionId, user);
+//         break;
+//       case "house-of-representatives":
+//         resultData = await getHouseOfRepsResults(electionId, user);
+//         break;
+//       case "house-of-assembly":
+//         resultData = await getHouseOfAssemblyResults(electionId, user);
+//         break;
+//       case "gubernatorial":
+//         resultData = await getGubernatorialResults(electionId, user);
+//         break;
+//       case "lga":
+//         resultData = await getLocalGovernmentResults(electionId, user);
+//         break;
+//       default:
+//         throw new Error("Invalid election type");
+//     }
 
-    return res.status(200).json(resultData);
-  } catch (error) {
-    return res.status(500).json({
-      message: "Error fetching live election results",
-      error: error.message,
-    });
-  }
-};
+//     return res.status(200).json(resultData);
+//   } catch (error) {
+//     return res.status(500).json({
+//       message: "Error fetching live election results",
+//       error: error.message,
+//     });
+//   }
+// };
 
-export const getLiveIncidentReport = async (req, res) => {
-  const { electionId } = req.params;
-  const userId = req.user._id; 
-  try {
-    // Fetch the user details based on their userId (to get their location information)
-    const user = await CompletedUser.findById(userId).lean();
-    if (!user) throw new Error("User not found");
+// export const getLiveIncidentReport = async (req, res) => {
+//   const { electionId } = req.params;
+//   const userId = req.user._id; 
+//   try {
+//     // Fetch the user details based on their userId (to get their location information)
+//     const user = await CompletedUser.findById(userId).lean();
+//     if (!user) throw new Error("User not found");
 
-    // Fetch the election details based on the electionId
-    const election = await Election.findById(electionId).lean();
-    if (!election) throw new Error("Election not found");
+//     // Fetch the election details based on the electionId
+//     const election = await Election.findById(electionId).lean();
+//     if (!election) throw new Error("Election not found");
 
-    let resultData;
+//     let resultData;
 
-    // Determine the election type and fetch the appropriate incident report data
-    switch (election.electionType) {
-      case "national":
-        resultData = await getNationalIncidentReports(electionId);
-        break;
-      case "senatorial":
-        resultData = await getSenatorialIncidentReports(electionId, user);
-        break;
-      case "house-of-representatives":
-        resultData = await getHouseOfRepsIncidentReports(electionId, user);
-        break;
-      case "gubernatorial":
-        resultData = await getGubernatorialIncidentReports(electionId, user);
-        break;
-      case "house-of-assembly":
-        resultData = await getHouseOfAssIncidentReports(electionId, user);
-        break;
-      case "lga":
-        resultData = await getLocalGovernmentIncidentReports(electionId, user);
-        break;
-      default:
-        throw new Error("Invalid election type");
-    }
+//     // Determine the election type and fetch the appropriate incident report data
+//     switch (election.electionType) {
+//       case "national":
+//         resultData = await getNationalIncidentReports(electionId);
+//         break;
+//       case "senatorial":
+//         resultData = await getSenatorialIncidentReports(electionId, user);
+//         break;
+//       case "house-of-representatives":
+//         resultData = await getHouseOfRepsIncidentReports(electionId, user);
+//         break;
+//       case "gubernatorial":
+//         resultData = await getGubernatorialIncidentReports(electionId, user);
+//         break;
+//       case "house-of-assembly":
+//         resultData = await getHouseOfAssIncidentReports(electionId, user);
+//         break;
+//       case "lga":
+//         resultData = await getLocalGovernmentIncidentReports(electionId, user);
+//         break;
+//       default:
+//         throw new Error("Invalid election type");
+//     }
 
-    // Return the incident report data
-    return res.status(200).json(resultData);
-  } catch (error) {
-    console.error("Error fetching live incident reports:", error);
-    return res.status(500).json({
-      message: "Error fetching live incident reports",
-      error: error.message,
-    });
-  }
-};
+//     // Return the incident report data
+//     return res.status(200).json(resultData);
+//   } catch (error) {
+//     console.error("Error fetching live incident reports:", error);
+//     return res.status(500).json({
+//       message: "Error fetching live incident reports",
+//       error: error.message,
+//     });
+//   }
+// };
 
-// Controller to handle sentiment analysis request
-export const getSentimentAnalysis = async (req, res) => {
-  const { electionId } = req.params;
-  const userId = req.user._id;
+// // Controller to handle sentiment analysis request
+// export const getSentimentAnalysis = async (req, res) => {
+//   const { electionId } = req.params;
+//   const userId = req.user._id;
 
-  try {
-    // Fetch user details (to determine the groupBy field)
-    const user = await CompletedUser.findById(userId).lean();
-    if (!user) throw new Error("User not found");
+//   try {
+//     // Fetch user details (to determine the groupBy field)
+//     const user = await CompletedUser.findById(userId).lean();
+//     if (!user) throw new Error("User not found");
 
-    // Fetch election details to determine grouping (state, lga, ward)
-    const election = await Election.findById(electionId).lean();
-    if (!election) throw new Error("Election not found");
+//     // Fetch election details to determine grouping (state, lga, ward)
+//     const election = await Election.findById(electionId).lean();
+//     if (!election) throw new Error("Election not found");
 
-    let groupBy = "lga";
-    switch (election.electionType) {
-      case "national":
-        groupBy = "state";
-        break;
-      case "senatorial":
-      case "house-of-representatives":
-      case "house-of-assembly":
-      case "gubernatorial":
-      case "lga":
-        groupBy = "ward";
-        break;
-      default:
-        groupBy = "lga";
-    }
+//     let groupBy = "lga";
+//     switch (election.electionType) {
+//       case "national":
+//         groupBy = "state";
+//         break;
+//       case "senatorial":
+//       case "house-of-representatives":
+//       case "house-of-assembly":
+//       case "gubernatorial":
+//       case "lga":
+//         groupBy = "ward";
+//         break;
+//       default:
+//         groupBy = "lga";
+//     }
 
-    // Call the sentiment analysis service
-    const sentimentAnalysis = await getSentimentAnalysisService(electionId, groupBy);
+//     // Call the sentiment analysis service
+//     const sentimentAnalysis = await getSentimentAnalysisService(electionId, groupBy);
 
-    return res.status(200).json({
-      electionDetails: {
-        electionType: election.electionType,
-        electionName: election.electionName,
-        startDate: election.startDate,
-        endDate: election.endDate,
-      },
-      sentimentAnalysis,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      message: "Error fetching sentiment analysis",
-      error: error.message,
-    });
-  }
-};
+//     return res.status(200).json({
+//       electionDetails: {
+//         electionType: election.electionType,
+//         electionName: election.electionName,
+//         startDate: election.startDate,
+//         endDate: election.endDate,
+//       },
+//       sentimentAnalysis,
+//     });
+//   } catch (error) {
+//     return res.status(500).json({
+//       message: "Error fetching sentiment analysis",
+//       error: error.message,
+//     });
+//   }
+// };
+
+

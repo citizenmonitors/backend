@@ -8,8 +8,6 @@ import AllLga from "../../state-data/lga.json" assert { type: "json" };
 import AllWard from "../../state-data/wards.json" assert { type: "json" };
 
 // Updated service
-// Updated service
-// Updated service
 export const getLiveElectionService = async (electionId, userId) => {
   try {
     const user = await CompletedUser.findById(userId).lean();

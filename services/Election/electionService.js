@@ -450,26 +450,34 @@ export const uploadResultDataService = async (
     election.resultsCount += 1; // Increment the results count
     await election.save();
 
-    // Create a notification for the result upload
-    const electionType = election.electionType || "Election";
-    const stateName = user.state || "State";
+    // Convert electionType and stateName to Title Case for notifications
+    const toTitleCase = (text) => {
+      return text
+        .split("-")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+    };
+    const formattedElectionType = toTitleCase(
+      election.electionType || "Election"
+    );
+    const formattedStateName = toTitleCase(user.state || "State");
     const uploadNotification = new Notification({
       type: "result-upload",
-      body: `Result uploaded for ${stateName} ${electionType}`,
-      info: `${stateName} ${electionType} Election`,
+      body: `Result uploaded for ${formattedStateName} ${formattedElectionType}`,
+      info: `${formattedStateName} ${formattedElectionType} Election`,
     });
     await uploadNotification.save();
 
     // Create or Update pending approval notification
     const pendingCount = await ElectionData.countDocuments({
       election: electionId,
-      isApproved: false, 
+      isApproved: false,
     });
 
     const pendingNotification = new Notification({
       type: "pending-approval",
-      body: `${pendingCount} pending approval for ${stateName}`,
-      info: `${electionType} Election`,
+      body: `${pendingCount} pending approval for ${formattedStateName}`,
+      info: `${formattedElectionType} Election`,
     });
 
     await pendingNotification.save();
@@ -477,7 +485,7 @@ export const uploadResultDataService = async (
     // Convert to a plain object and remove isApproved if not applicable
     const resultData = savedResultData.toObject();
     if (isApproved === null) {
-      delete resultData.isApproved; 
+      delete resultData.isApproved;
     }
 
     // Return the saved result data

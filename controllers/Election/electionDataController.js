@@ -49,12 +49,25 @@ export const updateElection = async (req, res) => {
 export const getAllElections = async (req, res) => {
   try {
     const userId = req.user._id;
+    // console.log("Fetching elections for user:", userId);
+
     const elections = await getAllElectionsService(userId);
+
+    // if (elections.length === 0) {
+    //   console.log("No relevant elections found for user.");
+    // } else {
+    //   console.log(`Found ${elections.length} elections for the user.`);
+    // }
+
     res.status(200).json({ elections });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching elections", error });
+    console.error("Error fetching elections:", error);
+    res
+      .status(500)
+      .json({ message: "Error fetching elections", error: error.message });
   }
 };
+
 
 export const getElectionResultByIdCont = async (req, res) => {
   try {

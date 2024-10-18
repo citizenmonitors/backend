@@ -11,7 +11,7 @@ const ElectionSchema = new mongoose.Schema(
       required: true,
     },
     electionLocation: {
-      type: String,
+      type: [String],
       // required: true,
     },
     startDate: {

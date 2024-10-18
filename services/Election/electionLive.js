@@ -149,17 +149,17 @@ export const getAllOngoingElectionResults = async (userId) => {
   try {
     const user = await CompletedUser.findById(userId).lean();
     if (!user) throw new Error("User not found");
-    console.log("User fetched:", user);
+    // console.log("User fetched:", user);
 
     // Fetch ongoing elections
     const ongoingElections = await Election.find({
       startDate: { $lte: new Date() },
       endDate: { $gte: new Date() },
     }).lean();
-    console.log("Ongoing Elections:", ongoingElections);
+    // console.log("Ongoing Elections:", ongoingElections);
 
     if (!ongoingElections || ongoingElections.length === 0) {
-      console.log("No ongoing elections found.");
+      // console.log("No ongoing elections found.");
       return { message: "No ongoing election results" };
     }
 
@@ -178,7 +178,7 @@ export const getAllOngoingElectionResults = async (userId) => {
     for (let i = 0; i < prioritizedTypes.length; i++) {
       lastServedIndex = (lastServedIndex + 1) % prioritizedTypes.length;
       const electionTypeToServe = prioritizedTypes[lastServedIndex];
-      console.log(`Serving election type: ${electionTypeToServe}`);
+      // console.log(`Serving election type: ${electionTypeToServe}`);
 
       // Find the next election of the specified type
       const selectedElection = ongoingElections.find(
@@ -190,7 +190,7 @@ export const getAllOngoingElectionResults = async (userId) => {
       }
     }
 
-    console.log("No prioritized ongoing election found.");
+    // console.log("No prioritized ongoing election found.");
     return { message: "No ongoing election results" };
   } catch (error) {
     console.error("Error fetching ongoing election results:", error);
@@ -213,7 +213,7 @@ const handleElectionResult = async (selectedElection, user) => {
       name: "Senatorial District",
       value: getSenatorialDistrict(user.lga) || "Unknown",
     };
-    console.log("Restricted LGAs for Senatorial:", restrictedLGAs);
+    // console.log("Restricted LGAs for Senatorial:", restrictedLGAs);
     if (!restrictedLGAs.length)
       return { message: "No results for your district" };
   } else if (selectedElection.electionType === "house-of-representatives") {
@@ -223,13 +223,13 @@ const handleElectionResult = async (selectedElection, user) => {
       name: "House of Reps District",
       value: getHouseOfRepsDistrict(user.lga) || "Unknown",
     };
-    console.log("Restricted LGAs for House of Reps:", restrictedLGAs);
+    // console.log("Restricted LGAs for House of Reps:", restrictedLGAs);
     if (!restrictedLGAs.length)
       return { message: "No results for your district" };
   } else if (selectedElection.electionType === "gubernatorial") {
     // Fetch gubernatorial results for all states
     const statesResults = await fetchGubernatorialResults(selectedElection._id);
-    console.log("Gubernatorial State Results:", statesResults);
+    // console.log("Gubernatorial State Results:", statesResults);
     if (statesResults.length > 0) {
       return {
         electionType: selectedElection.electionType,
@@ -244,7 +244,7 @@ const handleElectionResult = async (selectedElection, user) => {
     // Restrict to the specific ward within the user's LGA
     groupBy = "ward";
     restriction = { name: "Ward", value: user.ward };
-    console.log(`Restricting LGA election to user's ward: ${user.ward}`);
+    // console.log(`Restricting LGA election to user's ward: ${user.ward}`);
   }
 
   // Fetch other election results
@@ -262,7 +262,7 @@ const handleElectionResult = async (selectedElection, user) => {
       ? { ward: user.ward }
       : {}),
   }).lean();
-  console.log("Election Results:", electionResults);
+  // console.log("Election Results:", electionResults);
 
   if (electionResults.length > 0) {
     const { chart, aggregateAnalysis } = aggregateResultsAndTopParties(

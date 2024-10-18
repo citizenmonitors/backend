@@ -3,11 +3,12 @@ import ElectionData from "../../models/Election/ElectionData.js";
 import CompletedUser from "../../models/CompletedUser.js";
 import { politicalParties } from "../../models/Election/PoliticalParty.js";
 import IncidentReport from "../../models/Election/IncidentReport.js";
+import Notification from "../../models/DailyTraffic/Notification.js";
 import File from "../../models/file.js";
 import path from "path";
 import mongoose from "mongoose";
 import moment from "moment";
-import lgaData from "../../data/lgaData.json" assert { type: "json" };
+
 
 export const createElectionService = async (data) => {
   const { electionType, electionName, electionLocation, startDate, endDate } = data;
@@ -332,7 +333,7 @@ export const uploadResultDataService = async (
       voteRating,
       timeBegan,
       accreditedVoters,
-      rejectedVoters, // Include rejectedVoters in data
+      rejectedVoters,
     } = data;
 
     // Ensure that partiesVotes is properly parsed as JSON
@@ -375,7 +376,7 @@ export const uploadResultDataService = async (
     });
 
     if (existingResult) {
-      return existingResult; // If result already exists, return it
+      return existingResult;
     }
 
     // Convert partiesVotes.count to numbers
@@ -449,10 +450,34 @@ export const uploadResultDataService = async (
     election.resultsCount += 1; // Increment the results count
     await election.save();
 
+    // Create a notification for the result upload
+    const electionType = election.electionType || "Election";
+    const stateName = user.state || "State";
+    const uploadNotification = new Notification({
+      type: "result-upload",
+      body: `Result uploaded for ${stateName} ${electionType}`,
+      info: `${stateName} ${electionType} Election`,
+    });
+    await uploadNotification.save();
+
+    // Create or Update pending approval notification
+    const pendingCount = await ElectionData.countDocuments({
+      election: electionId,
+      isApproved: false, 
+    });
+
+    const pendingNotification = new Notification({
+      type: "pending-approval",
+      body: `${pendingCount} pending approval for ${stateName}`,
+      info: `${electionType} Election`,
+    });
+
+    await pendingNotification.save();
+
     // Convert to a plain object and remove isApproved if not applicable
     const resultData = savedResultData.toObject();
     if (isApproved === null) {
-      delete resultData.isApproved; // Remove isApproved if it's not set
+      delete resultData.isApproved; 
     }
 
     // Return the saved result data

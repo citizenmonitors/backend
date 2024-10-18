@@ -22,7 +22,7 @@ import {
   uploadResultDataFiles,
   uploadReportDataFiles,
 } from "../../config/electionMulter.js";
-import { getLiveElectionDetails } from "../../controllers/Election/electionLive.js";
+import { getActivityBoardAndNotifications, getLiveElectionDetails, getOngoingElections } from "../../controllers/Election/electionLive.js";
 
 const router = express.Router();
 
@@ -147,5 +147,7 @@ router.post(
   authMiddleware,
   getResultsAndPerformActionController);
 router.get("/live-results/:electionId", authMiddleware, getLiveElectionDetails);
+router.get("/live-result", authMiddleware, getOngoingElections);
+router.get("/activity-board", authMiddleware, getActivityBoardAndNotifications);
 
 export default router;

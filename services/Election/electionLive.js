@@ -1,11 +1,13 @@
 import CompletedUser from "../../models/CompletedUser.js";
 import Election from "../../models/Election/Election.js";
 import ElectionData from "../../models/Election/ElectionData.js";
+import Notification from "../../models/DailyTraffic/Notification.js";
 import IncidentReport from "../../models/Election/IncidentReport.js";
 import lgaData from "../../data/lgaData.json" assert { type: "json" };
 import AllState from "../../state-data/state.json" assert { type: "json" };
 import AllLga from "../../state-data/lga.json" assert { type: "json" };
 import AllWard from "../../state-data/wards.json" assert { type: "json" };
+import moment from "moment";
 
 // Updated service
 export const getLiveElectionService = async (electionId, userId) => {
@@ -27,14 +29,14 @@ export const getLiveElectionService = async (electionId, userId) => {
         groupBy = "lga";
         restriction = {
           name: "Senatorial District",
-          value: getSenatorialDistrict(user.lga) || "Unknown", // Using lgaData for senatorial district
+          value: getSenatorialDistrict(user.lga) || "Unknown", 
         };
         break;
       case "house-of-representatives":
         groupBy = "lga";
         restriction = {
           name: "House of Reps District",
-          value: getHouseOfRepsDistrict(user.lga) || "Unknown", // Using lgaData for house of reps district
+          value: getHouseOfRepsDistrict(user.lga) || "Unknown", 
         };
         break;
       case "gubernatorial":
@@ -60,13 +62,13 @@ export const getLiveElectionService = async (electionId, userId) => {
       userRole: "observer",
       ...(election.electionType === "gubernatorial" ||
       election.electionType === "house-of-assembly"
-        ? { state: user.state } // Restrict to user's state for gubernatorial and house of assembly
+        ? { state: user.state } 
         : election.electionType === "senatorial"
-        ? { lga: { $in: getLGAsInSenatorialDistrict(user.lga) } } // Restrict to LGAs in user's senatorial district
+        ? { lga: { $in: getLGAsInSenatorialDistrict(user.lga) } } 
         : election.electionType === "house-of-representatives"
-        ? { lga: { $in: getLGAsInHouseOfRepsDistrict(user.lga) } } // Restrict to LGAs in user's house of reps district
+        ? { lga: { $in: getLGAsInHouseOfRepsDistrict(user.lga) } } 
         : election.electionType === "lga"
-        ? { ward: user.ward } // Restrict to user's ward for lga elections
+        ? { ward: user.ward } 
         : {}),
     }).lean();
 
@@ -102,9 +104,9 @@ export const getLiveElectionService = async (electionId, userId) => {
       election.electionType === "house-of-assembly"
         ? { state: user.state }
         : election.electionType === "senatorial"
-        ? { lga: { $in: getLGAsInSenatorialDistrict(user.lga) } } // Restrict to LGAs in user's senatorial district
+        ? { lga: { $in: getLGAsInSenatorialDistrict(user.lga) } } 
         : election.electionType === "house-of-representatives"
-        ? { lga: { $in: getLGAsInHouseOfRepsDistrict(user.lga) } } // Restrict to LGAs in user's house of reps district
+        ? { lga: { $in: getLGAsInHouseOfRepsDistrict(user.lga) } } 
         : election.electionType === "lga"
         ? { ward: user.ward }
         : {}),
@@ -119,7 +121,7 @@ export const getLiveElectionService = async (electionId, userId) => {
       incidentReport = {
         chart: incidentChart,
         footer: calculateFooter(incidents, groupBy, election, user),
-        aggregateAnalysis: incidentAggregateAnalysis, 
+        aggregateAnalysis: incidentAggregateAnalysis,
         restriction,
       };
     }
@@ -139,6 +141,204 @@ export const getLiveElectionService = async (electionId, userId) => {
     throw new Error(`Error fetching election details: ${error.message}`);
   }
 };
+
+let lastServedIndex = -1;
+
+// Function to fetch ongoing election results with rotation
+export const getAllOngoingElectionResults = async (userId) => {
+  try {
+    const user = await CompletedUser.findById(userId).lean();
+    if (!user) throw new Error("User not found");
+    console.log("User fetched:", user);
+
+    // Fetch ongoing elections
+    const ongoingElections = await Election.find({
+      startDate: { $lte: new Date() },
+      endDate: { $gte: new Date() },
+    }).lean();
+    console.log("Ongoing Elections:", ongoingElections);
+
+    if (!ongoingElections || ongoingElections.length === 0) {
+      console.log("No ongoing elections found.");
+      return { message: "No ongoing election results" };
+    }
+
+    // Prioritize election types
+    const prioritizedTypes = [
+      "gubernatorial",
+      "national",
+      "senatorial",
+      "house-of-representatives",
+      "house-of-assembly",
+      "lga",
+    ];
+  
+
+    // Rotate to the next election type
+    for (let i = 0; i < prioritizedTypes.length; i++) {
+      lastServedIndex = (lastServedIndex + 1) % prioritizedTypes.length;
+      const electionTypeToServe = prioritizedTypes[lastServedIndex];
+      console.log(`Serving election type: ${electionTypeToServe}`);
+
+      // Find the next election of the specified type
+      const selectedElection = ongoingElections.find(
+        (election) => election.electionType === electionTypeToServe
+      );
+
+      if (selectedElection) {
+        return await handleElectionResult(selectedElection, user);
+      }
+    }
+
+    console.log("No prioritized ongoing election found.");
+    return { message: "No ongoing election results" };
+  } catch (error) {
+    console.error("Error fetching ongoing election results:", error);
+    throw new Error(`Error fetching election details: ${error.message}`);
+  }
+};
+
+// Helper function to handle election result fetching based on the election type
+const handleElectionResult = async (selectedElection, user) => {
+  let groupBy = "lga";
+  let restriction = null;
+  let restrictedLGAs = [];
+
+  if (selectedElection.electionType === "national") {
+    groupBy = "state";
+  } else if (selectedElection.electionType === "senatorial") {
+    groupBy = "lga";
+    restrictedLGAs = getLGAsInSenatorialDistrict(user.lga);
+    restriction = {
+      name: "Senatorial District",
+      value: getSenatorialDistrict(user.lga) || "Unknown",
+    };
+    console.log("Restricted LGAs for Senatorial:", restrictedLGAs);
+    if (!restrictedLGAs.length)
+      return { message: "No results for your district" };
+  } else if (selectedElection.electionType === "house-of-representatives") {
+    groupBy = "lga";
+    restrictedLGAs = getLGAsInHouseOfRepsDistrict(user.lga);
+    restriction = {
+      name: "House of Reps District",
+      value: getHouseOfRepsDistrict(user.lga) || "Unknown",
+    };
+    console.log("Restricted LGAs for House of Reps:", restrictedLGAs);
+    if (!restrictedLGAs.length)
+      return { message: "No results for your district" };
+  } else if (selectedElection.electionType === "gubernatorial") {
+    // Fetch gubernatorial results for all states
+    const statesResults = await fetchGubernatorialResults(selectedElection._id);
+    console.log("Gubernatorial State Results:", statesResults);
+    if (statesResults.length > 0) {
+      return {
+        electionType: selectedElection.electionType,
+        electionName: selectedElection.electionName,
+        startDate: selectedElection.startDate,
+        endDate: selectedElection.endDate,
+        result: statesResults,
+      };
+    }
+    return { message: "No gubernatorial results available" };
+  } else if (selectedElection.electionType === "lga") {
+    // Restrict to the specific ward within the user's LGA
+    groupBy = "ward";
+    restriction = { name: "Ward", value: user.ward };
+    console.log(`Restricting LGA election to user's ward: ${user.ward}`);
+  }
+
+  // Fetch other election results
+  const electionResults = await ElectionData.find({
+    election: selectedElection._id,
+    userRole: "observer",
+    ...(selectedElection.electionType === "gubernatorial" ||
+    selectedElection.electionType === "house-of-assembly"
+      ? { state: user.state }
+      : selectedElection.electionType === "senatorial"
+      ? { lga: { $in: restrictedLGAs } }
+      : selectedElection.electionType === "house-of-representatives"
+      ? { lga: { $in: restrictedLGAs } }
+      : selectedElection.electionType === "lga"
+      ? { ward: user.ward }
+      : {}),
+  }).lean();
+  console.log("Election Results:", electionResults);
+
+  if (electionResults.length > 0) {
+    const { chart, aggregateAnalysis } = aggregateResultsAndTopParties(
+      electionResults,
+      groupBy
+    );
+
+    return {
+      electionType: selectedElection.electionType,
+      electionName: selectedElection.electionName,
+      startDate: selectedElection.startDate,
+      endDate: selectedElection.endDate,
+      result: {
+        chart,
+        footer: calculateFooter(
+          electionResults,
+          groupBy,
+          selectedElection,
+          user
+        ),
+        aggregateAnalysis,
+        restriction,
+      },
+    };
+  }
+
+  console.log("No results available for the selected election.");
+  return { message: "No results available" };
+};
+
+
+
+
+// Fetch gubernatorial results for all states
+const fetchGubernatorialResults = async (electionId) => {
+  try {
+    // Aggregate data by state
+    const stateResults = await ElectionData.aggregate([
+      { $match: { election: electionId, userRole: "observer" } },
+      { $group: { _id: "$state", stateResults: { $push: "$$ROOT" } } },
+    ]);
+
+    console.log("State Results Aggregated:", stateResults);
+
+    // Get the election details to pass to calculateFooter
+    const election = await Election.findById(electionId).lean();
+
+    return await Promise.all(
+      stateResults.map(async ({ _id: state, stateResults }) => {
+        const { chart, aggregateAnalysis } = aggregateResultsAndTopParties(
+          stateResults,
+          "lga"
+        );
+
+        // Correctly pass the parameters to calculateFooter
+        return {
+          state,
+          chart,
+          footer: calculateFooter(
+            stateResults,
+            "lga",
+            election, // Pass the election object
+            { state } // Use state-level restriction
+          ),
+          aggregateAnalysis,
+        };
+      })
+    );
+  } catch (error) {
+    console.error("Error in fetchGubernatorialResults:", error);
+    throw new Error(
+      `Error in fetching gubernatorial results: ${error.message}`
+    );
+  }
+};
+
 
 // Helper function to fetch Senatorial District using lgaData
 const getSenatorialDistrict = (userLGA) => {
@@ -180,7 +380,6 @@ const getLGAsInHouseOfRepsDistrict = (userLGA) => {
     )
     .map((lga) => lga.name);
 };
-
 
 // Helper function to filter based on election type
 const getElectionLocationFilter = (electionType, user) => {
@@ -266,7 +465,15 @@ const aggregateSentimentAnalysis = (results, groupBy = "state") => {
   const aggregated = {};
 
   results.forEach((result) => {
-    const { state, lga, ward, voteRating, voterIntimidation, voteBuying, userRole } = result;
+    const {
+      state,
+      lga,
+      ward,
+      voteRating,
+      voterIntimidation,
+      voteBuying,
+      userRole,
+    } = result;
 
     if (userRole !== "observer") return;
 
@@ -320,7 +527,8 @@ export const getSentimentAnalysisService = async (
     ...(election.electionType === "gubernatorial" ||
     election.electionType === "house-of-assembly"
       ? { state: user.state } // Restrict to user's state
-      : election.electionType === "senatorial" || election.electionType === "house-of-representatives"
+      : election.electionType === "senatorial" ||
+        election.electionType === "house-of-representatives"
       ? { lga: user.lga } // Restrict to user's LGA for senatorial or house of reps
       : election.electionType === "lga"
       ? { ward: user.ward } // Restrict to user's ward for lga elections
@@ -328,7 +536,10 @@ export const getSentimentAnalysisService = async (
   }).lean();
 
   const aggregatedSentiment = aggregateSentimentAnalysis(electionData, groupBy);
-  const sentimentAnalysis = formatSentimentAnalysis(aggregatedSentiment, groupBy);
+  const sentimentAnalysis = formatSentimentAnalysis(
+    aggregatedSentiment,
+    groupBy
+  );
 
   return {
     chart: sentimentAnalysis,
@@ -383,7 +594,6 @@ const aggregateIncidentsByLocation = (incidents, groupBy = "state") => {
   };
 };
 
-
 // Helper function for restrictions (for senatorial districts, house of reps districts, and state restrictions)
 const getElectionRestriction = (election, user) => {
   const userLGA = user.lga;
@@ -417,7 +627,9 @@ const calculateFooter = (data, groupBy, election, user) => {
 
   switch (election.electionType) {
     case "national":
-      registeredLocations = new Set(AllState.map((state) => state.toUpperCase()));
+      registeredLocations = new Set(
+        AllState.map((state) => state.toUpperCase())
+      );
       break;
     case "senatorial":
     case "house-of-representatives":
@@ -426,22 +638,27 @@ const calculateFooter = (data, groupBy, election, user) => {
       );
       registeredLocations = new Set(
         lgaData
-          .filter((lga) => lga.senatorial_district === districtData?.senatorial_district)
+          .filter(
+            (lga) =>
+              lga.senatorial_district === districtData?.senatorial_district
+          )
           .map((lga) => lga.name)
       );
       break;
     case "gubernatorial":
     case "house-of-assembly":
-      const stateLGAs = AllLga.find(
-        (state) => state.state.toLowerCase() === user.state.toLowerCase()
-      )?.lgas || [];
+      const stateLGAs =
+        AllLga.find(
+          (state) => state.state.toLowerCase() === user.state.toLowerCase()
+        )?.lgas || [];
       registeredLocations = new Set(stateLGAs);
       break;
     case "lga":
-      const lgaWards = AllWard.find(
-        (state) => state.state.toLowerCase() === user.state.toLowerCase()
-      )?.lgas.find((lga) => lga.lga.toLowerCase() === user.lga.toLowerCase())
-        ?.wards || [];
+      const lgaWards =
+        AllWard.find(
+          (state) => state.state.toLowerCase() === user.state.toLowerCase()
+        )?.lgas.find((lga) => lga.lga.toLowerCase() === user.lga.toLowerCase())
+          ?.wards || [];
       registeredLocations = new Set(lgaWards);
       break;
     default:
@@ -473,4 +690,45 @@ const calculateSentimentFooter = (aggregatedSentiment) => {
   }
 
   return footer;
+};
+
+
+
+export const getActivityBoardAndNotificationsService = async () => {
+  try {
+    // Activity Board Data
+    const totalResults = await ElectionData.countDocuments({});
+    const totalObserverResults = await ElectionData.countDocuments({
+      userRole: "observer",
+    });
+    const totalVolunteerResults = await ElectionData.countDocuments({
+      userRole: "volunteer",
+    });
+    const totalApprovedResults = await ElectionData.countDocuments({
+      isApproved: true,
+    });
+    const totalPendingResults = await ElectionData.countDocuments({
+      isApproved: false,
+    });
+
+    const activityBoard = {
+      "all the total result submitted": totalResults,
+      "all the total result submitted by observer": totalObserverResults,
+      "all the total result submitted by volunteer": totalVolunteerResults,
+      "all the total approved result": totalApprovedResults,
+      "all the total pending approved result": totalPendingResults,
+    };
+
+    // Top 10 Most Recent Notifications
+    const notifications = await Notification.find({})
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .lean();
+
+    return { activityBoard, notifications };
+  } catch (error) {
+    throw new Error(
+      `Error fetching activity board and notifications: ${error.message}`
+    );
+  }
 };

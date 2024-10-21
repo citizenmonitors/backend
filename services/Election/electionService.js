@@ -551,7 +551,7 @@ export const uploadResultDataService = async (
     // Determine if the result should include "isApproved"
     let isApproved = null;
     if (user.role === "observer" && user.isObserverInPollingUnit) {
-      isApproved = false; // Mark as false if observer in the polling unit
+      isApproved = false;
     }
 
     // Create the election data document
@@ -580,15 +580,14 @@ export const uploadResultDataService = async (
 
     // Update the election document with the new result
     election.results.push(savedResultData);
-    election.resultsCount += 1; // Increment the results count
+    election.resultsCount += 1; 
     await election.save();
 
     // Convert electionType and stateName to Title Case for notifications
     const toTitleCase = (text) => {
       return text
         .split("-")
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(" ");
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ");
     };
     const formattedElectionType = toTitleCase(
       election.electionType || "Election"
@@ -613,6 +612,7 @@ export const uploadResultDataService = async (
       info: `${formattedElectionType} Election`,
     });
 
+    
     await pendingNotification.save();
 
     // Convert to a plain object and remove isApproved if not applicable

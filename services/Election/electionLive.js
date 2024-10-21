@@ -149,48 +149,41 @@ export const getAllOngoingElectionResults = async (userId) => {
   try {
     const user = await CompletedUser.findById(userId).lean();
     if (!user) throw new Error("User not found");
-    // console.log("User fetched:", user);
 
     // Fetch ongoing elections
     const ongoingElections = await Election.find({
       startDate: { $lte: new Date() },
       endDate: { $gte: new Date() },
     }).lean();
-    // console.log("Ongoing Elections:", ongoingElections);
 
     if (!ongoingElections || ongoingElections.length === 0) {
-      // console.log("No ongoing elections found.");
       return { message: "No ongoing election results" };
     }
 
     // Prioritize election types
     const prioritizedTypes = [
-      "gubernatorial",
       "national",
       "senatorial",
+      "gubernatorial",
       "house-of-representatives",
       "house-of-assembly",
       "lga",
     ];
-  
 
-    // Rotate to the next election type
-    for (let i = 0; i < prioritizedTypes.length; i++) {
-      lastServedIndex = (lastServedIndex + 1) % prioritizedTypes.length;
-      const electionTypeToServe = prioritizedTypes[lastServedIndex];
-      // console.log(`Serving election type: ${electionTypeToServe}`);
-
-      // Find the next election of the specified type
+    // Check for each election type in priority order and return the first available result
+    for (let electionType of prioritizedTypes) {
       const selectedElection = ongoingElections.find(
-        (election) => election.electionType === electionTypeToServe
+        (election) => election.electionType === electionType
       );
 
       if (selectedElection) {
-        return await handleElectionResult(selectedElection, user);
+        const result = await handleElectionResult(selectedElection, user);
+        if (result && !result.message) {
+          return result; // Return the first available result
+        }
       }
     }
 
-    // console.log("No prioritized ongoing election found.");
     return { message: "No ongoing election results" };
   } catch (error) {
     console.error("Error fetching ongoing election results:", error);
@@ -213,7 +206,6 @@ const handleElectionResult = async (selectedElection, user) => {
       name: "Senatorial District",
       value: getSenatorialDistrict(user.lga) || "Unknown",
     };
-    // console.log("Restricted LGAs for Senatorial:", restrictedLGAs);
     if (!restrictedLGAs.length)
       return { message: "No results for your district" };
   } else if (selectedElection.electionType === "house-of-representatives") {
@@ -223,13 +215,11 @@ const handleElectionResult = async (selectedElection, user) => {
       name: "House of Reps District",
       value: getHouseOfRepsDistrict(user.lga) || "Unknown",
     };
-    // console.log("Restricted LGAs for House of Reps:", restrictedLGAs);
     if (!restrictedLGAs.length)
       return { message: "No results for your district" };
   } else if (selectedElection.electionType === "gubernatorial") {
     // Fetch gubernatorial results for all states
     const statesResults = await fetchGubernatorialResults(selectedElection._id);
-    // console.log("Gubernatorial State Results:", statesResults);
     if (statesResults.length > 0) {
       return {
         electionType: selectedElection.electionType,
@@ -241,10 +231,8 @@ const handleElectionResult = async (selectedElection, user) => {
     }
     return { message: "No gubernatorial results available" };
   } else if (selectedElection.electionType === "lga") {
-    // Restrict to the specific ward within the user's LGA
     groupBy = "ward";
     restriction = { name: "Ward", value: user.ward };
-    // console.log(`Restricting LGA election to user's ward: ${user.ward}`);
   }
 
   // Fetch other election results
@@ -262,7 +250,6 @@ const handleElectionResult = async (selectedElection, user) => {
       ? { ward: user.ward }
       : {}),
   }).lean();
-  // console.log("Election Results:", electionResults);
 
   if (electionResults.length > 0) {
     const { chart, aggregateAnalysis } = aggregateResultsAndTopParties(
@@ -289,9 +276,9 @@ const handleElectionResult = async (selectedElection, user) => {
     };
   }
 
-  console.log("No results available for the selected election.");
   return { message: "No results available" };
 };
+
 
 
 
@@ -693,17 +680,68 @@ const calculateSentimentFooter = (aggregatedSentiment) => {
 };
 
 
-
 export const getActivityBoardAndNotificationsService = async () => {
   try {
-    // Activity Board Data
+    // Total number of results
     const totalResults = await ElectionData.countDocuments({});
-    const totalObserverResults = await ElectionData.countDocuments({
-      userRole: "observer",
-    });
-    const totalVolunteerResults = await ElectionData.countDocuments({
+
+    // Aggregate observer results based on the `isObserverInPollingUnit` field
+    const observerResultsAggregation = await ElectionData.aggregate([
+      { $match: { userRole: "observer" } },
+      {
+        $lookup: {
+          from: "completedusers",
+          localField: "user",
+          foreignField: "_id",
+          as: "userDetails",
+        },
+      },
+      { $unwind: "$userDetails" }, 
+      {
+        $group: {
+          _id: null,
+          totalObserverInPollingUnit: {
+            $sum: {
+              $cond: [
+                { $eq: ["$userDetails.isObserverInPollingUnit", true] },
+                1,
+                0,
+              ],
+            },
+          },
+          totalObserverNotInPollingUnit: {
+            $sum: {
+              $cond: [
+                { $eq: ["$userDetails.isObserverInPollingUnit", false] },
+                1,
+                0,
+              ],
+            },
+          },
+        },
+      },
+    ]);
+
+    // Determine counts from aggregation results
+    const totalObserverResults =
+      observerResultsAggregation.length > 0
+        ? observerResultsAggregation[0].totalObserverInPollingUnit
+        : 0;
+    const observerActingAsVolunteers =
+      observerResultsAggregation.length > 0
+        ? observerResultsAggregation[0].totalObserverNotInPollingUnit
+        : 0;
+
+    // Traditional volunteer results count
+    const traditionalVolunteerResults = await ElectionData.countDocuments({
       userRole: "volunteer",
     });
+
+    // Combine observers acting as volunteers with traditional volunteers
+    const totalVolunteerResults =
+      observerActingAsVolunteers + traditionalVolunteerResults;
+
+    // Approved and pending results counts
     const totalApprovedResults = await ElectionData.countDocuments({
       isApproved: true,
     });
@@ -719,7 +757,7 @@ export const getActivityBoardAndNotificationsService = async () => {
       "all the total pending approved result": totalPendingResults,
     };
 
-    // Top 10 Most Recent Notifications
+    // Fetch the top 10 most recent notifications
     const notifications = await Notification.find({})
       .sort({ createdAt: -1 })
       .limit(10)

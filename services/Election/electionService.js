@@ -839,11 +839,18 @@ export const updateResultDataService = async (
 };
 
 
-export const deleteElectionResultDataService = async (electionId) => {
+export const deleteElectionResultDataService = async (electionId, userId) => {
   try {
-    // Find and delete the result data
+    // Find the user by ID
+    const user = await CompletedUser.findById(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+    
+    // Find the result data and ensure it belongs to the requesting user
     const result = await ElectionData.findOneAndDelete({
       election: electionId,
+      user: userId,
     });
 
     if (!result) {
@@ -861,6 +868,7 @@ export const deleteElectionResultDataService = async (electionId) => {
     throw new Error(`Failed to delete result data: ${error.message}`);
   }
 };
+
 
 export const getUserElectionData = async (userId) => {
   return await ElectionData.find({ user: userId }).populate("election");
@@ -1221,6 +1229,10 @@ export const updateIncidentReportDataService = async (
     const electionExists = await Election.findById(electionId);
     if (!electionExists) throw new Error("Election not found");
 
+    // Check user existence
+    const user = await CompletedUser.findById(userId);
+    if (!user) throw new Error("User not found");
+
     // Check if the incident report exists and belongs to the user
     const report = await IncidentReport.findOne({
       election: electionId,
@@ -1244,10 +1256,10 @@ export const updateIncidentReportDataService = async (
     report.electionRating =
       electionRating !== undefined ? electionRating : report.electionRating;
 
-      const incidentVideos = files["incidentVideos[]"]
-      const incidentPictures = files["incidentPictures[]"]
+    const incidentVideos = files["incidentVideos[]"];
+    const incidentPictures = files["incidentPictures[]"];
 
-      console.log(incidentVideos, incidentPictures)
+    console.log(incidentVideos, incidentPictures);
     // Handle video files
     const previousIncidentVideoFiles = previousIncidentVideos?.length
       ? await File.find({ _id: { $in: previousIncidentVideos } })
@@ -1285,17 +1297,25 @@ export const updateIncidentReportDataService = async (
 
 };
 
-export const deleteIncidentReportDataService = async (electionId) => {
+export const deleteIncidentReportDataService = async (electionId, userId) => {
   try {
-    // Find and delete the incident report
+    // Find the user by ID
+    const user = await CompletedUser.findById(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Find the incident report and ensure it belongs to the requesting user
     const incidentReport = await IncidentReport.findOneAndDelete({
       election: electionId,
+      user: userId,
     });
 
     if (!incidentReport) {
       throw new Error("Incident report not found or unauthorized");
     }
 
+    // Update the election to remove the reference to the deleted incident report
     await Election.findByIdAndUpdate(electionId, {
       $pull: { incidentReports: incidentReport._id },
     });
@@ -1305,6 +1325,7 @@ export const deleteIncidentReportDataService = async (electionId) => {
     throw new Error(`Failed to delete incident report data: ${error.message}`);
   }
 };
+
 
 
 export const getUserElectionResultsAndReports = async (userId) => {
@@ -1679,757 +1700,6 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
     incidentReports: reportData,
   };
 };
-
-
-// Helper function to aggregate and get the top parties
-
-// const aggregateResultsAndTopParties = (results, groupBy = "state") => {
-//   const aggregated = {};
-//   const totalVotesByParty = {}; // To track the total votes for each party across all results
-
-//   // Step 1: Aggregating votes from polling unit -> ward -> lga -> state
-//   results.forEach((result) => {
-//     const { state, lga, ward, partiesVotes, userRole } = result;
-
-//     // Only consider results from observers
-//     if (userRole !== "observer") return;
-
-//     // Determine aggregation key based on groupBy parameter
-//     let key;
-//     if (groupBy === "state") {
-//       key = state;
-//     } else if (groupBy === "lga") {
-//       key = lga;
-//     } else if (groupBy === "ward") {
-//       key = ward;
-//     } else {
-//       throw new Error(
-//         "Invalid groupBy value. It must be 'state', 'lga', or 'ward'."
-//       );
-//     }
-
-//     // Initialize the aggregation structure if not exists
-//     if (!aggregated[key]) {
-//       aggregated[key] = { totalVotes: 0, partiesVotes: {} };
-//     }
-
-//     // Step 2: Aggregate partiesVotes at polling unit level
-//     partiesVotes.forEach(({ party, count }) => {
-//       // Aggregate the votes for each party at the key level (state, lga, or ward)
-//       aggregated[key].partiesVotes[party] =
-//         (aggregated[key].partiesVotes[party] || 0) + count;
-//       aggregated[key].totalVotes += count;
-
-//       // Accumulate total votes across all results for each party (for aggregate analysis)
-//       totalVotesByParty[party] = (totalVotesByParty[party] || 0) + count;
-//     });
-//   });
-
-//   // Step 3: Format aggregated results and get top three parties
-//   const chart = Object.entries(aggregated).map(([key, data]) => ({
-//     [groupBy]: key, // This will either be 'state', 'lga', or 'ward' based on aggregation
-//     ...getTopThreeParties(data.partiesVotes),
-//   }));
-
-//   // Step 4: Prepare the aggregate analysis (total votes for each party)
-//   const aggregateanalysis = Object.keys(totalVotesByParty).reduce(
-//     (acc, party) => {
-//       acc[party] = totalVotesByParty[party];
-//       return acc;
-//     },
-//     {}
-//   );
-
-//   return { chart, aggregateanalysis };
-// };
-
-// // Helper function to get top three parties (consider ties for third place)
-// const getTopThreeParties = (partiesVotes) => {
-//   const sortedParties = Object.entries(partiesVotes).sort(
-//     ([, aVotes], [, bVotes]) => bVotes - aVotes
-//   );
-
-//   const topParties = {};
-//   for (let i = 0; i < sortedParties.length; i++) {
-//     const [party, count] = sortedParties[i];
-//     if (Object.keys(topParties).length >= 3 && count !== sortedParties[2][1])
-//       break;
-//     topParties[party] = count;
-//   }
-
-//   return topParties;
-// };
-
-
-// export const getNationalResults = async (electionId) => {
-//   // Fetch election data for observers
-//   const electionResults = await ElectionData.find({
-//     election: electionId,
-//     userRole: "observer",
-//   }).lean();
-
-//   // Aggregate results by state and get top three parties
-//   const { chart, aggregateanalysis } = aggregateResultsAndTopParties(
-//     electionResults,
-//     "state"
-//   );
-
-//   // Registered and submitted states count
-//   const allStates = new Set(electionResults.map((result) => result.state));
-//   const submittedStates = new Set(
-//     electionResults
-//       .filter((result) => result.partiesVotes.length)
-//       .map((result) => result.state)
-//   );
-
-//   const footer = {
-//     "registered-states": allStates.size,
-//     "submitted-states": submittedStates.size,
-//   };
-
-//   // Fetch election details
-//   const electionDetails = await Election.findById(electionId)
-//     .select("electionType electionName electionLocation startDate endDate")
-//     .lean();
-
-//   // Return the election details, chart, footer, and aggregate analysis
-//   return { electionDetails, chart, footer, aggregateanalysis };
-// };
-
-// // Fetch results for senatorial election
-// export const getSenatorialResults = async (electionId, user) => {
-//   const userLGA = user.lga;
-
-//   // Find the senatorial district for the user's LGA
-//   const districtData = lgaData.find(
-//     (lga) => lga.name.toUpperCase() === userLGA.toUpperCase()
-//   );
-
-//   if (!districtData || !districtData.senatorial_district) {
-//     throw new Error("Senatorial district not found for user LGA");
-//   }
-
-
-//   // Fetch election results for all LGAs in the same senatorial district
-//   const allLGAsInDistrict = lgaData
-//     .filter(
-//       (lga) => lga.senatorial_district === districtData.senatorial_district
-//     )
-//     .map((lga) => lga.name);
-
-//   const electionResults = await ElectionData.find({
-//     election: electionId,
-//     lga: { $in: allLGAsInDistrict },
-//     // isApproved: true,
-//     userRole: "observer",
-//   }).lean();
-
-//   // Aggregate by LGA
-//   const { chart, aggregateanalysis } = aggregateResultsAndTopParties(
-//     electionResults,
-//     "lga"
-//   );
-
-//   // Registered and submitted LGAs
-//   const submittedLGAs = new Set(
-//     electionResults
-//       .filter((result) => result.partiesVotes.length)
-//       .map((result) => result.lga)
-//   );
-
-//   const footer = {
-//     "registered-LGAs": allLGAsInDistrict.length,
-//     "submitted-LGAs": submittedLGAs.size,
-//   };
-
-//   const electionDetails = await Election.findById(electionId)
-//     .select("electionType electionName electionLocation startDate endDate")
-//     .lean();
-
-//   return {
-//     electionDetails,
-//     chart,
-//     footer,
-//     restriction: {
-//       name: "Senatorial District",
-//       value: districtData.senatorial_district,
-//     },
-//     aggregateanalysis,
-//   };
-// };
-
-// // Fetch results for gubernatorial election
-// export const getGubernatorialResults = async (electionId, user) => {
-//   const electionResults = await ElectionData.find({
-//     election: electionId,
-//     state: user.state,
-//     // isApproved: true,
-//     userRole: "observer",
-//   }).lean();
-
-//   // Aggregate by LGA
-//   const { chart, aggregateanalysis } = aggregateResultsAndTopParties(
-//     electionResults,
-//     "lga"
-//   );
-
-//   // Registered and submitted LGAs
-//   const allLGAsInState = new Set(electionResults.map((result) => result.lga));
-//   const submittedLGAs = new Set(
-//     electionResults
-//       .filter((result) => result.partiesVotes.length)
-//       .map((result) => result.lga)
-//   );
-
-//   const footer = {
-//     "registered-LGAs": allLGAsInState.size,
-//     "submitted-LGAs": submittedLGAs.size,
-//   };
-
-//   const electionDetails = await Election.findById(electionId)
-//     .select("electionType electionName electionLocation startDate endDate")
-//     .lean();
-
-//   return { electionDetails, chart, footer, aggregateanalysis };
-// };
-
-// // Fetch results for House of Reps election
-// export const getHouseOfRepsResults = async (electionId, user) => {
-//   const userLGA = user.lga;
-
-//   // Find the House of Representatives district for the user's LGA
-//   const districtData = lgaData.find(
-//     (lga) => lga.name.toUpperCase() === userLGA.toUpperCase()
-//   );
-
-//   if (!districtData || !districtData.house_of_representatives) {
-//     throw new Error("House of Representatives district not found for user LGA");
-//   }
-
-//   // Fetch election results for all LGAs in the same district
-//   const allLGAsInDistrict = lgaData
-//     .filter(
-//       (lga) =>
-//         lga.house_of_representatives === districtData.house_of_representatives
-//     )
-//     .map((lga) => lga.name);
-
-//   const electionResults = await ElectionData.find({
-//     election: electionId,
-//     lga: { $in: allLGAsInDistrict },
-//     // isApproved: true,
-//     userRole: "observer",
-//   }).lean();
-
-//   // Aggregate by LGA
-//   const { chart, aggregateanalysis } = aggregateResultsAndTopParties(
-//     electionResults,
-//     "lga"
-//   );
-
-//   // Registered and submitted LGAs
-//   const submittedLGAs = new Set(
-//     electionResults
-//       .filter((result) => result.partiesVotes.length)
-//       .map((result) => result.lga)
-//   );
-
-//   const footer = {
-//     "registered-LGAs": allLGAsInDistrict.length,
-//     "submitted-LGAs": submittedLGAs.size,
-//   };
-
-//   const electionDetails = await Election.findById(electionId)
-//     .select("electionType electionName electionLocation startDate endDate")
-//     .lean();
-
-//   return {
-//     electionDetails,
-//     chart,
-//     footer,
-//     restriction: {
-//       name: "House of Reps",
-//       value: districtData.house_of_representatives,
-//     },
-//     aggregateanalysis,
-//   };
-// };
-
-// // Fetch results for house of assembly election
-// export const getHouseOfAssemblyResults = async (electionId, user) => {
-//   const electionResults = await ElectionData.find({
-//     election: electionId,
-//     state: user.state,
-//     // isApproved: true,
-//     userRole: "observer",
-//   }).lean();
-
-//   // Aggregate by LGA
-//   const { chart, aggregateanalysis } = aggregateResultsAndTopParties(
-//     electionResults,
-//     "lga"
-//   );
-
-//   // Registered and submitted LGAs
-//   const allLGAsInState = new Set(electionResults.map((result) => result.lga));
-//   const submittedLGAs = new Set(
-//     electionResults
-//       .filter((result) => result.partiesVotes.length)
-//       .map((result) => result.lga)
-//   );
-
-
-
-//   const footer = {
-//     "registered-LGAs": allLGAsInState.size,
-//     "submitted-LGAs": submittedLGAs.size,
-//   };
-
-//   const electionDetails = await Election.findById(electionId)
-//     .select("electionType electionName electionLocation startDate endDate")
-//     .lean();
-
-//   return { electionDetails, chart, footer, aggregateanalysis };
-// };
-
-// export const getLocalGovernmentResults = async (electionId, user) => {
-//   const electionResults = await ElectionData.find({
-//     election: electionId,
-//     lga: user.lga,
-//     // isApproved: true,
-//     userRole: "observer",
-//   }).lean();
-
-//   // Aggregate by Ward
-//   const { chart, aggregateanalysis } = aggregateResultsAndTopParties(
-//     electionResults,
-//     "ward"
-//   );
-
-//   // Registered and submitted wards
-//   const allWardsInLGA = new Set(electionResults.map((result) => result.ward));
-//   const submittedWards = new Set(
-//     electionResults
-//       .filter((result) => result.partiesVotes.length)
-//       .map((result) => result.ward)
-//   );
-
-//   const footer = {
-//     "registered-wards": allWardsInLGA.size,
-//     "submitted-wards": submittedWards.size,
-//   };
-
-//   const electionDetails = await Election.findById(electionId)
-//     .select("electionType electionName electionLocation startDate endDate")
-//     .lean();
-
-//   return { electionDetails, chart, footer, aggregateanalysis };
-// };
-
-// // Incident Report Aggregate Analysis
-
-// const aggregateIncidentsByLocation = (incidents, groupBy = "state") => {
-//   const aggregated = {};
-//   const totalIncidentCounts = {
-//     "Thuggery and Violence": 0,
-//     "Lack of electoral materials": 0,
-//     "Fraudulent electoral officers": 0,
-//     "Late commencement": 0,
-//     "Over voting": 0,
-//     Other: 0,
-//   };
-
-//   // Step 1: Aggregating incident counts based on the location
-//   incidents.forEach((incident) => {
-//     const { state, lga, ward, selectIncident } = incident;
-
-//     // Determine aggregation key based on groupBy parameter
-//     let key;
-//     if (groupBy === "state") {
-//       key = state;
-//     } else if (groupBy === "lga") {
-//       key = lga;
-//     } else if (groupBy === "ward") {
-//       key = ward;
-//     } else {
-//       throw new Error(
-//         "Invalid groupBy value. It must be 'state', 'lga', or 'ward'."
-//       );
-//     }
-
-//     // Initialize the aggregation structure if not exists
-//     if (!aggregated[key]) {
-//       aggregated[key] = {
-//         "Thuggery and Violence": 0,
-//         "Lack of electoral materials": 0,
-//         "Fraudulent electoral officers": 0,
-//         "Late commencement": 0,
-//         "Over voting": 0,
-//         Other: 0,
-//       };
-//     }
-
-//     // Increment incident count for the respective location and incident type
-//     aggregated[key][selectIncident]++;
-
-//     // Update total incident counts for the aggregate analysis
-//     totalIncidentCounts[selectIncident]++;
-//   });
-
-//   // Step 2: Format the chart with the incident data for each location
-//   const chart = Object.entries(aggregated).map(([key, incidents]) => ({
-//     [groupBy]: key,
-//     ...incidents,
-//   }));
-
-//   return { chart, totalIncidentCounts };
-// };
-
-// export const getNationalIncidentReports = async (electionId) => {
-//   // Fetch incident reports for the national election
-//   const incidents = await IncidentReport.find({
-//     election: electionId,
-//   }).lean();
-
-//   // Aggregate incident reports by state
-//   const { chart, totalIncidentCounts } = aggregateIncidentsByLocation(
-//     incidents,
-//     "state"
-//   );
-
-//   // Registered and submitted states count
-//   const allStates = new Set(incidents.map((incident) => incident.state));
-//   const submittedStates = new Set(
-//     incidents
-//       .filter((incident) => incident.selectIncident)
-//       .map((incident) => incident.state)
-//   );
-
-//   const footer = {
-//     "registered-states": allStates.size,
-//     "submitted-states": submittedStates.size,
-//   };
-
-//   const electionDetails = await Election.findById(electionId)
-//     .select("electionType electionName electionLocation startDate endDate")
-//     .lean();
-
-//   // Return the election details, incident chart, footer, and aggregate analysis
-//   return {
-//     electionDetails,
-//     chart,
-//     footer,
-//     aggregateanalysis: totalIncidentCounts,
-//   };
-// };
-
-// export const getSenatorialIncidentReports = async (electionId, user) => {
-//   const userLGA = user.lga;
-
-//   // Find the senatorial district for the user's LGA
-//   const districtData = lgaData.find(
-//     (lga) => lga.name.toUpperCase() === userLGA.toUpperCase()
-//   );
-
-//   if (!districtData || !districtData.senatorial_district) {
-//     throw new Error("Senatorial district not found for user LGA");
-//   }
-
-//   // Fetch incident reports for all LGAs in the same senatorial district
-//   const allLGAsInDistrict = lgaData
-//     .filter(
-//       (lga) => lga.senatorial_district === districtData.senatorial_district
-//     )
-//     .map((lga) => lga.name);
-
-//   const incidents = await IncidentReport.find({
-//     election: electionId,
-//     lga: { $in: allLGAsInDistrict },
-//   }).lean();
-
-//   // Aggregate incident reports by LGA
-//   const { chart, totalIncidentCounts } = aggregateIncidentsByLocation(
-//     incidents,
-//     "lga"
-//   );
-
-//   // Registered and submitted LGAs count
-//   const submittedLGAs = new Set(incidents.map((incident) => incident.lga));
-
-//   const footer = {
-//     "registered-LGAs": allLGAsInDistrict.length,
-//     "submitted-LGAs": submittedLGAs.size,
-//   };
-
-//   const electionDetails = await Election.findById(electionId)
-//     .select("electionType electionName electionLocation startDate endDate")
-//     .lean();
-
-//   // Return the election details, incident chart, footer, and aggregate analysis
-//   return {
-//     electionDetails,
-//     chart,
-//     footer,
-//     aggregateanalysis: totalIncidentCounts,
-//     restriction: {
-//       name: "Senatorial District",
-//       value: districtData.senatorial_district,
-//     },
-//   };
-// };
-
-// export const getHouseOfRepsIncidentReports = async (electionId, user) => {
-//   const userLGA = user.lga;
-
-//   // Find the House of Representatives district for the user's LGA
-//   const districtData = lgaData.find(
-//     (lga) => lga.name.toUpperCase() === userLGA.toUpperCase()
-//   );
-
-//   if (!districtData || !districtData.house_of_representatives) {
-//     throw new Error("House of Representatives district not found for user LGA");
-//   }
-
-//   // Fetch incident reports for all LGAs in the same House of Reps district
-//   const allLGAsInDistrict = lgaData
-//     .filter(
-//       (lga) =>
-//         lga.house_of_representatives === districtData.house_of_representatives
-//     )
-//     .map((lga) => lga.name);
-
-//   const incidents = await IncidentReport.find({
-//     election: electionId,
-//     lga: { $in: allLGAsInDistrict },
-//   }).lean();
-
-//   // Aggregate incident reports by LGA
-//   const { chart, totalIncidentCounts } = aggregateIncidentsByLocation(
-//     incidents,
-//     "lga"
-//   );
-
-//   // Registered and submitted LGAs count
-//   const submittedLGAs = new Set(incidents.map((incident) => incident.lga));
-
-//   const footer = {
-//     "registered-LGAs": allLGAsInDistrict.length,
-//     "submitted-LGAs": submittedLGAs.size,
-//   };
-
-//   const electionDetails = await Election.findById(electionId)
-//     .select("electionType electionName electionLocation startDate endDate")
-//     .lean();
-
-//   // Return the election details, incident chart, footer, and aggregate analysis
-//   return {
-//     electionDetails,
-//     chart,
-//     footer,
-//     aggregateanalysis: totalIncidentCounts,
-//     restriction: {
-//       name: "House of Reps",
-//       value: districtData.house_of_representatives,
-//     },
-//   };
-// };
-
-// export const getGubernatorialIncidentReports = async (electionId, user) => {
-//   // Fetch incident reports for the user's state
-//   const incidents = await IncidentReport.find({
-//     election: electionId,
-//     state: user.state,
-//   }).lean();
-
-//   // Aggregate incident reports by LGA
-//   const { chart, totalIncidentCounts } = aggregateIncidentsByLocation(
-//     incidents,
-//     "lga"
-//   );
-
-//   // Registered and submitted LGAs count
-//   const allLGAsInState = new Set(
-//     lgaData.filter((lga) => lga.state === user.state).map((lga) => lga.name)
-//   );
-//   const submittedLGAs = new Set(incidents.map((incident) => incident.lga));
-
-//   const footer = {
-//     "registered-LGAs": allLGAsInState.size,
-//     "submitted-LGAs": submittedLGAs.size,
-//   };
-
-//   const electionDetails = await Election.findById(electionId)
-//     .select("electionType electionName electionLocation startDate endDate")
-//     .lean();
-
-//   // Return the election details, incident chart, footer, and aggregate analysis
-//   return {
-//     electionDetails,
-//     chart,
-//     footer,
-//     aggregateanalysis: totalIncidentCounts,
-//   };
-// };
-
-// export const getHouseOfAssIncidentReports = async (electionId, user) => {
-//   // Fetch incident reports for the user's state
-//   const incidents = await IncidentReport.find({
-//     election: electionId,
-//     state: user.state,
-//   }).lean();
-
-//   // Aggregate incident reports by LGA
-//   const { chart, totalIncidentCounts } = aggregateIncidentsByLocation(
-//     incidents,
-//     "lga"
-//   );
-
-//   // Registered and submitted LGAs count
-//   const allLGAsInState = new Set(
-//     lgaData.filter((lga) => lga.state === user.state).map((lga) => lga.name)
-//   );
-//   const submittedLGAs = new Set(incidents.map((incident) => incident.lga));
-
-//   const footer = {
-//     "registered-LGAs": allLGAsInState.size,
-//     "submitted-LGAs": submittedLGAs.size,
-//   };
-
-//   const electionDetails = await Election.findById(electionId)
-//     .select("electionType electionName electionLocation startDate endDate")
-//     .lean();
-
-//   // Return the election details, incident chart, footer, and aggregate analysis
-//   return {
-//     electionDetails,
-//     chart,
-//     footer,
-//     aggregateanalysis: totalIncidentCounts,
-//   };
-// };
-
-// export const getLocalGovernmentIncidentReports = async (electionId, user) => {
-//   // Fetch incident reports for the user's LGA
-//   const incidents = await IncidentReport.find({
-//     election: electionId,
-//     lga: user.lga,
-//   }).lean();
-
-//   // Aggregate incident reports by Ward
-//   const { chart, totalIncidentCounts } = aggregateIncidentsByLocation(
-//     incidents,
-//     "ward"
-//   );
-
-//   // Registered and submitted Wards count
-//   const allWardsInLGA = new Set(
-//     lgaData.filter((lga) => lga.name === user.lga).map((ward) => ward.name)
-//   );
-//   const submittedWards = new Set(incidents.map((incident) => incident.ward));
-
-//   const footer = {
-//     "registered-wards": allWardsInLGA.size,
-//     "submitted-wards": submittedWards.size,
-//   };
-
-//   const electionDetails = await Election.findById(electionId)
-//     .select("electionType electionName electionLocation startDate endDate")
-//     .lean();
-
-//   // Return the election details, incident chart, footer, and aggregate analysis
-//   return {
-//     electionDetails,
-//     chart,
-//     footer,
-//     aggregateanalysis: totalIncidentCounts,
-//   };
-// };
-
-
-// const aggregateSentimentAnalysis = (results, groupBy = "state") => {
-//   const aggregated = {};
-
-//   results.forEach((result) => {
-//     const {
-//       state,
-//       lga,
-//       ward,
-//       voteRating,
-//       voterIntimidation,
-//       voteBuying,
-//       userRole,
-//     } = result;
-
-//     // Only include data from observers
-//     if (userRole !== "observer") return;
-
-//     // Determine aggregation key (state, lga, or ward)
-//     let key;
-//     if (groupBy === "state") {
-//       key = state;
-//     } else if (groupBy === "lga") {
-//       key = lga;
-//     } else if (groupBy === "ward") {
-//       key = ward;
-//     } else {
-//       throw new Error(
-//         "Invalid groupBy value. It must be 'state', 'lga', or 'ward'."
-//       );
-//     }
-
-//     // Initialize aggregation structure if it doesn't exist
-//     if (!aggregated[key]) {
-//       aggregated[key] = {
-//         voteRating: { good: 0, okay: 0, poor: 0 },
-//         voterIntimidation: { yes: 0, no: 0 },
-//         voteBuying: { yes: 0, no: 0 },
-//       };
-//     }
-
-//     // Aggregate voteRating counts
-//     if (voteRating) {
-//       aggregated[key].voteRating[voteRating] += 1;
-//     }
-
-//     // Aggregate voterIntimidation counts
-//     if (voterIntimidation) {
-//       aggregated[key].voterIntimidation[voterIntimidation] += 1;
-//     }
-
-//     // Aggregate voteBuying counts
-//     if (voteBuying) {
-//       aggregated[key].voteBuying[voteBuying] += 1;
-//     }
-//   });
-
-//   return aggregated;
-// };
-
-// const formatSentimentAnalysis = (aggregatedSentiment, groupBy) => {
-//   return Object.entries(aggregatedSentiment).map(([key, sentimentData]) => ({
-//     [groupBy]: key,
-//     voteRating: sentimentData.voteRating,
-//     voterIntimidation: sentimentData.voterIntimidation,
-//     voteBuying: sentimentData.voteBuying,
-//   }));
-// };
-
-// // Service function to fetch sentiment analysis data based on electionId and user details
-// export const getSentimentAnalysisService = async (
-//   electionId,
-//   groupBy = "state"
-// ) => {
-//   const electionData = await ElectionData.find({
-//     election: electionId,
-//     userRole: "observer",
-//   }).lean();
-
-//   // Perform sentiment analysis aggregation
-//   const aggregatedSentiment = aggregateSentimentAnalysis(electionData, groupBy);
-
-//   // Format the aggregated sentiment analysis data
-//   return formatSentimentAnalysis(aggregatedSentiment, groupBy);
-// };
 
 
 

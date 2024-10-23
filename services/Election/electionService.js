@@ -587,32 +587,98 @@ export const uploadResultDataService = async (
     const toTitleCase = (text) => {
       return text
         .split("-")
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ");
+        .map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        )
+        .join(" ");
     };
-    const formattedElectionType = toTitleCase(
-      election.electionType || "Election"
+
+    const formattedElectionName = toTitleCase(
+      election.electionName || "Election"
     );
     const formattedStateName = toTitleCase(user.state || "State");
+
+    // Determine body and info based on election type
+    let uploadNotificationBody = "";
+    let uploadNotificationInfo = "";
+
+    switch (election.electionType) {
+      case "national":
+        uploadNotificationBody = `Result uploaded for ${formattedStateName} State`;
+        uploadNotificationInfo = `${formattedElectionName} Election`;
+        break;
+
+      case "senatorial":
+      case "gubernatorial":
+      case "house-of-representatives":
+      case "house-of-assembly":
+        const formattedLGAName = toTitleCase(user.lga || "LGA");
+        uploadNotificationBody = `Result uploaded for ${formattedLGAName} LGA`;
+        uploadNotificationInfo = `${formattedStateName} State ${formattedElectionName} Election`;
+        break;
+
+      case "lga":
+        const formattedWardName = toTitleCase(user.ward || "Ward");
+        uploadNotificationBody = `Result uploaded for ${formattedWardName} Ward`;
+        uploadNotificationInfo = `${formattedStateName} State ${formattedElectionName} Election`;
+        break;
+
+      default:
+        uploadNotificationBody = `Result uploaded for ${formattedElectionName} Election`;
+        uploadNotificationInfo = `${formattedElectionName} Election`;
+    }
+
+    // Create the upload notification
     const uploadNotification = new Notification({
       type: "result-upload",
-      body: `Result uploaded for ${formattedStateName} ${formattedElectionType}`,
-      info: `${formattedStateName} ${formattedElectionType} Election`,
+      body: uploadNotificationBody,
+      info: uploadNotificationInfo,
     });
+
     await uploadNotification.save();
 
-    // Create or Update pending approval notification
+    // Create or update pending approval notification
     const pendingCount = await ElectionData.countDocuments({
       election: electionId,
       isApproved: false,
     });
 
+    let pendingNotificationBody = "";
+    let pendingNotificationInfo = "";
+
+    switch (election.electionType) {
+      case "national":
+        pendingNotificationBody = `${pendingCount} Pending Approval for ${formattedStateName} State`;
+        pendingNotificationInfo = `${formattedElectionName} Election`;
+        break;
+
+      case "senatorial":
+      case "gubernatorial":
+      case "house-of-representatives":
+      case "house-of-assembly":
+        const formattedLGANameForPending = toTitleCase(user.lga || "LGA");
+        pendingNotificationBody = `${pendingCount} Pending Approval for ${formattedLGANameForPending} LGA`;
+        pendingNotificationInfo = `${formattedStateName} State ${formattedElectionName} Election`;
+        break;
+
+      case "lga":
+        const formattedWardNameForPending = toTitleCase(user.ward || "Ward");
+        pendingNotificationBody = `${pendingCount} Pending Approval for ${formattedWardNameForPending} Ward`;
+        pendingNotificationInfo = `${formattedStateName} State ${formattedElectionName} Election`;
+        break;
+
+      default:
+        pendingNotificationBody = `${pendingCount} Pending Approval for ${formattedElectionName}`;
+        pendingNotificationInfo = `${formattedElectionName} Election`;
+    }
+
+    // Save pending approval notification
     const pendingNotification = new Notification({
       type: "pending-approval",
-      body: `${pendingCount} pending approval for ${formattedStateName}`,
-      info: `${formattedElectionType} Election`,
+      body: pendingNotificationBody,
+      info: pendingNotificationInfo,
     });
 
-    
     await pendingNotification.save();
 
     // Convert to a plain object and remove isApproved if not applicable

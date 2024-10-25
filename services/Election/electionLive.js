@@ -555,47 +555,47 @@ const aggregateResultsAndTopParties = (results, groupBy = "state") => {
 
 
 // Aggregates sentiment analysis based on vote rating, voter intimidation, and vote buying
-// const aggregateSentimentAnalysis = (results, groupBy = "state") => {
-//   const aggregated = {};
+const aggregateSentimentAnalysis = (results, groupBy = "state") => {
+  const aggregated = {};
 
-//   results.forEach((result) => {
-//     const {
-//       state,
-//       lga,
-//       ward,
-//       voteRating,
-//       voterIntimidation,
-//       voteBuying,
-//       userRole,
-//     } = result;
+  results.forEach((result) => {
+    const {
+      state,
+      lga,
+      ward,
+      voteRating,
+      voterIntimidation,
+      voteBuying,
+      userRole,
+    } = result;
 
-//     if (userRole !== "observer") return;
+    if (userRole !== "observer") return;
 
-//     // Determine the aggregation key based on the grouping level
-//     const key = groupBy === "state" ? state : groupBy === "lga" ? lga : ward;
+    // Determine the aggregation key based on the grouping level
+    const key = groupBy === "state" ? state : groupBy === "lga" ? lga : ward;
 
-//     if (!aggregated[key]) {
-//       aggregated[key] = {
-//         voteRating: { good: 0, okay: 0, poor: 0 },
-//         voterIntimidation: { yes: 0, no: 0 },
-//         voteBuying: { yes: 0, no: 0 },
-//       };
-//     }
+    if (!aggregated[key]) {
+      aggregated[key] = {
+        voteRating: { good: 0, okay: 0, poor: 0 },
+        voterIntimidation: { yes: 0, no: 0 },
+        voteBuying: { yes: 0, no: 0 },
+      };
+    }
 
-//     // Aggregate vote ratings, voter intimidation, and vote buying data
-//     if (voteRating) {
-//       aggregated[key].voteRating[voteRating]++;
-//     }
-//     if (voterIntimidation) {
-//       aggregated[key].voterIntimidation[voterIntimidation]++;
-//     }
-//     if (voteBuying) {
-//       aggregated[key].voteBuying[voteBuying]++;
-//     }
-//   });
+    // Aggregate vote ratings, voter intimidation, and vote buying data
+    if (voteRating) {
+      aggregated[key].voteRating[voteRating]++;
+    }
+    if (voterIntimidation) {
+      aggregated[key].voterIntimidation[voterIntimidation]++;
+    }
+    if (voteBuying) {
+      aggregated[key].voteBuying[voteBuying]++;
+    }
+  });
 
-//   return aggregated;
-// };
+  return aggregated;
+};
 
 // Formats the aggregated sentiment analysis into the desired structure
 const formatSentimentAnalysis = (aggregatedSentiment, groupBy) => {
@@ -662,17 +662,17 @@ export const getSentimentAnalysisService = async (
       : {}),
   }).lean();
 
-  // Use the new aggregation method
-  const aggregatedSentiment = aggregateSentimentAnalysis(electionData);
+  // Combine and aggregate sentiment data
+  const combinedSentiment = aggregateCombinedSentiment(electionData);
 
   return {
-    chart: aggregatedSentiment, // Return a single object instead of an array
+    chart: combinedSentiment, // Return combined sentiment analysis
   };
 };
 
-// Updated Helper Function to Aggregate Sentiment Data into a Single Object
-const aggregateSentimentAnalysis = (results) => {
-  const sentimentAggregate = {
+// Helper Function to Aggregate Combined Sentiment Data
+const aggregateCombinedSentiment = (results) => {
+  const combinedSentiment = {
     voteRating: { good: 0, okay: 0, poor: 0 },
     voterIntimidation: { yes: 0, no: 0 },
     voteBuying: { yes: 0, no: 0 },
@@ -684,23 +684,24 @@ const aggregateSentimentAnalysis = (results) => {
     if (userRole !== "observer") return;
 
     if (voteRating) {
-      sentimentAggregate.voteRating[voteRating] =
-        (sentimentAggregate.voteRating[voteRating] || 0) + 1;
+      combinedSentiment.voteRating[voteRating] =
+        (combinedSentiment.voteRating[voteRating] || 0) + 1;
     }
 
     if (voterIntimidation) {
-      sentimentAggregate.voterIntimidation[voterIntimidation] =
-        (sentimentAggregate.voterIntimidation[voterIntimidation] || 0) + 1;
+      combinedSentiment.voterIntimidation[voterIntimidation] =
+        (combinedSentiment.voterIntimidation[voterIntimidation] || 0) + 1;
     }
 
     if (voteBuying) {
-      sentimentAggregate.voteBuying[voteBuying] =
-        (sentimentAggregate.voteBuying[voteBuying] || 0) + 1;
+      combinedSentiment.voteBuying[voteBuying] =
+        (combinedSentiment.voteBuying[voteBuying] || 0) + 1;
     }
   });
 
-  return sentimentAggregate;
+  return combinedSentiment;
 };
+
 
 
 // Aggregates incident reports by location (state, lga, ward)

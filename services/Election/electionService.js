@@ -129,7 +129,6 @@ export const updateElectionService = async (electionId, data) => {
 };
 
 
-
 export const getAllElectionsService = async (userId) => {
   // Helper function to standardize names by replacing spaces and hyphens with underscores
   const standardizeName = (name) => {
@@ -694,8 +693,6 @@ export const uploadResultDataService = async (
     throw new Error(`Error saving election data: ${error.message}`);
   }
 };
-
-
 export const updateResultDataService = async (
   electionId,
   userId,
@@ -838,7 +835,6 @@ export const updateResultDataService = async (
   }
 };
 
-
 export const deleteElectionResultDataService = async (electionId, userId) => {
   try {
     // Find the user by ID
@@ -868,7 +864,6 @@ export const deleteElectionResultDataService = async (electionId, userId) => {
     throw new Error(`Failed to delete result data: ${error.message}`);
   }
 };
-
 
 export const getUserElectionData = async (userId) => {
   return await ElectionData.find({ user: userId }).populate("election");

@@ -555,47 +555,47 @@ const aggregateResultsAndTopParties = (results, groupBy = "state") => {
 
 
 // Aggregates sentiment analysis based on vote rating, voter intimidation, and vote buying
-const aggregateSentimentAnalysis = (results, groupBy = "state") => {
-  const aggregated = {};
+// const aggregateSentimentAnalysis = (results, groupBy = "state") => {
+//   const aggregated = {};
 
-  results.forEach((result) => {
-    const {
-      state,
-      lga,
-      ward,
-      voteRating,
-      voterIntimidation,
-      voteBuying,
-      userRole,
-    } = result;
+//   results.forEach((result) => {
+//     const {
+//       state,
+//       lga,
+//       ward,
+//       voteRating,
+//       voterIntimidation,
+//       voteBuying,
+//       userRole,
+//     } = result;
 
-    if (userRole !== "observer") return;
+//     if (userRole !== "observer") return;
 
-    // Determine the aggregation key based on the grouping level
-    const key = groupBy === "state" ? state : groupBy === "lga" ? lga : ward;
+//     // Determine the aggregation key based on the grouping level
+//     const key = groupBy === "state" ? state : groupBy === "lga" ? lga : ward;
 
-    if (!aggregated[key]) {
-      aggregated[key] = {
-        voteRating: { good: 0, okay: 0, poor: 0 },
-        voterIntimidation: { yes: 0, no: 0 },
-        voteBuying: { yes: 0, no: 0 },
-      };
-    }
+//     if (!aggregated[key]) {
+//       aggregated[key] = {
+//         voteRating: { good: 0, okay: 0, poor: 0 },
+//         voterIntimidation: { yes: 0, no: 0 },
+//         voteBuying: { yes: 0, no: 0 },
+//       };
+//     }
 
-    // Aggregate vote ratings, voter intimidation, and vote buying data
-    if (voteRating) {
-      aggregated[key].voteRating[voteRating]++;
-    }
-    if (voterIntimidation) {
-      aggregated[key].voterIntimidation[voterIntimidation]++;
-    }
-    if (voteBuying) {
-      aggregated[key].voteBuying[voteBuying]++;
-    }
-  });
+//     // Aggregate vote ratings, voter intimidation, and vote buying data
+//     if (voteRating) {
+//       aggregated[key].voteRating[voteRating]++;
+//     }
+//     if (voterIntimidation) {
+//       aggregated[key].voterIntimidation[voterIntimidation]++;
+//     }
+//     if (voteBuying) {
+//       aggregated[key].voteBuying[voteBuying]++;
+//     }
+//   });
 
-  return aggregated;
-};
+//   return aggregated;
+// };
 
 // Formats the aggregated sentiment analysis into the desired structure
 const formatSentimentAnalysis = (aggregatedSentiment, groupBy) => {
@@ -608,6 +608,39 @@ const formatSentimentAnalysis = (aggregatedSentiment, groupBy) => {
 };
 
 // Helper function to aggregate sentiment analysis restricted to user's location
+// export const getSentimentAnalysisService = async (
+//   electionId,
+//   groupBy = "state",
+//   user,
+//   election
+// ) => {
+//   // Restrict sentiment analysis to user's location if it's not a national election
+//   const electionData = await ElectionData.find({
+//     election: electionId,
+//     userRole: "observer",
+//     ...(election.electionType === "gubernatorial" ||
+//     election.electionType === "house-of-assembly"
+//       ? { state: user.state } // Restrict to user's state
+//       : election.electionType === "senatorial" ||
+//         election.electionType === "house-of-representatives"
+//       ? { lga: user.lga } // Restrict to user's LGA for senatorial or house of reps
+//       : election.electionType === "lga"
+//       ? { ward: user.ward } // Restrict to user's ward for lga elections
+//       : {}),
+//   }).lean();
+
+//   const aggregatedSentiment = aggregateSentimentAnalysis(electionData, groupBy);
+//   const sentimentAnalysis = formatSentimentAnalysis(
+//     aggregatedSentiment,
+//     groupBy
+//   );
+
+//   return {
+//     chart: sentimentAnalysis,
+//     aggregateAnalysis: aggregatedSentiment,
+//   };
+// };
+
 export const getSentimentAnalysisService = async (
   electionId,
   groupBy = "state",
@@ -629,17 +662,46 @@ export const getSentimentAnalysisService = async (
       : {}),
   }).lean();
 
-  const aggregatedSentiment = aggregateSentimentAnalysis(electionData, groupBy);
-  const sentimentAnalysis = formatSentimentAnalysis(
-    aggregatedSentiment,
-    groupBy
-  );
+  // Use the new aggregation method
+  const aggregatedSentiment = aggregateSentimentAnalysis(electionData);
 
   return {
-    chart: sentimentAnalysis,
-    aggregateAnalysis: aggregatedSentiment,
+    chart: aggregatedSentiment, // Return a single object instead of an array
   };
 };
+
+// Updated Helper Function to Aggregate Sentiment Data into a Single Object
+const aggregateSentimentAnalysis = (results) => {
+  const sentimentAggregate = {
+    voteRating: { good: 0, okay: 0, poor: 0 },
+    voterIntimidation: { yes: 0, no: 0 },
+    voteBuying: { yes: 0, no: 0 },
+  };
+
+  results.forEach((result) => {
+    const { voteRating, voterIntimidation, voteBuying, userRole } = result;
+
+    if (userRole !== "observer") return;
+
+    if (voteRating) {
+      sentimentAggregate.voteRating[voteRating] =
+        (sentimentAggregate.voteRating[voteRating] || 0) + 1;
+    }
+
+    if (voterIntimidation) {
+      sentimentAggregate.voterIntimidation[voterIntimidation] =
+        (sentimentAggregate.voterIntimidation[voterIntimidation] || 0) + 1;
+    }
+
+    if (voteBuying) {
+      sentimentAggregate.voteBuying[voteBuying] =
+        (sentimentAggregate.voteBuying[voteBuying] || 0) + 1;
+    }
+  });
+
+  return sentimentAggregate;
+};
+
 
 // Aggregates incident reports by location (state, lga, ward)
 const aggregateIncidentsByLocation = (incidents, groupBy = "state") => {

@@ -555,31 +555,6 @@ const getElectionLocationFilter = (electionType, user) => {
   }
 };
 
-// Helper function for getting top three parties based on vote counts, considering ties for third place
-// const getTopThreeParties = (partiesVotes) => {
-//   const sortedParties = Object.entries(partiesVotes).sort(
-//     ([, aVotes], [, bVotes]) => bVotes - aVotes
-//   );
-
-//   const topParties = {};
-//   let includedParties = 0; // Counter to keep track of how many parties have been included
-
-//   for (let i = 0; i < sortedParties.length; i++) {
-//     const [party, count] = sortedParties[i];
-//     if (includedParties < 3) {
-//       topParties[party] = count;
-//       includedParties++;
-//     } else if (count === sortedParties[2][1] && includedParties === 3) {
-//       break;
-//     } else {
-//       break; 
-//     }
-//   }
-
-//   return topParties;
-// };
-
-
 // Aggregates election results and calculates the top three parties for each grouping level (state, lga, or ward)
 // const aggregateResultsAndTopParties = (results, groupBy = "state") => {
 //   const aggregated = {};
@@ -627,10 +602,33 @@ const getElectionLocationFilter = (electionType, user) => {
 // };
 
 // Helper function for getting top three parties based on vote counts after aggregation
+// const getTopThreeParties = (partiesVotes) => {
+//   const sortedParties = Object.entries(partiesVotes).sort(
+//     ([, aVotes], [, bVotes]) => bVotes - aVotes
+//   );
+
+//   const topParties = {};
+//   let includedParties = 0;
+
+//   for (let i = 0; i < sortedParties.length; i++) {
+//     const [party, count] = sortedParties[i];
+//     if (includedParties < 3) {
+//       topParties[party] = count;
+//       includedParties++;
+//     } else if (count === sortedParties[2][1] && includedParties === 3) {
+//       break;
+//     } else {
+//       break;
+//     }
+//   }
+
+//   return topParties;
+// };
+
 const getTopThreeParties = (partiesVotes) => {
-  const sortedParties = Object.entries(partiesVotes).sort(
-    ([, aVotes], [, bVotes]) => bVotes - aVotes
-  );
+  const sortedParties = Object.entries(partiesVotes)
+    .sort(([, aVotes], [, bVotes]) => bVotes - aVotes)
+    .filter(([, votes]) => votes > 0); // Filter out parties with zero votes
 
   const topParties = {};
   let includedParties = 0;
@@ -640,8 +638,6 @@ const getTopThreeParties = (partiesVotes) => {
     if (includedParties < 3) {
       topParties[party] = count;
       includedParties++;
-    } else if (count === sortedParties[2][1] && includedParties === 3) {
-      break;
     } else {
       break;
     }
@@ -649,6 +645,7 @@ const getTopThreeParties = (partiesVotes) => {
 
   return topParties;
 };
+
 
 // Aggregates election results and calculates the top three parties for each grouping level (state, lga, or ward)
 const aggregateResultsAndTopParties = (results, groupBy = "state") => {

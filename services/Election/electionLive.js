@@ -628,7 +628,7 @@ const getElectionLocationFilter = (electionType, user) => {
 const getTopThreeParties = (partiesVotes) => {
   const sortedParties = Object.entries(partiesVotes)
     .sort(([, aVotes], [, bVotes]) => bVotes - aVotes)
-    .filter(([, votes]) => votes > 0); // Filter out parties with zero votes
+    .filter(([, votes]) => votes > 0);
 
   const topParties = {};
   let includedParties = 0;
@@ -1013,7 +1013,6 @@ const calculateSentimentFooter = (aggregatedSentiment) => {
   return footer;
 };
 
-
 export const getActivityBoardAndNotificationsService = async () => {
   try {
     // Total number of results
@@ -1030,7 +1029,7 @@ export const getActivityBoardAndNotificationsService = async () => {
           as: "userDetails",
         },
       },
-      { $unwind: "$userDetails" }, 
+      { $unwind: "$userDetails" },
       {
         $group: {
           _id: null,
@@ -1075,20 +1074,44 @@ export const getActivityBoardAndNotificationsService = async () => {
     const totalVolunteerResults =
       observerActingAsVolunteers + traditionalVolunteerResults;
 
-    // Approved and pending results counts
+    // Approved results count
     const totalApprovedResults = await ElectionData.countDocuments({
       isApproved: true,
     });
-    const totalPendingResults = await ElectionData.countDocuments({
-      isApproved: false,
-    });
+
+    // Pending results count considering `isObserverInPollingUnit`
+    const totalPendingResults = await ElectionData.aggregate([
+      { $match: { isApproved: false, userRole: "observer" } },
+      {
+        $lookup: {
+          from: "completedusers",
+          localField: "user",
+          foreignField: "_id",
+          as: "userDetails",
+        },
+      },
+      { $unwind: "$userDetails" },
+      {
+        $match: {
+          "userDetails.isObserverInPollingUnit": true,
+        },
+      },
+      {
+        $count: "totalPendingResults",
+      },
+    ]);
+
+    const pendingResultsCount =
+      totalPendingResults.length > 0
+        ? totalPendingResults[0].totalPendingResults
+        : 0;
 
     const activityBoard = {
       "all the total result submitted": totalResults,
       "all the total result submitted by observer": totalObserverResults,
       "all the total result submitted by volunteer": totalVolunteerResults,
       "all the total approved result": totalApprovedResults,
-      "all the total pending approved result": totalPendingResults,
+      "all the total pending approved result": pendingResultsCount,
     };
 
     // Fetch the top 10 most recent notifications
@@ -1104,4 +1127,6 @@ export const getActivityBoardAndNotificationsService = async () => {
     );
   }
 };
+
+
 

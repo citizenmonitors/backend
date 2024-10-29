@@ -716,8 +716,6 @@ const aggregateResultsAndTopParties = (results, groupBy = "state") => {
   return { chart, aggregateAnalysis };
 };
 
-
-
 // Aggregates sentiment analysis based on vote rating, voter intimidation, and vote buying
 const aggregateSentimentAnalysis = (results, groupBy = "state") => {
   const aggregated = {};

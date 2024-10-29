@@ -1322,7 +1322,6 @@ export const deleteIncidentReportDataService = async (electionId, userId) => {
 };
 
 
-
 export const getUserElectionResultsAndReports = async (userId) => {
   try {
     // Confirm that the user exists

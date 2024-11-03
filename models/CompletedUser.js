@@ -25,7 +25,7 @@ const completedUserSchema = new mongoose.Schema({
   pendingObserverVerification: { type: Boolean, default: true },
   isActive: Boolean,
   lastLogin: Date,
-  coverageUpdateCount: Number,
+  coverageUpdateCount: { type: Number, default: 0 },
   // Observer specific fields
   observerId: [observerIdSchema],
   phoneNumber: String,

@@ -342,7 +342,7 @@ export const updateUserService = async (
         url: `${BACKEND_URL}${profileImagePath}`,
       });
 
-      updateData.profileImage = profileImageFile; 
+      updateData.profileImage = profileImageFile; // Update with the new image
     }
 
     // Check for ongoing elections using moment.js
@@ -367,7 +367,7 @@ export const updateUserService = async (
       Object.keys(updateData).includes(field)
     );
 
-    if (ongoingElections.length > 0) {
+    if (user.role === "observer" && isChangingCoverageDetails) {
       const today = moment();
 
       // Prevent changes if the current date is within any election period
@@ -377,27 +377,25 @@ export const updateUserService = async (
         return today.isBetween(electionStart, electionEnd, "day", "[]");
       });
 
-      if (isWithinOngoingElection && isChangingCoverageDetails) {
+      if (isWithinOngoingElection) {
         throw new Error(
-          "Your coverage cannot be updated when elections are currently holding. Please try again later."
+          "Observers cannot update coverage details during ongoing elections. Please try again later."
         );
       }
 
-      // Check if the user has submitted results for any ongoing election
+      // Check if the observer has submitted results for any ongoing election
       const hasSubmittedResults = await ElectionData.findOne({
         user: user._id,
         election: { $in: ongoingElections.map((election) => election._id) },
       });
 
-      if (hasSubmittedResults && isChangingCoverageDetails) {
+      if (hasSubmittedResults) {
         throw new Error(
-          "You cannot change your coverage details because you have already submitted results for an ongoing election."
+          "Observers cannot change coverage details after submitting results for an ongoing election."
         );
       }
-    }
 
-    if (user.role === "observer" && isChangingCoverageDetails) {
-      // Downgrade the observer to a volunteer if they attempt to change coverage details
+      // Downgrade observer to volunteer if they attempt to change coverage details
       updateData.role = "volunteer";
       updateData.isObserverInPollingUnit = false;
       updateData.pendingObserverVerification = false;

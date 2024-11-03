@@ -109,7 +109,6 @@ export const volunteerToObserverService = async ({ email, details, files }) => {
   return userDetails;
 };
 
-
 // export const updateUserService = async (
 //   userId,
 //   updateData,
@@ -178,38 +177,11 @@ export const volunteerToObserverService = async ({ email, details, files }) => {
 //       updateData.profileImage = profileImageFile; // Update with the new image
 //     }
 
-//     // Check for ongoing elections
+//     // Check for ongoing elections using moment.js
 //     const ongoingElections = await Election.find({
 //       startDate: { $lte: new Date() },
 //       endDate: { $gte: new Date() },
 //     });
-
-//     if (ongoingElections.length > 0) {
-//       // Check if the user has submitted results for an ongoing election
-//       const hasSubmittedResults = await ElectionData.findOne({
-//         user: user._id,
-//         election: { $in: ongoingElections.map((election) => election._id) },
-//       });
-
-//       if (hasSubmittedResults) {
-//         throw new Error(
-//           "You cannot change your coverage details because you have already submitted results for an ongoing election."
-//         );
-//       }
-//     }
-
-//     // Check if today is the election day
-//     const isElectionDay = ongoingElections.some((election) => {
-//       const today = new Date().toDateString();
-//       const electionDay = election.startDate.toString();
-//       return today === electionDay;
-//     });
-
-//     if (isElectionDay) {
-//       throw new Error(
-//         "You cannot change your coverage details on election day."
-//       );
-//     }
 
 //     // Observers cannot change coverage details, downgrade if attempted
 //     const coverageFields = [
@@ -226,6 +198,35 @@ export const volunteerToObserverService = async ({ email, details, files }) => {
 //     const isChangingCoverageDetails = coverageFields.some((field) =>
 //       Object.keys(updateData).includes(field)
 //     );
+
+//     if (ongoingElections.length > 0) {
+//       const today = moment();
+
+//       // Prevent changes if the current date is within any election period
+//       const isWithinOngoingElection = ongoingElections.some((election) => {
+//         const electionStart = moment(election.startDate);
+//         const electionEnd = moment(election.endDate);
+//         return today.isBetween(electionStart, electionEnd, "day", "[]");
+//       });
+
+//       if (isWithinOngoingElection && isChangingCoverageDetails ) {
+//         throw new Error(
+//           "Your coverage cannot be updated when elections are currently holding. Please try again later."
+//         );
+//       }
+
+//       // Check if the user has submitted results for any ongoing election
+//       const hasSubmittedResults = await ElectionData.findOne({
+//         user: user._id,
+//         election: { $in: ongoingElections.map((election) => election._id) },
+//       });
+
+//       if (hasSubmittedResults && isChangingCoverageDetails) {
+//         throw new Error(
+//           "You cannot change your coverage details because you have already submitted results for an ongoing election."
+//         );
+//       }
+//     }
 
 //     if (user.role === "observer" && isChangingCoverageDetails) {
 //       // Downgrade the observer to a volunteer if they attempt to change coverage details
@@ -275,8 +276,6 @@ export const volunteerToObserverService = async ({ email, details, files }) => {
 //     throw new Error(`Error updating user details: ${error.message}`);
 //   }
 // };
-
-
 
 export const updateUserService = async (
   userId,
@@ -343,7 +342,7 @@ export const updateUserService = async (
         url: `${BACKEND_URL}${profileImagePath}`,
       });
 
-      updateData.profileImage = profileImageFile; // Update with the new image
+      updateData.profileImage = profileImageFile; 
     }
 
     // Check for ongoing elections using moment.js
@@ -378,7 +377,7 @@ export const updateUserService = async (
         return today.isBetween(electionStart, electionEnd, "day", "[]");
       });
 
-      if (isWithinOngoingElection && isChangingCoverageDetails ) {
+      if (isWithinOngoingElection && isChangingCoverageDetails) {
         throw new Error(
           "Your coverage cannot be updated when elections are currently holding. Please try again later."
         );
@@ -402,9 +401,18 @@ export const updateUserService = async (
       updateData.role = "volunteer";
       updateData.isObserverInPollingUnit = false;
       updateData.pendingObserverVerification = false;
+      updateData.coverageUpdateCount = 0; // Reset count upon downgrade
       console.log(
         "Observer downgraded to volunteer for changing coverage details."
       );
+    } else if (user.role === "volunteer" && isChangingCoverageDetails) {
+      // Allow volunteers to change coverage details only three times
+      if (user.coverageUpdateCount >= 3) {
+        throw new Error(
+          "You have reached the maximum limit of 3 coverage updates."
+        );
+      }
+      updateData.coverageUpdateCount = user.coverageUpdateCount + 1;
     }
 
     // Update user data in the database
@@ -445,6 +453,7 @@ export const updateUserService = async (
     throw new Error(`Error updating user details: ${error.message}`);
   }
 };
+
 
 
 export const updateUserEmail = async (userId, newEmail) => {

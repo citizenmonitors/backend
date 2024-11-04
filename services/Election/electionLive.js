@@ -144,51 +144,6 @@ import moment from "moment";
 // };
 
 // Function to fetch ongoing election results with rotation
-// export const getAllOngoingElectionResults = async (userId) => {
-//   try {
-//     const user = await CompletedUser.findById(userId).lean();
-//     if (!user) throw new Error("User not found");
-
-//     // Fetch ongoing elections
-//     const ongoingElections = await Election.find({
-//       startDate: { $lte: new Date() },
-//       endDate: { $gte: new Date() },
-//     }).lean();
-
-//     if (!ongoingElections || ongoingElections.length === 0) {
-//       return { message: "No ongoing election results" };
-//     }
-
-//     // Prioritize election types
-//     const prioritizedTypes = [
-//       "national",
-//       "senatorial",
-//       "gubernatorial",
-//       "house-of-representatives",
-//       "house-of-assembly",
-//       "lga",
-//     ];
-
-//     // Check for each election type in priority order and return the first available result
-//     for (let electionType of prioritizedTypes) {
-//       const selectedElection = ongoingElections.find(
-//         (election) => election.electionType === electionType
-//       );
-
-//       if (selectedElection) {
-//         const result = await handleElectionResult(selectedElection, user);
-//         if (result && !result.message) {
-//           return result;
-//         }
-//       }
-//     }
-
-//     return { message: "No ongoing election results" };
-//   } catch (error) {
-//     console.error("Error fetching ongoing election results:", error);
-//     throw new Error(`Error fetching election details: ${error.message}`);
-//   }
-// };
 
 export const getAllOngoingElectionResults = async (userId) => {
   try {
@@ -248,15 +203,15 @@ const handleElectionResult = async (selectedElection, user) => {
   let result = null;
 
   if (selectedElection.electionType === "national") {
-    // Presidential Election: Grouped by state with state-based aggregate analysis
+    // Presidential Election: Grouped by state with an overall aggregateAnalysis
     result = await fetchGroupedElectionResults(
       selectedElection._id,
       "state",
       7,
-      false, // No overall aggregate for presidential
-      true // Include state aggregate analysis
+      true, // Include overall aggregate analysis
+      false // No per-state aggregate analysis
     );
-    return result.chart;
+    return result;
   } else if (selectedElection.electionType === "gubernatorial") {
     // Gubernatorial Election: Grouped by state with state-based aggregate analysis
     result = await fetchGroupedElectionResults(
@@ -266,7 +221,7 @@ const handleElectionResult = async (selectedElection, user) => {
       false,
       true // Include state aggregate analysis
     );
-    return result.chart;
+    return result;
   } else {
     // Other Elections: No grouping, single chart of top seven parties with overall aggregate analysis
     const electionResults = await ElectionData.find({
@@ -322,6 +277,7 @@ const groupByStateAndAggregate = (
   includeStateAggregate
 ) => {
   const aggregated = {};
+  const totalVotesByParty = {}; // Track total votes for overall aggregate analysis
 
   results.forEach((result) => {
     const key = result[groupBy];
@@ -333,6 +289,11 @@ const groupByStateAndAggregate = (
     result.partiesVotes.forEach(({ party, count }) => {
       aggregated[key].partiesVotes[party] =
         (aggregated[key].partiesVotes[party] || 0) + count;
+
+      if (includeOverallAggregate) {
+        // Accumulate total votes for overall aggregate analysis
+        totalVotesByParty[party] = (totalVotesByParty[party] || 0) + count;
+      }
     });
   });
 
@@ -352,6 +313,11 @@ const groupByStateAndAggregate = (
     }
     return result;
   });
+
+  if (includeOverallAggregate) {
+    const aggregateAnalysis = getTopNParties(totalVotesByParty, topN);
+    return { chart, aggregateAnalysis };
+  }
 
   return { chart };
 };

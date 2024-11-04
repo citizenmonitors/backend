@@ -248,22 +248,23 @@ const handleElectionResult = async (selectedElection, user) => {
   let result = null;
 
   if (selectedElection.electionType === "national") {
-    // Presidential Election: Grouped by state with overall aggregate analysis
+    // Presidential Election: Grouped by state with state-based aggregate analysis
     result = await fetchGroupedElectionResults(
       selectedElection._id,
       "state",
       7,
-      true
+      false, // No overall aggregate for presidential
+      true // Include state aggregate analysis
     );
     return result.chart;
   } else if (selectedElection.electionType === "gubernatorial") {
-    // Gubernatorial Election: Grouped by state without overall aggregate analysis
+    // Gubernatorial Election: Grouped by state with state-based aggregate analysis
     result = await fetchGroupedElectionResults(
       selectedElection._id,
       "state",
       7,
       false,
-      true
+      true // Include state aggregate analysis
     );
     return result.chart;
   } else {
@@ -321,7 +322,6 @@ const groupByStateAndAggregate = (
   includeStateAggregate
 ) => {
   const aggregated = {};
-  const totalVotesByParty = {}; // Track total votes for overall aggregate analysis
 
   results.forEach((result) => {
     const key = result[groupBy];
@@ -333,11 +333,6 @@ const groupByStateAndAggregate = (
     result.partiesVotes.forEach(({ party, count }) => {
       aggregated[key].partiesVotes[party] =
         (aggregated[key].partiesVotes[party] || 0) + count;
-
-      if (includeOverallAggregate) {
-        // Accumulate total votes for overall aggregate analysis
-        totalVotesByParty[party] = (totalVotesByParty[party] || 0) + count;
-      }
     });
   });
 
@@ -358,11 +353,6 @@ const groupByStateAndAggregate = (
     return result;
   });
 
-  if (includeOverallAggregate) {
-    const aggregateAnalysis = getTopNParties(totalVotesByParty, topN);
-    return { chart, aggregateAnalysis };
-  }
-
   return { chart };
 };
 
@@ -373,6 +363,7 @@ const getTopNParties = (partiesVotes, topN) => {
     .slice(0, topN)
     .map(([party, votes]) => ({ party, [party]: votes }));
 };
+
 
 
 

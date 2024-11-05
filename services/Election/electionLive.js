@@ -9,148 +9,199 @@ import AllLga from "../../state-data/lga.json" assert { type: "json" };
 import AllWard from "../../state-data/wards.json" assert { type: "json" };
 import moment from "moment";
 
-// Updated service
 
-// export const getLiveElectionService = async (electionId, userId) => {
+// Function to fetch ongoing election results with rotation
+
+// export const getAllOngoingElectionResults = async (userId) => {
 //   try {
 //     const user = await CompletedUser.findById(userId).lean();
 //     if (!user) throw new Error("User not found");
 
-//     const election = await Election.findById(electionId).lean();
-//     if (!election) throw new Error("Election not found");
-
-//     let groupBy = "lga";
-//     let restriction = null;
-
-//     switch (election.electionType) {
-//       case "national":
-//         groupBy = "state";
-//         break;
-//       case "senatorial":
-//         groupBy = "lga";
-//         restriction = {
-//           name: "Senatorial District",
-//           value: getSenatorialDistrict(user.lga) || "Unknown",
-//         };
-//         break;
-//       case "house-of-representatives":
-//         groupBy = "lga";
-//         restriction = {
-//           name: "House of Reps District",
-//           value: getHouseOfRepsDistrict(user.lga) || "Unknown",
-//         };
-//         break;
-//       case "gubernatorial":
-//       case "house-of-assembly":
-//         groupBy = "lga";
-//         restriction = { name: "State", value: user.state };
-//         break;
-//       case "lga":
-//         groupBy = "ward";
-//         restriction = { name: "LGA", value: user.lga };
-//         break;
-//       default:
-//         groupBy = "lga";
-//     }
-
-//     let result = null;
-//     let incidentReport = null;
-//     let sentimentAnalysis = null;
-
-//     // Fetch election results and sentiment analysis (restricted to user's location)
-//     const electionResults = await ElectionData.find({
-//       election: electionId,
-//       userRole: "observer",
-//       ...(election.electionType === "gubernatorial" ||
-//       election.electionType === "house-of-assembly"
-//         ? { state: user.state }
-//         : election.electionType === "senatorial"
-//         ? { lga: { $in: getLGAsInSenatorialDistrict(user.lga) } }
-//         : election.electionType === "house-of-representatives"
-//         ? { lga: { $in: getLGAsInHouseOfRepsDistrict(user.lga) } }
-//         : election.electionType === "lga"
-//         ? { ward: user.ward }
-//         : {}),
+//     // Fetch ongoing elections
+//     const ongoingElections = await Election.find({
+//       startDate: { $lte: new Date() },
+//       endDate: { $gte: new Date() },
 //     }).lean();
 
-//     if (electionResults.length > 0) {
-//       const { chart: resultChart, aggregateAnalysis: resultAggregateAnalysis } =
-//         aggregateResultsAndTopParties(electionResults, groupBy);
+//     if (!ongoingElections || ongoingElections.length === 0) {
+//       return { message: "No ongoing election results" };
+//     }
 
-//       const sentimentData = await getSentimentAnalysisService(
-//         electionId,
-//         groupBy,
-//         user,
-//         election
+//     // Prioritize election types
+//     const prioritizedTypes = [
+//       "national", // Presidential comes first
+//       "gubernatorial",
+//       "senatorial",
+//       "house-of-representatives",
+//       "house-of-assembly",
+//       "lga",
+//     ];
+
+//     for (let electionType of prioritizedTypes) {
+//       const selectedElection = ongoingElections.find(
+//         (election) => election.electionType === electionType
 //       );
 
-//       result = {
-//         chart: resultChart,
-//         footer: calculateFooter(electionResults, groupBy, election, user),
-//         aggregateAnalysis: resultAggregateAnalysis,
-//         restriction,
-//       };
-
-//       sentimentAnalysis = {
-//         chart: sentimentData.chart,
-//         aggregateAnalysis: sentimentData.aggregateAnalysis,
-//       };
+//       if (selectedElection) {
+//         const result = await handleElectionResult(selectedElection, user);
+//         if (result && !result.message) {
+//           return {
+//             electionDetails: {
+//               electionType: selectedElection.electionType,
+//               electionName: selectedElection.electionName,
+//               startDate: selectedElection.startDate,
+//               endDate: selectedElection.endDate,
+//             },
+//             result,
+//           };
+//         }
+//       }
 //     }
 
-//     // Fetch incident reports (restricted to user's location)
-//     const incidents = await IncidentReport.find({
-//       election: electionId,
-//       userRole: "observer",
-//       ...(election.electionType === "gubernatorial" ||
-//       election.electionType === "house-of-assembly"
-//         ? { state: user.state }
-//         : election.electionType === "senatorial"
-//         ? { lga: { $in: getLGAsInSenatorialDistrict(user.lga) } }
-//         : election.electionType === "house-of-representatives"
-//         ? { lga: { $in: getLGAsInHouseOfRepsDistrict(user.lga) } }
-//         : election.electionType === "lga"
-//         ? { ward: user.ward }
-//         : {}),
-//     }).lean();
-
-//     if (incidents.length > 0) {
-//       const {
-//         chart: incidentChart,
-//         aggregateAnalysis: incidentAggregateAnalysis,
-//       } = aggregateIncidentsByLocation(incidents, groupBy);
-
-//       incidentReport = {
-//         chart: incidentChart,
-//         footer: calculateFooter(incidents, groupBy, election, user),
-//         aggregateAnalysis: incidentAggregateAnalysis,
-//         restriction,
-//       };
-//     }
-
-//     return {
-//       electionDetails: {
-//         electionType: election.electionType,
-//         electionName: election.electionName,
-//         startDate: election.startDate,
-//         endDate: election.endDate,
-//       },
-//       result,
-//       incidentReport,
-//       sentimentAnalysis,
-//     };
+//     return { message: "No ongoing election results" };
 //   } catch (error) {
+//     console.error("Error fetching ongoing election results:", error);
 //     throw new Error(`Error fetching election details: ${error.message}`);
 //   }
 // };
 
-// Function to fetch ongoing election results with rotation
+// // Helper function to handle election result fetching based on the election type
+// const handleElectionResult = async (selectedElection, user) => {
+//   let result = null;
+
+//   if (selectedElection.electionType === "national") {
+//     // Presidential Election: Grouped by state with an overall aggregateAnalysis
+//     result = await fetchGroupedElectionResults(
+//       selectedElection._id,
+//       "state",
+//       7,
+//       true, // Include overall aggregate analysis
+//       false // No per-state aggregate analysis
+//     );
+//     return result;
+//   } else if (selectedElection.electionType === "gubernatorial") {
+//     // Gubernatorial Election: Grouped by state with state-based aggregate analysis
+//     result = await fetchGroupedElectionResults(
+//       selectedElection._id,
+//       "state",
+//       7,
+//       false,
+//       true // Include state aggregate analysis
+//     );
+//     return result;
+//   } else {
+//     // Other Elections: No grouping, single chart of top seven parties with overall aggregate analysis
+//     const electionResults = await ElectionData.find({
+//       election: selectedElection._id,
+//       userRole: "observer",
+//     }).lean();
+
+//     if (electionResults.length > 0) {
+//       const { chart, aggregateAnalysis } = aggregateResultsAndTopParties(
+//         electionResults,
+//         "lga",
+//         7
+//       );
+//       return {
+//         chart,
+//         aggregateAnalysis,
+//       };
+//     }
+//   }
+//   return { message: "No results available for this election" };
+// };
+
+// // Fetch grouped election results with optional aggregate analysis per grouping
+// const fetchGroupedElectionResults = async (
+//   electionId,
+//   groupBy,
+//   topN,
+//   includeOverallAggregate = false,
+//   includeStateAggregate = false
+// ) => {
+//   const electionResults = await ElectionData.find({
+//     election: electionId,
+//     userRole: "observer",
+//   }).lean();
+
+//   const groupedResults = groupByStateAndAggregate(
+//     electionResults,
+//     groupBy,
+//     topN,
+//     includeOverallAggregate,
+//     includeStateAggregate
+//   );
+
+//   return groupedResults;
+// };
+
+// // Groups election results by state and includes aggregate analysis if needed
+// const groupByStateAndAggregate = (
+//   results,
+//   groupBy,
+//   topN,
+//   includeOverallAggregate,
+//   includeStateAggregate
+// ) => {
+//   const aggregated = {};
+//   const totalVotesByParty = {}; // Track total votes for overall aggregate analysis
+
+//   results.forEach((result) => {
+//     const key = result[groupBy];
+
+//     if (!aggregated[key]) {
+//       aggregated[key] = { partiesVotes: {} };
+//     }
+
+//     result.partiesVotes.forEach(({ party, count }) => {
+//       aggregated[key].partiesVotes[party] =
+//         (aggregated[key].partiesVotes[party] || 0) + count;
+
+//       if (includeOverallAggregate) {
+//         // Accumulate total votes for overall aggregate analysis
+//         totalVotesByParty[party] = (totalVotesByParty[party] || 0) + count;
+//       }
+//     });
+//   });
+
+//   const chart = Object.entries(aggregated).map(([key, data]) => {
+//     const topParties = getTopNParties(data.partiesVotes, topN);
+//     const result = {
+//       [groupBy]: key,
+//       chart: topParties, // Top parties for each state in `chart` array format
+//     };
+
+//     if (includeStateAggregate) {
+//       result.aggregateAnalysis = topParties.reduce((acc, partyObj) => {
+//         const party = Object.keys(partyObj)[1];
+//         acc[party] = partyObj[party];
+//         return acc;
+//       }, {});
+//     }
+//     return result;
+//   });
+
+//   if (includeOverallAggregate) {
+//     const aggregateAnalysis = getTopNParties(totalVotesByParty, topN);
+//     return { chart, aggregateAnalysis };
+//   }
+
+//   return { chart };
+// };
+
+// // Get top N parties with vote counts for the chart
+// const getTopNParties = (partiesVotes, topN) => {
+//   return Object.entries(partiesVotes)
+//     .sort(([, aVotes], [, bVotes]) => bVotes - aVotes)
+//     .slice(0, topN)
+//     .map(([party, votes]) => ({ party, [party]: votes }));
+// };
 
 export const getAllOngoingElectionResults = async (userId) => {
   try {
     const user = await CompletedUser.findById(userId).lean();
     if (!user) throw new Error("User not found");
 
-    // Fetch ongoing elections
     const ongoingElections = await Election.find({
       startDate: { $lte: new Date() },
       endDate: { $gte: new Date() },
@@ -203,25 +254,24 @@ const handleElectionResult = async (selectedElection, user) => {
   let result = null;
 
   if (selectedElection.electionType === "national") {
-    // Presidential Election: Grouped by state with an overall aggregateAnalysis
+    // Presidential Election: Grouped by state with an overall aggregate analysis
     result = await fetchGroupedElectionResults(
       selectedElection._id,
       "state",
       7,
-      true, // Include overall aggregate analysis
-      false // No per-state aggregate analysis
+      true // Include overall aggregate analysis for presidential
     );
-    return result;
+    return result.chart;
   } else if (selectedElection.electionType === "gubernatorial") {
     // Gubernatorial Election: Grouped by state with state-based aggregate analysis
     result = await fetchGroupedElectionResults(
       selectedElection._id,
       "state",
       7,
-      false,
-      true // Include state aggregate analysis
+      false, // No overall aggregate analysis for gubernatorial
+      true // Include per-state aggregate analysis for gubernatorial
     );
-    return result;
+    return result.chart;
   } else {
     // Other Elections: No grouping, single chart of top seven parties with overall aggregate analysis
     const electionResults = await ElectionData.find({
@@ -235,9 +285,22 @@ const handleElectionResult = async (selectedElection, user) => {
         "lga",
         7
       );
+      const footer = calculateFooter(
+        electionResults,
+        "lga",
+        selectedElection,
+        user
+      );
+      const restriction = determineRestriction(
+        selectedElection.electionType,
+        user
+      );
+
       return {
         chart,
         aggregateAnalysis,
+        footer,
+        restriction,
       };
     }
   }
@@ -257,15 +320,13 @@ const fetchGroupedElectionResults = async (
     userRole: "observer",
   }).lean();
 
-  const groupedResults = groupByStateAndAggregate(
+  return groupByStateAndAggregate(
     electionResults,
     groupBy,
     topN,
     includeOverallAggregate,
     includeStateAggregate
   );
-
-  return groupedResults;
 };
 
 // Groups election results by state and includes aggregate analysis if needed
@@ -304,12 +365,14 @@ const groupByStateAndAggregate = (
       chart: topParties, // Top parties for each state in `chart` array format
     };
 
-    if (includeStateAggregate) {
-      result.aggregateAnalysis = topParties.reduce((acc, partyObj) => {
-        const party = Object.keys(partyObj)[1];
-        acc[party] = partyObj[party];
-        return acc;
-      }, {});
+    if (includeStateAggregate || includeOverallAggregate) {
+      result.aggregateAnalysis = includeStateAggregate
+        ? topParties.reduce((acc, partyObj) => {
+            const party = Object.keys(partyObj)[1];
+            acc[party] = partyObj[party];
+            return acc;
+          }, {})
+        : getTopNParties(totalVotesByParty, topN);
     }
     return result;
   });
@@ -330,145 +393,28 @@ const getTopNParties = (partiesVotes, topN) => {
     .map(([party, votes]) => ({ party, [party]: votes }));
 };
 
+// Define determineRestriction to handle restriction for other election types
+const determineRestriction = (electionType, user) => {
+  if (electionType === "senatorial") {
+    return {
+      name: "Senatorial District",
+      value: getSenatorialDistrict(user.lga) || "Unknown",
+    };
+  } else if (electionType === "house-of-representatives") {
+    return {
+      name: "House of Reps District",
+      value: getHouseOfRepsDistrict(user.lga) || "Unknown",
+    };
+  } else if (electionType === "lga") {
+    return { name: "Ward", value: user.ward };
+  }
+  return null;
+};
+
 
 
 
 // Service to get live election details for a specific election
-// export const getLiveElectionService = async (electionId, userId) => {
-//   try {
-//     const user = await CompletedUser.findById(userId).lean();
-//     if (!user) throw new Error("User not found");
-
-//     const election = await Election.findById(electionId).lean();
-//     if (!election) throw new Error("Election not found");
-
-//     let groupBy = "lga";
-//     let restriction = null;
-
-//     switch (election.electionType) {
-//       case "national":
-//         groupBy = "state";
-//         break;
-//       case "senatorial":
-//         groupBy = "lga";
-//         restriction = {
-//           name: "Senatorial District",
-//           value: getSenatorialDistrict(user.lga) || "Unknown",
-//         };
-//         break;
-//       case "house-of-representatives":
-//         groupBy = "lga";
-//         restriction = {
-//           name: "House of Reps District",
-//           value: getHouseOfRepsDistrict(user.lga) || "Unknown",
-//         };
-//         break;
-//       case "gubernatorial":
-//       case "house-of-assembly":
-//         groupBy = "lga";
-//         restriction = { name: "State", value: user.state };
-//         break;
-//       case "lga":
-//         groupBy = "ward";
-//         restriction = { name: "LGA", value: user.lga };
-//         break;
-//       default:
-//         groupBy = "lga";
-//     }
-
-//     let result = null;
-//     let incidentReport = null;
-//     let sentimentAnalysis = null;
-
-//     // Fetch election results and sentiment analysis based on location and grouping
-//     const electionResults = await ElectionData.find({
-//       election: electionId,
-//       userRole: "observer",
-//       ...(election.electionType === "gubernatorial" ||
-//       election.electionType === "house-of-assembly"
-//         ? { state: user.state }
-//         : election.electionType === "senatorial"
-//         ? { lga: { $in: getLGAsInSenatorialDistrict(user.lga) } }
-//         : election.electionType === "house-of-representatives"
-//         ? { lga: { $in: getLGAsInHouseOfRepsDistrict(user.lga) } }
-//         : election.electionType === "lga"
-//         ? { ward: user.ward }
-//         : {}),
-//     }).lean();
-
-//     if (electionResults.length > 0) {
-//       const { chart: resultChart, aggregateAnalysis: resultAggregateAnalysis } =
-//         aggregateResultsAndTopParties(
-//           electionResults,
-//           groupBy,
-//           election.electionType
-//         );
-
-//       const sentimentData = await getSentimentAnalysisService(
-//         electionId,
-//         groupBy,
-//         user,
-//         election
-//       );
-
-//       result = {
-//         chart: resultChart,
-//         footer: calculateFooter(electionResults, groupBy, election, user),
-//         aggregateAnalysis: resultAggregateAnalysis,
-//         restriction,
-//       };
-
-//       sentimentAnalysis = {
-//         chart: sentimentData.chart,
-//         aggregateAnalysis: sentimentData.aggregateAnalysis,
-//       };
-//     }
-
-//     // Fetch incident reports, restricted by the user's location for non-presidential elections
-//     const incidents = await IncidentReport.find({
-//       election: electionId,
-//       userRole: "observer",
-//       ...(election.electionType === "gubernatorial" ||
-//       election.electionType === "house-of-assembly"
-//         ? { state: user.state }
-//         : election.electionType === "senatorial"
-//         ? { lga: { $in: getLGAsInSenatorialDistrict(user.lga) } }
-//         : election.electionType === "house-of-representatives"
-//         ? { lga: { $in: getLGAsInHouseOfRepsDistrict(user.lga) } }
-//         : election.electionType === "lga"
-//         ? { ward: user.ward }
-//         : {}),
-//     }).lean();
-
-//     if (incidents.length > 0) {
-//       const {
-//         chart: incidentChart,
-//         aggregateAnalysis: incidentAggregateAnalysis,
-//       } = aggregateIncidentsByLocation(incidents, groupBy);
-
-//       incidentReport = {
-//         chart: incidentChart,
-//         footer: calculateFooter(incidents, groupBy, election, user),
-//         aggregateAnalysis: incidentAggregateAnalysis,
-//         restriction,
-//       };
-//     }
-
-//     return {
-//       electionDetails: {
-//         electionType: election.electionType,
-//         electionName: election.electionName,
-//         startDate: election.startDate,
-//         endDate: election.endDate,
-//       },
-//       result,
-//       incidentReport,
-//       sentimentAnalysis,
-//     };
-//   } catch (error) {
-//     throw new Error(`Error fetching election details: ${error.message}`);
-//   }
-// };
 
 export const getLiveElectionService = async (electionId, userId) => {
   try {

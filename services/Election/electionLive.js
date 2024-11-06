@@ -223,8 +223,7 @@ const determineRestriction = (electionType, user) => {
 
 
 
-
-// Service to get live election details for a specific election
+// // Service to get live election details for a specific election
 
 // export const getLiveElectionService = async (electionId, userId) => {
 //   try {
@@ -289,12 +288,11 @@ const determineRestriction = (electionType, user) => {
 //     }).lean();
 
 //     if (electionResults.length > 0) {
-//       const { chart: resultChart, aggregateAnalysis: resultAggregateAnalysis } =
-//         aggregateResultsAndTopParties(
-//           electionResults,
-//           groupBy,
-//           election.electionType
-//         );
+//       const { resultData, aggregateAnalysis } = aggregateResultsAndTopParties(
+//         electionResults,
+//         groupBy,
+//         election.electionType
+//       );
 
 //       const sentimentData = await getSentimentAnalysisService(
 //         electionId,
@@ -303,16 +301,22 @@ const determineRestriction = (electionType, user) => {
 //         election
 //       );
 
-//       result = {
-//         chart: resultChart,
-//         footer: calculateFooter(electionResults, groupBy, election, user),
-//         aggregateAnalysis: resultAggregateAnalysis,
-//         restriction,
-//       };
+//       result =
+//         election.electionType === "national"
+//           ? resultData.map((stateResult) => ({
+//               ...stateResult,
+//               aggregateAnalysis, // Overall aggregate analysis added to each state
+//             }))
+//           : {
+//               chart: resultData,
+//               footer: calculateFooter(electionResults, groupBy, election, user),
+//               aggregateAnalysis,
+//               restriction,
+//             };
 
 //       sentimentAnalysis = {
 //         chart: sentimentData.chart,
-//         aggregateAnalysis: sentimentData.aggregateAnalysis,
+//         aggregateAnalysis: aggregateCombinedSentiment(electionResults),
 //       };
 //     }
 
@@ -353,7 +357,7 @@ const determineRestriction = (electionType, user) => {
 //         startDate: election.startDate,
 //         endDate: election.endDate,
 //       },
-//       result: election.electionType === "national" ? [result] : result, // Ensure presidential result is returned as an array
+//       result,
 //       incidentReport,
 //       sentimentAnalysis,
 //     };
@@ -361,7 +365,6 @@ const determineRestriction = (electionType, user) => {
 //     throw new Error(`Error fetching election details: ${error.message}`);
 //   }
 // };
-
 
 // // Aggregates election results and calculates the top seven parties for each grouping level (state, lga, or ward)
 // const aggregateResultsAndTopParties = (results, groupBy, electionType) => {
@@ -387,25 +390,22 @@ const determineRestriction = (electionType, user) => {
 //     });
 //   });
 
-//   // Get top seven parties overall for aggregate analysis
-//   const overallTopSevenParties = getTopSevenParties(totalVotesByParty);
-
-//   // Prepare chart data without aggregateAnalysis in each state for Presidential
-//   const chart =
+//   // Prepare result data as array of state objects with top parties
+//   const resultData =
 //     electionType === "national"
 //       ? Object.entries(aggregated).map(([state, data]) => ({
 //           state,
-//           chart: getTopSevenParties(data.partiesVotes),
+//           chart: getTopSevenParties(data.partiesVotes), // Each state has its top parties
 //         }))
-//       : overallTopSevenParties;
+//       : getTopSevenParties(totalVotesByParty); // For non-presidential results
 
 //   return {
-//     chart,
+//     resultData,
 //     aggregateAnalysis: totalVotesByParty,
 //   };
 // };
 
-
+// // Extracts the top seven parties with vote counts
 // const getTopSevenParties = (partiesVotes) => {
 //   return Object.entries(partiesVotes)
 //     .sort(([, aVotes], [, bVotes]) => bVotes - aVotes)
@@ -495,7 +495,11 @@ export const getLiveElectionService = async (electionId, userId) => {
 
       result =
         election.electionType === "national"
-          ? resultData // Presidential result as array of state objects
+          ? resultData.map((stateResult) => ({
+              ...stateResult,
+              aggregateAnalysis, // Overall aggregate analysis added to each state
+              footer: calculateFooter(electionResults, groupBy, election, user), // Add footer specific to each state
+            }))
           : {
               chart: resultData,
               footer: calculateFooter(electionResults, groupBy, election, user),
@@ -505,7 +509,7 @@ export const getLiveElectionService = async (electionId, userId) => {
 
       sentimentAnalysis = {
         chart: sentimentData.chart,
-        aggregateAnalysis: sentimentData.aggregateAnalysis,
+        aggregateAnalysis: aggregateCombinedSentiment(electionResults),
       };
     }
 
@@ -584,9 +588,9 @@ const aggregateResultsAndTopParties = (results, groupBy, electionType) => {
     electionType === "national"
       ? Object.entries(aggregated).map(([state, data]) => ({
           state,
-          chart: getTopSevenParties(data.partiesVotes), // Each state has its top parties in `chart`
+          chart: getTopSevenParties(data.partiesVotes), 
         }))
-      : getTopSevenParties(totalVotesByParty); // For non-presidential results
+      : getTopSevenParties(totalVotesByParty); 
 
   return {
     resultData,
@@ -594,7 +598,7 @@ const aggregateResultsAndTopParties = (results, groupBy, electionType) => {
   };
 };
 
-// Extracts the top seven parties with vote counts for the chart
+// Extracts the top seven parties with vote counts
 const getTopSevenParties = (partiesVotes) => {
   return Object.entries(partiesVotes)
     .sort(([, aVotes], [, bVotes]) => bVotes - aVotes)
@@ -606,10 +610,6 @@ const getTopSevenParties = (partiesVotes) => {
 };
 
 
-
-
-
-// Helper function to fetch Senatorial District using lgaData
 const getSenatorialDistrict = (userLGA) => {
   const districtData = lgaData.find(
     (lga) => lga.name.toUpperCase() === userLGA.toUpperCase()
@@ -757,12 +757,69 @@ const aggregateCombinedSentiment = (results) => {
 
 
 // Helper function to calculate the footer for registered and submitted locations
+// const calculateFooter = (data, groupBy, election, user) => {
+//   let registeredLocations = new Set();
+//   let submittedLocations = new Set();
+
+//   switch (election.electionType) {
+//     case "national":
+//       registeredLocations = new Set(
+//         AllState.map((state) => state.toUpperCase())
+//       );
+//       break;
+//     case "senatorial":
+//     case "house-of-representatives":
+//       const districtData = lgaData.find(
+//         (lga) => lga.name.toUpperCase() === user.lga.toUpperCase()
+//       );
+//       registeredLocations = new Set(
+//         lgaData
+//           .filter(
+//             (lga) =>
+//               lga.senatorial_district === districtData?.senatorial_district
+//           )
+//           .map((lga) => lga.name)
+//       );
+//       break;
+//     case "gubernatorial":
+//     case "house-of-assembly":
+//       const stateLGAs =
+//         AllLga.find(
+//           (state) => state.state.toLowerCase() === user.state.toLowerCase()
+//         )?.lgas || [];
+//       registeredLocations = new Set(stateLGAs);
+//       break;
+//     case "lga":
+//       const lgaWards =
+//         AllWard.find(
+//           (state) => state.state.toLowerCase() === user.state.toLowerCase()
+//         )?.lgas.find((lga) => lga.lga.toLowerCase() === user.lga.toLowerCase())
+//           ?.wards || [];
+//       registeredLocations = new Set(lgaWards);
+//       break;
+//     default:
+//       registeredLocations = new Set();
+//   }
+
+//   submittedLocations = new Set(
+//     data
+//       .filter((item) => item.partiesVotes?.length || item.selectIncident)
+//       .map((item) => item[groupBy])
+//   );
+
+//   return {
+//     [`registered-${groupBy}s`]: registeredLocations.size,
+//     [`submitted-${groupBy}s`]: submittedLocations.size,
+//   };
+// };
+
 const calculateFooter = (data, groupBy, election, user) => {
   let registeredLocations = new Set();
   let submittedLocations = new Set();
 
   switch (election.electionType) {
     case "national":
+      // Register all states for a national election
       registeredLocations = new Set(
         AllState.map((state) => state.toUpperCase())
       );
@@ -772,6 +829,7 @@ const calculateFooter = (data, groupBy, election, user) => {
       const districtData = lgaData.find(
         (lga) => lga.name.toUpperCase() === user.lga.toUpperCase()
       );
+      // Register LGAs within the user's senatorial or house district
       registeredLocations = new Set(
         lgaData
           .filter(
@@ -783,6 +841,7 @@ const calculateFooter = (data, groupBy, election, user) => {
       break;
     case "gubernatorial":
     case "house-of-assembly":
+      // Register all LGAs in the user's state
       const stateLGAs =
         AllLga.find(
           (state) => state.state.toLowerCase() === user.state.toLowerCase()
@@ -790,6 +849,7 @@ const calculateFooter = (data, groupBy, election, user) => {
       registeredLocations = new Set(stateLGAs);
       break;
     case "lga":
+      // Register all wards in the user's LGA
       const lgaWards =
         AllWard.find(
           (state) => state.state.toLowerCase() === user.state.toLowerCase()
@@ -801,6 +861,7 @@ const calculateFooter = (data, groupBy, election, user) => {
       registeredLocations = new Set();
   }
 
+  // Calculate submitted locations based on unique entries in data
   submittedLocations = new Set(
     data
       .filter((item) => item.partiesVotes?.length || item.selectIncident)
@@ -928,5 +989,6 @@ export const getActivityBoardAndNotificationsService = async () => {
     );
   }
 };
+
 
 

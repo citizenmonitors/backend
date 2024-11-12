@@ -1359,6 +1359,183 @@ export const getUserElectionResultsAndReports = async (userId) => {
 };
 
 
+// export const getResultsAndPerformAction = async (userId, actionData) => {
+//   // Fetch user to get polling unit
+//   const user = await CompletedUser.findById(userId).lean();
+//   if (!user || !user.pollingUnit) {
+//     throw new Error("User not found or polling unit is missing");
+//   }
+
+//   const pollingUnit = user.pollingUnit;
+
+//   // Fetch all observers in the same polling unit
+//   // const observers = await CompletedUser.find({
+//   //   pollingUnit,
+//   //   role: "observer",
+//   //   // isObserverInPollingUnit: true,
+//   // }).lean();
+
+//   // If actionData is provided, perform the action
+//   if (
+//     actionData &&
+//     actionData.electionId &&
+//     actionData.action &&
+//     actionData.dataType
+//   ) {
+//     let dataModel;
+
+//     // Determine the model based on the data type
+//     if (actionData.dataType === "election") {
+//       dataModel = ElectionData;
+//     } else if (actionData.dataType === "incident") {
+//       dataModel = IncidentReport;
+//     } else {
+//       throw new Error(
+//         "Invalid data type. It must be 'election' or 'incident'."
+//       );
+//     }
+
+//     // Find the election result or incident report by electionId
+//     const data = await dataModel.findById(actionData.electionId);
+//     if (!data) {
+//       throw new Error(
+//         `${
+//           actionData.dataType === "election"
+//             ? "Election result"
+//             : "Incident report"
+//         } not found`
+//       );
+//     }
+
+//     // Handle user action
+//     const existingAction = data.actions.find(
+//       (a) => a.userId.toString() === userId.toString()
+//     );
+
+//     if (existingAction) {
+//       // Update existing action
+//       if (actionData.action === "agree") {
+//         // User can agree if they haven't flagged it
+//         if (existingAction.action !== "flag") {
+//           existingAction.action = "agree";
+//           data.agreed = true;
+//           data.flagged = false;
+//         } else {
+//           throw new Error("You cannot agree after flagging the result.");
+//         }
+//       } else if (actionData.action === "flag") {
+//         // Ensure flagReason is provided
+//         if (!actionData.flagReason) {
+//           throw new Error("Flag reason is required when flagging.");
+//         }
+//         // Flag the result or report with a reason
+//         existingAction.action = "flag";
+//         existingAction.flagReason = actionData.flagReason;
+//         data.flagged = true;
+//         data.agreed = false;
+//       } else if (actionData.action === "unagree") {
+//         // Allow the user to unclick "agree" only if they agreed before
+//         if (existingAction.action === "agree") {
+//           existingAction.action = "unagree";
+//           data.agreed = false;
+//         } else {
+//           throw new Error("You haven't agreed to this result/report.");
+//         }
+//       }
+//     } else {
+//       // Add new action to the actions array
+//       const newAction = { userId, action: actionData.action };
+//       if (actionData.action === "flag") {
+//         // Ensure flagReason is provided for flagging
+//         if (!actionData.flagReason) {
+//           throw new Error("Flag reason is required when flagging.");
+//         }
+//         newAction.flagReason = actionData.flagReason;
+//         data.flagged = true;
+//         data.agreed = false;
+//       } else if (actionData.action === "agree") {
+//         if (!data.flagged) {
+//           data.agreed = true;
+//         } else {
+//           throw new Error("You cannot agree after flagging the result.");
+//         }
+//       }
+//       data.actions.push(newAction);
+//     }
+
+//     // Save the updated election result or incident report
+//     await data.save();
+//   }
+
+//   const electionResults = await ElectionData.find({
+//     pollingUnit,
+//     // user: { $in: observerIds },
+//   })
+//     .populate({
+//       path: "election",
+//       select: "electionType electionName electionLocation startDate endDate",
+//     })
+//     .lean();
+
+//   // Fetch incident reports uploaded by observers in the polling unit
+//   const incidentReports = await IncidentReport.find({
+//     pollingUnit,
+//     // user: { $in: observerIds },
+//   })
+//     .populate({
+//       path: "election",
+//       select: "electionType electionName electionLocation startDate endDate",
+//     })
+//     .lean();
+
+//   console.log(incidentReports, electionResults);
+
+//   // Prepare election result data
+//   const resultData = electionResults.map((result) => ({
+//     electionId: result._id,
+//     electionType: result.election.electionType,
+//     pollingUnit: result.pollingUnit,
+//     electionYear: moment(result.election.startDate).format('YYYY'),
+//     uploadedAt: result.createdAt,
+//     partiesVotes: result.partiesVotes,
+//     voteRating: result.voteRating,
+//     voterIntimidation: result.voterIntimidation,
+//     voteBuying: result.voteBuying,
+//     resultPicture: result.resultPicture,
+//     resultVideo: result.resultVideo,
+//     agreed: result.agreed || false,
+//     flagged: result.flagged || false,
+//     actions: result.actions,
+//     timeBegan: result.timeBegan,
+//     isApproved: result.isApproved,
+//     election: result.election
+//   }));
+
+//   // Prepare incident report data
+//   const reportData = incidentReports.map((report) => ({
+//     electionId: report._id,
+//     electionType: report.election.electionType,
+//     pollingUnit: report.pollingUnit,
+//     electionYear: moment(report.election.startDate).format("YYYY"),
+//     uploadedAt: report.createdAt,
+//     selectIncident: report.selectIncident,
+//     incidentNote: report.incidentNote,
+//     electionRating: report.electionRating,
+//     incidentPictures: report.incidentPictures,
+//     incidentVideos: report.incidentVideos,
+//     agreed: report.agreed || false,
+//     flagged: report.flagged || false,
+//     actions: report.actions,
+//     election: report.election,
+//   }));
+
+//   return {
+//     results: resultData,
+//     incidentReports: reportData,
+//   };
+// };
+
+
 export const getResultsAndPerformAction = async (userId, actionData) => {
   // Fetch user to get polling unit
   const user = await CompletedUser.findById(userId).lean();
@@ -1368,172 +1545,129 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
 
   const pollingUnit = user.pollingUnit;
 
-  // Fetch all observers in the same polling unit
-  // const observers = await CompletedUser.find({
-  //   pollingUnit,
-  //   role: "observer",
-  //   // isObserverInPollingUnit: true,
-  // }).lean();
-
-  // If actionData is provided, perform the action
-  if (
-    actionData &&
-    actionData.electionId &&
-    actionData.action &&
-    actionData.dataType
-  ) {
-    let dataModel;
-
-    // Determine the model based on the data type
-    if (actionData.dataType === "election") {
-      dataModel = ElectionData;
-    } else if (actionData.dataType === "incident") {
-      dataModel = IncidentReport;
-    } else {
-      throw new Error(
-        "Invalid data type. It must be 'election' or 'incident'."
-      );
-    }
-
-    // Find the election result or incident report by electionId
-    const data = await dataModel.findById(actionData.electionId);
-    if (!data) {
-      throw new Error(
-        `${
-          actionData.dataType === "election"
-            ? "Election result"
-            : "Incident report"
-        } not found`
-      );
-    }
-
-    // Handle user action
-    const existingAction = data.actions.find(
-      (a) => a.userId.toString() === userId.toString()
-    );
-
-    if (existingAction) {
-      // Update existing action
-      if (actionData.action === "agree") {
-        // User can agree if they haven't flagged it
-        if (existingAction.action !== "flag") {
-          existingAction.action = "agree";
-          data.agreed = true;
-          data.flagged = false;
-        } else {
-          throw new Error("You cannot agree after flagging the result.");
-        }
-      } else if (actionData.action === "flag") {
-        // Ensure flagReason is provided
-        if (!actionData.flagReason) {
-          throw new Error("Flag reason is required when flagging.");
-        }
-        // Flag the result or report with a reason
-        existingAction.action = "flag";
-        existingAction.flagReason = actionData.flagReason;
-        data.flagged = true;
-        data.agreed = false;
-      } else if (actionData.action === "unagree") {
-        // Allow the user to unclick "agree" only if they agreed before
-        if (existingAction.action === "agree") {
-          existingAction.action = "unagree";
-          data.agreed = false;
-        } else {
-          throw new Error("You haven't agreed to this result/report.");
-        }
-      }
-    } else {
-      // Add new action to the actions array
-      const newAction = { userId, action: actionData.action };
-      if (actionData.action === "flag") {
-        // Ensure flagReason is provided for flagging
-        if (!actionData.flagReason) {
-          throw new Error("Flag reason is required when flagging.");
-        }
-        newAction.flagReason = actionData.flagReason;
-        data.flagged = true;
-        data.agreed = false;
-      } else if (actionData.action === "agree") {
-        if (!data.flagged) {
-          data.agreed = true;
-        } else {
-          throw new Error("You cannot agree after flagging the result.");
-        }
-      }
-      data.actions.push(newAction);
-    }
-
-    // Save the updated election result or incident report
-    await data.save();
+  // Determine the data model based on the actionData type
+  let dataModel;
+  if (actionData.dataType === "election") {
+    dataModel = ElectionData;
+  } else if (actionData.dataType === "incident") {
+    dataModel = IncidentReport;
+  } else {
+    throw new Error("Invalid data type. It must be 'election' or 'incident'.");
   }
 
-  const electionResults = await ElectionData.find({
-    pollingUnit,
-    // user: { $in: observerIds },
-  })
-    .populate({
-      path: "election",
-      select: "electionType electionName electionLocation startDate endDate",
-    })
-    .lean();
+  // Fetch the specific election result or incident report
+  const data = await dataModel.findById(actionData.electionId);
+  if (!data) {
+    throw new Error(`${actionData.dataType === "election" ? "Election result" : "Incident report"} not found`);
+  }
 
-  // Fetch incident reports uploaded by observers in the polling unit
-  const incidentReports = await IncidentReport.find({
-    pollingUnit,
-    // user: { $in: observerIds },
-  })
-    .populate({
-      path: "election",
-      select: "electionType electionName electionLocation startDate endDate",
-    })
-    .lean();
+  // Locate the user's existing action
+  const existingActionIndex = data.actions.findIndex(
+    (a) => a.userId.toString() === userId.toString()
+  );
+  const existingAction = data.actions[existingActionIndex];
 
-  console.log(incidentReports, electionResults);
+  // Process action based on actionData
+  if (existingAction) {
+    if (actionData.action === "agree") {
+      // Toggle agree: if already agreed, remove action; otherwise, set to agree
+      if (existingAction.action === "agree") {
+        data.actions.splice(existingActionIndex, 1); // Remove the action
+      } else if (existingAction.action !== "flag") {
+        existingAction.action = "agree"; // Set to agree if not flagged
+      } else {
+        throw new Error("You cannot agree after flagging the result.");
+      }
+    } else if (actionData.action === "flag") {
+      if (!actionData.flagReason) {
+        throw new Error("Flag reason is required when flagging.");
+      }
+      existingAction.action = "flag";
+      existingAction.flagReason = actionData.flagReason;
+    } else if (actionData.action === "unagree") {
+      if (existingAction.action === "agree") {
+        data.actions.splice(existingActionIndex, 1); // Remove agree action
+      } else {
+        throw new Error("You haven't agreed to this result/report.");
+      }
+    }
+  } else {
+    // Add a new action
+    const newAction = { userId, action: actionData.action };
+    if (actionData.action === "flag") {
+      if (!actionData.flagReason) {
+        throw new Error("Flag reason is required when flagging.");
+      }
+      newAction.flagReason = actionData.flagReason;
+    }
+    data.actions.push(newAction);
+  }
 
-  // Prepare election result data
-  const resultData = electionResults.map((result) => ({
-    electionId: result._id,
-    electionType: result.election.electionType,
-    pollingUnit: result.pollingUnit,
-    electionYear: moment(result.election.startDate).format('YYYY'),
-    uploadedAt: result.createdAt,
-    partiesVotes: result.partiesVotes,
-    voteRating: result.voteRating,
-    voterIntimidation: result.voterIntimidation,
-    voteBuying: result.voteBuying,
-    resultPicture: result.resultPicture,
-    resultVideo: result.resultVideo,
-    agreed: result.agreed || false,
-    flagged: result.flagged || false,
-    actions: result.actions,
-    timeBegan: result.timeBegan,
-    isApproved: result.isApproved,
-    election: result.election
-  }));
+  // Save the updated election result or incident report
+  await data.save();
 
-  // Prepare incident report data
-  const reportData = incidentReports.map((report) => ({
-    electionId: report._id,
-    electionType: report.election.electionType,
-    pollingUnit: report.pollingUnit,
-    electionYear: moment(report.election.startDate).format("YYYY"),
-    uploadedAt: report.createdAt,
-    selectIncident: report.selectIncident,
-    incidentNote: report.incidentNote,
-    electionRating: report.electionRating,
-    incidentPictures: report.incidentPictures,
-    incidentVideos: report.incidentVideos,
-    agreed: report.agreed || false,
-    flagged: report.flagged || false,
-    actions: report.actions,
-    election: report.election,
-  }));
+  // Fetch all election results and incident reports for the user's polling unit
+  const electionResults = await ElectionData.find({ pollingUnit }).populate({
+    path: "election",
+    select: "electionType electionName electionLocation startDate endDate",
+  }).lean();
+
+  const incidentReports = await IncidentReport.find({ pollingUnit }).populate({
+    path: "election",
+    select: "electionType electionName electionLocation startDate endDate",
+  }).lean();
+
+  // Prepare election result data for response
+  const resultData = electionResults.map((result) => {
+    const userAction = result.actions.find((a) => a.userId.toString() === userId.toString());
+    return {
+      electionId: result._id,
+      electionType: result.election.electionType,
+      pollingUnit: result.pollingUnit,
+      electionYear: moment(result.election.startDate).format("YYYY"),
+      uploadedAt: result.createdAt,
+      partiesVotes: result.partiesVotes,
+      voteRating: result.voteRating,
+      voterIntimidation: result.voterIntimidation,
+      voteBuying: result.voteBuying,
+      resultPicture: result.resultPicture,
+      resultVideo: result.resultVideo,
+      agreed: userAction ? userAction.action === "agree" : false,
+      flagged: userAction ? userAction.action === "flag" : false,
+      actions: result.actions,
+      timeBegan: result.timeBegan,
+      isApproved: result.isApproved,
+      election: result.election,
+    };
+  });
+
+  // Prepare incident report data for response
+  const reportData = incidentReports.map((report) => {
+    const userAction = report.actions.find((a) => a.userId.toString() === userId.toString());
+    return {
+      electionId: report._id,
+      electionType: report.election.electionType,
+      pollingUnit: report.pollingUnit,
+      electionYear: moment(report.election.startDate).format("YYYY"),
+      uploadedAt: report.createdAt,
+      selectIncident: report.selectIncident,
+      incidentNote: report.incidentNote,
+      electionRating: report.electionRating,
+      incidentPictures: report.incidentPictures,
+      incidentVideos: report.incidentVideos,
+      agreed: userAction ? userAction.action === "agree" : false,
+      flagged: userAction ? userAction.action === "flag" : false,
+      actions: report.actions,
+      election: report.election,
+    };
+  });
 
   return {
     results: resultData,
     incidentReports: reportData,
   };
 };
+
 
 
 

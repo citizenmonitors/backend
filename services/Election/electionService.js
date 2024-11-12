@@ -1545,6 +1545,11 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
 
   const pollingUnit = user.pollingUnit;
 
+  // If no actionData is provided, skip action handling and just return results
+  if (!actionData) {
+    return await fetchResults(pollingUnit, userId);
+  }
+
   // Determine the data model based on the actionData type
   let dataModel;
   if (actionData.dataType === "election") {
@@ -1558,7 +1563,13 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
   // Fetch the specific election result or incident report
   const data = await dataModel.findById(actionData.electionId);
   if (!data) {
-    throw new Error(`${actionData.dataType === "election" ? "Election result" : "Incident report"} not found`);
+    throw new Error(
+      `${
+        actionData.dataType === "election"
+          ? "Election result"
+          : "Incident report"
+      } not found`
+    );
   }
 
   // Locate the user's existing action
@@ -1606,20 +1617,31 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
   // Save the updated election result or incident report
   await data.save();
 
-  // Fetch all election results and incident reports for the user's polling unit
-  const electionResults = await ElectionData.find({ pollingUnit }).populate({
-    path: "election",
-    select: "electionType electionName electionLocation startDate endDate",
-  }).lean();
+  // Fetch and return the updated results and reports
+  return await fetchResults(pollingUnit, userId);
+};
 
-  const incidentReports = await IncidentReport.find({ pollingUnit }).populate({
-    path: "election",
-    select: "electionType electionName electionLocation startDate endDate",
-  }).lean();
+// Helper function to fetch results and reports for a polling unit and specific user
+const fetchResults = async (pollingUnit, userId) => {
+  const electionResults = await ElectionData.find({ pollingUnit })
+    .populate({
+      path: "election",
+      select: "electionType electionName electionLocation startDate endDate",
+    })
+    .lean();
+
+  const incidentReports = await IncidentReport.find({ pollingUnit })
+    .populate({
+      path: "election",
+      select: "electionType electionName electionLocation startDate endDate",
+    })
+    .lean();
 
   // Prepare election result data for response
   const resultData = electionResults.map((result) => {
-    const userAction = result.actions.find((a) => a.userId.toString() === userId.toString());
+    const userAction = result.actions.find(
+      (a) => a.userId.toString() === userId.toString()
+    );
     return {
       electionId: result._id,
       electionType: result.election.electionType,
@@ -1643,7 +1665,9 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
 
   // Prepare incident report data for response
   const reportData = incidentReports.map((report) => {
-    const userAction = report.actions.find((a) => a.userId.toString() === userId.toString());
+    const userAction = report.actions.find(
+      (a) => a.userId.toString() === userId.toString()
+    );
     return {
       electionId: report._id,
       electionType: report.election.electionType,

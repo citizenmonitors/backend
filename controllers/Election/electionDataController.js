@@ -329,17 +329,11 @@ export const getResultsAndPerformActionController = async (req, res) => {
     const userId = req.user._id;
     const { electionId, action, dataType, flagReason } = req.body;
 
-    // Ensure flagReason is provided when action is "flag"
-    if (action === "flag" && !flagReason) {
-      return res.status(400).json({ message: "Flag reason is required." });
-    }
+    const actionData = action
+      ? { electionId, action, dataType, flagReason }
+      : null;
 
-    const results = await getResultsAndPerformAction(userId, {
-      electionId,
-      action,
-      dataType,
-      flagReason,
-    });
+    const results = await getResultsAndPerformAction(userId, actionData);
 
     return res.status(200).json({
       message: action

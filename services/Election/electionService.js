@@ -1465,12 +1465,14 @@ const fetchResults = async (pollingUnit, userId) => {
     })
     .lean();
 
+    
   // Prepare election result data for response
   const resultData = electionResults.map((result) => {
     const userAction = result.actions.find(
       (a) => a.userId.toString() === userId.toString()
     );
     return {
+      electionTypeId: result.election._id,
       electionId: result._id,
       electionType: result.election.electionType,
       pollingUnit: result.pollingUnit,
@@ -1497,6 +1499,7 @@ const fetchResults = async (pollingUnit, userId) => {
       (a) => a.userId.toString() === userId.toString()
     );
     return {
+      electionTypeId: report.election._id,
       electionId: report._id,
       electionType: report.election.electionType,
       pollingUnit: report.pollingUnit,

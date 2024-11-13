@@ -9,6 +9,7 @@ import path from "path";
 import mongoose from "mongoose";
 import moment from "moment";
 
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export const createElectionService = async (data) => {
   const { electionType, electionName, startDate, endDate, electionLocation } =
@@ -529,11 +530,14 @@ export const uploadResultDataService = async (
 
     // Handle the picture file upload (if provided)
     if (files.resultPicture && files.resultPicture.length > 0) {
+      const resultPicturePath = `/resultpicture/${path.basename(files.resultPicture[0].path)}`;
+
       resultPicture = await File.create({
         location: files.resultPicture[0].path,
         name: files.resultPicture[0].originalname,
         type: files.resultPicture[0].mimetype,
         size: files.resultPicture[0].size,
+        url:  `${BACKEND_URL}${resultPicturePath}`,
       });
     }
 
@@ -1158,11 +1162,13 @@ export const uploadIncidentReportDataService = async (
           )}`
         );
       }
+       const incidentReportFilePath = `/incidentreport/${path.basename(file.path)}`;
       return {
         location: file.path,
         name: file.originalname,
         type: file.mimetype,
         size: file.size,
+        url: `${BACKEND_URL}${incidentReportFilePath}`,
       };
     };
 

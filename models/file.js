@@ -5,6 +5,7 @@ const fileSchema = new mongoose.Schema({
   name: String,
   type: String,
   size: Number,
+  url: String,
 });
 export { fileSchema };
 export default mongoose.model("File", fileSchema);

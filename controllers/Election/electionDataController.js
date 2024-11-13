@@ -15,6 +15,7 @@ import {
   getLiveElectionById,
   getUserElectionResultsAndReports,
   getResultsAndPerformAction,
+  checkUserSubmissionStatusForFlag,
 } from "../../services/Election/electionService.js";
 import CompletedUser from "../../models/CompletedUser.js";
 import Election from "../../models/Election/Election.js";
@@ -261,68 +262,6 @@ export const getUserElectionResultsAndReportsCon = async (req, res) => {
     });
   }
 };
-//   try {
-//     const userId = req.user._id;
-//     const { electionId, action, dataType } = req.body;
-
-//     const results = await getResultsAndPerformAction(userId, {
-//       electionId,
-//       action,
-//       dataType,
-//     });
-
-//     return res.status(200).json({
-//       message: "Election results and incident reports fetched successfully",
-//       results,
-//     });
-//   } catch (error) {
-//     console.error(
-//       "Error fetching election results and performing action:",
-//       error
-//     );
-//     return res.status(500).json({
-//       message: "Failed to fetch election results or perform action",
-//       error: error.message,
-//     });
-//   }
-// };
-
-// export const getResultsAndPerformActionController = async (req, res) => {
-//   try {
-//     const userId = req.user._id;
-//     const { electionId, action, dataType, flagReason } = req.body;
-
-//     // Check if flagReason is provided when action is "flag"
-//     if (action === "flag" && !flagReason) {
-//       return res.status(400).json({ message: "Flag reason is required." });
-//     }
-
-//     // Call the service, passing action data
-//     const results = await getResultsAndPerformAction(userId, {
-//       electionId,
-//       action,
-//       dataType,
-//       flagReason, 
-//     });
-
-//     return res.status(200).json({
-//       message: action
-//         ? "Election results and incident reports updated successfully"
-//         : "Fetched election results and incident reports",
-//       results,
-//     });
-//   } catch (error) {
-//     console.error(
-//       "Error fetching election results and performing action:",
-//       error
-//     );
-//     return res.status(500).json({
-//       message: "Failed to fetch election results or perform action",
-//       error: error.message,
-//     });
-//   }
-// };
-
 
 export const getResultsAndPerformActionController = async (req, res) => {
   try {
@@ -348,6 +287,37 @@ export const getResultsAndPerformActionController = async (req, res) => {
     );
     return res.status(500).json({
       message: "Failed to fetch election results or perform action",
+      error: error.message,
+    });
+  }
+};
+
+
+export const checkUserStatusForFlagController = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { electionId, action, dataType } = req.body;
+
+    // Validate required fields
+    if (!electionId || !action || !dataType) {
+      return res.status(400).json({
+        message: "Election ID, action, and data type are required.",
+      });
+    }
+
+    // Call the service to check submission status
+    const hasSubmitted = await checkUserSubmissionStatusForFlag(userId, {
+      electionId,
+      action,
+      dataType,
+    });
+
+    // Respond with the submission status
+    return res.status(200).json({ hasSubmitted });
+  } catch (error) {
+    console.error("Error checking user submission status for flag:", error);
+    return res.status(500).json({
+      message: "Failed to check submission status",
       error: error.message,
     });
   }

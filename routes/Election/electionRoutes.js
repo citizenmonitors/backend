@@ -16,6 +16,7 @@ import {
   getLiveElectionByIdCont,
   getUserElectionResultsAndReportsCon,
   getResultsAndPerformActionController,
+  checkUserStatusForFlagController,
 } from "../../controllers/Election/electionDataController.js";
 import { authMiddleware } from "../../middleware/authMiddleware.js";
 import {
@@ -146,6 +147,7 @@ router.post(
   "/user-action",
   authMiddleware,
   getResultsAndPerformActionController);
+router.post("/flag-action", authMiddleware, checkUserStatusForFlagController);
 router.get("/live-results/:electionId", authMiddleware, getLiveElectionDetails);
 router.get("/live-result", authMiddleware, getOngoingElections);
 router.get("/activity-board", authMiddleware, getActivityBoardAndNotifications);

@@ -299,9 +299,9 @@ export const checkUserStatusForFlagController = async (req, res) => {
     const { electionId, action, dataType } = req.body;
 
     // Validate required fields
-    if (!electionId || !action || !dataType) {
+    if (!electionId || !action) {
       return res.status(400).json({
-        message: "Election ID, action, and data type are required.",
+        message: "Election ID and action are required.",
       });
     }
 

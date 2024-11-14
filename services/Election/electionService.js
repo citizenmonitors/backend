@@ -1525,31 +1525,25 @@ const fetchResults = async (pollingUnit, userId) => {
 
 
 export const checkUserSubmissionStatusForFlag = async (userId, actionData) => {
-  const { electionId, action, dataType } = actionData;
+  const { electionId, action } = actionData;
 
-  // Validate that action is "flag" and dataType is either "election" or "incident"
+  // Validate that action is "flag"
   if (action !== "flag") {
     throw new Error("Action must be 'flag' to check submission status.");
   }
-  if (!["election", "incident"].includes(dataType)) {
-    throw new Error("Invalid data type. It must be 'election' or 'incident'.");
-  }
 
-  // Determine the data model based on dataType
-  let dataModel;
-  if (dataType === "election") {
-    dataModel = ElectionData;
-  } else {
-    dataModel = IncidentReport;
-  }
-
-  // Check if the user has already submitted data for the specified election
-  const userSubmission = await dataModel.findOne({
+  // Check if the user has submitted either an election result or an incident report for the specified election
+  const electionSubmission = await ElectionData.findOne({
     user: userId,
     election: electionId,
   }).lean();
 
-  // Return true if submission exists, otherwise false
-  return Boolean(userSubmission);
+  const incidentSubmission = await IncidentReport.findOne({
+    user: userId,
+    election: electionId,
+  }).lean();
+
+  // Return true if a submission exists in either collection, otherwise false
+  return Boolean(electionSubmission || incidentSubmission);
 };
 

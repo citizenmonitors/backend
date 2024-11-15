@@ -1452,7 +1452,7 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
 const fetchResults = async (pollingUnit, userId) => {
   const electionResults = await ElectionData.find({
     pollingUnit,
-    role: "observer",
+    userRole: "observer",
   })
     .populate({
       path: "election",
@@ -1462,7 +1462,7 @@ const fetchResults = async (pollingUnit, userId) => {
 
   const incidentReports = await IncidentReport.find({
     pollingUnit,
-    role: "observer",
+    userRolerole: "observer",
   })
     .populate({
       path: "election",
@@ -1494,7 +1494,7 @@ const fetchResults = async (pollingUnit, userId) => {
       actions: result.actions,
       timeBegan: result.timeBegan,
       isApproved: result.isApproved,
-      election: result.election,
+      // election: result.election,
     };
   });
 
@@ -1518,7 +1518,7 @@ const fetchResults = async (pollingUnit, userId) => {
       agreed: userAction ? userAction.action === "agree" : false,
       flagged: userAction ? userAction.action === "flag" : false,
       actions: report.actions,
-      election: report.election,
+      // election: report.election,
     };
   });
 

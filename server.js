@@ -33,6 +33,8 @@ app.use("/api", adminRoutes);
 
 app.use("/observerid", express.static(path.join(__dirname, "observerId")));
 app.use("/profileimage", express.static(path.join(__dirname, "profileImage")));
+app.use("/resultpicture", express.static(path.join(__dirname, "electionsData")));
+app.use("/incidentreport", express.static(path.join(__dirname, "electionsData")));
 
 app.use((err, req, res, next) => {
   res.status(500).json({ message: err.message });

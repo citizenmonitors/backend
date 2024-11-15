@@ -6,7 +6,6 @@ import IncidentReport from "../../models/Election/IncidentReport.js";
 import Notification from "../../models/DailyTraffic/Notification.js";
 import File from "../../models/file.js";
 import path from "path";
-import mongoose from "mongoose";
 import moment from "moment";
 
 const BACKEND_URL = process.env.BACKEND_URL;
@@ -1451,14 +1450,20 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
 
 // Helper function to fetch results and reports for a polling unit and specific user
 const fetchResults = async (pollingUnit, userId) => {
-  const electionResults = await ElectionData.find({ pollingUnit })
+  const electionResults = await ElectionData.find({
+    pollingUnit,
+    role: "observer",
+  })
     .populate({
       path: "election",
       select: "electionType electionName electionLocation startDate endDate",
     })
     .lean();
 
-  const incidentReports = await IncidentReport.find({ pollingUnit })
+  const incidentReports = await IncidentReport.find({
+    pollingUnit,
+    role: "observer",
+  })
     .populate({
       path: "election",
       select: "electionType electionName electionLocation startDate endDate",

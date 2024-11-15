@@ -299,21 +299,21 @@ export const checkUserStatusForFlagController = async (req, res) => {
     const { electionId, action, dataType } = req.body;
 
     // Validate required fields
-    if (!electionId || !action) {
+    if (!electionId || !action || !dataType) {
       return res.status(400).json({
-        message: "Election ID and action are required.",
+        message: "Election ID, action, and data type are required.",
       });
     }
 
     // Call the service to check submission status
-    const hasSubmitted = await checkUserSubmissionStatusForFlag(userId, {
+    const isUploaded = await checkUserSubmissionStatusForFlag(userId, {
       electionId,
       action,
       dataType,
     });
 
     // Respond with the submission status
-    return res.status(200).json({ hasSubmitted });
+    return res.status(200).json({ isUploaded });
   } catch (error) {
     console.error("Error checking user submission status for flag:", error);
     return res.status(500).json({

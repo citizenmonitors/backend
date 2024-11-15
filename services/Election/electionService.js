@@ -1525,25 +1525,45 @@ const fetchResults = async (pollingUnit, userId) => {
 
 
 export const checkUserSubmissionStatusForFlag = async (userId, actionData) => {
-  const { electionId, action } = actionData;
+  const { electionId, action, dataType } = actionData;
 
-  // Validate that action is "flag"
+  // Validate that action is "flag" and dataType is either "election" or "incident"
   if (action !== "flag") {
     throw new Error("Action must be 'flag' to check submission status.");
   }
+  if (!["election", "incident"].includes(dataType)) {
+    throw new Error("Invalid data type. It must be 'election' or 'incident'.");
+  }
 
-  // Check if the user has submitted either an election result or an incident report for the specified election
+  // Fetch the election ID for the main election from the provided dataType and electionId
+  let mainElectionId;
+  if (dataType === "election") {
+    const electionResult = await ElectionData.findById(electionId).lean();
+    if (!electionResult) {
+      throw new Error("Election result not found.");
+    }
+    mainElectionId = electionResult.election; // Main election field in ElectionData
+  } else if (dataType === "incident") {
+    const incidentReport = await IncidentReport.findById(electionId).lean();
+    if (!incidentReport) {
+      throw new Error("Incident report not found.");
+    }
+    mainElectionId = incidentReport.election; // Main election field in IncidentReport
+  }
+
+  // Check if the user has submitted either an election result or an incident report for the specific election
   const electionSubmission = await ElectionData.findOne({
     user: userId,
-    election: electionId,
+    election: mainElectionId, // Check against the main election field
   }).lean();
 
   const incidentSubmission = await IncidentReport.findOne({
     user: userId,
-    election: electionId,
+    election: mainElectionId, // Check against the main election field
   }).lean();
 
   // Return true if a submission exists in either collection, otherwise false
   return Boolean(electionSubmission || incidentSubmission);
 };
+
 

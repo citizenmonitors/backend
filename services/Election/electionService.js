@@ -1424,7 +1424,7 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
       existingAction.flagReason = actionData.flagReason;
     } else if (actionData.action === "unagree") {
       if (existingAction.action === "agree") {
-        data.actions.splice(existingActionIndex, 1); // Remove agree action
+        data.actions.splice(existingActionIndex, 1); 
       } else {
         throw new Error("You haven't agreed to this result/report.");
       }
@@ -1462,7 +1462,7 @@ const fetchResults = async (pollingUnit, userId) => {
 
   const incidentReports = await IncidentReport.find({
     pollingUnit,
-    userRolerole: "observer",
+    userRole: "observer",
   })
     .populate({
       path: "election",

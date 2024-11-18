@@ -88,7 +88,13 @@ const ElectionDataSchema = new mongoose.Schema(
     accreditedVoters: {
       type: Number,
     },
-    rejectedVoters: {
+    rejectedPapers: {
+      type: Number,
+    },
+    spoiledBallotPapers: {
+      type: Number,
+    },
+    usedBallotPapers: {
       type: Number,
     },
   },

@@ -4,6 +4,7 @@ import CompletedUser from "../../models/CompletedUser.js";
 import { politicalParties } from "../../models/Election/PoliticalParty.js";
 import IncidentReport from "../../models/Election/IncidentReport.js";
 import Notification from "../../models/DailyTraffic/Notification.js";
+import { uploadFilesToGCS } from "../GoogleCloud/gcsService.js"; 
 import File from "../../models/file.js";
 import path from "path";
 import moment from "moment";
@@ -331,6 +332,8 @@ export const getLiveElectionById = async (electionId) => {
   }
 };
 
+
+
 // export const uploadResultDataService = async (
 //   electionId,
 //   userId,
@@ -361,7 +364,7 @@ export const getLiveElectionById = async (electionId) => {
 //       }
 //     }
 
-//     // Convert accreditedVoters and rejectedVoters to numbers
+//     // Convert accreditedVoters and rejectedPapers to numbers
 //     accreditedVoters = Number(accreditedVoters);
 //     rejectedPapers = Number(rejectedPapers);
 //     spoiledBallotPapers = Number(spoiledBallotPapers);
@@ -369,7 +372,7 @@ export const getLiveElectionById = async (electionId) => {
 
 //     if (
 //       isNaN(accreditedVoters) ||
-//       isNaN(rejectedVoters) ||
+//       isNaN(rejectedPapers) ||
 //       isNaN(spoiledBallotPapers) ||
 //       isNaN(usedBallotPapers)
 //     ) {
@@ -405,10 +408,19 @@ export const getLiveElectionById = async (electionId) => {
 //       return sum + Number(partyVote.count);
 //     }, 0);
 
-//     // Validate that the sum of partiesVotes and rejectedVoters equals accreditedVoters
-//     if (totalVotes + rejectedVoters !== accreditedVoters) {
+//     if (
+//       spoiledBallotPapers + rejectedPapers + totalVotes !==
+//       usedBallotPapers
+//     ) {
 //       throw new Error(
-//         "The total of partiesVotes plus rejectedVoters must equal accreditedVoters"
+//         "The total of spoiledBallotPapers, rejectedPapers, and totalValidVotes must equal usedBallotPapers."
+//       );
+//     }
+
+//     // Validate that accreditedVoters is greater than or equal to usedBallotPapers
+//     if (accreditedVoters < usedBallotPapers) {
+//       throw new Error(
+//         "The number of accreditedVoters cannot be less than the total number of used ballot papers."
 //       );
 //     }
 
@@ -418,14 +430,16 @@ export const getLiveElectionById = async (electionId) => {
 
 //     // Handle the picture file upload (if provided)
 //     if (files.resultPicture && files.resultPicture.length > 0) {
-//       const resultPicturePath = `/resultpicture/${path.basename(files.resultPicture[0].path)}`;
+//       const resultPicturePath = `/resultpicture/${path.basename(
+//         files.resultPicture[0].path
+//       )}`;
 
 //       resultPicture = await File.create({
 //         location: files.resultPicture[0].path,
 //         name: files.resultPicture[0].originalname,
 //         type: files.resultPicture[0].mimetype,
 //         size: files.resultPicture[0].size,
-//         url:  `${BACKEND_URL}${resultPicturePath}`,
+//         url: `${BACKEND_URL}${resultPicturePath}`,
 //       });
 //     }
 
@@ -462,8 +476,10 @@ export const getLiveElectionById = async (electionId) => {
 //       voteRating,
 //       timeBegan,
 //       accreditedVoters,
-//       rejectedVoters, // Include rejectedVoters field
-//       ...(isApproved !== null && { isApproved }), // Conditionally include isApproved
+//       rejectedPapers,
+//       spoiledBallotPapers,
+//       usedBallotPapers,
+//       ...(isApproved !== null && { isApproved }),
 //     });
 
 //     // Save the election result data
@@ -586,6 +602,7 @@ export const getLiveElectionById = async (electionId) => {
 //   }
 // };
 
+
 export const uploadResultDataService = async (
   electionId,
   userId,
@@ -676,34 +693,30 @@ export const uploadResultDataService = async (
       );
     }
 
-    // Initialize result picture and video
-    let resultPicture = null;
-    let resultVideo = null;
+    // Upload files to GCS
+    const uploadedFiles = await uploadFilesToGCS(files, "electionData");
 
-    // Handle the picture file upload (if provided)
-    if (files.resultPicture && files.resultPicture.length > 0) {
-      const resultPicturePath = `/resultpicture/${path.basename(
-        files.resultPicture[0].path
-      )}`;
+    // Create resultPicture and resultVideo objects with GCS URLs
+    const resultPicture = uploadedFiles.resultPicture
+      ? {
+          location: files.resultPicture[0].path,
+          name: files.resultPicture[0].originalname,
+          type: files.resultPicture[0].mimetype,
+          size: files.resultPicture[0].size,
+          url: `${BACKEND_URL}/resultpicture/${files.resultPicture[0].path}`,
+          gcsUrl: uploadedFiles.resultPicture,
+        }
+      : null;
 
-      resultPicture = await File.create({
-        location: files.resultPicture[0].path,
-        name: files.resultPicture[0].originalname,
-        type: files.resultPicture[0].mimetype,
-        size: files.resultPicture[0].size,
-        url: `${BACKEND_URL}${resultPicturePath}`,
-      });
-    }
-
-    // Handle the video file upload (if provided)
-    if (files.resultVideo && files.resultVideo.length > 0) {
-      resultVideo = await File.create({
-        location: files.resultVideo[0].path,
-        name: files.resultVideo[0].originalname,
-        type: files.resultVideo[0].mimetype,
-        size: files.resultVideo[0].size,
-      });
-    }
+    const resultVideo = uploadedFiles.resultVideo
+      ? {
+          location: files.resultVideo[0].path,
+          name: files.resultVideo[0].originalname,
+          type: files.resultVideo[0].mimetype,
+          size: files.resultVideo[0].size,
+          gcsUrl: uploadedFiles.resultVideo,
+        }
+      : null;
 
     // Determine if the result should include "isApproved"
     let isApproved = null;
@@ -868,7 +881,9 @@ export const uploadResultDataService = async (
 //       voteRating,
 //       timeBegan,
 //       accreditedVoters,
-//       rejectedVoters,
+//       rejectedPapers,
+//       spoiledBallotPapers,
+//       usedBallotPapers,
 //     } = data;
 
 //     // Ensure partiesVotes is properly parsed if sent as a string
@@ -882,11 +897,17 @@ export const uploadResultDataService = async (
 //       }
 //     }
 
-//     // Convert accreditedVoters and rejectedVoters to numbers if provided
+//     // Convert inputs to numbers if provided
 //     accreditedVoters =
 //       accreditedVoters !== undefined ? Number(accreditedVoters) : undefined;
-//     rejectedVoters =
-//       rejectedVoters !== undefined ? Number(rejectedVoters) : undefined;
+//     rejectedPapers =
+//       rejectedPapers !== undefined ? Number(rejectedPapers) : undefined;
+//     spoiledBallotPapers =
+//       spoiledBallotPapers !== undefined
+//         ? Number(spoiledBallotPapers)
+//         : undefined;
+//     usedBallotPapers =
+//       usedBallotPapers !== undefined ? Number(usedBallotPapers) : undefined;
 
 //     // Check if the election exists
 //     const electionExists = await Election.findById(electionId);
@@ -910,8 +931,14 @@ export const uploadResultDataService = async (
 //       throw new Error("Result data not found or unauthorized");
 //     }
 
-//     // Validate that the sum of partiesVotes and rejectedVoters equals accreditedVoters
-//     if (partiesVotes || rejectedVoters || accreditedVoters) {
+//     // Validate new logic for ballot papers and votes
+//     if (
+//       partiesVotes ||
+//       rejectedPapers ||
+//       spoiledBallotPapers ||
+//       usedBallotPapers ||
+//       accreditedVoters
+//     ) {
 //       const totalVotes = partiesVotes
 //         ? partiesVotes.reduce(
 //             (sum, partyVote) => sum + Number(partyVote.count),
@@ -922,16 +949,35 @@ export const uploadResultDataService = async (
 //             0
 //           );
 
-//       const validatedRejectedVoters =
-//         rejectedVoters !== undefined ? rejectedVoters : result.rejectedVoters;
+//       const validatedRejectedPapers =
+//         rejectedPapers !== undefined ? rejectedPapers : result.rejectedPapers;
+//       const validatedSpoiledBallotPapers =
+//         spoiledBallotPapers !== undefined
+//           ? spoiledBallotPapers
+//           : result.spoiledBallotPapers;
+//       const validatedUsedBallotPapers =
+//         usedBallotPapers !== undefined
+//           ? usedBallotPapers
+//           : result.usedBallotPapers;
 //       const validatedAccreditedVoters =
 //         accreditedVoters !== undefined
 //           ? accreditedVoters
 //           : result.accreditedVoters;
 
-//       if (totalVotes + validatedRejectedVoters !== validatedAccreditedVoters) {
+//       // Validate that usedBallotPapers equals spoiled + rejected + totalValidVotes
+//       if (
+//         validatedSpoiledBallotPapers + validatedRejectedPapers + totalVotes !==
+//         validatedUsedBallotPapers
+//       ) {
 //         throw new Error(
-//           "The total of partiesVotes plus rejectedVoters must equal accreditedVoters"
+//           "The total of spoiledBallotPapers, rejectedPapers, and totalValidVotes must equal usedBallotPapers."
+//         );
+//       }
+
+//       // Validate that accreditedVoters is greater than or equal to usedBallotPapers
+//       if (validatedAccreditedVoters < validatedUsedBallotPapers) {
+//         throw new Error(
+//           "The number of accreditedVoters cannot be less than the total number of used ballot papers."
 //         );
 //       }
 //     }
@@ -952,8 +998,16 @@ export const uploadResultDataService = async (
 //       accreditedVoters !== undefined
 //         ? accreditedVoters
 //         : result.accreditedVoters;
-//     result.rejectedVoters =
-//       rejectedVoters !== undefined ? rejectedVoters : result.rejectedVoters;
+//     result.rejectedPapers =
+//       rejectedPapers !== undefined ? rejectedPapers : result.rejectedPapers;
+//     result.spoiledBallotPapers =
+//       spoiledBallotPapers !== undefined
+//         ? spoiledBallotPapers
+//         : result.spoiledBallotPapers;
+//     result.usedBallotPapers =
+//       usedBallotPapers !== undefined
+//         ? usedBallotPapers
+//         : result.usedBallotPapers;
 
 //     // Concurrently create resultPicture and resultVideo if provided
 //     const filePromises = [];
@@ -996,12 +1050,7 @@ export const uploadResultDataService = async (
 //   }
 // };
 
-export const updateResultDataService = async (
-  electionId,
-  userId,
-  data,
-  files
-) => {
+export const updateResultDataService = async (electionId, userId, data, files) => {
   try {
     let {
       partiesVotes,
@@ -1138,43 +1187,43 @@ export const updateResultDataService = async (
         ? usedBallotPapers
         : result.usedBallotPapers;
 
-    // Concurrently create resultPicture and resultVideo if provided
-    const filePromises = [];
-
-    if (files.resultPicture && files.resultPicture.length > 0) {
-      filePromises.push(
-        File.create({
-          location: files.resultPicture[0].path,
-          name: files.resultPicture[0].originalname,
-          type: files.resultPicture[0].mimetype,
-          size: files.resultPicture[0].size,
-        }).then((file) => {
-          result.resultPicture = file;
-        })
-      );
+    // Upload new files to GCS if provided
+    let uploadedFiles = {};
+    if (Object.keys(files).length > 0) {
+      uploadedFiles = await uploadFilesToGCS(files, "electionData");
     }
 
-    if (files.resultVideo && files.resultVideo.length > 0) {
-      filePromises.push(
-        File.create({
-          location: files.resultVideo[0].path,
-          name: files.resultVideo[0].originalname,
-          type: files.resultVideo[0].mimetype,
-          size: files.resultVideo[0].size,
-        }).then((file) => {
-          result.resultVideo = file;
-        })
-      );
+    // Update resultPicture and resultVideo objects if new files are uploaded
+    if (uploadedFiles.resultPicture) {
+      result.resultPicture = {
+        ...result.resultPicture,
+        gcsUrl: uploadedFiles.resultPicture,
+      };
     }
 
-    // Wait for all file operations to complete
-    await Promise.all(filePromises);
+    if (uploadedFiles.resultVideo) {
+      result.resultVideo = {
+        ...result.resultVideo,
+        gcsUrl: uploadedFiles.resultVideo,
+      };
+    }
 
     // Save the updated result data
     const updatedResult = await result.save();
 
-    return updatedResult;
+    return {
+      ...updatedResult.toObject(),
+      resultPicture: {
+        ...result.resultPicture,
+        gcsUrl: uploadedFiles.resultPicture || result.resultPicture?.gcsUrl,
+      },
+      resultVideo: {
+        ...result.resultVideo,
+        gcsUrl: uploadedFiles.resultVideo || result.resultVideo?.gcsUrl,
+      },
+    };
   } catch (error) {
+    console.error("Failed to update result data:", error);
     throw new Error(`Failed to update result data: ${error.message}`);
   }
 };
@@ -1266,206 +1315,6 @@ export const getAllElectionResults = async () => {
   }
 };
 
-// export const uploadIncidentReportDataService = async (
-//   electionId,
-//   userId,
-//   data,
-//   files
-// ) => {
-//   try {
-//     const { selectIncident, incidentNote, electionRating } = data;
-
-//     // Check election existence
-//     const election = await Election.findById(electionId);
-//     if (!election) {
-//       throw new Error("Election not found");
-//     }
-
-//     // Check user existence
-//     const user = await CompletedUser.findById(userId);
-//     if (!user) {
-//       throw new Error("User not found");
-//     }
-
-//     // Check if an incident report already exists
-//     const existingReport = await IncidentReport.findOne({
-//       election: electionId,
-//       user: userId,
-//     });
-//     if (existingReport) return existingReport;
-
-//     // Validate file types
-//     const validateFile = (file, allowedExtensions) => {
-//       const ext = path.extname(file.originalname).toLowerCase();
-//       if (!allowedExtensions.includes(ext)) {
-//         throw new Error(
-//           `Invalid file type. Allowed types: ${allowedExtensions.join(", ")}`
-//         );
-//       }
-//       return {
-//         location: file.path,
-//         name: file.originalname,
-//         type: file.mimetype,
-//         size: file.size,
-//       };
-//     };
-
-//     // Process and validate incident videos
-//     const incidentVideos = files?.["incidentVideos"]?.length
-//       ? files["incidentVideos[]"].map((file) =>
-//           validateFile(file, [".mp4", ".avi", ".mov", ".webm", ".wmv"])
-//         )
-//       : [];
-
-//     // Process and validate incident pictures
-//     const incidentPictures = files?.["incidentPictures"]?.length
-//       ? files["incidentPictures[]"].map((file) =>
-//           validateFile(file, [".jpg", ".jpeg", ".png", ".svg"])
-//         )
-//       : [];
-
-//     // Insert files if any are provided
-//     const insertedPictures = incidentPictures.length
-//       ? await File.insertMany(incidentPictures)
-//       : [];
-//     const insertedVideos = incidentVideos.length
-//       ? await File.insertMany(incidentVideos)
-//       : [];
-
-//     // Create and save the incident report
-//     const incidentReport = new IncidentReport({
-//       election: electionId,
-//       user: userId,
-//       userRole: user.role,
-//       state: user.state,
-//       lga: user.lga,
-//       ward: user.ward,
-//       pollingUnit: user.pollingUnit,
-//       selectIncident,
-//       incidentNote,
-//       electionRating,
-//       incidentPictures: insertedPictures,
-//       incidentVideos: insertedVideos,
-//     });
-
-//     const savedReport = await incidentReport.save();
-
-//     // Link the incident report to the election
-//     election.incidentReports.push(savedReport);
-//     await election.save();
-
-//     return savedReport;
-//   } catch (error) {
-//     console.error("Error uploading incident report data:", error);
-//     throw new Error(`Error saving election incident: ${error.message}`);
-//   }
-// };
-
-// export const uploadIncidentReportDataService = async (
-//   electionId,
-//   userId,
-//   data,
-//   files
-// ) => {
-//   try {
-//     const { selectIncident, incidentNote, electionRating } = data;
-
-//     // Rename files if they are sent without `[]` in Postman or frontend
-//     if (files?.incidentPictures) {
-//       files["incidentPictures[]"] = files.incidentPictures;
-//       delete files.incidentPictures;
-//     }
-
-//     if (files?.incidentVideos) {
-//       files["incidentVideos[]"] = files.incidentVideos;
-//       delete files.incidentVideos;
-//     }
-
-//     // Check if the election exists
-//     const election = await Election.findById(electionId);
-//     if (!election) {
-//       throw new Error("Election not found");
-//     }
-
-//     // Check if the user exists
-//     const user = await CompletedUser.findById(userId);
-//     if (!user) {
-//       throw new Error("User not found");
-//     }
-
-//     // Check if an incident report already exists
-//     const existingReport = await IncidentReport.findOne({
-//       election: electionId,
-//       user: userId,
-//     });
-//     if (existingReport) return existingReport;
-
-//     // Helper function to validate file types
-//     const validateFile = (file, allowedExtensions) => {
-//       const ext = path.extname(file.originalname).toLowerCase();
-//       if (!allowedExtensions.includes(ext)) {
-//         throw new Error(
-//           `Invalid file type. Allowed types: ${allowedExtensions.join(", ")}`
-//         );
-//       }
-//       return {
-//         location: file.path,
-//         name: file.originalname,
-//         type: file.mimetype,
-//         size: file.size,
-//       };
-//     };
-
-//     // Process and validate incident videos
-//     const incidentVideos = files?.["incidentVideos[]"]?.length
-//       ? files["incidentVideos[]"].map((file) =>
-//           validateFile(file, [".mp4", ".avi", ".mov", ".webm", ".wmv"])
-//         )
-//       : [];
-
-//     // Process and validate incident pictures
-//     const incidentPictures = files?.["incidentPictures[]"]?.length
-//       ? files["incidentPictures[]"].map((file) =>
-//           validateFile(file, [".jpg", ".jpeg", ".png", ".svg"])
-//         )
-//       : [];
-
-//     // Insert files if any are provided
-//     const insertedPictures = incidentPictures.length
-//       ? await File.insertMany(incidentPictures)
-//       : [];
-//     const insertedVideos = incidentVideos.length
-//       ? await File.insertMany(incidentVideos)
-//       : [];
-
-//     // Create and save the incident report
-//     const incidentReport = new IncidentReport({
-//       election: electionId,
-//       user: userId,
-//       userRole: user.role,
-//       state: user.state,
-//       lga: user.lga,
-//       ward: user.ward,
-//       pollingUnit: user.pollingUnit,
-//       selectIncident,
-//       incidentNote,
-//       electionRating,
-//       incidentPictures: insertedPictures,
-//       incidentVideos: insertedVideos,
-//     });
-
-//     const savedReport = await incidentReport.save();
-
-//     // Link the incident report to the election
-//     election.incidentReports.push(savedReport);
-//     await election.save();
-
-//     return savedReport;
-//   } catch (error) {
-//     console.error("Error uploading incident report data:", error);
-//     throw new Error(`Error saving election incident: ${error.message}`);
-//   }
-// };
 
 export const uploadIncidentReportDataService = async (
   electionId,

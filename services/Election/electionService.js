@@ -4,7 +4,7 @@ import CompletedUser from "../../models/CompletedUser.js";
 import { politicalParties } from "../../models/Election/PoliticalParty.js";
 import IncidentReport from "../../models/Election/IncidentReport.js";
 import Notification from "../../models/DailyTraffic/Notification.js";
-import { uploadFilesToGCS } from "../GoogleCloud/gcsService.js"; 
+// import { uploadFilesToGCS } from "../GoogleCloud/gcsService.js"; 
 import File from "../../models/file.js";
 import path from "path";
 import moment from "moment";

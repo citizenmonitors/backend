@@ -346,7 +346,7 @@ export const submitObserverDetails = async ({
   return {
     message:
       "Observer details submitted successfully, pending admin verification.",
-      token: token,
+      token,
     user: userDetails,
   };
 };

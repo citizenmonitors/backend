@@ -339,12 +339,14 @@ export const submitObserverDetails = async ({
   // Remove the original user from the User collection
   await user.deleteOne();
 
-  // Return the user details, excluding the password
+  // Return the user details and token, excluding the password
+  const token = generateToken({email: user.email})
   const { password, ...userDetails } = completedUser.toObject();
 
   return {
     message:
       "Observer details submitted successfully, pending admin verification.",
+      token: token,
     user: userDetails,
   };
 };

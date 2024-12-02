@@ -62,7 +62,7 @@ export const registerUser = async ({ email, password, confirmPassword }) => {
     html: `<p>Your verification code is: ${verificationCode}</p>`,
   });
 
-  return { message: "Verification code sent to email.", token };
+  return { message: "Verification code sent to email." };
 };
 
 // verify done 

@@ -38,12 +38,10 @@ export const registerUser = async ({ email, password, confirmPassword }) => {
   } else {
     // If user does not exist, create a new one
     const hashedPassword = await hashPassword(password);
-    const token = generateToken({ email: user.email });
 
     user = new User({
       email,
       password: hashedPassword,
-      token,
     });
     await user.save();
   }
@@ -55,6 +53,9 @@ export const registerUser = async ({ email, password, confirmPassword }) => {
   user.verificationCodeExpires = moment().add(10, "minutes").toDate();
 
   await user.save();
+  
+  // Generate a token 
+  const token = generateToken({ email });
 
   await transporter.sendMail({
     to: email,
@@ -62,7 +63,7 @@ export const registerUser = async ({ email, password, confirmPassword }) => {
     html: `<p>Your verification code is: ${verificationCode}</p>`,
   });
 
-  return { message: "Verification code sent to email." };
+  return { message: "Verification code sent to email.", token };
 };
 
 // verify done 

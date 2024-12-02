@@ -14,9 +14,11 @@ import upload from "../config/multer.js";
 
 export const register = async (req, res) => {
   try {
-    const result = await registerUser(req.body);
+    const {token} = await registerUser(req.body);
     res.status(201).json({
-      message: 'Registration successful! Please check your email for the verification code.',
+      message:
+        "Registration successful! Please check your email for the verification code.",
+      token,
     });
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -51,44 +53,6 @@ export const pickRole = async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 };
-
-// export const submitRoleForm = [
-//   upload.fields([
-//     { name: "governmentId", maxCount: 1 },
-//     { name: "profileImage", maxCount: 1 },
-//   ]),
-//   async (req, res) => {
-//     try {
-//       const { email, role, ...details } = req.body;
-//       const files = req.files;
-
-//       if (!email) {
-//         return res.status(400).json({ message: "Email is required" });
-//       }
-
-//       if (!role) {
-//         return res.status(400).json({ message: "Role is required" });
-//       }
-
-//       const { token, user } = await submitRoleFormDetails({
-//         email,
-//         role,
-//         details,
-//         files,
-//       });
-
-//       res.status(200).json({
-//         message:
-//           "Details submitted successfully. You can now login to your account.",
-//         token,
-//         user,
-//       });
-//     } catch (err) {
-//       console.error(err);
-//       res.status(400).json({ message: err.message });
-//     }
-//   },
-// ];
 
 export const submitRoleForm = [
   upload.single("profileImage"), 
@@ -137,6 +101,7 @@ export const submitObserverDetailsController = [
         bankName,
         bankAccountNumber,
         bankAccountName,
+        token,
       } = req.body;
 
       // Collect the two observer ID files (PVC front and back)
@@ -146,16 +111,18 @@ export const submitObserverDetailsController = [
       // Call the service and pass the observerIdFiles
       const result = await submitObserverDetails({
         email,
-        observerIdFiles, 
+        observerIdFiles,
         phoneNumber,
         bankName,
         bankAccountNumber,
         bankAccountName,
+        token,
       });
 
       // Send response
       return res.status(200).json({
         message: result.message,
+        token,
         user: result.user,
       });
     } catch (err) {

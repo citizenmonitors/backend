@@ -34,17 +34,16 @@ export const registerUser = async ({ email, password, confirmPassword }) => {
   if (user) {
     // If user exists but is not verified, update the password and verification token
     user.password = await hashPassword(password);
-    user.verificationToken = generateToken({ email });
     await user.save();
   } else {
     // If user does not exist, create a new one
     const hashedPassword = await hashPassword(password);
-    const verificationToken = generateToken({ email });
+    const token = generateToken({ email: user.email });
 
     user = new User({
       email,
       password: hashedPassword,
-      verificationToken,
+      token,
     });
     await user.save();
   }
@@ -63,7 +62,7 @@ export const registerUser = async ({ email, password, confirmPassword }) => {
     html: `<p>Your verification code is: ${verificationCode}</p>`,
   });
 
-  return { message: "Verification code sent to email." };
+  return { message: "Verification code sent to email.", token };
 };
 
 // verify done 

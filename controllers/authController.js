@@ -14,7 +14,7 @@ import upload from "../config/multer.js";
 
 export const register = async (req, res) => {
   try {
-    const { token } = await registerUser(req.body);
+    const result = await registerUser(req.body, token);
     res.status(201).json({
       message:
         "Registration successful! Please check your email for the verification code.",
@@ -47,8 +47,22 @@ export const resendToken = async (req, res) => {
 export const pickRole = async (req, res) => {
   try {
     const { email, role } = req.body;
-    const user = await selectUserRole(email, role);
-    res.status(200).json({ message: "Role selected successfully", user });
+
+    const result = await selectUserRole(email, role);
+
+    const respone = {
+      message: result.message,
+    };
+
+    if (result.token){
+      respone.token = result.token
+    }
+
+    if (result.user){
+      respone.user = result.user;
+    }
+
+    res.status(200).json(respone);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
@@ -66,7 +80,7 @@ export const submitRoleForm = [
       }
 
       // Call the service with the email, details, and the file
-      const { token, user, isObserverInPollingUnit } =
+      const { user, isObserverInPollingUnit } =
         await submitRoleFormDetails({
           email,
           details,
@@ -77,7 +91,6 @@ export const submitRoleForm = [
       res.status(200).json({
         message:
           "Details submitted successfully. You can now select your role.",
-        token,
         user,
         isObserverInPollingUnit,
       });
@@ -116,13 +129,12 @@ export const submitObserverDetailsController = [
         bankName,
         bankAccountNumber,
         bankAccountName,
-        token,
       });
 
       // Send response
       return res.status(200).json({
         message: result.message,
-        token,
+        token: result.token,
         user: result.user,
       });
     } catch (err) {
@@ -131,7 +143,6 @@ export const submitObserverDetailsController = [
     }
   },
 ];
-
 
 
 export const signIn = async (req, res) => {

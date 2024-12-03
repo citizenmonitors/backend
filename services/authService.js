@@ -53,9 +53,6 @@ export const registerUser = async ({ email, password, confirmPassword }) => {
   user.verificationCodeExpires = moment().add(10, "minutes").toDate();
 
   await user.save();
-  
-  // Generate a token 
-  const token = generateToken({ email });
 
   await transporter.sendMail({
     to: email,
@@ -63,7 +60,7 @@ export const registerUser = async ({ email, password, confirmPassword }) => {
     html: `<p>Your verification code is: ${verificationCode}</p>`,
   });
 
-  return { message: "Verification code sent to email.", token };
+  return { message: "Verification code sent to email." };
 };
 
 // verify done 
@@ -165,8 +162,7 @@ export const submitRoleFormDetails = async ({ email, details, file }) => {
 
   // console.log("User details after saving:", user); 
 
-  // Generate a token for the user after the form submission
-  const token = generateToken({ email: user.email });
+
 
   // Destructure the user to exclude the password
   const { password, ...userDetails } = user.toObject();
@@ -181,7 +177,6 @@ export const submitRoleFormDetails = async ({ email, details, file }) => {
 
   // Return the token, user details, and observer status in the polling unit
   return {
-    token,
     user: response,
     isObserverInPollingUnit: !!isObserverInPollingUnit,
   };
@@ -340,7 +335,7 @@ export const submitObserverDetails = async ({
   await user.deleteOne();
 
   // Return the user details and token, excluding the password
-  const token = generateToken({email: user.email})
+  const token = generateToken({ email: completedUser.email });
   const { password, ...userDetails } = completedUser.toObject();
 
   return {
@@ -350,7 +345,6 @@ export const submitObserverDetails = async ({
     user: userDetails,
   };
 };
-
 
 export const authenticateUser = async ({ email, password }) => {
   const user = await CompletedUser.findOne({ email });

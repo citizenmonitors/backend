@@ -156,6 +156,7 @@ export const submitRoleFormDetails = async ({ email, details, file }) => {
   // Assign general details to the user
   Object.assign(user, details);
   user.isVerified = true;
+  user.hasSubmittedRoleForm = true;
 
   // Save the user with updated details
   await user.save();
@@ -181,7 +182,6 @@ export const submitRoleFormDetails = async ({ email, details, file }) => {
     isObserverInPollingUnit: !!isObserverInPollingUnit,
   };
 };
- 
 
 export const selectUserRole = async (email, role) => {
   // Check if the selected role is valid
@@ -200,8 +200,13 @@ export const selectUserRole = async (email, role) => {
     throw new Error("User has not verified their email.");
   }
 
-  // Set the user's role
-  user.role = role;
+  if (!user.hasSubmittedRoleForm){
+    throw new Error(
+      "You must submit your details before selecting a role"
+    );
+  }
+    // Set the user's role
+    user.role = role;
   await user.save();
 
 

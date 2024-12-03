@@ -28,6 +28,7 @@ const completedUserSchema = new mongoose.Schema({
   coverageUpdateCount: { type: Number, default: 0 },
   // Observer specific fields
   observerId: [observerIdSchema],
+  hasSubmittedRoleForm: { type: Boolean, default: false },
   phoneNumber: String,
   bankName: String,
   bankAccountNumber: String,

@@ -14,11 +14,10 @@ import upload from "../config/multer.js";
 
 export const register = async (req, res) => {
   try {
-    const result = await registerUser(req.body, token);
+    const result = await registerUser(req.body);
     res.status(201).json({
       message:
-        "Registration successful! Please check your email for the verification code.",
-      token,
+        "Registration successful! Please check your email for the verification code."
     });
   } catch (err) {
     res.status(400).json({ message: err.message });

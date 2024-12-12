@@ -1,51 +1,17 @@
 import express from "express";
 import {
     getAllAdminController,
-    // getDailyTrafficController,
     getDashboardDataController,
-  //   getTotalActiveUserController,
-  // getTotalRegisteredUsersController,
-  // getTotalResultsUploadedController,
-  // getTotalVolunteerUsersController,
-  // getUserInfoController,
+
 } from "../../controllers/adminController/adminElectionController.js";
 import { authMiddleware, isAdmin } from "../../middleware/authMiddleware.js";
+import { getDashboardController } from "../../controllers/adminController/adminDashboard.js";
 
 const router = express.Router();
 
-// router.get(
-//   "/admin/total-users",
-//   authMiddleware,
-//   isAdmin, getTotalRegisteredUsersController
-// );
 
-// router.get(
-//   "/admin/total-volunteers",
-//   authMiddleware,
-//   isAdmin,
-//   getTotalVolunteerUsersController
-// );
-// router.get(
-//   "/admin/active-users",
-//   authMiddleware,
-//   isAdmin,
-//   getTotalActiveUserController
-// );
-
-// router.get(
-//   "/admin/results-uploaded",
-//   authMiddleware,
-//   isAdmin,
-//   getTotalResultsUploadedController
-// );
-// router.get("/admin/users-info", authMiddleware, isAdmin, getUserInfoController);
-router.get("/admin/dashboard", getDashboardDataController)
+router.get("/admin/", getDashboardDataController)
 router.get("/admin/admins", authMiddleware, isAdmin, getAllAdminController);
-// router.get(
-//   "/admin/daily-traffic",
-//   authMiddleware,
-//   isAdmin,
-//   getDailyTrafficController
-// );
+router.get("/admin/dashboard", authMiddleware, isAdmin, getDashboardController);
 
 export default router; 

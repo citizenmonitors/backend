@@ -1,5 +1,3 @@
-// Import necessary modules and functions
-
 import path from "path";
 import {
   getData,

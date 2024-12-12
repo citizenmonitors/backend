@@ -3,12 +3,7 @@ import mongoose from "mongoose";
 const monthlyActiveUsersSchema = new mongoose.Schema({
   month: {
     type: String,
-    required: true,
     unique: true,
-  },
-  activeUserCount: {
-    type: Number,
-    // default: 0,
     required: true,
   },
   users: [
@@ -19,6 +14,6 @@ const monthlyActiveUsersSchema = new mongoose.Schema({
   ],
 });
 
-const MontlyActiveUsers = mongoose.model('MontlyActiveUsers', monthlyActiveUsersSchema);
+const ActiveUser = mongoose.model('ActiveUser', monthlyActiveUsersSchema);
 
-export default MontlyActiveUsers;
+export default ActiveUser;

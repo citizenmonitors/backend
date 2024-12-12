@@ -28,7 +28,6 @@ const completedUserSchema = new mongoose.Schema({
   coverageUpdateCount: { type: Number, default: 0 },
   // Observer specific fields
   observerId: [observerIdSchema],
-  hasSubmittedRoleForm: { type: Boolean, default: false },
   phoneNumber: String,
   bankName: String,
   bankAccountNumber: String,
@@ -36,6 +35,9 @@ const completedUserSchema = new mongoose.Schema({
   resetPasswordToken: String,
   resetPasswordExpires: Date,
   password: { type: String, required: true },
+  hasSubmittedRoleForm: { type: Boolean, default: false },
 });
 
 export default mongoose.model("CompletedUser", completedUserSchema);
+
+

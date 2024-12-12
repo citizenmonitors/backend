@@ -20,7 +20,6 @@ const userSchema = new mongoose.Schema({
   isOpenToSurvey: Boolean,
   isObserverInPollingUnit: Boolean,
   pendingObserverVerification: Boolean,
-  hasSubmittedRoleForm: { type: Boolean, default: false },
   // Observer specific fields
   governmentId: String,
   phoneNumber: String,
@@ -32,6 +31,7 @@ const userSchema = new mongoose.Schema({
   // verificationToken: { type: String },
   verificationCode: { type: String },
   verificationCodeExpires: { type: Date, required: false },
+  hasSubmittedRoleForm: { type: Boolean, default: false },
 });
 
 export default mongoose.model("User", userSchema);

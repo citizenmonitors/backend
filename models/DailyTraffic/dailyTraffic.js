@@ -1,24 +1,18 @@
 import mongoose from 'mongoose';
 
-const dailyTrafficSchema = new mongoose.Schema({
+const TrafficSchema = new mongoose.Schema({
   date: {
-    type: String,
+    type: Date,
     unique: true,
     required: true,
   },
-  loginCount: {
+  visitCount: {
     type: Number,
-    // default: 0,
+    default: 0,
     required: true,
   },
-  users: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "CompletedUser",
-    },
-  ],
 });
 
-const DailyTraffic = mongoose.model('DailyTraffic', dailyTrafficSchema);
+const Traffic = mongoose.model("Traffic", TrafficSchema);
 
-export default DailyTraffic;
+export default Traffic;

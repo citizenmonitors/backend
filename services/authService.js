@@ -3,8 +3,8 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import User from "../models/User.js";
 import CompletedUser from "../models/CompletedUser.js";
-import DailyTraffic from "../models/DailyTraffic/dailyTraffic.js";
-import monthlyActiveUsers from "../models/ActiveMontlyUsers/activeMontlyUsers.js";
+import  Traffic  from "../models/DailyTraffic/dailyTraffic.js";
+import  ActiveUser  from "../models/ActiveMontlyUsers/activeMontlyUsers.js";
 import transporter from "../config/email.js";
 import { generateToken } from "../utils/generateToken.js";
 import { hashPassword } from "../utils/hashPassword.js";
@@ -351,6 +351,62 @@ export const submitObserverDetails = async ({
   };
 };
 
+// export const authenticateUser = async ({ email, password }) => {
+//   const user = await CompletedUser.findOne({ email });
+//   if (!user) {
+//     throw new Error("The email or password you entered is incorrect");
+//   }
+
+//   const isMatch = await bcrypt.compare(password, user.password);
+//   if (!isMatch) {
+//     throw new Error("The password you entered is incorrect");
+//   }
+//   user.isActive = true;
+//   user.lastLogin = new Date();
+//   await user.save();
+
+//   // Update daily login count
+//   const today = moment().startOf("day").format("DD MM YYYY");
+//   let dailyTraffic = await DailyTraffic.findOne({ date: today });
+
+//   if (!dailyTraffic) {
+//     dailyTraffic = new DailyTraffic({ date: today, loginCount: 0, users: [] });
+//   }
+
+//   if (!dailyTraffic.users) {
+//     dailyTraffic.users = [];
+//   }
+
+//   if (!dailyTraffic.users.includes(user._id)) {
+//     dailyTraffic.loginCount += 1;
+//     dailyTraffic.users.push(user._id);
+//     await dailyTraffic.save();
+//   }
+
+//   // update monthly active users
+
+//   const currentMonth = moment().subtract(1, "month").format("MM YYYY");
+//   let monthlyActive = await monthlyActiveUsers.findOne({ month: currentMonth });
+
+//   if (!monthlyActive) {
+//     monthlyActive = new monthlyActiveUsers({
+//       month: currentMonth,
+//       activeUserCount: 0,
+//       users: [],
+//     });
+//   }
+
+//   if (!monthlyActive.users.includes(user._id)) {
+//     monthlyActive.activeUserCount += 1;
+//     monthlyActive.users.push(user._id);
+//     await monthlyActive.save();
+//   }
+
+//   const token = generateToken({ email: user.email });
+//   const { password: userPassword, ...usersDetails } = user.toObject();
+//   return { token, user: usersDetails };
+// };
+
 export const authenticateUser = async ({ email, password }) => {
   const user = await CompletedUser.findOne({ email });
   if (!user) {
@@ -365,42 +421,23 @@ export const authenticateUser = async ({ email, password }) => {
   user.lastLogin = new Date();
   await user.save();
 
-  // Update daily login count
-  const today = moment().startOf("day").format("DD MM YYYY");
-  let dailyTraffic = await DailyTraffic.findOne({ date: today });
+  // Update daily traffic
+  const today = moment().startOf("day").toDate();
+  const traffic = await Traffic.findOneAndUpdate(
+    { date: today },
+    { $inc: { visitCount: 1 } },
+    { upsert: true, new: true }
+  );
 
-  if (!dailyTraffic) {
-    dailyTraffic = new DailyTraffic({ date: today, loginCount: 0, users: [] });
-  }
+  // Add user to monthly active users
+  const currentMonth = moment().format("YYYY-MM");
+  const activeUser = await ActiveUser.findOneAndUpdate(
+    { month: currentMonth },
+    { $addToSet: { users: user._id } },
+    { upsert: true, new: true }
+  );
 
-  if (!dailyTraffic.users) {
-    dailyTraffic.users = [];
-  }
-
-  if (!dailyTraffic.users.includes(user._id)) {
-    dailyTraffic.loginCount += 1;
-    dailyTraffic.users.push(user._id);
-    await dailyTraffic.save();
-  }
-
-  // update monthly active users
-
-  const currentMonth = moment().subtract(1, "month").format("MM YYYY");
-  let monthlyActive = await monthlyActiveUsers.findOne({ month: currentMonth });
-
-  if (!monthlyActive) {
-    monthlyActive = new monthlyActiveUsers({
-      month: currentMonth,
-      activeUserCount: 0,
-      users: [],
-    });
-  }
-
-  if (!monthlyActive.users.includes(user._id)) {
-    monthlyActive.activeUserCount += 1;
-    monthlyActive.users.push(user._id);
-    await monthlyActive.save();
-  }
+  // Generate JWT token
 
   const token = generateToken({ email: user.email });
   const { password: userPassword, ...usersDetails } = user.toObject();
@@ -469,3 +506,4 @@ export const validateTokenService = async (token) => {
     throw new Error("Token is not valid or expired");
   }
 };
+

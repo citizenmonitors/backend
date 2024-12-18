@@ -162,20 +162,21 @@ const findDirectoryWithPrefix = (baseDir, name) => {
     `Looking for directory with prefix: "${name}" in base directory: ${baseDir}`
   );
 
-  // Normalize name to handle spaces and remove special characters
-  const normalizedName = normalizeName(name);
+  const normalizedName = normalizeName(name); 
   const directories = fs
     .readdirSync(baseDir, { withFileTypes: true })
     .filter((dirent) => dirent.isDirectory())
     .map((dirent) => ({
       original: dirent.name,
-      normalized: normalizeName(dirent.name),
-    }))
-    .filter((dir) => dir.normalized.includes(normalizedName));
+      normalized: normalizeName(dirent.name), 
+    }));
 
-  if (directories.length) {
-    console.log(`Found directory: ${directories[0].original}`);
-    return directories[0].original; // Return the original directory name
+  const matchedDirectory = directories.find(
+    (dir) => dir.normalized === normalizedName
+  );
+  if (matchedDirectory) {
+    console.log(`Found directory: ${matchedDirectory.original}`);
+    return matchedDirectory.original;
   } else {
     console.warn(
       `Directory with prefix "${name}" not found in base directory: ${baseDir}`
@@ -184,6 +185,7 @@ const findDirectoryWithPrefix = (baseDir, name) => {
 
   return null;
 };
+
 
 // Function to resolve nested directories
 const resolveNestedDirectories = (baseDir, parts) => {

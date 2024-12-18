@@ -3,6 +3,7 @@ import CompletedUser from "../../models/CompletedUser.js";
 import ElectionData from "../../models/Election/ElectionData.js";
 import  Traffic  from "../../models/DailyTraffic/dailyTraffic.js";
 import  ActiveUser  from "../../models/ActiveMontlyUsers/activeMontlyUsers.js";
+import Election from "../../models/Election/Election.js";
 
 
 export const getDashboardData = async () => {
@@ -187,4 +188,267 @@ const getTrafficStats = async () => {
       return stat ? stat.visitCount : 0;
     });
 };
+
+
+export const getAllElectionsService = async () => {
+  // Fetch all elections with their results and incident reports
+  const elections = await Election.find()
+
+  // Format and return elections, excluding `electionLocation` and unnecessary fields
+  return elections.map((election) => {
+    const {
+      electionLocation,
+      politicalParties,
+      resultsCount,
+      incidentReports,
+      results,
+      ...electionData
+    } = election.toObject();
+
+
+    return electionData;
+  });
+};
+
+
+export const getAdminLiveElectionService = async (electionId) => {
+  try {
+    const election = await Election.findById(electionId).lean();
+    if (!election) throw new Error("Election not found");
+
+    const { electionName, electionType, startDate, endDate, electionLocation } =
+      election;
+
+    // Fetch live election results
+    const electionResults = await ElectionData.find({
+      election: electionId,
+      userRole: "observer",
+    }).lean();
+
+    if (electionResults.length === 0) {
+      return { message: "No live results available for this election." };
+    }
+
+    // Group results by location (state, lga, or ward based on election type)
+    const locationResults = electionResults.reduce((acc, result) => {
+      const locationKey =
+        electionType === "national"
+          ? result.state
+          : electionType === "gubernatorial"
+          ? result.state
+          : result.lga;
+
+      if (!acc[locationKey]) acc[locationKey] = [];
+      acc[locationKey].push(result);
+      return acc;
+    }, {});
+
+    // Handle national elections
+    if (electionType === "national") {
+      const stateArray = Object.keys(locationResults).map((state) => {
+        const stateResults = locationResults[state];
+        const { resultData, aggregateAnalysis } = aggregateResultsAndTopParties(
+          stateResults,
+          "state"
+        );
+        const footer = calculateFooter(stateResults, "state", electionLocation);
+
+        return {
+          state,
+          chart: resultData,
+          aggregateAnalysis,
+          footer,
+        };
+      });
+
+      return {
+        electionDetails: {
+          electionId,
+          electionName,
+          electionType,
+          startDate,
+          endDate,
+        },
+        result: stateArray,
+      };
+    }
+
+    // Handle gubernatorial elections
+    if (electionType === "gubernatorial") {
+      const uniqueStates = Object.keys(locationResults);
+
+      if (uniqueStates.length === 1) {
+        // Single state with results
+        const stateResults = locationResults[uniqueStates[0]];
+        const { aggregateAnalysis } = aggregateResultsAndTopParties(
+          stateResults,
+          "lga"
+        );
+
+        const footer = calculateFooter(stateResults, "lga", electionLocation);
+
+        return {
+          electionDetails: {
+            electionId,
+            electionName,
+            electionType,
+            startDate,
+            endDate,
+          },
+          result: {
+            aggregateAnalysis,
+            footer,
+          },
+        };
+      }
+
+      // Multiple states with results
+      const stateArray = uniqueStates.map((state) => {
+        const stateResults = locationResults[state];
+        const { resultData, aggregateAnalysis } = aggregateResultsAndTopParties(
+          stateResults,
+          "lga"
+        );
+        const footer = calculateFooter(stateResults, "lga", electionLocation);
+
+        return {
+          state,
+          chart: resultData,
+          aggregateAnalysis,
+          footer,
+        };
+      });
+
+      return {
+        electionDetails: {
+          electionId,
+          electionName,
+          electionType,
+          startDate,
+          endDate,
+        },
+        result: stateArray,
+      };
+    }
+
+    // Handle other elections (senatorial, house-of-representatives, etc.)
+    const uniqueLGAs = Object.keys(locationResults);
+
+    if (uniqueLGAs.length === 1) {
+      // Single LGA with results
+      const lgaResults = locationResults[uniqueLGAs[0]];
+      const { resultData, aggregateAnalysis } = aggregateResultsAndTopParties(
+        lgaResults,
+        "ward"
+      );
+
+      const footer = calculateFooter(lgaResults, "ward", electionLocation);
+
+      return {
+        electionDetails: {
+          electionId,
+          electionName,
+          electionType,
+          startDate,
+          endDate,
+        },
+        result: {
+          chart: resultData,
+          aggregateAnalysis,
+          footer,
+        },
+      };
+    }
+
+    // Multiple LGAs with results
+    const lgaArray = uniqueLGAs.map((lga) => {
+      const lgaResults = locationResults[lga];
+      const { resultData, aggregateAnalysis } = aggregateResultsAndTopParties(
+        lgaResults,
+        "ward"
+      );
+      const footer = calculateFooter(lgaResults, "ward", electionLocation);
+
+      return {
+        lga,
+        chart: resultData,
+        aggregateAnalysis,
+        footer,
+      };
+    });
+
+    return {
+      electionDetails: {
+        electionId,
+        electionName,
+        electionType,
+        startDate,
+        endDate,
+      },
+      result: lgaArray,
+    };
+  } catch (error) {
+    throw new Error(
+      `Error fetching admin live election data: ${error.message}`
+    );
+  }
+};
+
+// Helper: Aggregate Results and Top Parties
+const aggregateResultsAndTopParties = (results, groupBy) => {
+  const aggregated = {};
+  const totalVotesByParty = {};
+
+  results.forEach((result) => {
+    const groupKey = result[groupBy]; // Either state, lga, or ward
+    const { partiesVotes } = result;
+
+    // Initialize group if not exists
+    if (!aggregated[groupKey]) {
+      aggregated[groupKey] = { partiesVotes: {} };
+    }
+
+    // Aggregate votes by party
+    partiesVotes.forEach(({ party, count }) => {
+      aggregated[groupKey].partiesVotes[party] =
+        (aggregated[groupKey].partiesVotes[party] || 0) + count;
+
+      // Update total aggregate analysis
+      totalVotesByParty[party] = (totalVotesByParty[party] || 0) + count;
+    });
+  });
+
+  return {
+    resultData: getTopSevenParties(totalVotesByParty),
+    aggregateAnalysis: totalVotesByParty,
+  };
+};
+
+// Helper: Get Top 7 Parties
+const getTopSevenParties = (partiesVotes) => {
+  return Object.entries(partiesVotes)
+    .sort(([, votesA], [, votesB]) => votesB - votesA) // Sort by descending votes
+    .slice(0, 7) // Get top 7
+    .map(([party, votes]) => ({ party, [party]: votes }));
+};
+
+// Helper: Calculate Footer
+const calculateFooter = (data, groupBy, electionLocation) => {
+  // Ensure electionLocation is an array, fallback to an empty array
+  const registeredLocations = new Set(
+    Array.isArray(electionLocation)
+      ? electionLocation.map((loc) => loc.toUpperCase())
+      : []
+  );
+
+  const submittedLocations = new Set(
+    data.map((item) => (item[groupBy] || "").toUpperCase())
+  );
+
+  return {
+    [`registered-${groupBy}s`]: registeredLocations.size,
+    [`submitted-${groupBy}s`]: submittedLocations.size,
+  };
+};
+
 

@@ -13,15 +13,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 global.baseDir = path.join(__dirname, "../../data/states");
 
-// Function to normalize names (e.g., replace spaces with hyphens)
-// const normalizeName = (name) => name.trim().toLowerCase().replace(/\s+/g, "-");
 
 const normalizeName = (name) => {
   return name
+    .replace(/\(.*?\)/g, "") 
     .trim()
     .toLowerCase()
-    .replace(/[^\w\s-]/g, "") 
-    .replace(/\s+/g, "-"); 
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-");
 };
 
 

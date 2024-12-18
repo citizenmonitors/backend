@@ -17,8 +17,6 @@ import {
   getResultsAndPerformAction,
   checkUserSubmissionStatusForFlag,
 } from "../../services/Election/electionService.js";
-import CompletedUser from "../../models/CompletedUser.js";
-import Election from "../../models/Election/Election.js";
 
 export const createElection = async (req, res) => {
   try {

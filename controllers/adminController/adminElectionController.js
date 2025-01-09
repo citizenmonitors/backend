@@ -1,7 +1,10 @@
 import { getAdminLiveElectionService, getAllElectionsService } from "../../services/adminService/adminDashboard.js";
 import {
+  deleteResultOrIncidentService,
     getAllAdminService,
+    getAllResultService,
     getDashboardDataService,
+    getResultOrIncidentByIdService,
 } from "../../services/adminService/adminElectionService.js";
 
 export const getDashboardDataController = async (req, res) => {
@@ -54,3 +57,42 @@ export const getAdminLiveElectionController = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
+// Fetch all results and incidents
+export const getAllElectionAndIncidentController = async (req, res) =>{
+  try {
+    
+    const results = await getAllResultService();
+    res.status(200).json({results});
+  } catch (error) {
+    res.status(500).json({message: error.message});
+  }
+};
+
+export const getResultOrIncidentByController = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const resultOrIncident = await getResultOrIncidentByIdService(id);
+    res.status(200).json({result: resultOrIncident});
+  } catch (error) {
+    res.status(500).json({message: error.message});
+  }
+};
+
+// Delete result or incident
+export const deletedResultOrIncidentController = async (req, res) => {
+  try {
+
+    const { id } = req.params;
+
+    // check admin role
+    if(req.user.role !== 'admin') {
+      return res.status(403).json({message: "Access denied"});
+    }
+
+    const message = await deleteResultOrIncidentService(id);
+    res.status(200).json({message})
+  } catch (error) {
+    res.status(500).json({message: error.message})
+  }
+}

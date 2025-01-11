@@ -136,19 +136,55 @@ export const getAllResultService = async () => {
 
 export const getResultOrIncidentByIdService = async (id) => {
     try {
-        let result = await ElectionData.findById(id).lean();
-        if(result){
+      const result = await ElectionData.findById(id).lean();
+      if (result) {
+        const election = await Election.findById(result.election).lean();
+        if (!election) {
+          throw new Error("Election details not found for the result");
+        }
+
         const { flagged, actions, agreed, ...filterdResult } = result;
 
-            return { result: filterdResult };
+        return {
+          result: {
+            electionDetails: {
+              electionType: election.electionType,
+              electionName: election.electionName,
+              startDate: election.startDate,
+              endDate: election.endDate,
+            },
+            ...filterdResult,
+          },
         };
+      }
 
-        let incident = await IncidentReport.findById(id).lean();
-        if(incident){
-            const { flagged, actions, agreed, ...filterdIncident } = incident;
-            return { incident: filterdIncident };
+      // Find the incident by ID
+      const incident = await IncidentReport.findById(id).lean();
+      if (incident) {
+        // Fetch the associated election details
+        const election = await Election.findById(incident.election).lean();
+        if (!election) {
+          throw new Error("Election details not found for the incident.");
+        }
+
+        // Exclude flagged, actions, and agreed fields
+        const { flagged, actions, agreed, ...filteredIncident } = incident;
+
+        // Attach election details
+        return {
+          incident: {
+            electionDetails: {
+              electionType: election.electionType,
+              electionName: election.electionName,
+              startDate: election.startDate,
+              endDate: election.endDate,
+            },
+            ...filteredIncident,
+          },
         };
-        throw new Error('No result or incident found with the given id');
+      }
+
+      throw new Error("No result or incident found with the given id");
     } catch (error) {
         throw new Error('Error fetching results and incidents: ${error.message}')
     }

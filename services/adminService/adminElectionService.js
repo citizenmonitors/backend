@@ -86,6 +86,7 @@ export const getAllResultService = async () => {
         if (result.user) {
           // Filter out null users
           allResults.push({
+            id: result._id,
             firstName: result.user.firstName || "N/A",
             lastName: result.user.lastName || "N/A",
             email: result.user.email || "N/A",
@@ -106,6 +107,7 @@ export const getAllResultService = async () => {
         if (incident.user) {
           // Filter out null users
           allResults.push({
+            id: incident._id,
             firstName: incident.user.firstName || "N/A",
             lastName: incident.user.lastName || "N/A",
             email: incident.user.email || "N/A",

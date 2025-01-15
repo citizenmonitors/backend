@@ -1,4 +1,4 @@
-import { getAdminLiveElectionService, getAllElectionsService } from "../../services/adminService/adminDashboard.js";
+import { deleteUserService, getAdminLiveElectionService, getAllElectionsService, getAllUsersService, getUserByIdService } from "../../services/adminService/adminDashboard.js";
 import {
   deleteResultOrIncidentService,
     getAllAdminService,
@@ -94,5 +94,43 @@ export const deletedResultOrIncidentController = async (req, res) => {
     res.status(200).json({message})
   } catch (error) {
     res.status(500).json({message: error.message})
+  }
+}
+
+export const getAllUsersController = async (req, res) => {
+  try {
+    const results = await getAllUsersService();
+    res.status(200).json({results});
+  } catch (error) {
+    res
+      .status(500)
+      .json({
+        message: "Error fetching users and stats",
+        error: error.message,
+      });
+  }
+}
+
+export const getUserByIdController = async (req, res) => {
+  try {
+    const {id} = req.params;
+    const user = await getUserByIdService(id);
+    res.status(200).json(user);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error fetching user", error: error.message });
+  }
+};
+
+export const deleteUserByIdController = async (req, res) => {
+  try {
+    const {id} = req.params;
+    const result = await deleteUserService(id);
+    res.status(200).json(result);
+  } catch (error) {
+     res
+       .status(500)
+       .json({ message: "Error deleting user", error: error.message });
   }
 }

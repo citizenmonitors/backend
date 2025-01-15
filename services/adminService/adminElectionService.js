@@ -205,3 +205,11 @@ export const deleteResultOrIncidentService = async (id) => {
         throw new Error('Error deleting result and incident: ${error.message}');
     }
 };
+
+
+
+
+
+
+
+

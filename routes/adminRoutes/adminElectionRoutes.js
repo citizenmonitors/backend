@@ -1,12 +1,15 @@
 import express from "express";
 import {
+  deleteUserByIdController,
   deletedResultOrIncidentController,
     getAdminLiveElectionController,
     getAllAdminController,
     getAllElectionAndIncidentController,
     getAllElections,
+    getAllUsersController,
     getDashboardDataController,
     getResultOrIncidentByController,
+    getUserByIdController,
 
 } from "../../controllers/adminController/adminElectionController.js";
 import { authMiddleware, isAdmin } from "../../middleware/authMiddleware.js";
@@ -37,5 +40,12 @@ router.delete(
   authMiddleware,
   isAdmin,
   deletedResultOrIncidentController);
+router.get("/admin/users", authMiddleware, isAdmin, getAllUsersController);
+router.get("/admin/user/:id", authMiddleware, isAdmin, getUserByIdController);
+router.delete(
+  "/admin/user/:id",
+  authMiddleware,
+  isAdmin,
+  deleteUserByIdController);
 
 export default router; 

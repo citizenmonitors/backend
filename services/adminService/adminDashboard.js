@@ -150,6 +150,157 @@ const dailyTrafficComparison = dailyTrafficLastMonth?.length
   };
 };
 
+// Get all users
+
+export const getAllUsersService = async () => {
+  try {
+    const lastMonthStart = moment().subtract(1, "month").startOf("month");
+    const lastMonthEnd = moment().subtract(1, "month").endOf("month");
+
+    // Fetch all user details
+
+    const users = await CompletedUser.find().select("_id firstName lastName email state role gender createdAt").lean();
+
+    // Total number of registered users
+
+    const registeredUsersCount = await CompletedUser.countDocuments();
+    const lastMonthRegisteredUsers = await CompletedUser.countDocuments({
+      createdAt: { $gte : lastMonthStart.toDate(), $lte : lastMonthEnd.toDate() },
+     })
+    const thisMonthRegisteredUsers = await CompletedUser.countDocuments({
+      createdAt: { $gte : moment().startOf("month").toDate()},
+    });
+
+    const registeredUsersComparison = lastMonthRegisteredUsers ? Math.round(
+      ((thisMonthRegisteredUsers - lastMonthRegisteredUsers) / lastMonthRegisteredUsers) * 100
+    ) + "%" : "0%";
+
+    // Total number of observers
+    const observersCount = await CompletedUser.countDocuments({
+      role: "observer",
+    });
+     const lastMonthObservers = await CompletedUser.countDocuments({
+       role: "observer",
+       createdAt: {
+         $gte: lastMonthStart.toDate(),
+         $lte: lastMonthEnd.toDate(),
+       },
+     });
+     const observersComparison = lastMonthObservers
+       ? Math.round(
+           ((observersCount - lastMonthObservers) / lastMonthObservers) * 100
+         ) + "%"
+       : "0%";
+
+    //  Total number of volunteers
+    const volunteersCount = await CompletedUser.countDocuments({
+      role: "volunteer",
+    });
+
+     const lastMonthVolunteers = await CompletedUser.countDocuments({
+       role: "volunteer",
+       createdAt: {
+         $gte: lastMonthStart.toDate(),
+         $lte: lastMonthEnd.toDate(),
+       },
+     });
+     const volunteersComparison = lastMonthVolunteers
+       ? Math.round(
+           ((volunteersCount - lastMonthVolunteers) / lastMonthVolunteers) * 100
+         ) + "%"
+       : "0%";
+
+    // Total number of observers awaiting verification
+    const observersAwaitingVerification = await CompletedUser.countDocuments({
+      role: "observer",
+      pendingObserverVerification: true,
+    });
+
+     const lastMonthAwaitingVerification = await CompletedUser.countDocuments({
+       role: "observer",
+       pendingObserverVerification: true,
+       createdAt: {
+         $gte: lastMonthStart.toDate(),
+         $lte: lastMonthEnd.toDate(),
+       },
+     });
+     const awaitingVerificationComparison = lastMonthAwaitingVerification
+       ? Math.round(
+           ((observersAwaitingVerification - lastMonthAwaitingVerification) /
+             lastMonthAwaitingVerification) *
+             100
+         ) + "%"
+       : "0%";
+
+    // Gender breakdown
+    const genderBreakdown = await CompletedUser.aggregate([
+      { $group: { _id: "$gender", count: {$sum: 1}}},
+      { $project: { name: "$_id", count: 1, _id: 0}},
+    ]);
+
+    // Role breakdown
+    const rolesBreakdown = await CompletedUser.aggregate([
+      { $group: { _id: "$role", count: {$sum: 1}}},
+      { $project: { name: "$_id", count: 1, _id: 0}},
+    ]);
+
+    // Response
+
+    return {
+      registeredUsers: {
+        count: registeredUsersCount,
+        lastMonthComparison: registeredUsersComparison,
+      },
+      observers: {
+        count: observersCount,
+        lastMonthComparison: observersComparison,
+      },
+      volunteers: {
+        count: volunteersCount,
+        lastMonthComparison: volunteersComparison,
+      },
+      awaitingVerification: {
+        count: observersAwaitingVerification,
+        lastMonthComparison: awaitingVerificationComparison,
+      },
+      userInfo: {
+        gender: genderBreakdown,
+        roles: rolesBreakdown,
+      },
+      users,
+    };
+    
+  } catch (error) {
+    throw new Error(`Error fetching users and stats: ${error.message}`);
+  }
+};
+
+// Fetch single user info
+export const getUserByIdService = async (id) =>{
+  try {
+    const user = await CompletedUser.findById(id).lean();
+    if(!user){
+      throw new Error("User not found");
+    }
+    return user;
+  } catch (error) {
+    throw new Error(`Error fetching user: ${error.message}`);
+  }
+};
+
+// Delete single user
+export const deleteUserService = async (id) =>{
+  try {
+    const user = await CompletedUser.findByIdAndDelete(id);
+    if(!user){
+      throw new Error("User not found or already deleted")
+    }
+    return {message: "User deleted successfully"};
+  } catch (error) {
+    throw new Error(`Error deleting user: ${error.message}`);
+  }
+};
+
 // Helper Functions
 const getDailyStats = async (model, dateField, match = {}) => {
   const startOfWeek = moment().subtract(6, "days").startOf("day");

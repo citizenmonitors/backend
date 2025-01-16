@@ -341,7 +341,7 @@ export const approveObserverService = async (id) => {
     // Find all users in the same polling unit
     const usersInPollingUnit = await CompletedUser.find({
       pollingUnit: user.pollingUnit,
-      _id: { $ne: userId },
+      _id: { $ne: id },
     });
 
     for (const otherUser of usersInPollingUnit) {

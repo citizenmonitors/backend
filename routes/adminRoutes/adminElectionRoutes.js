@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  approveObserverController,
   deleteUserByIdController,
   deletedResultOrIncidentController,
     getAdminLiveElectionController,
@@ -47,5 +48,7 @@ router.delete(
   authMiddleware,
   isAdmin,
   deleteUserByIdController);
+
+router.patch("/admin/approve-observer/:id", approveObserverController);
 
 export default router; 

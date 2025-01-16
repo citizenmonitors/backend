@@ -174,6 +174,7 @@ export const getAllUsersService = async () => {
     const registeredUsersComparison = lastMonthRegisteredUsers ? Math.round(
       ((thisMonthRegisteredUsers - lastMonthRegisteredUsers) / lastMonthRegisteredUsers) * 100
     ) + "%" : "0%";
+    const registeredUsersData = await getDailyStats(CompletedUser, "createdAt");
 
     // Total number of observers
     const observersCount = await CompletedUser.countDocuments({
@@ -191,6 +192,9 @@ export const getAllUsersService = async () => {
            ((observersCount - lastMonthObservers) / lastMonthObservers) * 100
          ) + "%"
        : "0%";
+         const observersData = await getDailyStats(CompletedUser, "createdAt", {
+           role: "observer",
+         });
 
     //  Total number of volunteers
     const volunteersCount = await CompletedUser.countDocuments({
@@ -209,6 +213,9 @@ export const getAllUsersService = async () => {
            ((volunteersCount - lastMonthVolunteers) / lastMonthVolunteers) * 100
          ) + "%"
        : "0%";
+         const volunteersData = await getDailyStats(CompletedUser, "createdAt", {
+           role: "volunteer",
+         });
 
     // Total number of observers awaiting verification
     const observersAwaitingVerification = await CompletedUser.countDocuments({
@@ -231,6 +238,14 @@ export const getAllUsersService = async () => {
              100
          ) + "%"
        : "0%";
+          const observersAwaitingVerificationData = await getDailyStats(
+            CompletedUser,
+            "createdAt",
+            {
+              role: "observer",
+              pendingObserverVerification: true,
+            }
+          );
 
     // Gender breakdown
     const genderBreakdown = await CompletedUser.aggregate([
@@ -250,18 +265,22 @@ export const getAllUsersService = async () => {
       registeredUsers: {
         count: registeredUsersCount,
         lastMonthComparison: registeredUsersComparison,
+        data: registeredUsersData,
       },
       observers: {
         count: observersCount,
         lastMonthComparison: observersComparison,
+        data: observersData,
       },
       volunteers: {
         count: volunteersCount,
         lastMonthComparison: volunteersComparison,
+        data: volunteersData,
       },
       awaitingVerification: {
         count: observersAwaitingVerification,
         lastMonthComparison: awaitingVerificationComparison,
+        data: observersAwaitingVerificationData,
       },
       userInfo: {
         gender: genderBreakdown,
@@ -300,6 +319,65 @@ export const deleteUserService = async (id) =>{
     throw new Error(`Error deleting user: ${error.message}`);
   }
 };
+
+export const approveObserverService = async (id) => {
+  try {
+    // Find the user by ID
+    const user = await CompletedUser.findById(id);
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    if (user.role !== "observer") {
+      throw new Error("User is not an observer");
+    }
+
+    // Approve the observer and update their details
+    user.isObserverInPollingUnit = true;
+    user.pendingObserverVerification = false;
+    await user.save();
+
+    // Find all users in the same polling unit
+    const usersInPollingUnit = await CompletedUser.find({
+      pollingUnit: user.pollingUnit,
+      _id: { $ne: userId },
+    });
+
+    for (const otherUser of usersInPollingUnit) {
+      if (otherUser.role === "observer") {
+        // Downgrade other observers to volunteers
+        otherUser.role = "volunteer";
+        otherUser.isObserverInPollingUnit = false;
+      }
+
+      if (otherUser.role === "volunteer" && otherUser.pendingObserverVerification) {
+        // Remove pending verification for volunteers
+        otherUser.pendingObserverVerification = false;
+      }
+
+      await otherUser.save();
+    }
+
+    // Fetch all users after updates
+    const allUsers = await CompletedUser.find().select(
+      "_id firstName lastName email state role gender createdAt"
+      );
+
+    return {
+      message: "Observer approved successfully",
+      approvedObserver: {
+        id: user._id,
+        name: `${user.firstName} ${user.lastName}`,
+        pollingUnit: user.pollingUnit,
+      },
+      allUsers,
+    };
+  } catch (error) {
+    throw new Error(`Error approving observer: ${error.message}`);
+  }
+};
+
 
 // Helper Functions
 const getDailyStats = async (model, dateField, match = {}) => {

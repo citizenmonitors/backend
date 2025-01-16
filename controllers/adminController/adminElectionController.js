@@ -1,4 +1,4 @@
-import { deleteUserService, getAdminLiveElectionService, getAllElectionsService, getAllUsersService, getUserByIdService } from "../../services/adminService/adminDashboard.js";
+import { approveObserverService, deleteUserService, getAdminLiveElectionService, getAllElectionsService, getAllUsersService, getUserByIdService } from "../../services/adminService/adminDashboard.js";
 import {
   deleteResultOrIncidentService,
     getAllAdminService,
@@ -134,3 +134,16 @@ export const deleteUserByIdController = async (req, res) => {
        .json({ message: "Error deleting user", error: error.message });
   }
 }
+
+export const approveObserverController = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const response = await approveObserverService(id);
+
+    res.status(200).json(response);
+  } catch (error) {
+    console.error(`Error in approveObserverController: ${error.message}`);
+    res.status(500).json({ error: error.message });
+  }
+};

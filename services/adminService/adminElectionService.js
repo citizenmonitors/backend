@@ -93,7 +93,7 @@ export const getAllResultService = async () => {
             role: result.user.role || "N/A",
             election: election.electionType,
             state: result.state,
-            lga: result.lga,
+            LGA: result.lga,
             createdAt: result.createdAt,
             resultUploaded: "Election Result",
           });
@@ -114,7 +114,7 @@ export const getAllResultService = async () => {
             role: incident.user.role || "N/A",
             election: election.electionType,
             state: incident.state,
-            lga: incident.lga,
+            LGA: incident.lga,
             createdAt: incident.createdAt,
             resultUploaded: "Incident Report",
           });

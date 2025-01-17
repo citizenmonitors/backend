@@ -159,7 +159,11 @@ export const getAllUsersService = async () => {
 
     // Fetch all user details
 
-    const users = await CompletedUser.find().select("_id firstName lastName email state role gender createdAt").lean();
+    const users = await CompletedUser.find()
+      .select(
+        "_id firstName lastName email state role gender createdAt pendingObserverVerification"
+      )
+      .lean();
 
     // Total number of registered users
 
@@ -361,8 +365,8 @@ export const approveObserverService = async (id) => {
 
     // Fetch all users after updates
     const allUsers = await CompletedUser.find().select(
-      "_id firstName lastName email state role gender createdAt"
-      );
+      "_id firstName lastName email state role gender createdAt pendingObserverVerification"
+    );
 
     return {
       message: "Observer approved successfully",
@@ -370,6 +374,8 @@ export const approveObserverService = async (id) => {
         id: user._id,
         name: `${user.firstName} ${user.lastName}`,
         pollingUnit: user.pollingUnit,
+        pendingObserverVerification: user.pendingObserverVerification,
+        isObserverInPollingUnit: user.isObserverInPollingUnit,
       },
       allUsers,
     };

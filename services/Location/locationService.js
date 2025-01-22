@@ -126,64 +126,36 @@ const getData = (baseDir) => {
 };
 
 // Function to find the directory with prefix
-// const findDirectoryWithPrefix = (baseDir, name) => {
-//   console.log(
-//     `Looking for directory with prefix: ${name} in base directory: ${baseDir}`
-//   );
-
-//   // Normalize name to handle spaces and convert to lowercase
-  
-//   const normalizedEncodedName = encodeURIComponent(
-//     name.toLowerCase().replace(/[^A-Z0-9]+/gi, "-")
-//   );
-
-//   const directories = fs
-//     .readdirSync(baseDir, { withFileTypes: true })
-//     .filter(
-//       (dirent) =>
-//         dirent.isDirectory() &&
-//         dirent.name.toLowerCase().includes(normalizedEncodedName)
-//     )
-//     .map((dirent) => dirent.name);
-
-//   if (directories.length) {
-//     console.log(`Found directory: ${directories[0]}`);
-//   } else {
-//     console.warn(
-//       `Directory with prefix ${name} not found in base directory: ${baseDir}`
-//     );
-//   }
-
-//   return directories.length ? directories[0] : null;
-// };
-
 const findDirectoryWithPrefix = (baseDir, name) => {
   console.log(
-    `Looking for directory with prefix: "${name}" in base directory: ${baseDir}`
+    `Looking for directory with prefix: ${name} in base directory: ${baseDir}`
   );
 
-  const normalizedName = normalizeName(name); 
+  // Normalize name to handle spaces and convert to lowercase
+  
+  const normalizedEncodedName = encodeURIComponent(
+    name.toLowerCase().replace(/[^A-Z0-9]+/gi, "-")
+  );
+
+
   const directories = fs
     .readdirSync(baseDir, { withFileTypes: true })
-    .filter((dirent) => dirent.isDirectory())
-    .map((dirent) => ({
-      original: dirent.name,
-      normalized: normalizeName(dirent.name), 
-    }));
+    .filter(
+      (dirent) =>
+        dirent.isDirectory() &&
+        dirent.name.toLowerCase().includes(normalizedEncodedName)
+    )
+    .map((dirent) => dirent.name);
 
-  const matchedDirectory = directories.find(
-    (dir) => dir.normalized === normalizedName
-  );
-  if (matchedDirectory) {
-    console.log(`Found directory: ${matchedDirectory.original}`);
-    return matchedDirectory.original;
+  if (directories.length) {
+    console.log(`Found directory: ${directories[0]}`);
   } else {
     console.warn(
-      `Directory with prefix "${name}" not found in base directory: ${baseDir}`
+      `Directory with prefix ${name} not found in base directory: ${baseDir}`
     );
   }
 
-  return null;
+  return directories.length ? directories[0] : null;
 };
 
 

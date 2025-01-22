@@ -4,7 +4,7 @@ import ElectionData from "../../models/Election/ElectionData.js";
 import  Traffic  from "../../models/DailyTraffic/dailyTraffic.js";
 import  ActiveUser  from "../../models/ActiveMontlyUsers/activeMontlyUsers.js";
 import Election from "../../models/Election/Election.js";
-
+import transporter from "../../config/email.js";
 
 export const getDashboardData = async () => {
   const today = moment().startOf("day");
@@ -342,6 +342,14 @@ export const approveObserverService = async (id) => {
     user.pendingObserverVerification = false;
     await user.save();
 
+    // Notify the approved observer via email
+
+    transporter({
+      to: user.email,
+      subject: "Observer Approval",
+      body: `Dear ${user.firstName},\n\nYour observer account for polling unit ${user.pollingUnit} has been approved.\n\nThank you for your commitment.\n\n Citizen Monitors`
+    })
+
     // Find all users in the same polling unit
     const usersInPollingUnit = await CompletedUser.find({
       pollingUnit: user.pollingUnit,
@@ -358,32 +366,46 @@ export const approveObserverService = async (id) => {
       if (otherUser.role === "volunteer" && otherUser.pendingObserverVerification) {
         // Remove pending verification for volunteers
         otherUser.pendingObserverVerification = false;
+
+        // Notify them about new observer
+        transporter({
+          to: otherUser.email,
+          subject: "Observer Notification",
+          body: `Dear ${otherUser.firstName},\n\nAnother observer has been selected for polling unit ${user.pollingUnit}. Your role has been updated to volunteer.\n\nThank you for your understanding.\n\n Citizen Monitors`,
+        });
       }
 
       await otherUser.save();
     }
 
     // Fetch all users after updates
-    const allUsers = await CompletedUser.find().select(
-      "_id firstName lastName email state role gender createdAt pendingObserverVerification"
-    );
+    const observers = await CompletedUser.find({ role: "observer" }).select(
+      "_id firstName lastName email state role gender createdAt pendingObserverVerification isObserverInPollingUnit"
+    ).lean();
 
     return {
       message: "Observer approved successfully",
-      approvedObserver: {
-        id: user._id,
-        name: `${user.firstName} ${user.lastName}`,
-        pollingUnit: user.pollingUnit,
-        pendingObserverVerification: user.pendingObserverVerification,
-        isObserverInPollingUnit: user.isObserverInPollingUnit,
-      },
-      allUsers,
+      observers,
     };
   } catch (error) {
     throw new Error(`Error approving observer: ${error.message}`);
   }
 };
 
+export const getAllObsersverService = async () => {
+  try {
+    const observers = await CompletedUser.find({ role: "observer" }).select(
+      "_id firstName lastName email state role gender createdAt pendingObserverVerification isObserverInPollingUnit"
+    ).lean();
+
+    return {
+      message: "Observers fetched successfully",
+      observers,
+    };
+  } catch (error) {
+    throw new Error(`Error fetching observers: ${error.message}`);
+  }
+};
 
 // Helper Functions
 const getDailyStats = async (model, dateField, match = {}) => {

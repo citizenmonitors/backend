@@ -444,11 +444,15 @@ export const uploadResultDataService = async (
 
     // Handle the video file upload 
     if (files.resultVideo && files.resultVideo.length > 0) {
+      const resultVideoPath = `/resultvideo/${path.basename(
+        files.resultVideo[0].path
+      )}`;
       resultVideo = await File.create({
         location: files.resultVideo[0].path,
         name: files.resultVideo[0].originalname,
         type: files.resultVideo[0].mimetype,
         size: files.resultVideo[0].size,
+        url: `${BACKEND_URL}${resultVideoPath}`,
       });
     }
 

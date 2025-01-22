@@ -1,4 +1,4 @@
-import { approveObserverService, deleteUserService, getAdminLiveElectionService, getAllElectionsService, getAllUsersService, getUserByIdService } from "../../services/adminService/adminDashboard.js";
+import { approveObserverService, deleteUserService, getAdminLiveElectionService, getAllElectionsService, getAllObsersverService, getAllUsersService, getUserByIdService } from "../../services/adminService/adminDashboard.js";
 import {
   deleteResultOrIncidentService,
     getAllAdminService,
@@ -147,3 +147,12 @@ export const approveObserverController = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const getAllObserver = async (req, res) => {
+  try {
+    const data = await getAllObsersverService();
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}

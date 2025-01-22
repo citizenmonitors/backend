@@ -7,6 +7,7 @@ import {
     getAllAdminController,
     getAllElectionAndIncidentController,
     getAllElections,
+    getAllObserver,
     getAllUsersController,
     getDashboardDataController,
     getResultOrIncidentByController,
@@ -50,5 +51,7 @@ router.delete(
   deleteUserByIdController);
 
 router.patch("/admin/approve-observer/:id", approveObserverController);
+router.get("/admin/observers/", getAllObserver);
 
 export default router; 
+

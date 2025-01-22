@@ -344,7 +344,7 @@ export const approveObserverService = async (id) => {
 
     // Notify the approved observer via email
 
-    transporter({
+     transporter.sendMail({
       to: user.email,
       subject: "Observer Approval",
       body: `Dear ${user.firstName},\n\nYour observer account for polling unit ${user.pollingUnit} has been approved.\n\nThank you for your commitment.\n\n Citizen Monitors`
@@ -368,7 +368,7 @@ export const approveObserverService = async (id) => {
         otherUser.pendingObserverVerification = false;
 
         // Notify them about new observer
-        transporter({
+        transporter.sendMail({
           to: otherUser.email,
           subject: "Observer Notification",
           body: `Dear ${otherUser.firstName},\n\nAnother observer has been selected for polling unit ${user.pollingUnit}. Your role has been updated to volunteer.\n\nThank you for your understanding.\n\n Citizen Monitors`,

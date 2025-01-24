@@ -410,7 +410,7 @@ export const getAllObsersverService = async () => {
 
 export const downgradeObserverService = async (id, adminReason) => {
   try {
-    // Find the observer by Id
+    // Find the observer by ID
     const user = await CompletedUser.findById(id);
 
     if (!user) {
@@ -430,32 +430,42 @@ export const downgradeObserverService = async (id, adminReason) => {
     await user.save();
 
     // Notify the downgraded observer
-    await transporter.sendMail({
-      to: user.email,
-      subject: "Observer Role Downgraded",
-      text: `Dear ${user.firstName},\n\nYour observer role for polling unit ${pollingUnit} has been downgraded to a volunteer by the Admin.\n\nReason: ${adminReason}\n\nThank you for your understanding.\n\nCitizen Monitors`,
-    });
+    try {
+      await transporter.sendMail({
+        to: user.email,
+        subject: "Observer Role Downgraded",
+        text: `Dear ${user.firstName},\n\nYour observer role for polling unit ${pollingUnit} has been downgraded to a volunteer by the Admin.\n\nReason: ${adminReason}\n\nThank you for your understanding.\n\nCitizen Monitors`,
+      });
+    } catch (emailError) {
+      console.error(
+        `Error sending email to downgraded observer: ${emailError.message}`
+      );
+    }
 
     // Notify other users in the same polling unit
-
     const otherUsers = await CompletedUser.find({
       pollingUnit,
-      // Exclude the just downgraded observer
-      _id: { $ne: id },
+      _id: { $ne: id }, 
     });
 
     for (const otherUser of otherUsers) {
-      await transporter.sendMail({
-        to: otherUser.email,
-        subject: "Observer Role Available",
-        text: `Dear ${otherUser.firstName},\n\nThere is currently no observer in polling unit ${pollingUnit}. You can upgrade your account to become an observer for this polling unit.\n\nThank you for your participation.\n\nCitizen Monitors`,
-      });
+      try {
+        await transporter.sendMail({
+          to: otherUser.email,
+          subject: "Observer Role Available",
+          text: `Dear ${otherUser.firstName},\n\nThere is currently no observer in polling unit ${pollingUnit}. You can upgrade your account to become an observer for this polling unit.\n\nThank you for your participation.\n\nCitizen Monitors`,
+        });
+      } catch (emailError) {
+        console.error(
+          `Error sending email to user ${otherUser.email}: ${emailError.message}`
+        );
+      }
     }
 
-    // Fetch all users after updates
+    // Fetch all users with role "observer" after updates
     const observers = await CompletedUser.find({ role: "observer" })
       .select(
-        "id firstName lastName email state role gender createdAt pendingObserverVerification isObserverInPollingUnit"
+        "_id firstName lastName email state role gender createdAt pendingObserverVerification isObserverInPollingUnit"
       )
       .lean();
 
@@ -464,9 +474,12 @@ export const downgradeObserverService = async (id, adminReason) => {
       observers,
     };
   } catch (error) {
+    console.error(`Error downgrading observer: ${error.message}`);
     throw new Error(`Error downgrading observer: ${error.message}`);
   }
-}
+};
+
+
 // Helper Functions
 const getDailyStats = async (model, dateField, match = {}) => {
   const startOfWeek = moment().subtract(6, "days").startOf("day");

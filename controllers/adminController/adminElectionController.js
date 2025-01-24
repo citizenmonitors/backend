@@ -159,16 +159,14 @@ export const getAllObserver = async (req, res) => {
 
 export const downgradeObserverController = async (req, res) => {
   try {
-    const {id} = req.params;
-    const {adminReason} = req.body;
-
-    if(!adminReason) {
-      return res.status(400).json({message: "Admin reasn is required"});
+    const { id } = req.params; 
+    const { adminReason } = req.body;
+    if (!adminReason) {
+      return res.status(400).json({ message: "Admin reason is required" });
     }
 
     const result = await downgradeObserverService(id, adminReason);
-    res.status(200).json(result); 
-
+    res.status(200).json(result);
   } catch (error) {
     console.error(`Error in downgradeObserverController: ${error.message}`);
     res.status(500).json({ error: error.message });

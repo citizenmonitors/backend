@@ -455,7 +455,7 @@ export const downgradeObserverService = async (id, adminReason) => {
     // Fetch all users after updates
     const observers = await CompletedUser.find({ role: "observer" })
       .select(
-        "_id firstName lastName email state role gender createdAt pendingObserverVerification isObserverInPollingUnit"
+        "id firstName lastName email state role gender createdAt pendingObserverVerification isObserverInPollingUnit"
       )
       .lean();
 

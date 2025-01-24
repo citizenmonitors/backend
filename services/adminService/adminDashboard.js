@@ -407,6 +407,66 @@ export const getAllObsersverService = async () => {
   }
 };
 
+
+export const downgradeObserverService = async (id, adminReason) => {
+  try {
+    // Find the observer by Id
+    const user = await CompletedUser.findById(id);
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    if (user.role !== "observer" || !user.isObserverInPollingUnit) {
+      throw new Error("User is not a verified observer in their polling unit");
+    }
+
+    const pollingUnit = user.pollingUnit;
+
+    // Downgrade observer
+    user.role = "volunteer";
+    user.isObserverInPollingUnit = false;
+    user.pendingObserverVerification = false;
+    await user.save();
+
+    // Notify the downgraded observer
+    await transporter.sendMail({
+      to: user.email,
+      subject: "Observer Role Downgraded",
+      text: `Dear ${user.firstName},\n\nYour observer role for polling unit ${pollingUnit} has been downgraded to a volunteer by the Admin.\n\nReason: ${adminReason}\n\nThank you for your understanding.\n\nCitizen Monitors`,
+    });
+
+    // Notify other users in the same polling unit
+
+    const otherUsers = await CompletedUser.find({
+      pollingUnit,
+      // Exclude the just downgraded observer
+      _id: { $ne: id },
+    });
+
+    for (const otherUser of otherUsers) {
+      await transporter.sendMail({
+        to: otherUser.email,
+        subject: "Observer Role Available",
+        text: `Dear ${otherUser.firstName},\n\nThere is currently no observer in polling unit ${pollingUnit}. You can upgrade your account to become an observer for this polling unit.\n\nThank you for your participation.\n\nCitizen Monitors`,
+      });
+    }
+
+    // Fetch all users after updates
+    const observers = await CompletedUser.find({ role: "observer" })
+      .select(
+        "_id firstName lastName email state role gender createdAt pendingObserverVerification isObserverInPollingUnit"
+      )
+      .lean();
+
+    return {
+      message: "Observer downgraded successfully",
+      observers,
+    };
+  } catch (error) {
+    throw new Error(`Error downgrading observer: ${error.message}`);
+  }
+}
 // Helper Functions
 const getDailyStats = async (model, dateField, match = {}) => {
   const startOfWeek = moment().subtract(6, "days").startOf("day");

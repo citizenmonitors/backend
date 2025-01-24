@@ -1,4 +1,4 @@
-import { approveObserverService, deleteUserService, getAdminLiveElectionService, getAllElectionsService, getAllObsersverService, getAllUsersService, getUserByIdService } from "../../services/adminService/adminDashboard.js";
+import { approveObserverService, deleteUserService, downgradeObserverService, getAdminLiveElectionService, getAllElectionsService, getAllObsersverService, getAllUsersService, getUserByIdService } from "../../services/adminService/adminDashboard.js";
 import {
   deleteResultOrIncidentService,
     getAllAdminService,
@@ -156,3 +156,21 @@ export const getAllObserver = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 }
+
+export const downgradeObserverController = async (req, res) => {
+  try {
+    const {id} = req.params;
+    const {adminReason} = req.body;
+
+    if(!adminReason) {
+      return res.status(400).json({message: "Admin reasn is required"});
+    }
+
+    const result = await downgradeObserverService(id, adminReason);
+    res.status(200).json(result); 
+
+  } catch (error) {
+    console.error(`Error in downgradeObserverController: ${error.message}`);
+    res.status(500).json({ error: error.message });
+  }
+};

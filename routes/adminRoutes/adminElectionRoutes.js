@@ -53,7 +53,7 @@ router.delete(
 
 router.patch("/admin/approve-observer/:id",authMiddleware, isAdmin, approveObserverController);
 router.get("/admin/observers/", authMiddleware, isAdmin, getAllObserver);
-router.get("/admin/downgrade-observer/:id", authMiddleware, isAdmin, downgradeObserverService);
+router.post("/admin/downgrade-observer/:id", authMiddleware, isAdmin, downgradeObserverService);
 
 export default router; 
 

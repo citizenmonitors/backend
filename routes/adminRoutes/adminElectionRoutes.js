@@ -3,6 +3,7 @@ import {
   approveObserverController,
   deleteUserByIdController,
   deletedResultOrIncidentController,
+    downgradeObserverController,
     getAdminLiveElectionController,
     getAllAdminController,
     getAllElectionAndIncidentController,
@@ -16,7 +17,6 @@ import {
 } from "../../controllers/adminController/adminElectionController.js";
 import { authMiddleware, isAdmin } from "../../middleware/authMiddleware.js";
 import { getDashboardController } from "../../controllers/adminController/adminDashboard.js";
-import { downgradeObserverService } from "../../services/adminService/adminDashboard.js";
 
 const router = express.Router();
 
@@ -53,7 +53,12 @@ router.delete(
 
 router.patch("/admin/approve-observer/:id",authMiddleware, isAdmin, approveObserverController);
 router.get("/admin/observers/", authMiddleware, isAdmin, getAllObserver);
-router.post("/admin/downgrade-observer/:id", authMiddleware, isAdmin, downgradeObserverService);
+router.patch(
+  "/admin/downgrade-observer/:id",
+  authMiddleware,
+  isAdmin,
+  downgradeObserverController
+);
 
 export default router; 
 

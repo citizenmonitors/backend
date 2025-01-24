@@ -1,4 +1,5 @@
 import moment from "moment";
+import mongoose from "mongoose";
 import CompletedUser from "../../models/CompletedUser.js";
 import ElectionData from "../../models/Election/ElectionData.js";
 import  Traffic  from "../../models/DailyTraffic/dailyTraffic.js";
@@ -347,7 +348,7 @@ export const approveObserverService = async (id) => {
      transporter.sendMail({
       to: user.email,
       subject: "Observer Approval",
-      body: `Dear ${user.firstName},\n\nYour observer account for polling unit ${user.pollingUnit} has been approved.\n\nThank you for your commitment.\n\n Citizen Monitors`
+      text: `Dear ${user.firstName},\n\nYour observer account for polling unit ${user.pollingUnit} has been approved.\n\nThank you for your commitment.\n\n Citizen Monitors`
     })
 
     // Find all users in the same polling unit
@@ -371,7 +372,7 @@ export const approveObserverService = async (id) => {
         transporter.sendMail({
           to: otherUser.email,
           subject: "Observer Notification",
-          body: `Dear ${otherUser.firstName},\n\nAnother observer has been selected for polling unit ${user.pollingUnit}. Your role has been updated to volunteer.\n\nThank you for your understanding.\n\n Citizen Monitors`,
+          text: `Dear ${otherUser.firstName},\n\nAnother observer has been selected for polling unit ${user.pollingUnit}. Your role has been updated to volunteer.\n\nThank you for your understanding.\n\n Citizen Monitors`,
         });
       }
 
@@ -410,7 +411,7 @@ export const getAllObsersverService = async () => {
 
 export const downgradeObserverService = async (id, adminReason) => {
   try {
-    // Find the observer by ID
+    // Find the user by ID
     const user = await CompletedUser.findById(id);
 
     if (!user) {
@@ -421,45 +422,41 @@ export const downgradeObserverService = async (id, adminReason) => {
       throw new Error("User is not a verified observer in their polling unit");
     }
 
-    const pollingUnit = user.pollingUnit;
-
-    // Downgrade observer
+    // Downgrade the observer role
     user.role = "volunteer";
     user.isObserverInPollingUnit = false;
     user.pendingObserverVerification = false;
     await user.save();
 
-    // Notify the downgraded observer
-    try {
-      await transporter.sendMail({
-        to: user.email,
-        subject: "Observer Role Downgraded",
-        text: `Dear ${user.firstName},\n\nYour observer role for polling unit ${pollingUnit} has been downgraded to a volunteer by the Admin.\n\nReason: ${adminReason}\n\nThank you for your understanding.\n\nCitizen Monitors`,
-      });
-    } catch (emailError) {
-      console.error(
-        `Error sending email to downgraded observer: ${emailError.message}`
-      );
-    }
-
-    // Notify other users in the same polling unit
-    const otherUsers = await CompletedUser.find({
-      pollingUnit,
-      _id: { $ne: id }, 
+    // Notify the downgraded observer via email
+    await transporter.sendMail({
+      to: user.email,
+      subject: "Observer Role Downgraded",
+      text: `Dear ${user.firstName},\n\nYour observer role for polling unit ${user.pollingUnit} has been downgraded to a volunteer by the Admin.\n\nReason: ${adminReason}\n\nThank you for your understanding.\n\nCitizen Monitors`,
     });
 
-    for (const otherUser of otherUsers) {
-      try {
+    // Find all users in the same polling unit
+    const usersInPollingUnit = await CompletedUser.find({
+      pollingUnit: user.pollingUnit,
+      _id: { $ne: id },
+    });
+
+    for (const otherUser of usersInPollingUnit) {
+      // Notify other volunteers about the observer role
+      if (
+        otherUser.role === "volunteer" &&
+        otherUser.pendingObserverVerification
+      ) {
+        otherUser.pendingObserverVerification = false; // Remove pending verification
         await transporter.sendMail({
           to: otherUser.email,
           subject: "Observer Role Available",
-          text: `Dear ${otherUser.firstName},\n\nThere is currently no observer in polling unit ${pollingUnit}. You can upgrade your account to become an observer for this polling unit.\n\nThank you for your participation.\n\nCitizen Monitors`,
+          text: `Dear ${otherUser.firstName},\n\nThere is currently no observer in polling unit ${user.pollingUnit}. You can upgrade your account to become an observer for this polling unit.\n\nThank you for your participation.\n\nCitizen Monitors`,
         });
-      } catch (emailError) {
-        console.error(
-          `Error sending email to user ${otherUser.email}: ${emailError.message}`
-        );
       }
+
+      // Save changes for other users
+      await otherUser.save();
     }
 
     // Fetch all users with role "observer" after updates
@@ -478,6 +475,8 @@ export const downgradeObserverService = async (id, adminReason) => {
     throw new Error(`Error downgrading observer: ${error.message}`);
   }
 };
+
+
 
 
 // Helper Functions
@@ -539,6 +538,8 @@ export const getAllElectionsService = async () => {
     return electionData;
   });
 };
+
+
 
 
 export const getAdminLiveElectionService = async (electionId) => {

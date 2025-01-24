@@ -7,6 +7,8 @@ import {
     getResultOrIncidentByIdService,
 } from "../../services/adminService/adminElectionService.js";
 
+import mongoose from "mongoose";
+
 export const getDashboardDataController = async (req, res) => {
     try {
         const dashboardData = await getDashboardDataService();
@@ -159,8 +161,11 @@ export const getAllObserver = async (req, res) => {
 
 export const downgradeObserverController = async (req, res) => {
   try {
-    const { id } = req.params; 
+    let { id } = req.params;
     const { adminReason } = req.body;
+
+
+    // Validate admin reason
     if (!adminReason) {
       return res.status(400).json({ message: "Admin reason is required" });
     }

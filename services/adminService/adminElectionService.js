@@ -94,12 +94,16 @@ export const getAllResultService = async () => {
             election: election.electionType,
             state: result.state,
             lga: result.lga,
-            pictures: Array.isArray(result.resultPicture)
-              ? result.resultPicture
-              : Object.values(result.resultPicture || {}),
-            videos: Array.isArray(result.resultVideo)
-              ? result.resultVideo
-              : Object.values(result.resultVideo || {}),
+            pictures: result.resultPicture
+              ? Array.isArray(result.resultPicture)
+                ? result.resultPicture
+                : [result.resultPicture] // Wrap object in array
+              : [],
+            videos: result.resultVideo
+              ? Array.isArray(result.resultVideo)
+                ? result.resultVideo
+                : [result.resultVideo] // Wrap object in array
+              : [],
             createdAt: result.createdAt,
             resultUploaded: "Election Result",
           });

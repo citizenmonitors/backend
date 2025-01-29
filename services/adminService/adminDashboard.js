@@ -382,7 +382,7 @@ export const approveObserverService = async (id) => {
     // Fetch all users after updates
     const observers = await CompletedUser.find({ role: "observer" })
       .select(
-        "_id firstName lastName email state role gender createdAt pendingObserverVerification isObserverInPollingUnit phoneNumber bankName bankAccountName bankAccountNumber"
+        "_id firstName lastName email state role gender createdAt pendingObserverVerification isObserverInPollingUnit observerId phoneNumber bankName bankAccountName bankAccountNumber"
       )
       .lean();
 
@@ -399,7 +399,7 @@ export const getAllObsersverService = async () => {
   try {
     const observers = await CompletedUser.find({ role: "observer" })
       .select(
-        "_id firstName lastName email state role gender createdAt pendingObserverVerification isObserverInPollingUnit phoneNumber bankName bankAccountName bankAccountNumber"
+        "_id firstName lastName email state role gender createdAt pendingObserverVerification isObserverInPollingUnit observerId phoneNumber bankName bankAccountName bankAccountNumber"
       )
       .lean();
 
@@ -466,7 +466,7 @@ export const downgradeObserverService = async (id, adminReason) => {
     // Fetch all users with role "observer" after updates
     const observers = await CompletedUser.find({ role: "observer" })
       .select(
-        "_id firstName lastName email state role gender createdAt pendingObserverVerification isObserverInPollingUnit phoneNumber bankName bankAccountName bankAccountNumber"
+        "_id firstName lastName email state role gender createdAt pendingObserverVerification isObserverInPollingUnit observerId phoneNumber bankName bankAccountName bankAccountNumber"
       )
       .lean();
 

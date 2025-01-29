@@ -94,8 +94,8 @@ export const getAllResultService = async () => {
             election: election.electionType,
             state: result.state,
             lga: result.lga,
-            pictures: result.resultPicture,
-            videos: result.resultVideo,
+            pictures: Array.isArray(result.resultPicture) ? result.resultPicture : [],
+            videos: Array.isArray(result.resultVideo) ? result.resultVideo : [],
             createdAt: result.createdAt,
             resultUploaded: "Election Result",
           });

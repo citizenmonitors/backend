@@ -162,7 +162,7 @@ export const getAllUsersService = async () => {
 
     const users = await CompletedUser.find()
       .select(
-        "_id firstName lastName email state role gender createdAt pendingObserverVerification"
+        "_id firstName lastName email state role gender createdAt pendingObserverVerification "
       )
       .lean();
 
@@ -380,9 +380,11 @@ export const approveObserverService = async (id) => {
     }
 
     // Fetch all users after updates
-    const observers = await CompletedUser.find({ role: "observer" }).select(
-      "_id firstName lastName email state role gender createdAt pendingObserverVerification isObserverInPollingUnit"
-    ).lean();
+    const observers = await CompletedUser.find({ role: "observer" })
+      .select(
+        "_id firstName lastName email state role gender createdAt pendingObserverVerification isObserverInPollingUnit phoneNumber bankName bankAccountName bankAccountNumber"
+      )
+      .lean();
 
     return {
       message: "Observer approved successfully",
@@ -395,9 +397,11 @@ export const approveObserverService = async (id) => {
 
 export const getAllObsersverService = async () => {
   try {
-    const observers = await CompletedUser.find({ role: "observer" }).select(
-      "_id firstName lastName email state role gender createdAt pendingObserverVerification isObserverInPollingUnit"
-    ).lean();
+    const observers = await CompletedUser.find({ role: "observer" })
+      .select(
+        "_id firstName lastName email state role gender createdAt pendingObserverVerification isObserverInPollingUnit phoneNumber bankName bankAccountName bankAccountNumber"
+      )
+      .lean();
 
     return {
       message: "Observers fetched successfully",
@@ -462,7 +466,7 @@ export const downgradeObserverService = async (id, adminReason) => {
     // Fetch all users with role "observer" after updates
     const observers = await CompletedUser.find({ role: "observer" })
       .select(
-        "_id firstName lastName email state role gender createdAt pendingObserverVerification isObserverInPollingUnit"
+        "_id firstName lastName email state role gender createdAt pendingObserverVerification isObserverInPollingUnit phoneNumber bankName bankAccountName bankAccountNumber"
       )
       .lean();
 

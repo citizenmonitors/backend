@@ -94,6 +94,8 @@ export const getAllResultService = async () => {
             election: election.electionType,
             state: result.state,
             lga: result.lga,
+            picture: result.resultPicture,
+            video: result.resultVideo,
             createdAt: result.createdAt,
             resultUploaded: "Election Result",
           });
@@ -115,6 +117,8 @@ export const getAllResultService = async () => {
             election: election.electionType,
             state: incident.state,
             lga: incident.lga,
+            pictures: incident.incidentPictures,
+            videos: incident.incidentVideos,
             createdAt: incident.createdAt,
             resultUploaded: "Incident Report",
           });

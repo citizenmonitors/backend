@@ -1113,88 +1113,108 @@ export const getUserElectionResultsAndReports = async (userId) => {
 };
 
 export const getResultsAndPerformAction = async (userId, actionData) => {
-  // Fetch user to get polling unit
-  const user = await CompletedUser.findById(userId).lean();
-  if (!user || !user.pollingUnit) {
-    throw new Error("User not found or polling unit is missing");
-  }
+  try {
+    // Fetch user to get polling unit
+    const user = await CompletedUser.findById(userId).lean();
+    if (!user || !user.pollingUnit) {
+      throw new Error("User not found or polling unit is missing");
+    }
 
-  const pollingUnit = user.pollingUnit;
+    const pollingUnit = user.pollingUnit;
 
-  // If no actionData is provided, skip action handling and just return results
-  if (!actionData) {
-    return await fetchResults(pollingUnit, userId);
-  }
+    // If no actionData is provided, skip action handling and just return results
+    if (!actionData) {
+      return await fetchResults(pollingUnit, userId);
+    }
 
-  // Determine the data model based on the actionData type
-  let dataModel;
-  if (actionData.dataType === "election") {
-    dataModel = ElectionData;
-  } else if (actionData.dataType === "incident") {
-    dataModel = IncidentReport;
-  } else {
-    throw new Error("Invalid data type. It must be 'election' or 'incident'.");
-  }
+    // Determine the data model based on the actionData type
+    let dataModel;
+    if (actionData.dataType === "election") {
+      dataModel = ElectionData;
+    } else if (actionData.dataType === "incident") {
+      dataModel = IncidentReport;
+    } else {
+      throw new Error(
+        "Invalid data type. It must be 'election' or 'incident'."
+      );
+    }
 
-  // Fetch the specific election result or incident report
-  const data = await dataModel.findById(actionData.electionId);
-  if (!data) {
-    throw new Error(
-      `${
-        actionData.dataType === "election"
-          ? "Election result"
-          : "Incident report"
-      } not found`
+    // Fetch the specific election result or incident report
+    const data = await dataModel.findById(actionData.electionId);
+    if (!data) {
+      throw new Error(
+        `${
+          actionData.dataType === "election"
+            ? "Election result"
+            : "Incident report"
+        } not found`
+      );
+    }
+
+    // Locate the user's existing action
+    const existingActionIndex = data.actions.findIndex(
+      (a) => a.userId.toString() === userId.toString()
     );
-  }
+    const existingAction = data.actions[existingActionIndex];
 
-  // Locate the user's existing action
-  const existingActionIndex = data.actions.findIndex(
-    (a) => a.userId.toString() === userId.toString()
-  );
-  const existingAction = data.actions[existingActionIndex];
-
-  // Process action based on actionData
-  if (existingAction) {
-    if (actionData.action === "agree") {
-      // Toggle agree: if already agreed, remove action; otherwise, set to agree
-      if (existingAction.action === "agree") {
-        data.actions.splice(existingActionIndex, 1); // Remove the action
-      } else if (existingAction.action !== "flag") {
-        existingAction.action = "agree"; // Set to agree if not flagged
-      } else {
-        throw new Error("You cannot agree after flagging the result.");
+    // Process action based on actionData
+    if (existingAction) {
+      if (actionData.action === "agree") {
+        // Toggle agree: if already agreed, remove action; otherwise, set to agree
+        if (existingAction.action === "agree") {
+          data.actions.splice(existingActionIndex, 1); 
+        } else if (existingAction.action !== "flag") {
+          existingAction.action = "agree"; 
+        } else {
+          throw new Error("You cannot agree after flagging the result.");
+        }
+      } else if (actionData.action === "flag") {
+        if (!actionData.flagReason) {
+          throw new Error("Flag reason is required when flagging.");
+        }
+        existingAction.action = "flag";
+        existingAction.flagReason = actionData.flagReason;
+        data.flagged = true;
+      } else if (actionData.action === "unagree") {
+        if (existingAction.action === "agree") {
+          data.actions.splice(existingActionIndex, 1);
+        } else {
+          throw new Error("You haven't agreed to this result/report.");
+        }
       }
-    } else if (actionData.action === "flag") {
-      if (!actionData.flagReason) {
-        throw new Error("Flag reason is required when flagging.");
+    } else {
+      // Add a new action
+      const newAction = { userId, action: actionData.action };
+      if (actionData.action === "flag") {
+        if (!actionData.flagReason) {
+          throw new Error("Flag reason is required when flagging.");
+        }
+        newAction.flagReason = actionData.flagReason;
       }
-      existingAction.action = "flag";
-      existingAction.flagReason = actionData.flagReason;
-    } else if (actionData.action === "unagree") {
-      if (existingAction.action === "agree") {
-        data.actions.splice(existingActionIndex, 1);
-      } else {
-        throw new Error("You haven't agreed to this result/report.");
-      }
+      data.actions.push(newAction);
     }
-  } else {
-    // Add a new action
-    const newAction = { userId, action: actionData.action };
-    if (actionData.action === "flag") {
-      if (!actionData.flagReason) {
-        throw new Error("Flag reason is required when flagging.");
-      }
-      newAction.flagReason = actionData.flagReason;
+
+    // Count total users in the polling unit
+    const totalUsersInPollingUnit = await CompletedUser.countDocuments({
+      pollingUnit: user.pollingUnit,
+    });
+
+    // Count users who flagged the result
+    const flaggedCount = data.actions.filter((a) => a.action === "flag").length;
+
+    // Hide the result if 50% or more users in polling unit have flagged it
+    if (flaggedCount >= totalUsersInPollingUnit / 2) {
+      data.hidden = true;
     }
-    data.actions.push(newAction);
+
+    // Save the updated election result or incident report
+    await data.save();
+
+    // Fetch and return the updated results and reports
+    return await fetchResults(pollingUnit, userId);
+  } catch (error) {
+    throw new Error(`Error processing action: ${error.message}`);
   }
-
-  // Save the updated election result or incident report
-  await data.save();
-
-  // Fetch and return the updated results and reports
-  return await fetchResults(pollingUnit, userId);
 };
 
 // Helper function to fetch results and reports for a polling unit and specific user

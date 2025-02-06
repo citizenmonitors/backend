@@ -219,9 +219,91 @@ export const deleteResultOrIncidentService = async (id) => {
 };
 
 
+export const getFlaggedResultsService = async () => {
+
+try {
+  const flaggedResults = await ElectionData.find({
+    "actions.action": "flag",
+  }).lean();
+  const flaggedIncidents = await IncidentReport.find({
+    "actions.action": "flag",
+  }).lean();
+
+  return { flaggedResults, flaggedIncidents };
+} catch (error) {
+  throw new Error(`Error fetching flagged results: ${error.message}`);
+}
+
+}
+
+export const deleteFlaggedResults = async (id) => {
+  try {
+    // Check if the result or incident is flagged before deleting
+    const result = await ElectionData.findOne({ _id: id, flagged: true });
+    const incident = await IncidentReport.findOne({ _id: id, flagged: true });
+
+    if (!result && !incident) {
+      throw new Error("No flagged result found for deletion");
+    }
+
+    if (result) {
+      await ElectionData.findByIdAndDelete(id);
+    }
+
+    if (incident) {
+      await IncidentReport.findByIdAndDelete(id);
+    }
+
+      const flaggedResults = await ElectionData.find({ flagged: true }).lean();
+   const flaggedIncidents = await IncidentReport.find({ flagged: true }).lean();
 
 
+    return {
+      message: "Flagged result deleted successfully",
+      flaggedResults,
+      flaggedIncidents,
+    };
+  } catch (error) {
+    throw new Error(`Error deleting flagged result: ${error.message}`);
+  }
+};
 
 
+export const restoreFlaggedResult = async (id) => {
+  try {
 
+    let updated = false
+    const result = await ElectionData.findById(id);
+    if(result){
+      result.hidden = false;
+      result.flagged = false;
+      result.actions = [];
+      await result.save();
+      updated = true;
+    }
 
+    const incident = await IncidentReport.findById(id);
+
+    if(incident) {
+      incident.hidden = false;
+      incident.flagged = false;
+      incident.actions = [];
+      await incident.save()
+    }
+
+     if (!updated) {
+       throw new Error("No flagged result or incident found.");
+     }
+
+   const flaggedResults = await ElectionData.find({ flagged: true }).lean();
+   const flaggedIncidents = await IncidentReport.find({ flagged: true }).lean();
+
+   return {
+     message: "Result restored successfully",
+     flaggedResults,
+     flaggedIncidents,
+   };
+  } catch (error) {
+    throw new Error(`Error restoring flagged result: ${error.message}`);
+  }
+}

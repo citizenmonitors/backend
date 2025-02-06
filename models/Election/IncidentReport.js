@@ -73,6 +73,10 @@ const incidentReportSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    hidden: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

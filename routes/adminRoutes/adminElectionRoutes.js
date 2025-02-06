@@ -1,6 +1,7 @@
 import express from "express";
 import {
   approveObserverController,
+  deleteFlaggedResultController,
   deleteUserByIdController,
   deletedResultOrIncidentController,
     downgradeObserverController,
@@ -11,8 +12,10 @@ import {
     getAllObserver,
     getAllUsersController,
     getDashboardDataController,
+    getFlaggedResultsCon,
     getResultOrIncidentByController,
     getUserByIdController,
+    restoreFlaggedResultController,
 
 } from "../../controllers/adminController/adminElectionController.js";
 import { authMiddleware, isAdmin } from "../../middleware/authMiddleware.js";
@@ -58,6 +61,25 @@ router.patch(
   authMiddleware,
   isAdmin,
   downgradeObserverController
+);
+router.get(
+  "/admin/flagged-results/",
+  authMiddleware,
+  isAdmin,
+  getFlaggedResultsCon
+);
+router.delete(
+  "/admin/delete-flagged/:id",
+  authMiddleware,
+  isAdmin,
+  deleteFlaggedResultController
+);
+
+router.put(
+  "/admin/restore-flagged/:id",
+  authMiddleware,
+  isAdmin,
+  restoreFlaggedResultController
 );
 
 export default router; 

@@ -78,6 +78,10 @@ const ElectionDataSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    hidden: {
+      type: Boolean,
+      default: false,
+    },
     isApproved: {
       type: Boolean,
       default: false,

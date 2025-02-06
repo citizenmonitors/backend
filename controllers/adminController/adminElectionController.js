@@ -1,10 +1,13 @@
 import { approveObserverService, deleteUserService, downgradeObserverService, getAdminLiveElectionService, getAllElectionsService, getAllObsersverService, getAllUsersService, getUserByIdService } from "../../services/adminService/adminDashboard.js";
 import {
+  deleteFlaggedResults,
   deleteResultOrIncidentService,
     getAllAdminService,
     getAllResultService,
     getDashboardDataService,
+    getFlaggedResultsService,
     getResultOrIncidentByIdService,
+    restoreFlaggedResult,
 } from "../../services/adminService/adminElectionService.js";
 
 import mongoose from "mongoose";
@@ -174,6 +177,38 @@ export const downgradeObserverController = async (req, res) => {
     res.status(200).json(result);
   } catch (error) {
     console.error(`Error in downgradeObserverController: ${error.message}`);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getFlaggedResultsCon = async (req, res) => {
+  try {
+    const results = await getFlaggedResultsService();
+    res.status(200).json({flaggedResults: results});
+  } catch (error) {
+    res.status(500).json({error: error.message});
+  }
+}
+
+export const deleteFlaggedResultController = async (req, res) => {
+  try {
+    const { resultId } = req.params;
+
+    const response = await deleteFlaggedResults(id);
+    res.status(200).json(response);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+export const restoreFlaggedResultController = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const response = await restoreFlaggedResult(id);
+    res.status(200).json(response);
+  } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };

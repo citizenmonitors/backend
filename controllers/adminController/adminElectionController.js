@@ -192,7 +192,7 @@ export const getFlaggedResultsCon = async (req, res) => {
 
 export const deleteFlaggedResultController = async (req, res) => {
   try {
-    const { resultId } = req.params;
+    const { id } = req.params;
 
     const response = await deleteFlaggedResults(id);
     res.status(200).json(response);

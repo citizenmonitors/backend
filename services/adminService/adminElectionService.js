@@ -222,12 +222,8 @@ export const deleteResultOrIncidentService = async (id) => {
 export const getFlaggedResultsService = async () => {
 
 try {
-  const flaggedResults = await ElectionData.find({
-    "actions.action": "flag",
-  }).lean();
-  const flaggedIncidents = await IncidentReport.find({
-    "actions.action": "flag",
-  }).lean();
+  const flaggedResults = await ElectionData.find({ flagged: true }).lean();
+  const flaggedIncidents = await IncidentReport.find({ flagged: true }).lean();
 
   return { flaggedResults, flaggedIncidents };
 } catch (error) {
@@ -278,6 +274,7 @@ export const restoreFlaggedResult = async (id) => {
       result.hidden = false;
       result.flagged = false;
       result.actions = [];
+      result.priorityLevel = 0;
       await result.save();
       updated = true;
     }
@@ -288,7 +285,9 @@ export const restoreFlaggedResult = async (id) => {
       incident.hidden = false;
       incident.flagged = false;
       incident.actions = [];
+      incident.priorityLevel = 0;
       await incident.save()
+      updated = true;
     }
 
      if (!updated) {
@@ -307,3 +306,89 @@ export const restoreFlaggedResult = async (id) => {
     throw new Error(`Error restoring flagged result: ${error.message}`);
   }
 }
+
+
+export const getSingleFlaggedElectionService = async (electionId) => {
+  try {
+    let flaggedData = await ElectionData.findById(electionId)
+      .populate("election", "electionType electionName startDate endDate")
+      .populate("user", "firstName lastName email")
+      .lean();
+
+    let dataType = "election"; // Default to election result
+
+    // If no flagged election is found, check if it's an incident report
+    if (!flaggedData || !flaggedData.flagged) {
+      flaggedData = await IncidentReport.findById(electionId)
+        .populate("election", "electionType electionName startDate endDate")
+        .populate("user", "firstName lastName email")
+        .lean();
+      dataType = "incident"; // Change type to incident report
+    }
+
+    if (!flaggedData || !flaggedData.flagged) {
+      throw new Error("Flagged election result or incident report not found.");
+    }
+
+    // Extract counter evidence IDs from actions
+    const evidenceIds = flaggedData.actions
+      .filter((action) => action.evidenceId) 
+      .map((action) => action.evidenceId); 
+
+    // Fetch counter evidence results
+    const counterEvidenceResults = await ElectionData.find({
+      _id: { $in: evidenceIds },
+    })
+      .populate("user", "firstName lastName email")
+      .lean();
+
+    return {
+      dataType, // election or incident
+      electionDetails: {
+        electionId: flaggedData._id,
+        electionType: flaggedData.election.electionType,
+        electionName: flaggedData.election.electionName,
+        startDate: flaggedData.election.startDate,
+        endDate: flaggedData.election.endDate,
+      },
+      result: {
+        electionId: flaggedData._id,
+        pollingUnit: flaggedData.pollingUnit,
+        state: flaggedData.state,
+        lga: flaggedData.lga,
+        ward: flaggedData.ward,
+        user: {
+          firstName: flaggedData.user.firstName,
+          lastName: flaggedData.user.lastName,
+          email: flaggedData.user.email,
+        },
+        resultPicture: flaggedData.resultPicture,
+        resultVideo: flaggedData.resultVideo,
+        partiesVotes: flaggedData.partiesVotes,
+        voteRating: flaggedData.voteRating,
+        voterIntimidation: flaggedData.voterIntimidation,
+        voteBuying: flaggedData.voteBuying,
+        actions: flaggedData.actions,
+        flagged: flaggedData.flagged,
+        hidden: flaggedData.hidden,
+        priorityLevel: flaggedData.priorityLevel, // Use existing priorityLevel
+      },
+      counterEvidence: counterEvidenceResults.map((evidence) => ({
+        evidenceId: evidence._id,
+        user: {
+          firstName: evidence.user.firstName,
+          lastName: evidence.user.lastName,
+          email: evidence.user.email,
+        },
+        resultPicture: evidence.resultPicture,
+        resultVideo: evidence.resultVideo,
+        partiesVotes: evidence.partiesVotes,
+        voteRating: evidence.voteRating,
+        voterIntimidation: evidence.voterIntimidation,
+        voteBuying: evidence.voteBuying,
+      })),
+    };
+  } catch (error) {
+    throw new Error(`Error fetching flagged data: ${error.message}`);
+  }
+};

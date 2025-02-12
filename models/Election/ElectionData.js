@@ -68,6 +68,10 @@ const ElectionDataSchema = new mongoose.Schema(
         flagReason: {
           type: String,
         },
+        evidenceId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "ElectionData",
+        },
       },
     ],
     agreed: {

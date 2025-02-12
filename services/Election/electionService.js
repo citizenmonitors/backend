@@ -1151,6 +1151,16 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
       );
     }
 
+    if(data.user.toString() === userId.toString()){
+       throw new Error("You cannot flag your own result or incident.");
+    }
+
+     // Ensure user has uploaded a result before flagging
+    const hasUploaded = await checkUserSubmissionStatusForFlag(userId, actionData);
+    if (!hasUploaded) {
+      throw new Error("You must have submitted a result/incident to flag one.");
+    }
+
     // Locate the user's existing action
     const existingActionIndex = data.actions.findIndex(
       (a) => a.userId.toString() === userId.toString()
@@ -1172,9 +1182,14 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
         if (!actionData.flagReason) {
           throw new Error("Flag reason is required when flagging.");
         }
+        if (!actionData.evidenceId) {
+          throw new Error(
+            "You must provide an evidenceId when flagging a result."
+          );
+        }
         existingAction.action = "flag";
         existingAction.flagReason = actionData.flagReason;
-        data.flagged = true;
+        existingAction.evidenceId = hasUploaded.evidenceId;
       } else if (actionData.action === "unagree") {
         if (existingAction.action === "agree") {
           data.actions.splice(existingActionIndex, 1);
@@ -1184,12 +1199,17 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
       }
     } else {
       // Add a new action
-      const newAction = { userId, action: actionData.action };
+      const newAction = {
+        userId,
+        action: actionData.action,
+        evidenceId: hasUploaded.evidenceId,
+      };
       if (actionData.action === "flag") {
         if (!actionData.flagReason) {
           throw new Error("Flag reason is required when flagging.");
         }
         newAction.flagReason = actionData.flagReason;
+     
       }
       data.actions.push(newAction);
     }
@@ -1202,9 +1222,14 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
     // Count users who flagged the result
     const flaggedCount = data.actions.filter((a) => a.action === "flag").length;
 
+// set flagged to true
+if(flaggedCount > 0) {
+  data.flagged = true;
+}
+
     // Hide the result if 50% or more users in polling unit have flagged it
     if (flaggedCount >= totalUsersInPollingUnit / 2) {
-      data.hidden = true;
+     await dataModel.findByIdAndUpdate(data._id, { hidden: true });
     }
 
     // Save the updated election result or incident report
@@ -1222,6 +1247,7 @@ const fetchResults = async (pollingUnit, userId) => {
   const electionResults = await ElectionData.find({
     pollingUnit,
     userRole: "observer",
+    hidden: false,
   })
     .populate({
       path: "election",
@@ -1232,6 +1258,7 @@ const fetchResults = async (pollingUnit, userId) => {
   const incidentReports = await IncidentReport.find({
     pollingUnit,
     userRole: "observer",
+    hidden: false,
   })
     .populate({
       path: "election",
@@ -1244,6 +1271,11 @@ const fetchResults = async (pollingUnit, userId) => {
     const userAction = result.actions.find(
       (a) => a.userId.toString() === userId.toString()
     );
+
+    const totalActions = result.actions.length || 1; 
+    const flaggedCount = result.actions.filter((a) => a.action === "flag").length;
+    const priorityLevel = Math.round((flaggedCount / totalActions) * 100);
+
     return {
       electionTypeId: result.election._id,
       electionId: result._id,
@@ -1259,6 +1291,8 @@ const fetchResults = async (pollingUnit, userId) => {
       resultVideo: result.resultVideo,
       agreed: userAction ? userAction.action === "agree" : false,
       flagged: userAction ? userAction.action === "flag" : false,
+      hidden: result.hidden,
+      priorityLevel,
       actions: result.actions,
       timeBegan: result.timeBegan,
       isApproved: result.isApproved,
@@ -1271,6 +1305,12 @@ const fetchResults = async (pollingUnit, userId) => {
     const userAction = report.actions.find(
       (a) => a.userId.toString() === userId.toString()
     );
+
+    const totalActions = report.actions.length || 1; 
+    const flaggedCount = report.actions.filter((a) => a.action === "flag").length;
+    const priorityLevel = Math.round((flaggedCount / totalActions) * 100);
+
+
     return {
       electionTypeId: report.election._id,
       electionId: report._id,
@@ -1285,6 +1325,8 @@ const fetchResults = async (pollingUnit, userId) => {
       incidentVideos: report.incidentVideos,
       agreed: userAction ? userAction.action === "agree" : false,
       flagged: userAction ? userAction.action === "flag" : false,
+      hidden: report.hidden,
+      priorityLevel,
       actions: report.actions,
       election: report.election,
     };
@@ -1314,26 +1356,32 @@ export const checkUserSubmissionStatusForFlag = async (userId, actionData) => {
     if (!electionResult) {
       throw new Error("Election result not found.");
     }
-    mainElectionId = electionResult.election; // Main election field in ElectionData
+    mainElectionId = electionResult.election;
   } else if (dataType === "incident") {
     const incidentReport = await IncidentReport.findById(electionId).lean();
     if (!incidentReport) {
       throw new Error("Incident report not found.");
     }
-    mainElectionId = incidentReport.election; // Main election field in IncidentReport
+    mainElectionId = incidentReport.election;
   }
 
   // Check if the user has submitted either an election result or an incident report for the specific election
   const electionSubmission = await ElectionData.findOne({
     user: userId,
-    election: mainElectionId, // Check against the main election field
+    election: mainElectionId,
   }).lean();
 
   const incidentSubmission = await IncidentReport.findOne({
     user: userId,
-    election: mainElectionId, // Check against the main election field
+    election: mainElectionId,
   }).lean();
 
-  // Return true if a submission exists in either collection, otherwise false
-  return Boolean(electionSubmission || incidentSubmission);
+  // If user has a submission, return its ID as `evidenceId`
+  if (electionSubmission) {
+    return { hasUploaded: true, evidenceId: electionSubmission._id };
+  } else if (incidentSubmission) {
+    return { hasUploaded: true, evidenceId: incidentSubmission._id };
+  }
+
+  return { hasUploaded: false };
 };

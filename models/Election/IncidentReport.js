@@ -63,6 +63,10 @@ const incidentReportSchema = new mongoose.Schema(
         flagReason: {
           type: String,
         },
+        evidenceId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "IncidentReport",
+        },
       },
     ],
     agreed: {

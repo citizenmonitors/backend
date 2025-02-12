@@ -14,6 +14,7 @@ import {
     getDashboardDataController,
     getFlaggedResultsCon,
     getResultOrIncidentByController,
+    getSingleFlaggedElectionController,
     getUserByIdController,
     restoreFlaggedResultController,
 
@@ -80,6 +81,12 @@ router.put(
   authMiddleware,
   isAdmin,
   restoreFlaggedResultController
+);
+router.get(
+  "/admin/single-flagged/:id",
+  authMiddleware,
+  isAdmin,
+  getSingleFlaggedElectionController
 );
 
 export default router; 

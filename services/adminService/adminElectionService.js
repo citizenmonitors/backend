@@ -245,13 +245,8 @@ export const deleteFlaggedResults = async (id) => {
       throw new Error("No flagged result found for deletion");
     }
 
-    if (result) {
-      await ElectionData.findByIdAndDelete(id);
-    }
-
-    if (incident) {
-      await IncidentReport.findByIdAndDelete(id);
-    }
+    if (result) await ElectionData.findByIdAndDelete(id);
+    if (incident) await IncidentReport.findByIdAndDelete(id);
 
     const flaggedResults = await ElectionData.find({ flagged: true }).lean();
     const flaggedIncidents = await IncidentReport.find({
@@ -311,23 +306,48 @@ export const restoreFlaggedResult = async (id) => {
   }
 };
 
-// Helper function to format media (pictures & videos)
+// Helper function to format media (pictures & videos) and remove unwanted fields
 const formatMedia = (data, type) => {
-  return data.map((item) => ({
-    ...item,
-    resultPicture:
-      type === "result" && item.resultPicture ? [item.resultPicture] : [],
-    resultVideo: type === "result" && item.resultVideo ? item.resultVideo : {},
-    incidentPictures:
-      type === "incident" && item.incidentPictures.length > 0
-        ? item.incidentPictures
-        : [],
-    incidentVideos:
-      type === "incident" && item.incidentVideos.length > 0
-        ? item.incidentVideos[0]
-        : {}, // Convert to object if only one
-  }));
+  return data.map((item) => {
+    let formattedData = {
+      electionId: item._id,
+      state: item.state,
+      lga: item.lga,
+      ward: item.ward,
+      pollingUnit: item.pollingUnit,
+      flagged: item.flagged,
+      hidden: item.hidden,
+      priorityLevel: item.priorityLevel,
+    };
+
+    if (type === "result") {
+      formattedData = {
+        ...formattedData,
+        partiesVotes: item.partiesVotes,
+        accreditedVoters: item.accreditedVoters,
+        rejectedPapers: item.rejectedPapers,
+        spoiledBallotPapers: item.spoiledBallotPapers,
+        usedBallotPapers: item.usedBallotPapers,
+        resultPicture: item.resultPicture ? [item.resultPicture] : [],
+        resultVideo: item.resultVideo || {},
+      };
+    } else if (type === "incident") {
+      formattedData = {
+        ...formattedData,
+        selectIncident: item.selectIncident,
+        incidentNote: item.incidentNote,
+        electionRating: item.electionRating,
+        incidentPictures:
+          item.incidentPictures.length > 0 ? item.incidentPictures : [],
+        incidentVideos:
+          item.incidentVideos.length > 0 ? item.incidentVideos[0] : {}, // Convert array to object
+      };
+    }
+
+    return formattedData;
+  });
 };
+
 
 
 

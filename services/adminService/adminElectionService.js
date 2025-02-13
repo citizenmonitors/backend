@@ -220,31 +220,26 @@ export const deleteResultOrIncidentService = async (id) => {
 
 
 export const getFlaggedResultsService = async () => {
+  try {
+    const flaggedResults = await ElectionData.find({ flagged: true }).lean();
+    const flaggedIncidents = await IncidentReport.find({
+      flagged: true,
+    }).lean();
 
-try {
-  const flaggedResults = await ElectionData.find({ flagged: true }).lean();
-  const flaggedIncidents = await IncidentReport.find({ flagged: true }).lean();
-
-  return { flaggedResults, flaggedIncidents };
-} catch (error) {
-  throw new Error(`Error fetching flagged results: ${error.message}`);
-}
-
-}
+    return {
+      flaggedResults: formatMedia(flaggedResults, "result"),
+      flaggedIncidents: formatMedia(flaggedIncidents, "incident"),
+    };
+  } catch (error) {
+    throw new Error(`Error fetching flagged results: ${error.message}`);
+  }
+};
 
 export const deleteFlaggedResults = async (id) => {
   try {
     // Check if the result or incident is flagged before deleting
-    const result = await ElectionData.findOne({
-      _id: id,
-      flagged: true,
-      userRole: "observer",
-    });
-    const incident = await IncidentReport.findOne({
-      _id: id,
-      flagged: true,
-      userRole: "observer",
-    });
+    const result = await ElectionData.findOne({ _id: id, flagged: true });
+    const incident = await IncidentReport.findOne({ _id: id, flagged: true });
 
     if (!result && !incident) {
       throw new Error("No flagged result found for deletion");
@@ -258,33 +253,27 @@ export const deleteFlaggedResults = async (id) => {
       await IncidentReport.findByIdAndDelete(id);
     }
 
-      const flaggedResults = await ElectionData.find({
-        flagged: true,
-        userRole: "observer",
-      }).lean();
-   const flaggedIncidents = await IncidentReport.find({
-     flagged: true,
-     userRole: "observer",
-   }).lean();
-
+    const flaggedResults = await ElectionData.find({ flagged: true }).lean();
+    const flaggedIncidents = await IncidentReport.find({
+      flagged: true,
+    }).lean();
 
     return {
       message: "Flagged result deleted successfully",
-      flaggedResults,
-      flaggedIncidents,
+      flaggedResults: formatMedia(flaggedResults, "result"),
+      flaggedIncidents: formatMedia(flaggedIncidents, "incident"),
     };
   } catch (error) {
     throw new Error(`Error deleting flagged result: ${error.message}`);
   }
 };
 
-
 export const restoreFlaggedResult = async (id) => {
   try {
+    let updated = false;
 
-    let updated = false
     const result = await ElectionData.findById(id);
-    if(result){
+    if (result) {
       result.hidden = false;
       result.flagged = false;
       result.actions = [];
@@ -294,38 +283,52 @@ export const restoreFlaggedResult = async (id) => {
     }
 
     const incident = await IncidentReport.findById(id);
-
-    if(incident) {
+    if (incident) {
       incident.hidden = false;
       incident.flagged = false;
       incident.actions = [];
       incident.priorityLevel = 0;
-      await incident.save()
+      await incident.save();
       updated = true;
     }
 
-     if (!updated) {
-       throw new Error("No flagged result or incident found.");
-     }
+    if (!updated) {
+      throw new Error("No flagged result or incident found.");
+    }
 
-   const flaggedResults = await ElectionData.find({
-     flagged: true,
-     userRole: "observer",
-   }).lean();
-   const flaggedIncidents = await IncidentReport.find({
-     flagged: true,
-     userRole: "observer",
-   }).lean();
+    const flaggedResults = await ElectionData.find({ flagged: true }).lean();
+    const flaggedIncidents = await IncidentReport.find({
+      flagged: true,
+    }).lean();
 
-   return {
-     message: "Result restored successfully",
-     flaggedResults,
-     flaggedIncidents,
-   };
+    return {
+      message: "Result restored successfully",
+      flaggedResults: formatMedia(flaggedResults, "result"),
+      flaggedIncidents: formatMedia(flaggedIncidents, "incident"),
+    };
   } catch (error) {
     throw new Error(`Error restoring flagged result: ${error.message}`);
   }
-}
+};
+
+// Helper function to format media (pictures & videos)
+const formatMedia = (data, type) => {
+  return data.map((item) => ({
+    ...item,
+    resultPicture:
+      type === "result" && item.resultPicture ? [item.resultPicture] : [],
+    resultVideo: type === "result" && item.resultVideo ? item.resultVideo : {},
+    incidentPictures:
+      type === "incident" && item.incidentPictures.length > 0
+        ? item.incidentPictures
+        : [],
+    incidentVideos:
+      type === "incident" && item.incidentVideos.length > 0
+        ? item.incidentVideos[0]
+        : {}, // Convert to object if only one
+  }));
+};
+
 
 
 export const getSingleFlaggedElectionService = async (electionId) => {
@@ -384,8 +387,8 @@ export const getSingleFlaggedElectionService = async (electionId) => {
           rejectedPapers: data.rejectedPapers,
           spoiledBallotPapers: data.spoiledBallotPapers,
           usedBallotPapers: data.usedBallotPapers,
-          resultPicture: data.resultPicture ? data.resultPicture : undefined,
-          resultVideo: data.resultVideo || undefined,
+          resultPicture: data.resultPicture ? [data.resultPicture] : [],
+          resultVideo: data.resultVideo || {},
         };
       } else {
         filteredData = {
@@ -394,11 +397,15 @@ export const getSingleFlaggedElectionService = async (electionId) => {
           incidentNote: data.incidentNote,
           electionRating: data.electionRating,
           incidentPictures:
-            data.incidentPictures.length > 0
+            data.incidentPictures && data.incidentPictures.length > 0
               ? data.incidentPictures
-              : undefined,
+              : [],
           incidentVideos:
-            data.incidentVideos.length > 0 ? data.incidentVideos : undefined,
+            data.incidentVideos && data.incidentVideos.length > 1
+              ? data.incidentVideos 
+              : data.incidentVideos.length === 1
+              ? data.incidentVideos[0] 
+              : {},
         };
       }
 

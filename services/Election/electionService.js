@@ -1284,8 +1284,8 @@ const fetchResults = async (pollingUnit, userId) => {
       voteRating: result.voteRating,
       voterIntimidation: result.voterIntimidation,
       voteBuying: result.voteBuying,
-      resultPicture: result.resultPicture,
-      resultVideo: result.resultVideo,
+      resultPicture: result.resultPicture ? [result.resultPicture] : [],
+      resultVideo: result.resultVideo || {},
       agreed: userAction ? userAction.action === "agree" : false,
       flagged: userAction ? userAction.action === "flag" : false,
       hidden: result.hidden,
@@ -1313,8 +1313,14 @@ const fetchResults = async (pollingUnit, userId) => {
       selectIncident: report.selectIncident,
       incidentNote: report.incidentNote,
       electionRating: report.electionRating,
-      incidentPictures: report.incidentPictures,
-      incidentVideos: report.incidentVideos,
+      incidentPictures: report.incidentPictures.length
+        ? report.incidentPictures
+        : [],
+      incidentVideos: report.incidentVideos && report.incidentVideos.length > 1
+              ? report.incidentVideos 
+              : report.incidentVideos.length === 1
+              ? report.incidentVideos[0] 
+              : {},
       agreed: userAction ? userAction.action === "agree" : false,
       flagged: userAction ? userAction.action === "flag" : false,
       hidden: report.hidden,

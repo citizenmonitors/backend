@@ -185,7 +185,7 @@ export const downgradeObserverController = async (req, res) => {
 export const getFlaggedResultsCon = async (req, res) => {
   try {
     const results = await getFlaggedResultsService();
-    res.status(200).json({flaggedResults: results});
+    res.status(200).json(results);
   } catch (error) {
     res.status(500).json({error: error.message});
   }

@@ -255,6 +255,7 @@ export const getElectionById = async (electionId, userId) => {
       user: userId,
     }).lean();
 
+
     // Fetch the incident report data for the specific user and election
     const incidentReport = await IncidentReport.findOne({
       election: electionId,
@@ -1151,12 +1152,15 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
       );
     }
 
-    if(data.user.toString() === userId.toString()){
-       throw new Error("You cannot flag your own result or incident.");
+    if (data.user.toString() === userId.toString()) {
+      throw new Error("You cannot flag your own result or incident.");
     }
 
-     // Ensure user has uploaded a result before flagging
-    const hasUploaded = await checkUserSubmissionStatusForFlag(userId, actionData);
+    // Ensure user has uploaded a result before flagging
+    const hasUploaded = await checkUserSubmissionStatusForFlag(
+      userId,
+      actionData
+    );
     if (!hasUploaded) {
       throw new Error("You must have submitted a result/incident to flag one.");
     }
@@ -1172,9 +1176,9 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
       if (actionData.action === "agree") {
         // Toggle agree: if already agreed, remove action; otherwise, set to agree
         if (existingAction.action === "agree") {
-          data.actions.splice(existingActionIndex, 1); 
+          data.actions.splice(existingActionIndex, 1);
         } else if (existingAction.action !== "flag") {
-          existingAction.action = "agree"; 
+          existingAction.action = "agree";
         } else {
           throw new Error("You cannot agree after flagging the result.");
         }
@@ -1209,28 +1213,25 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
           throw new Error("Flag reason is required when flagging.");
         }
         newAction.flagReason = actionData.flagReason;
-     
       }
       data.actions.push(newAction);
     }
 
-    // Count total users in the polling unit
     const totalUsersInPollingUnit = await CompletedUser.countDocuments({
-      pollingUnit: user.pollingUnit,
-    });
+  pollingUnit: user.pollingUnit,
+});
 
-    // Count users who flagged the result
-    const flaggedCount = data.actions.filter((a) => a.action === "flag").length;
 
-// set flagged to true
-if(flaggedCount > 0) {
+const totalUsers = totalUsersInPollingUnit > 0 ? totalUsersInPollingUnit : 1;
+const flaggedCount = data.actions.filter((a) => a.action === "flag").length;
+const priorityLevel = Math.round((flaggedCount / totalUsers) * 100);
+if (flaggedCount > 0) {
   data.flagged = true;
+  data.priorityLevel = priorityLevel;
 }
-
-    // Hide the result if 50% or more users in polling unit have flagged it
-    if (flaggedCount >= totalUsersInPollingUnit / 2) {
-     await dataModel.findByIdAndUpdate(data._id, { hidden: true });
-    }
+if (priorityLevel >= 50) {
+  data.hidden = true;
+}
 
     // Save the updated election result or incident report
     await data.save();
@@ -1251,7 +1252,7 @@ const fetchResults = async (pollingUnit, userId) => {
   })
     .populate({
       path: "election",
-      select: "electionType electionName electionLocation startDate endDate",
+      select: "electionType electionName startDate endDate",
     })
     .lean();
 
@@ -1262,19 +1263,15 @@ const fetchResults = async (pollingUnit, userId) => {
   })
     .populate({
       path: "election",
-      select: "electionType electionName electionLocation startDate endDate",
+      select: "electionType electionName startDate endDate",
     })
     .lean();
 
-  // Prepare election result data for response
+  // Process election results
   const resultData = electionResults.map((result) => {
     const userAction = result.actions.find(
       (a) => a.userId.toString() === userId.toString()
     );
-
-    const totalActions = result.actions.length || 1; 
-    const flaggedCount = result.actions.filter((a) => a.action === "flag").length;
-    const priorityLevel = Math.round((flaggedCount / totalActions) * 100);
 
     return {
       electionTypeId: result.election._id,
@@ -1292,7 +1289,7 @@ const fetchResults = async (pollingUnit, userId) => {
       agreed: userAction ? userAction.action === "agree" : false,
       flagged: userAction ? userAction.action === "flag" : false,
       hidden: result.hidden,
-      priorityLevel,
+      priorityLevel: result.priorityLevel,
       actions: result.actions,
       timeBegan: result.timeBegan,
       isApproved: result.isApproved,
@@ -1300,16 +1297,11 @@ const fetchResults = async (pollingUnit, userId) => {
     };
   });
 
-  // Prepare incident report data for response
+  // Process incident reports
   const reportData = incidentReports.map((report) => {
     const userAction = report.actions.find(
       (a) => a.userId.toString() === userId.toString()
     );
-
-    const totalActions = report.actions.length || 1; 
-    const flaggedCount = report.actions.filter((a) => a.action === "flag").length;
-    const priorityLevel = Math.round((flaggedCount / totalActions) * 100);
-
 
     return {
       electionTypeId: report.election._id,
@@ -1326,7 +1318,7 @@ const fetchResults = async (pollingUnit, userId) => {
       agreed: userAction ? userAction.action === "agree" : false,
       flagged: userAction ? userAction.action === "flag" : false,
       hidden: report.hidden,
-      priorityLevel,
+      priorityLevel: report.priorityLevel,
       actions: report.actions,
       election: report.election,
     };
@@ -1337,6 +1329,8 @@ const fetchResults = async (pollingUnit, userId) => {
     incidentReports: reportData,
   };
 };
+
+
 
 export const checkUserSubmissionStatusForFlag = async (userId, actionData) => {
   const { electionId, action, dataType } = actionData;

@@ -105,6 +105,9 @@ const ElectionDataSchema = new mongoose.Schema(
     usedBallotPapers: {
       type: Number,
     },
+    priorityLevel: {
+      type: Number,
+    },
   },
   {
     timestamps: true,

@@ -218,16 +218,14 @@ export const restoreFlaggedResultController = async (req, res) => {
 export const getSingleFlaggedElectionController = async (req, res) => {
   try {
     const { id } = req.params;
-    const flaggedElection = await getSingleFlaggedElectionService(id);
-
-    res.status(200).json(flaggedElection);
+    const result = await getSingleFlaggedElectionService(id);
+    res.status(200).json(result);
   } catch (error) {
-    console.error(
-      `Error in getSingleFlaggedElectionController: ${error.message}`
-    );
+    console.error(`Error fetching flagged election: ${error.message}`);
     res.status(500).json({ error: error.message });
   }
 };
+
 
 
 

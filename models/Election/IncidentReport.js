@@ -81,6 +81,9 @@ const incidentReportSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    priorityLevel: {
+      type: Number,
+    },
   },
   {
     timestamps: true,

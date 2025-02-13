@@ -235,8 +235,16 @@ try {
 export const deleteFlaggedResults = async (id) => {
   try {
     // Check if the result or incident is flagged before deleting
-    const result = await ElectionData.findOne({ _id: id, flagged: true });
-    const incident = await IncidentReport.findOne({ _id: id, flagged: true });
+    const result = await ElectionData.findOne({
+      _id: id,
+      flagged: true,
+      userRole: "observer",
+    });
+    const incident = await IncidentReport.findOne({
+      _id: id,
+      flagged: true,
+      userRole: "observer",
+    });
 
     if (!result && !incident) {
       throw new Error("No flagged result found for deletion");
@@ -250,8 +258,14 @@ export const deleteFlaggedResults = async (id) => {
       await IncidentReport.findByIdAndDelete(id);
     }
 
-      const flaggedResults = await ElectionData.find({ flagged: true }).lean();
-   const flaggedIncidents = await IncidentReport.find({ flagged: true }).lean();
+      const flaggedResults = await ElectionData.find({
+        flagged: true,
+        userRole: "observer",
+      }).lean();
+   const flaggedIncidents = await IncidentReport.find({
+     flagged: true,
+     userRole: "observer",
+   }).lean();
 
 
     return {
@@ -294,8 +308,14 @@ export const restoreFlaggedResult = async (id) => {
        throw new Error("No flagged result or incident found.");
      }
 
-   const flaggedResults = await ElectionData.find({ flagged: true }).lean();
-   const flaggedIncidents = await IncidentReport.find({ flagged: true }).lean();
+   const flaggedResults = await ElectionData.find({
+     flagged: true,
+     userRole: "observer",
+   }).lean();
+   const flaggedIncidents = await IncidentReport.find({
+     flagged: true,
+     userRole: "observer",
+   }).lean();
 
    return {
      message: "Result restored successfully",
@@ -312,18 +332,16 @@ export const getSingleFlaggedElectionService = async (electionId) => {
   try {
     let flaggedData = await ElectionData.findById(electionId)
       .populate("election", "electionType electionName startDate endDate")
-      .populate("user", "firstName lastName email")
       .lean();
 
-    let dataType = "election"; // Default to election result
+    let dataType = "result";
 
     // If no flagged election is found, check if it's an incident report
     if (!flaggedData || !flaggedData.flagged) {
       flaggedData = await IncidentReport.findById(electionId)
         .populate("election", "electionType electionName startDate endDate")
-        .populate("user", "firstName lastName email")
         .lean();
-      dataType = "incident"; // Change type to incident report
+      dataType = "incident";
     }
 
     if (!flaggedData || !flaggedData.flagged) {
@@ -332,63 +350,75 @@ export const getSingleFlaggedElectionService = async (electionId) => {
 
     // Extract counter evidence IDs from actions
     const evidenceIds = flaggedData.actions
-      .filter((action) => action.evidenceId) 
-      .map((action) => action.evidenceId); 
+      .filter((action) => action.evidenceId)
+      .map((action) => action.evidenceId);
 
-    // Fetch counter evidence results
-    const counterEvidenceResults = await ElectionData.find({
-      _id: { $in: evidenceIds },
-    })
-      .populate("user", "firstName lastName email")
-      .lean();
+    // Fetch counter evidence results or incidents
+    const counterEvidence =
+      dataType === "result"
+        ? await ElectionData.find({ _id: { $in: evidenceIds } }).lean()
+        : await IncidentReport.find({ _id: { $in: evidenceIds } }).lean();
+
+    // Function to filter out empty fields and irrelevant data
+    const filterFields = (data, isElection) => {
+      let filteredData = {
+        electionId: data._id,
+        electionType: data.election.electionType,
+        electionName: data.election.electionName,
+        startDate: data.election.startDate,
+        endDate: data.election.endDate,
+        state: data.state,
+        lga: data.lga,
+        ward: data.ward,
+        pollingUnit: data.pollingUnit,
+        flagged: data.flagged,
+        hidden: data.hidden,
+        priorityLevel: data.priorityLevel,
+      };
+
+      if (isElection) {
+        filteredData = {
+          ...filteredData,
+          partiesVotes: data.partiesVotes,
+          accreditedVoters: data.accreditedVoters,
+          rejectedPapers: data.rejectedPapers,
+          spoiledBallotPapers: data.spoiledBallotPapers,
+          usedBallotPapers: data.usedBallotPapers,
+          resultPicture: data.resultPicture ? data.resultPicture : undefined,
+          resultVideo: data.resultVideo || undefined,
+        };
+      } else {
+        filteredData = {
+          ...filteredData,
+          selectIncident: data.selectIncident,
+          incidentNote: data.incidentNote,
+          electionRating: data.electionRating,
+          incidentPictures:
+            data.incidentPictures.length > 0
+              ? data.incidentPictures
+              : undefined,
+          incidentVideos:
+            data.incidentVideos.length > 0 ? data.incidentVideos : undefined,
+        };
+      }
+
+      // Remove undefined fields
+      return Object.fromEntries(
+        Object.entries(filteredData).filter(([_, v]) => v !== undefined)
+      );
+    };
 
     return {
-      dataType, // election or incident
-      electionDetails: {
-        electionId: flaggedData._id,
-        electionType: flaggedData.election.electionType,
-        electionName: flaggedData.election.electionName,
-        startDate: flaggedData.election.startDate,
-        endDate: flaggedData.election.endDate,
-      },
       result: {
-        electionId: flaggedData._id,
-        pollingUnit: flaggedData.pollingUnit,
-        state: flaggedData.state,
-        lga: flaggedData.lga,
-        ward: flaggedData.ward,
-        user: {
-          firstName: flaggedData.user.firstName,
-          lastName: flaggedData.user.lastName,
-          email: flaggedData.user.email,
-        },
-        resultPicture: flaggedData.resultPicture,
-        resultVideo: flaggedData.resultVideo,
-        partiesVotes: flaggedData.partiesVotes,
-        voteRating: flaggedData.voteRating,
-        voterIntimidation: flaggedData.voterIntimidation,
-        voteBuying: flaggedData.voteBuying,
-        actions: flaggedData.actions,
-        flagged: flaggedData.flagged,
-        hidden: flaggedData.hidden,
-        priorityLevel: flaggedData.priorityLevel, // Use existing priorityLevel
+        [dataType]: filterFields(flaggedData, dataType === "result"),
+        counterEvidence: counterEvidence.map((evidence) =>
+          filterFields(evidence, dataType === "result")
+        ),
       },
-      counterEvidence: counterEvidenceResults.map((evidence) => ({
-        evidenceId: evidence._id,
-        user: {
-          firstName: evidence.user.firstName,
-          lastName: evidence.user.lastName,
-          email: evidence.user.email,
-        },
-        resultPicture: evidence.resultPicture,
-        resultVideo: evidence.resultVideo,
-        partiesVotes: evidence.partiesVotes,
-        voteRating: evidence.voteRating,
-        voterIntimidation: evidence.voterIntimidation,
-        voteBuying: evidence.voteBuying,
-      })),
     };
   } catch (error) {
     throw new Error(`Error fetching flagged data: ${error.message}`);
   }
 };
+
+

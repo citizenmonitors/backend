@@ -408,8 +408,16 @@ const fetchUpdatedFlaggedResults = async () => {
           flagged: result.flagged,
           hidden: result.hidden,
           priorityLevel: result.priorityLevel,
-          pictures: result.resultPicture,
-          videos: result.resultVideo,
+          pictures: result.resultPicture
+              ? Array.isArray(result.resultPicture)
+                ? result.resultPicture
+                : [result.resultPicture] 
+              : [],
+          videos: result.resultVideo
+              ? Array.isArray(result.resultVideo)
+                ? result.resultVideo
+                : [result.resultVideo] 
+              : [],
           createdAt: result.createdAt,
           resultUploaded: "Election Result",
         });

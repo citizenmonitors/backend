@@ -334,7 +334,7 @@ export const getSingleFlaggedElectionService = async (id) => {
           ...filteredResult,
         },
         counterEvidence: counterEvidence.map((evidence) => ({
-          electionId: evidence._id,
+          id: evidence._id,
           state: evidence.state,
           lga: evidence.lga,
           ward: evidence.ward,
@@ -389,7 +389,7 @@ export const getSingleFlaggedElectionService = async (id) => {
           ...filteredIncident,
         },
         counterEvidence: counterEvidence.map((evidence) => ({
-          incidentId: evidence._id,
+          IDBRequest: evidence._id,
           state: evidence.state,
           lga: evidence.lga,
           ward: evidence.ward,

@@ -389,7 +389,7 @@ export const getSingleFlaggedElectionService = async (id) => {
           ...filteredIncident,
         },
         counterEvidence: counterEvidence.map((evidence) => ({
-          IDBRequest: evidence._id,
+          id: evidence._id,
           state: evidence.state,
           lga: evidence.lga,
           ward: evidence.ward,

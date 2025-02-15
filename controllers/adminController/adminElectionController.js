@@ -178,16 +178,16 @@ export const downgradeObserverController = async (req, res) => {
     res.status(200).json(result);
   } catch (error) {
     console.error(`Error in downgradeObserverController: ${error.message}`);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
 export const getFlaggedResultsCon = async (req, res) => {
   try {
     const results = await getFlaggedResultsService();
-    res.status(200).json(results);
+    res.status(200).json({results});
   } catch (error) {
-    res.status(500).json({error: error.message});
+    res.status(500).json({ message: error.message });
   }
 }
 
@@ -195,10 +195,10 @@ export const deleteFlaggedResultController = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const response = await deleteFlaggedResults(id);
-    res.status(200).json(response);
+    const results = await deleteFlaggedResults(id);
+    res.status(200).json({ results});
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -207,10 +207,10 @@ export const restoreFlaggedResultController = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const response = await restoreFlaggedResult(id);
-    res.status(200).json(response);
+    const results = await restoreFlaggedResult(id);
+    res.status(200).json({ results });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -218,11 +218,11 @@ export const restoreFlaggedResultController = async (req, res) => {
 export const getSingleFlaggedElectionController = async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await getSingleFlaggedElectionService(id);
-    res.status(200).json(result);
+    const resultOrIncident = await getSingleFlaggedElectionService(id);
+    res.status(200).json({ result: resultOrIncident });
   } catch (error) {
     console.error(`Error fetching flagged election: ${error.message}`);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 

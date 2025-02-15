@@ -97,12 +97,12 @@ export const getAllResultService = async () => {
             pictures: result.resultPicture
               ? Array.isArray(result.resultPicture)
                 ? result.resultPicture
-                : [result.resultPicture] // Wrap object in array
+                : [result.resultPicture] 
               : [],
             videos: result.resultVideo
               ? Array.isArray(result.resultVideo)
                 ? result.resultVideo
-                : [result.resultVideo] // Wrap object in array
+                : [result.resultVideo] 
               : [],
             createdAt: result.createdAt,
             resultUploaded: "Election Result",
@@ -220,19 +220,15 @@ export const deleteResultOrIncidentService = async (id) => {
 
 
 export const getFlaggedResultsService = async () => {
-  try {
-    const flaggedResults = await ElectionData.find({ flagged: true }).lean();
-    const flaggedIncidents = await IncidentReport.find({
-      flagged: true,
-    }).lean();
-
-    return {
-      flaggedResults: formatMedia(flaggedResults, "result"),
-      flaggedIncidents: formatMedia(flaggedIncidents, "incident"),
-    };
-  } catch (error) {
-    throw new Error(`Error fetching flagged results: ${error.message}`);
-  }
+  
+   try {
+  return await fetchUpdatedFlaggedResults();
+   } catch (error) {
+     console.error(`Error fetching results and incidents: ${error.message}`);
+     throw new Error(`Error fetching results and incidents: ${error.message}`);
+   }
+  
+  
 };
 
 export const deleteFlaggedResults = async (id) => {
@@ -248,15 +244,12 @@ export const deleteFlaggedResults = async (id) => {
     if (result) await ElectionData.findByIdAndDelete(id);
     if (incident) await IncidentReport.findByIdAndDelete(id);
 
-    const flaggedResults = await ElectionData.find({ flagged: true }).lean();
-    const flaggedIncidents = await IncidentReport.find({
-      flagged: true,
-    }).lean();
+const allResults = await fetchUpdatedFlaggedResults();
+
 
     return {
       message: "Flagged result deleted successfully",
-      flaggedResults: formatMedia(flaggedResults, "result"),
-      flaggedIncidents: formatMedia(flaggedIncidents, "incident"),
+      allResults,
     };
   } catch (error) {
     throw new Error(`Error deleting flagged result: ${error.message}`);
@@ -291,161 +284,162 @@ export const restoreFlaggedResult = async (id) => {
       throw new Error("No flagged result or incident found.");
     }
 
-    const flaggedResults = await ElectionData.find({ flagged: true }).lean();
-    const flaggedIncidents = await IncidentReport.find({
-      flagged: true,
-    }).lean();
+const allResults = await fetchUpdatedFlaggedResults();
 
     return {
       message: "Result restored successfully",
-      flaggedResults: formatMedia(flaggedResults, "result"),
-      flaggedIncidents: formatMedia(flaggedIncidents, "incident"),
+      allResults,
     };
   } catch (error) {
     throw new Error(`Error restoring flagged result: ${error.message}`);
   }
 };
 
-// Helper function to format media (pictures & videos) and remove unwanted fields
-const formatMedia = (data, type) => {
-  return data.map((item) => {
-    let formattedData = {
-      electionId: item._id,
-      state: item.state,
-      lga: item.lga,
-      ward: item.ward,
-      pollingUnit: item.pollingUnit,
-      flagged: item.flagged,
-      hidden: item.hidden,
-      priorityLevel: item.priorityLevel,
-    };
 
-    if (type === "result") {
-      formattedData = {
-        ...formattedData,
-        partiesVotes: item.partiesVotes,
-        accreditedVoters: item.accreditedVoters,
-        rejectedPapers: item.rejectedPapers,
-        spoiledBallotPapers: item.spoiledBallotPapers,
-        usedBallotPapers: item.usedBallotPapers,
-        resultPicture: item.resultPicture ? [item.resultPicture] : [],
-        resultVideo: item.resultVideo || {},
-      };
-    } else if (type === "incident") {
-      formattedData = {
-        ...formattedData,
-        selectIncident: item.selectIncident,
-        incidentNote: item.incidentNote,
-        electionRating: item.electionRating,
-        incidentPictures:
-          item.incidentPictures.length > 0 ? item.incidentPictures : [],
-        incidentVideos:
-          item.incidentVideos.length > 0 ? item.incidentVideos[0] : {}, // Convert array to object
-      };
-    }
+export const getSingleFlaggedElectionService = async (id) => {
+  
+  
+     try {
+       const result = await ElectionData.findById(id).lean();
+       if (result) {
 
-    return formattedData;
-  });
+        if(!result.flagged){
+              throw new Error("This election result is not flagged");
+        }
+         const election = await Election.findById(result.election).lean();
+         if (!election) {
+           throw new Error("Election details not found for the result");
+         }
+
+         const { actions, agreed, ...filterdResult } = result;
+
+         return {
+           result: {
+             electionDetails: {
+               electionType: election.electionType,
+               electionName: election.electionName,
+               startDate: election.startDate,
+               endDate: election.endDate,
+             },
+             ...filterdResult,
+           },
+         };
+       }
+
+       // Find the incident by ID
+       const incident = await IncidentReport.findById(id).lean();
+       if (incident) {
+
+          if (!incident.flagged) {
+            throw new Error("This election result is not flagged");
+          }
+
+         // Fetch the associated election details
+         const election = await Election.findById(incident.election).lean();
+         if (!election) {
+           throw new Error("Election details not found for the incident.");
+         }
+
+         // Exclude flagged, actions, and agreed fields
+         const { actions, agreed, ...filteredIncident } = incident;
+
+         // Attach election details
+         return {
+           incident: {
+             electionDetails: {
+               electionType: election.electionType,
+               electionName: election.electionName,
+               startDate: election.startDate,
+               endDate: election.endDate,
+             },
+             ...filteredIncident,
+           },
+         };
+       }
+
+       throw new Error("No result or incident found with the given id");
+     } catch (error) {
+       throw new Error(
+         "Error fetching results and incidents: ${error.message}"
+       );
+     }
+  
+
 };
 
 
+// Helper function to fetch updated flagged results
+const fetchUpdatedFlaggedResults = async () => {
+  const elections = await Election.find().lean();
+  if (!elections || elections.length === 0) {
+    throw new Error("No election found");
+  }
 
+  const allResults = [];
 
-export const getSingleFlaggedElectionService = async (electionId) => {
-  try {
-    let flaggedData = await ElectionData.findById(electionId)
-      .populate("election", "electionType electionName startDate endDate")
+  for (const election of elections) {
+    const electionResults = await ElectionData.find({
+      election: election._id,
+      flagged: true,
+    })
+      .populate("user", "firstName lastName email role")
       .lean();
 
-    let dataType = "result";
+    const electionIncidents = await IncidentReport.find({
+      election: election._id,
+      flagged: true,
+    })
+      .populate("user", "firstName lastName email role")
+      .lean();
 
-    // If no flagged election is found, check if it's an incident report
-    if (!flaggedData || !flaggedData.flagged) {
-      flaggedData = await IncidentReport.findById(electionId)
-        .populate("election", "electionType electionName startDate endDate")
-        .lean();
-      dataType = "incident";
-    }
-
-    if (!flaggedData || !flaggedData.flagged) {
-      throw new Error("Flagged election result or incident report not found.");
-    }
-
-    // Extract counter evidence IDs from actions
-    const evidenceIds = flaggedData.actions
-      .filter((action) => action.evidenceId)
-      .map((action) => action.evidenceId);
-
-    // Fetch counter evidence results or incidents
-    const counterEvidence =
-      dataType === "result"
-        ? await ElectionData.find({ _id: { $in: evidenceIds } }).lean()
-        : await IncidentReport.find({ _id: { $in: evidenceIds } }).lean();
-
-    // Function to filter out empty fields and irrelevant data
-    const filterFields = (data, isElection) => {
-      let filteredData = {
-        electionId: data._id,
-        electionType: data.election.electionType,
-        electionName: data.election.electionName,
-        startDate: data.election.startDate,
-        endDate: data.election.endDate,
-        state: data.state,
-        lga: data.lga,
-        ward: data.ward,
-        pollingUnit: data.pollingUnit,
-        flagged: data.flagged,
-        hidden: data.hidden,
-        priorityLevel: data.priorityLevel,
-      };
-
-      if (isElection) {
-        filteredData = {
-          ...filteredData,
-          partiesVotes: data.partiesVotes,
-          accreditedVoters: data.accreditedVoters,
-          rejectedPapers: data.rejectedPapers,
-          spoiledBallotPapers: data.spoiledBallotPapers,
-          usedBallotPapers: data.usedBallotPapers,
-          resultPicture: data.resultPicture ? [data.resultPicture] : [],
-          resultVideo: data.resultVideo || {},
-        };
-      } else {
-        filteredData = {
-          ...filteredData,
-          selectIncident: data.selectIncident,
-          incidentNote: data.incidentNote,
-          electionRating: data.electionRating,
-          incidentPictures:
-            data.incidentPictures && data.incidentPictures.length > 0
-              ? data.incidentPictures
-              : [],
-          incidentVideos:
-            data.incidentVideos && data.incidentVideos.length > 1
-              ? data.incidentVideos 
-              : data.incidentVideos.length === 1
-              ? data.incidentVideos[0] 
-              : {},
-        };
+    // Consolidate results
+    for (const result of electionResults) {
+      if (result.user) {
+        allResults.push({
+          id: result._id,
+          firstName: result.user.firstName || "N/A",
+          lastName: result.user.lastName || "N/A",
+          email: result.user.email || "N/A",
+          role: result.user.role || "N/A",
+          election: election.electionType,
+          state: result.state,
+          lga: result.lga,
+          pollingUnit: result.pollingUnit,
+          flagged: result.flagged,
+          hidden: result.hidden,
+          priorityLevel: result.priorityLevel,
+          pictures: result.resultPicture,
+          videos: result.resultVideo,
+          createdAt: result.createdAt,
+          resultUploaded: "Election Result",
+        });
       }
+    }
 
-      // Remove undefined fields
-      return Object.fromEntries(
-        Object.entries(filteredData).filter(([_, v]) => v !== undefined)
-      );
-    };
-
-    return {
-      result: {
-        [dataType]: filterFields(flaggedData, dataType === "result"),
-        counterEvidence: counterEvidence.map((evidence) =>
-          filterFields(evidence, dataType === "result")
-        ),
-      },
-    };
-  } catch (error) {
-    throw new Error(`Error fetching flagged data: ${error.message}`);
+    // Consolidate incidents
+    for (const incident of electionIncidents) {
+      if (incident.user) {
+        allResults.push({
+          id: incident._id,
+          firstName: incident.user.firstName || "N/A",
+          lastName: incident.user.lastName || "N/A",
+          email: incident.user.email || "N/A",
+          role: incident.user.role || "N/A",
+          election: election.electionType,
+          state: incident.state,
+          lga: incident.lga,
+          pollingUnit: incident.pollingUnit,
+          flagged: incident.flagged,
+          hidden: incident.hidden,
+          priorityLevel: incident.priorityLevel,
+          pictures: incident.incidentPictures,
+          videos: incident.incidentVideos,
+          createdAt: incident.createdAt,
+          resultUploaded: "Incident Report",
+        });
+      }
+    }
   }
+
+  return allResults;
 };
-
-

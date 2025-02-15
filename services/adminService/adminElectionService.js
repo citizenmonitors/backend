@@ -297,75 +297,121 @@ const results = await fetchUpdatedFlaggedResults();
 
 
 export const getSingleFlaggedElectionService = async (id) => {
-  
-  
-     try {
-       const result = await ElectionData.findById(id).lean();
-       if (result) {
+  try {
+    // Check if it's an election result
+    const result = await ElectionData.findById(id).lean();
+    if (result) {
+      if (!result.flagged) {
+        throw new Error("This election result is not flagged");
+      }
 
-        if(!result.flagged){
-              throw new Error("This election result is not flagged");
-        }
-         const election = await Election.findById(result.election).lean();
-         if (!election) {
-           throw new Error("Election details not found for the result");
-         }
+      const election = await Election.findById(result.election).lean();
+      if (!election) {
+        throw new Error("Election details not found for the result");
+      }
 
-         const { actions, agreed, ...filterdResult } = result;
+      // Extract counter evidence IDs from actions
+      const evidenceIds = result.actions
+        .filter((action) => action.evidenceId)
+        .map((action) => action.evidenceId);
 
-         return {
-           result: {
-             electionDetails: {
-               electionType: election.electionType,
-               electionName: election.electionName,
-               startDate: election.startDate,
-               endDate: election.endDate,
-             },
-             ...filterdResult,
-           },
-         };
-       }
+      // Fetch counter evidence results
+      const counterEvidence = await ElectionData.find({
+        _id: { $in: evidenceIds },
+      }).lean();
 
-       // Find the incident by ID
-       const incident = await IncidentReport.findById(id).lean();
-       if (incident) {
+      // Remove unnecessary fields
+      const { actions, agreed, ...filteredResult } = result;
 
-          if (!incident.flagged) {
-            throw new Error("This election result is not flagged");
-          }
+      return {
+        result: {
+          electionDetails: {
+            electionType: election.electionType,
+            electionName: election.electionName,
+            startDate: election.startDate,
+            endDate: election.endDate,
+          },
+          ...filteredResult,
+        },
+        counterEvidence: counterEvidence.map((evidence) => ({
+          electionId: evidence._id,
+          state: evidence.state,
+          lga: evidence.lga,
+          ward: evidence.ward,
+          pollingUnit: evidence.pollingUnit,
+          partiesVotes: evidence.partiesVotes,
+          accreditedVoters: evidence.accreditedVoters,
+          rejectedPapers: evidence.rejectedPapers,
+          spoiledBallotPapers: evidence.spoiledBallotPapers,
+          usedBallotPapers: evidence.usedBallotPapers,
+          resultPicture: evidence.resultPicture,
+          resultVideo: evidence.resultVideo,
+          flagged: evidence.flagged,
+          hidden: evidence.hidden,
+          priorityLevel: evidence.priorityLevel,
+        })),
+      };
+    }
 
-         // Fetch the associated election details
-         const election = await Election.findById(incident.election).lean();
-         if (!election) {
-           throw new Error("Election details not found for the incident.");
-         }
+    // Check if it's an incident report
+    const incident = await IncidentReport.findById(id).lean();
+    if (incident) {
+      if (!incident.flagged) {
+        throw new Error("This incident report is not flagged");
+      }
 
-         // Exclude flagged, actions, and agreed fields
-         const { actions, agreed, ...filteredIncident } = incident;
+      const election = await Election.findById(incident.election).lean();
+      if (!election) {
+        throw new Error("Election details not found for the incident.");
+      }
 
-         // Attach election details
-         return {
-           incident: {
-             electionDetails: {
-               electionType: election.electionType,
-               electionName: election.electionName,
-               startDate: election.startDate,
-               endDate: election.endDate,
-             },
-             ...filteredIncident,
-           },
-         };
-       }
+      // Extract counter evidence IDs from actions
+      const evidenceIds = incident.actions
+        .filter((action) => action.evidenceId)
+        .map((action) => action.evidenceId);
 
-       throw new Error("No result or incident found with the given id");
-     } catch (error) {
-       throw new Error(
-         "Error fetching results and incidents: ${error.message}"
-       );
-     }
-  
+      // Fetch counter evidence incidents
+      const counterEvidence = await IncidentReport.find({
+        _id: { $in: evidenceIds },
+      }).lean();
 
+      // Remove unnecessary fields
+      const { actions, agreed, ...filteredIncident } = incident;
+
+      return {
+        incident: {
+          electionDetails: {
+            electionType: election.electionType,
+            electionName: election.electionName,
+            startDate: election.startDate,
+            endDate: election.endDate,
+          },
+          ...filteredIncident,
+        },
+        counterEvidence: counterEvidence.map((evidence) => ({
+          incidentId: evidence._id,
+          state: evidence.state,
+          lga: evidence.lga,
+          ward: evidence.ward,
+          pollingUnit: evidence.pollingUnit,
+          selectIncident: evidence.selectIncident,
+          incidentNote: evidence.incidentNote,
+          electionRating: evidence.electionRating,
+          incidentPictures: evidence.incidentPictures,
+          incidentVideos: evidence.incidentVideos,
+          flagged: evidence.flagged,
+          hidden: evidence.hidden,
+          priorityLevel: evidence.priorityLevel,
+        })),
+      };
+    }
+
+    throw new Error("No result or incident found with the given ID");
+  } catch (error) {
+    throw new Error(`Error fetching flagged result/incident: ${error.message}`);
+  }
 };
+
 
 
 // Helper function to fetch updated flagged results

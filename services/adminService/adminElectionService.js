@@ -244,12 +244,12 @@ export const deleteFlaggedResults = async (id) => {
     if (result) await ElectionData.findByIdAndDelete(id);
     if (incident) await IncidentReport.findByIdAndDelete(id);
 
-const allResults = await fetchUpdatedFlaggedResults();
+const results = await fetchUpdatedFlaggedResults();
 
 
     return {
       message: "Flagged result deleted successfully",
-      allResults,
+      results,
     };
   } catch (error) {
     throw new Error(`Error deleting flagged result: ${error.message}`);
@@ -284,11 +284,11 @@ export const restoreFlaggedResult = async (id) => {
       throw new Error("No flagged result or incident found.");
     }
 
-const allResults = await fetchUpdatedFlaggedResults();
+const results = await fetchUpdatedFlaggedResults();
 
     return {
       message: "Result restored successfully",
-      allResults,
+      results,
     };
   } catch (error) {
     throw new Error(`Error restoring flagged result: ${error.message}`);

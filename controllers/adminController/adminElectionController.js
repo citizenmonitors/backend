@@ -196,7 +196,7 @@ export const deleteFlaggedResultController = async (req, res) => {
     const { id } = req.params;
 
     const results = await deleteFlaggedResults(id);
-    res.status(200).json({ results});
+    res.status(200).json(results);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -208,7 +208,7 @@ export const restoreFlaggedResultController = async (req, res) => {
     const { id } = req.params;
 
     const results = await restoreFlaggedResult(id);
-    res.status(200).json({ results });
+    res.status(200).json(results );
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

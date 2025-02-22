@@ -10,13 +10,17 @@ import {
   updateElectionService,
   uploadIncidentReportDataService,
   updateIncidentReportDataService,
-  getAllElectionsService,
+  getAllActiveElectionsService,
   deleteIncidentReportDataService,
   getLiveElectionById,
   getUserElectionResultsAndReports,
   getResultsAndPerformAction,
   checkUserSubmissionStatusForFlag,
+  activeElections,
+  updateActiveElections,
+  getAllElectionTypesService,
 } from "../../services/Election/electionService.js";
+import { createEventService } from "../../services/adminService/adminElectionService.js";
 
 export const createElection = async (req, res) => {
   try {
@@ -45,20 +49,49 @@ export const updateElection = async (req, res) => {
   }
 };
 
-export const getAllElections = async (req, res) => {
+export const createActiveElectionsCon = async (req, res) => {
+  try {
+    const activeElection = await activeElections(req.body);
+    res.status(201).json(activeElection);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const updateActiveElectionCon = async (req, res) => {
+  try {
+    
+    const { electionId } = req.params;
+    const updatedElection = await updateActiveElections(electionId, req.body);
+    res.status(200).json(updatedElection);
+  } catch (error) {
+    res.status(500).json({ message:"Error updating election", error: error.message });
+  }
+}
+
+export const getAllActiveElections = async (req, res) => {
   try {
     const userId = req.user._id;
     // console.log("Fetching elections for user:", userId);
 
-    const elections = await getAllElectionsService(userId);
+    const elections = await getAllActiveElectionsService(userId);
 
-    // if (elections.length === 0) {
-    //   console.log("No relevant elections found for user.");
-    // } else {
-    //   console.log(`Found ${elections.length} elections for the user.`);
-    // }
+    res.status(200).json(elections );
+  } catch (error) {
+    console.error("Error fetching elections:", error);
+    res
+      .status(500)
+      .json({ message: "Error fetching elections", error: error.message });
+  }
+};
+export const getAllElectionTypes = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    // console.log("Fetching elections for user:", userId);
 
-    res.status(200).json({ elections });
+    const elections = await getAllElectionTypesService(userId);
+
+    res.status(200).json(elections );
   } catch (error) {
     console.error("Error fetching elections:", error);
     res
@@ -318,5 +351,16 @@ export const checkUserStatusForFlagController = async (req, res) => {
       message: "Failed to check submission status",
       error: error.message,
     });
+  }
+};
+
+
+
+export const createEventController = async (req, res) => {
+  try {
+    const event = await createEventService(req.body);
+    res.status(201).json({ message: "Event created successfully", event });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };

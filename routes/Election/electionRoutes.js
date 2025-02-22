@@ -10,13 +10,16 @@ import {
   updateResultData,
   uploadIncidentReportData,
   uploadResultData,
-  getAllElections,
+  getAllActiveElections,
   updateIncidentReportData,
   deleteIncidentReportData,
   getLiveElectionByIdCont,
   getUserElectionResultsAndReportsCon,
   getResultsAndPerformActionController,
   checkUserStatusForFlagController,
+  createActiveElectionsCon,
+  updateActiveElectionCon,
+  getAllElectionTypes,
 } from "../../controllers/Election/electionDataController.js";
 import { authMiddleware } from "../../middleware/authMiddleware.js";
 import {
@@ -39,7 +42,8 @@ const logFields = (req, res, next) => {
   next();
 };
 
-router.get("/", authMiddleware, getAllElections);
+router.get("/", authMiddleware, getAllActiveElections);
+router.get("/election-types", authMiddleware, getAllElectionTypes);
 router.get("/results", authMiddleware, getAllElectionResultsController);
 router.get(
   "/election/:electionId/result",
@@ -50,6 +54,8 @@ router.get("/election/:electionId", authMiddleware, getElectionByIdCont);
 router.get("/live-election/:electionId", authMiddleware, getLiveElectionByIdCont);
 router.post("/election", authMiddleware, createElection);
 router.put("/election/:electionId", authMiddleware, updateElection);
+router.post("/active-elections", authMiddleware, createActiveElectionsCon);
+router.put("/active-elections/:electionId", authMiddleware, updateActiveElectionCon);
 
 router.delete(
   "/election/:electionId/results",

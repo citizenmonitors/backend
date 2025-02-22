@@ -6,7 +6,7 @@ const ElectionDataSchema = new mongoose.Schema(
   {
     election: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Election",
+      ref: "ActiveElection",
       required: true,
     },
     user: {

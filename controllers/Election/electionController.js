@@ -3,14 +3,9 @@ import PoliticalParty from "../../models/Election/PoliticalParty.js";
 
 export const createElection = async (req, res) => {
   try {
-    const { year, type, startDate, endDate } = req.body;
+    const { type, name } = req.body;
     const existingElection = await Election.findOne({ year, type });
 
-    if (existingElection) {
-      return res
-        .status(400)
-        .json({ message: "Election type already exists for this year" });
-    }
 
     const election = new Election({ year, type, startDate, endDate });
     await election.save();

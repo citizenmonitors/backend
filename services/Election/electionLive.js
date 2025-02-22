@@ -8,6 +8,7 @@ import AllState from "../../state-data/state.json" assert { type: "json" };
 import AllLga from "../../state-data/lga.json" assert { type: "json" };
 import AllWard from "../../state-data/wards.json" assert { type: "json" };
 import moment from "moment";
+import ActiveElection from "../../models/Election/ActiveElection.js";
 
 
 // Service to get all ongoing election results
@@ -16,10 +17,10 @@ export const getAllOngoingElectionResults = async (userId) => {
     const user = await CompletedUser.findById(userId).lean();
     if (!user) throw new Error("User not found");
 
-    const ongoingElections = await Election.find({
+    const ongoingElections = await ActiveElection.find({
       startDate: { $lte: new Date() },
       endDate: { $gte: new Date() },
-    }).lean();
+    }).populate("election", "electionType electionName").lean();
 
     if (!ongoingElections || ongoingElections.length === 0) {
       return { message: "No ongoing election results" };
@@ -36,7 +37,7 @@ export const getAllOngoingElectionResults = async (userId) => {
 
     for (let electionType of prioritizedTypes) {
       const selectedElection = ongoingElections.find(
-        (election) => election.electionType === electionType
+        (election) => ongoingElections.election.electionType === electionType
       );
 
       if (selectedElection) {

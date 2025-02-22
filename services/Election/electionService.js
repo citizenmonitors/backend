@@ -1,5 +1,6 @@
 import Election from "../../models/Election/Election.js";
 import ElectionData from "../../models/Election/ElectionData.js";
+import ActiveElection from "../../models/Election/ActiveElection.js";
 import CompletedUser from "../../models/CompletedUser.js";
 import { politicalParties } from "../../models/Election/PoliticalParty.js";
 import IncidentReport from "../../models/Election/IncidentReport.js";
@@ -12,38 +13,50 @@ import moment from "moment";
 const BACKEND_URL = process.env.BACKEND_URL;
 
 export const createElectionService = async (data) => {
-  const { electionType, electionName, startDate, endDate, electionLocation } =
-    data;
+ const { electionType, electionName } = data;
 
-  const existingElection = await Election.findOne({
-    electionType,
-    electionName,
-    startDate,
-    endDate,
-    electionLocation,
-  });
+  const existingElection = await Election.findOne({ electionType, electionName });
   if (existingElection) {
-    const error = new Error(
-      "Election already exists for this type and date range"
-    );
-    error.statusCode = 400;
-    throw error;
+    throw new Error("Election already exists");
+  }
+
+  const election = new Election({ electionType, electionName });
+  return await election.save();
+};
+
+
+export const updateElectionService = async (electionId, data) => {
+  const updatedElection = await Election.findByIdAndUpdate(electionId, data, {
+    new: true,
+  });
+  if (!updatedElection) {
+    throw new Error("Election not found");
+  }
+  return updatedElection;
+
+};
+
+
+
+export const activeElections = async (data) => {
+  const { electionId, electionLocation, startDate, endDate, } = data;
+
+  const existingElection = await Election.findById(electionId);
+  if (!existingElection) {
+    throw new Error("Election not found");
   }
 
   try {
-    const election = new Election({
-      electionType,
-      electionName,
+    const activeElection = new ActiveElection({
+      election: electionId,
+      electionLocation,
       startDate,
       endDate,
-      electionLocation: Array.isArray(electionLocation)
-        ? electionLocation
-        : [electionLocation],
     });
 
-    const savedElection = await election.save();
+    const savedElection = await activeElection.save();
 
-    // Remove the fields from the saved election object
+    // Remove unnecessary fields before returning
     const {
       results,
       resultsCount,
@@ -54,89 +67,39 @@ export const createElectionService = async (data) => {
 
     return electionData;
   } catch (error) {
-    const serviceError = new Error("Failed to create a new election");
-    serviceError.statusCode = 500;
-    serviceError.details = error.message;
-    throw serviceError;
+    throw new Error(`Failed to create a new active election: ${error.message}`);
   }
 };
 
-export const updateElectionService = async (electionId, data) => {
-  // Fetch the existing election to get the current electionLocation
-  const existingElection = await Election.findById(electionId).lean();
+export const updateActiveElections = async (electionId, data) => {
 
-  if (!existingElection) {
-    const error = new Error("Election not found");
-    error.statusCode = 404;
-    throw error;
-  }
+  try {
+    const updateElection = await ActiveElection.findByIdAndUpdate(electionId, data,{
+      new: true,
+    }).lean();
 
-  // Handle electionLocation updates by adding/removing based on the provided data
-  if (data.electionLocation) {
-    // Convert the input to an array if it's a single string
-    let newLocations = Array.isArray(data.electionLocation)
-      ? data.electionLocation
-      : [data.electionLocation];
+    if(!updateElection){
+      throw new Error("Election not found")
+    }
 
-    // Standardize existing locations and new locations for consistent comparison
-    const standardizedExistingLocations = existingElection.electionLocation.map(
-      (loc) => standardizeName(loc)
-    );
+    // Remove unnecessary fields before returning
+    const {
+      results,
+      resultsCount,
+      incidentReports,
+      politicalParties,
+      ...electionData
+    } = updateElection;
 
-    const standardizedNewLocations = newLocations.map((loc) =>
-      standardizeName(loc)
-    );
-
-    // Create a set to manage updated locations (remove duplicates)
-    let updatedLocations = new Set(standardizedExistingLocations);
-
-    // Check for additions or removals
-    standardizedNewLocations.forEach((loc) => {
-      if (updatedLocations.has(loc)) {
-        // If it exists, remove it (this handles removal)
-        updatedLocations.delete(loc);
-      } else {
-        // If it doesn't exist, add it (this handles addition)
-        updatedLocations.add(loc);
-      }
-    });
-
-    // Convert the updated set back to an array for MongoDB
-    data.electionLocation = Array.from(updatedLocations);
-  }
-
-  // Update the election with the new data
-  const updatedElection = await Election.findByIdAndUpdate(electionId, data, {
-    new: true,
-  }).lean();
-
-  if (!updatedElection) {
-    const error = new Error("Election not found");
-    error.statusCode = 404;
-    throw error;
-  }
-
-  const {
-    politicalParties,
-    resultsCount,
-    incidentReports,
-    results,
-    ...electionData
-  } = updatedElection;
-
-  // Return the election data including electionLocation
-  return electionData;
-
-  // Helper function to standardize names (handles consistent formatting)
-  function standardizeName(text) {
-    return text
-      .split(/\s|-/) // Split by space or hyphen
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(" ");
+    return electionData;
+  } catch (error) {
+    throw new Error(`Failed to update election: ${error.message}`);
   }
 };
 
-export const getAllElectionsService = async (userId) => {
+
+
+export const getAllActiveElectionsService = async (userId) => {
   // Helper function to standardize names by replacing spaces and hyphens with underscores
   const standardizeName = (name) => {
     return name.toLowerCase().replace(/[-\s]/g, "_").trim();
@@ -151,43 +114,26 @@ export const getAllElectionsService = async (userId) => {
   const userState = standardizeName(user.state);
   const userLGA = standardizeName(user.lga);
 
-  // Fetch all elections
-  const elections = await Election.find()
+  // Fetch all active elections with election details
+  const activeElections = await ActiveElection.find()
     .populate({ path: "results", select: "election user" })
-    .populate({ path: "incidentReports", select: "election user" });
+    .populate({ path: "incidentReports", select: "election user" })
+    .populate("election", "electionType electionName")
+    .lean();
 
-  console.log(`User ID: ${userId}, State: ${user.state}, LGA: ${user.lga}`);
+  // Filter elections based on user's location
+  const relevantElections = activeElections.filter((election) => {
+    const electionType = election.election.electionType.toLowerCase();
+    const electionLocation = election.electionLocation.toLowerCase();
 
-  // Filter elections based on the user's state or LGA and election type
-  const relevantElections = elections.filter((election) => {
-    const electionType = election.electionType.toLowerCase(); // Convert to lowercase
-    const electionLocation = election.electionLocation.map((loc) =>
-      standardizeName(loc)
-    );
-
-    switch (electionType) {
-      case "national":
-      case "gubernatorial":
-      case "house-of-assembly":
-        if (electionLocation.includes(userState)) {
-          console.log(
-            `Found relevant election for state: ${userState}, Election Type: ${electionType}`
-          );
-          return true;
-        }
-        break;
-      case "senatorial":
-      case "house-of-representatives":
-      case "lga":
-        if (electionLocation.includes(userLGA)) {
-          console.log(
-            `Found relevant election for LGA: ${userLGA}, Election Type: ${electionType}`
-          );
-          return true;
-        }
-        break;
-      default:
-        return false;
+    if (
+      ["national", "gubernatorial", "house-of-assembly"].includes(electionType)
+    ) {
+      return electionLocation === userState;
+    } else if (
+      ["senatorial", "house-of-representatives", "lga"].includes(electionType)
+    ) {
+      return electionLocation === userLGA;
     }
     return false;
   });
@@ -195,35 +141,104 @@ export const getAllElectionsService = async (userId) => {
   // Log if no elections were found
   if (relevantElections.length === 0) {
     console.log("No relevant elections found for user.");
-    return [];
+    return { elections: [] };
   }
 
-  // Format and return relevant elections, excluding `electionLocation` from the response
-  return relevantElections.map((election) => {
-    const {
-      electionLocation, 
-      politicalParties,
-      resultsCount,
-      incidentReports,
-      results,
-      ...electionData
-    } = election.toObject();
+  // Format the response
+  return {
+    elections: relevantElections.map((election) => {
+      const {
+        election: electionDetails,
+        electionLocation,
+        politicalParties,
+        resultsCount,
+        incidentReports,
+        results,
+        ...electionData
+      } = election;
 
-    // Process and return results and incident reports as needed
-    electionData.results = election.results
-      .filter((result) => result.user.toString() === userId.toString())
-      .map((result) => result._id);
-    electionData.incidentReports = election.incidentReports
-      .filter((report) => report.user.toString() === userId.toString())
-      .map((report) => report._id);
-
-    return electionData;
-  });
+      return {
+        electionType: electionDetails.electionType,
+        electionName: electionDetails.electionName,
+        ...electionData,
+        results: results?.map((result) => result._id) || [],
+        incidentReports: incidentReports?.map((report) => report._id) || [],
+      };
+    }),
+  };
 };
 
+export const getAllElectionTypesService = async (userId) => {
+  // Helper function to standardize names by replacing spaces and hyphens with underscores
+  const standardizeName = (name) => {
+    return name.toLowerCase().replace(/[-\s]/g, "_").trim();
+  };
+
+  const user = await CompletedUser.findById(userId).lean();
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  console.log(`Fetching elections for user: ${userId}`);
+  const userState = standardizeName(user.state);
+  const userLGA = standardizeName(user.lga);
+
+  // Fetch all active elections with election details
+  const activeElections = await ActiveElection.find()
+    .populate("election", "electionType electionName")
+    .lean();
+
+  // Filter elections based on user's location
+  const relevantElections = activeElections.filter((election) => {
+    const electionType = election.election.electionType.toLowerCase();
+    const electionLocation = election.electionLocation.toLowerCase();
+
+    if (
+      ["national", "gubernatorial", "house-of-assembly"].includes(electionType)
+    ) {
+      return electionLocation === userState;
+    } else if (
+      ["senatorial", "house-of-representatives", "lga"].includes(electionType)
+    ) {
+      return electionLocation === userLGA;
+    }
+    return false;
+  });
+
+  // Log if no elections were found
+  if (relevantElections.length === 0) {
+    console.log("No relevant elections found for user.");
+    return { elections: [] };
+  }
+
+  // Format the response
+  return {
+    elections: relevantElections.map((election) => {
+      const {
+        election: electionDetails,
+        politicalParties,
+        resultsCount,
+        startDate,
+        endDate,
+        electionLocation,
+        incidentReports,
+        results,
+        ...electionData
+      } = election;
+
+      return {
+        electionType: electionDetails.electionType,
+        electionName: electionDetails.electionName,
+        ...electionData,
+      };
+    }),
+  };
+};
+
+
 export const getElectionResultById = async (electionId, userId) => {
-  const election = await Election.findById(electionId).lean();
-  if (!election) {
+  const activeElection = await ActiveElection.findById(electionId).lean();
+  if (!activeElection) {
     throw new Error("Election not found");
   }
   const result = await ElectionData.findOne({
@@ -236,15 +251,15 @@ export const getElectionResultById = async (electionId, userId) => {
   }).lean();
 
   if (result || incidentReport) {
-    return { election, result, incidentReport };
+    return { election: activeElection, result, incidentReport };
   }
 };
 
 export const getElectionById = async (electionId, userId) => {
   try {
     // Fetch the election data by ID
-    const election = await Election.findById(electionId).lean();
-    if (!election) {
+    const activeElection = await ActiveElection.findById(electionId).lean();
+    if (!activeElection) {
       throw new Error("Election not found");
     }
     // console.log("Election and User:", electionId, userId);
@@ -263,7 +278,7 @@ export const getElectionById = async (electionId, userId) => {
     }).lean();
 
     // Create the election data object including political parties, results, and incident reports
-    const { electionLocation, resultsCount, ...electionData } = election;
+    const { electionLocation, resultsCount, ...electionData } = activeElection;
 
     // Include only required data and format political parties properly
     const formattedElectionData = {
@@ -291,6 +306,11 @@ export const getLiveElectionById = async (electionId) => {
     }
     console.log("election", electionId);
 
+      const activeElection = await ActiveElection.findOne({
+        election: electionId,
+      }).lean();
+      if (!activeElection) throw new Error("Active Election not found");
+
     // Fetch the election result data for the specific election
     const results = await ElectionData.find({ election: electionId }).lean();
 
@@ -303,8 +323,9 @@ export const getLiveElectionById = async (electionId) => {
     const electionData = {
       electionDetails: {
         electiontype: election.electionType,
-        startdate: election.startDate,
-        enddate: election.endDate,
+        electionname: election.electionName,
+        startdate: activeElection.startDate,
+        enddate: activeElection.endDate,
       },
       results: results.map((result) => ({
         state: result.state,
@@ -382,8 +403,10 @@ export const uploadResultDataService = async (
     }
 
     // Find the election by its ID
-    const election = await Election.findById(electionId);
-    if (!election) {
+    const activeElection = await ActiveElection.findById(electionId).populate(
+      "election", "electionType electionName"
+    );
+    if (!activeElection) {
       throw new Error("Election not found");
     }
 
@@ -490,9 +513,9 @@ export const uploadResultDataService = async (
     const savedResultData = await electionData.save();
 
     // Update the election document with the new result
-    election.results.push(savedResultData);
-    election.resultsCount += 1;
-    await election.save();
+    activeElection.results.push(savedResultData);
+    activeElection.resultsCount += 1;
+    await activeElection.save();
 
     // Convert electionType and stateName to Title Case for notifications
     const toTitleCase = (text) => {
@@ -505,7 +528,7 @@ export const uploadResultDataService = async (
     };
 
     const formattedElectionName = toTitleCase(
-      election.electionName || "Election"
+      activeElection.election.electionName || "Election"
     );
     const formattedStateName = toTitleCase(user.state || "State");
 
@@ -513,7 +536,7 @@ export const uploadResultDataService = async (
     let uploadNotificationBody = "";
     let uploadNotificationInfo = "";
 
-    switch (election.electionType) {
+    switch (activeElection.election.electionType) {
       case "national":
         uploadNotificationBody = `Result uploaded for ${formattedStateName} State`;
         uploadNotificationInfo = `${formattedElectionName} Election`;
@@ -557,7 +580,7 @@ export const uploadResultDataService = async (
     let pendingNotificationBody = "";
     let pendingNotificationInfo = "";
 
-    switch (election.electionType) {
+    switch (activeElection.election.electionType) {
       case "national":
         pendingNotificationBody = `${pendingCount} Pending Approval for ${formattedStateName} State`;
         pendingNotificationInfo = `${formattedElectionName} Election`;
@@ -649,7 +672,7 @@ export const updateResultDataService = async (
       usedBallotPapers !== undefined ? Number(usedBallotPapers) : undefined;
 
     // Check if the election exists
-    const electionExists = await Election.findById(electionId);
+    const electionExists = await ActiveElection.findById(electionId);
     if (!electionExists) {
       throw new Error("Election not found");
     }
@@ -808,7 +831,7 @@ export const deleteElectionResultDataService = async (electionId, userId) => {
     }
 
     // Update the election to remove the reference to the deleted result
-    await Election.findByIdAndUpdate(electionId, {
+    await ActiveElection.findByIdAndUpdate(electionId, {
       $pull: { results: result._id },
       $inc: { resultsCount: -1 },
     });
@@ -825,14 +848,14 @@ export const getUserElectionData = async (userId) => {
 
 export const getAllElectionResults = async () => {
   try {
-    const elections = await Election.find().lean();
-    if (!elections || elections.length === 0) {
+    const activeElections = await ActiveElection.find().populate("election", "electionType electionName").lean();
+    if (!activeElections || activeElections.length === 0) {
       throw new Error("No elections found");
     }
 
     const allResults = {};
 
-    for (const election of elections) {
+    for (const election of activeElections) {
       const results = await ElectionData.find({
         election: election._id,
       }).lean();
@@ -844,10 +867,10 @@ export const getAllElectionResults = async () => {
         // console.log(`No results found for election ${election._id}`);
         allResults[election._id] = {
           electionDetails: {
-            electionType: election.electionType,
-            electionName: election.electionName,
-            startDate: election.startDate,
-            endDate: election.endDate,
+            electionType: activeElections.election.electionType,
+            electionName: activeElections.election.electionName,
+            // startDate: activeElections.electionLocation.startDate,
+            // endDate: activeElections.electionLocation.endDate,
           },
           results: [],
           incidents: aggregateIncidents(incidents) || [],
@@ -858,11 +881,11 @@ export const getAllElectionResults = async () => {
       const aggregatedResults = aggregateResults(results);
       allResults[election._id] = {
         electionDetails: {
-          electionType: election.electionType,
-          electionName: election.electionName,
-          startDate: election.startDate,
-          endDate: election.endDate,
-          resultsCount: election.resultsCount,
+          electionType: activeElections.election.electionType,
+          electionName: activeElections.election.electionName,
+          // startDate: activeElections.electionLocation.startDate,
+          // endDate: activeElections.electionLocation.endDate,
+          resultsCount: activeElections.resultsCount,
         },
         results: aggregatedResults,
         incidents: aggregateIncidents(incidents) || [],
@@ -887,8 +910,8 @@ export const uploadIncidentReportDataService = async (
     const { selectIncident, incidentNote, electionRating } = data;
 
     // Check election existence
-    const election = await Election.findById(electionId);
-    if (!election) throw new Error("Election not found");
+    const activeElection = await ActiveElection.findById(electionId);
+    if (!activeElection) throw new Error("Election not found");
 
     // Check user existence
     const user = await CompletedUser.findById(userId);
@@ -952,8 +975,8 @@ export const uploadIncidentReportDataService = async (
 
     // Save and return
     const savedReport = await incidentReport.save();
-    election.incidentReports.push(savedReport);
-    await election.save();
+    activeElection.incidentReports.push(savedReport);
+    await activeElection.save();
 
     return savedReport;
   } catch (error) {
@@ -978,7 +1001,7 @@ export const updateIncidentReportDataService = async (
     } = data;
 
     // Check if the election exists
-    const electionExists = await Election.findById(electionId);
+    const electionExists = await ActiveElection.findById(electionId);
     if (!electionExists) throw new Error("Election not found");
 
     // Check user existence
@@ -1067,7 +1090,7 @@ export const deleteIncidentReportDataService = async (electionId, userId) => {
     }
 
     // Update the election to remove the reference to the deleted incident report
-    await Election.findByIdAndUpdate(electionId, {
+    await ActiveElection.findByIdAndUpdate(electionId, {
       $pull: { incidentReports: incidentReport._id },
     });
 
@@ -1251,8 +1274,12 @@ const fetchResults = async (pollingUnit, userId) => {
     hidden: false,
   })
     .populate({
+      path: "activeElection",
+     populate: {
       path: "election",
-      select: "electionType electionName startDate endDate",
+        select: "electionType electionName",
+      },
+      select: "startDate endDate electionLocation",
     })
     .lean();
 
@@ -1262,8 +1289,12 @@ const fetchResults = async (pollingUnit, userId) => {
     hidden: false,
   })
     .populate({
-      path: "election",
-      select: "electionType electionName startDate endDate",
+      path: "activeElection",
+      populate: {
+        path: "election",
+        select: "electionType electionName",
+      },
+      select: "startDate endDate electionLocation",
     })
     .lean();
 
@@ -1276,9 +1307,10 @@ const fetchResults = async (pollingUnit, userId) => {
     return {
       electionTypeId: result.election._id,
       electionId: result._id,
-      electionType: result.election.electionType,
+      electionType: result.activeElection?.election?.electionType,
+      electionName: result.activeElection?.election?.electionName,
       pollingUnit: result.pollingUnit,
-      electionYear: moment(result.election.startDate).format("YYYY"),
+      electionYear: result.activeElection ? moment(result.activeElection.election.startDate).format("YYYY") : "N/A",
       uploadedAt: result.createdAt,
       partiesVotes: result.partiesVotes,
       voteRating: result.voteRating,
@@ -1294,6 +1326,9 @@ const fetchResults = async (pollingUnit, userId) => {
       timeBegan: result.timeBegan,
       isApproved: result.isApproved,
       election: result.election,
+      electionLocation: result.activeElection?.electionLocation || "N/A",
+      startDate: result.activeElection?.startDate || null,
+      endDate: result.activeElection?.endDate || null,
     };
   });
 
@@ -1306,7 +1341,11 @@ const fetchResults = async (pollingUnit, userId) => {
     return {
       electionTypeId: report.election._id,
       electionId: report._id,
-      electionType: report.election.electionType,
+      electionType: report.activeElection?.election?.electionType || "N/A",
+      electionName: report.activeElection?.election?.electionName || "N/A",
+      electionYear: report.activeElection
+        ? moment(report.activeElection.startDate).format("YYYY")
+        : "N/A",
       pollingUnit: report.pollingUnit,
       electionYear: moment(report.election.startDate).format("YYYY"),
       uploadedAt: report.createdAt,
@@ -1320,6 +1359,9 @@ const fetchResults = async (pollingUnit, userId) => {
       hidden: report.hidden,
       priorityLevel: report.priorityLevel,
       actions: report.actions,
+      electionLocation: report.activeElection?.electionLocation || "N/A",
+      startDate: report.activeElection?.startDate || null,
+      endDate: report.activeElection?.endDate || null,
       election: report.election,
     };
   });

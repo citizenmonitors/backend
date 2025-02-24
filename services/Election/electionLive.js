@@ -17,17 +17,22 @@ export const getAllOngoingElectionResults = async (userId) => {
     const user = await CompletedUser.findById(userId).lean();
     if (!user) throw new Error("User not found");
 
+    console.log(`Fetching ongoing elections for user: ${userId}`);
+
     const ongoingElections = await ActiveElection.find({
       startDate: { $lte: new Date() },
       endDate: { $gte: new Date() },
-    }).populate("election", "electionType electionName").lean();
+    })
+      .populate("election", "electionType electionName")
+      .lean();
 
     if (!ongoingElections || ongoingElections.length === 0) {
+      console.log("No ongoing elections found.");
       return { message: "No ongoing election results" };
     }
 
     const prioritizedTypes = [
-      "national", 
+      "national",
       "gubernatorial",
       "senatorial",
       "house-of-representatives",
@@ -37,16 +42,21 @@ export const getAllOngoingElectionResults = async (userId) => {
 
     for (let electionType of prioritizedTypes) {
       const selectedElection = ongoingElections.find(
-        (election) => ongoingElections.election.electionType === electionType
+        (election) =>
+          election?.election?.electionType?.toLowerCase() === electionType
       );
 
       if (selectedElection) {
+        console.log(
+          `Processing electionType: ${selectedElection.election.electionType}`
+        );
+
         const result = await handleElectionResult(selectedElection, user);
         if (result && !result.message) {
           return {
             electionDetails: {
-              electionType: selectedElection.electionType,
-              electionName: selectedElection.electionName,
+              electionType: selectedElection.election.electionType,
+              electionName: selectedElection.election.electionName,
               startDate: selectedElection.startDate,
               endDate: selectedElection.endDate,
             },
@@ -56,6 +66,7 @@ export const getAllOngoingElectionResults = async (userId) => {
       }
     }
 
+    console.log("No relevant ongoing election results.");
     return { message: "No ongoing election results" };
   } catch (error) {
     console.error("Error fetching ongoing election results:", error);
@@ -65,14 +76,21 @@ export const getAllOngoingElectionResults = async (userId) => {
 
 // Helper function to handle election result fetching based on the election type
 const handleElectionResult = async (selectedElection, user) => {
-  if (selectedElection.electionType === "national") {
+  if (!selectedElection?.election?.electionType) {
+    console.warn("Election type is missing in selected election.");
+    return { message: "Election type not found" };
+  }
+
+  console.log(`Fetching results for electionType: ${selectedElection.election.electionType}`);
+
+  if (selectedElection.election.electionType === "national") {
     return await fetchGroupedElectionResults(
       selectedElection._id,
       "state",
       7,
       true // Include overall aggregate analysis in each state's aggregateAnalysis
     );
-  } else if (selectedElection.electionType === "gubernatorial") {
+  } else if (selectedElection.election.electionType === "gubernatorial") {
     return await fetchGroupedElectionResults(
       selectedElection._id,
       "state",
@@ -82,12 +100,17 @@ const handleElectionResult = async (selectedElection, user) => {
     );
   } else {
     const electionResults = await ElectionData.find({
-      election: selectedElection._id,
+      activeElection: selectedElection._id, // Use ActiveElection ID instead
       userRole: "observer",
     }).lean();
 
+    console.log(`Election results found: ${electionResults.length}`);
+
     if (electionResults.length > 0) {
-      const { chart, aggregateAnalysis } = getTopPartiesOverall(electionResults, 7);
+      const { chart, aggregateAnalysis } = getTopPartiesOverall(
+        electionResults,
+        7
+      );
       const footer = computeFooter(
         electionResults,
         "lga",
@@ -95,7 +118,7 @@ const handleElectionResult = async (selectedElection, user) => {
         user
       );
       const restriction = determineRestriction(
-        selectedElection.electionType,
+        selectedElection.election.electionType,
         user
       );
 
@@ -107,6 +130,8 @@ const handleElectionResult = async (selectedElection, user) => {
       };
     }
   }
+
+  console.log("No results available for this election.");
   return { message: "No results available for this election" };
 };
 
@@ -228,35 +253,51 @@ const determineRestriction = (electionType, user) => {
 };
 
 // Calculate footer for registered and submitted locations
-const computeFooter = (data, groupBy, election, user) => {
+const computeFooter = (data, groupBy, activeElection, user) => {
+  if (!activeElection || !activeElection.election) {
+    console.error("Invalid activeElection object:", activeElection);
+    throw new Error("Active election details are missing.");
+  }
+
   let registeredLocations = new Set();
   let submittedLocations = new Set();
 
-  switch (election.electionType) {
+  switch (activeElection.election.electionType) {
     case "national":
-      registeredLocations = new Set(AllState.map((state) => state.toUpperCase()));
+      registeredLocations = new Set(
+        AllState.map((state) => state.toUpperCase())
+      );
       break;
     case "senatorial":
     case "house-of-representatives":
       const districtData = lgaData.find(
         (lga) => lga.name.toUpperCase() === user.lga.toUpperCase()
       );
-      registeredLocations = new Set(
-        lgaData
-          .filter((lga) => lga.senatorial_district === districtData?.senatorial_district)
-          .map((lga) => lga.name)
-      );
+      if (districtData) {
+        registeredLocations = new Set(
+          lgaData
+            .filter(
+              (lga) =>
+                lga.senatorial_district === districtData.senatorial_district
+            )
+            .map((lga) => lga.name)
+        );
+      }
       break;
     case "gubernatorial":
     case "house-of-assembly":
       const stateLGAs =
-        AllLga.find((state) => state.state.toLowerCase() === user.state.toLowerCase())?.lgas || [];
+        AllLga.find(
+          (state) => state.state.toLowerCase() === user.state.toLowerCase()
+        )?.lgas || [];
       registeredLocations = new Set(stateLGAs);
       break;
     case "lga":
       const lgaWards =
-        AllWard.find((state) => state.state.toLowerCase() === user.state.toLowerCase())
-          ?.lgas.find((lga) => lga.lga.toLowerCase() === user.lga.toLowerCase())?.wards || [];
+        AllWard.find(
+          (state) => state.state.toLowerCase() === user.state.toLowerCase()
+        )?.lgas.find((lga) => lga.lga.toLowerCase() === user.lga.toLowerCase())
+          ?.wards || [];
       registeredLocations = new Set(lgaWards);
       break;
     default:
@@ -264,7 +305,9 @@ const computeFooter = (data, groupBy, election, user) => {
   }
 
   submittedLocations = new Set(
-    data.filter((item) => item.partiesVotes?.length || item.selectIncident).map((item) => item[groupBy])
+    data
+      .filter((item) => item.partiesVotes?.length || item.selectIncident)
+      .map((item) => item[groupBy])
   );
 
   return {
@@ -274,20 +317,23 @@ const computeFooter = (data, groupBy, election, user) => {
 };
 
 
-// // Service to get live election details for a specific election
+
+// Service to get live election details for a specific election
 
 export const getLiveElectionService = async (electionId, userId) => {
   try {
     const user = await CompletedUser.findById(userId).lean();
     if (!user) throw new Error("User not found");
 
-    const election = await Election.findById(electionId).lean();
-    if (!election) throw new Error("Election not found");
+    const activeElection = await ActiveElection.findById(electionId)
+      .populate("election", "electionType electionName")
+      .lean();
+    if (!activeElection) throw new Error("Election not found");
 
     let groupBy = "lga";
     let restriction = null;
 
-    switch (election.electionType) {
+    switch (activeElection.election.electionType) {
       case "national":
         groupBy = "state";
         break;
@@ -323,26 +369,26 @@ export const getLiveElectionService = async (electionId, userId) => {
     let sentimentAnalysis = null;
 
     // Fetch election results and sentiment analysis based on location and grouping
-    const electionResults = await ElectionData.find({
-      election: electionId,
-      userRole: "observer",
-      ...(election.electionType === "gubernatorial" ||
-      election.electionType === "house-of-assembly"
-        ? { state: user.state }
-        : election.electionType === "senatorial"
-        ? { lga: { $in: getLGAsInSenatorialDistrict(user.lga) } }
-        : election.electionType === "house-of-representatives"
-        ? { lga: { $in: getLGAsInHouseOfRepsDistrict(user.lga) } }
-        : election.electionType === "lga"
-        ? { ward: user.ward }
-        : {}),
-    }).lean();
+  const electionResults = await ElectionData.find({
+    election: activeElection._id, 
+    userRole: "observer",
+    ...(activeElection.election.electionType === "gubernatorial" ||
+    activeElection.election.electionType === "house-of-assembly"
+      ? { state: user.state }
+      : activeElection.election.electionType === "senatorial"
+      ? { lga: { $in: getLGAsInSenatorialDistrict(user.lga) } }
+      : activeElection.election.electionType === "house-of-representatives"
+      ? { lga: { $in: getLGAsInHouseOfRepsDistrict(user.lga) } }
+      : activeElection.election.electionType === "lga"
+      ? { ward: user.ward }
+      : {}),
+  }).lean();
 
     if (electionResults.length > 0) {
       const { resultData, aggregateAnalysis } = aggregateResultsAndTopParties(
         electionResults,
         groupBy,
-        election.electionType
+        activeElection.election.electionType
       );
 
       const sentimentData = await getSentimentAnalysisService(
@@ -353,7 +399,7 @@ export const getLiveElectionService = async (electionId, userId) => {
       );
 
       result =
-        election.electionType === "national"
+        activeElection.election.electionType === "national"
           ? resultData.map((stateResult) => ({
               ...stateResult,
               aggregateAnalysis, // Overall aggregate analysis added to each state
@@ -376,14 +422,14 @@ export const getLiveElectionService = async (electionId, userId) => {
     const incidents = await IncidentReport.find({
       election: electionId,
       userRole: "observer",
-      ...(election.electionType === "gubernatorial" ||
-      election.electionType === "house-of-assembly"
+      ...(activeElection.election.electionType === "gubernatorial" ||
+      activeElection.election.electionType === "house-of-assembly"
         ? { state: user.state }
-        : election.electionType === "senatorial"
+        : activeElection.election.electionType === "senatorial"
         ? { lga: { $in: getLGAsInSenatorialDistrict(user.lga) } }
-        : election.electionType === "house-of-representatives"
+        : activeElection.election.electionType === "house-of-representatives"
         ? { lga: { $in: getLGAsInHouseOfRepsDistrict(user.lga) } }
-        : election.electionType === "lga"
+        : activeElection.election.electionType === "lga"
         ? { ward: user.ward }
         : {}),
     }).lean();
@@ -404,10 +450,10 @@ export const getLiveElectionService = async (electionId, userId) => {
 
     return {
       electionDetails: {
-        electionType: election.electionType,
-        electionName: election.electionName,
-        startDate: election.startDate,
-        endDate: election.endDate,
+        electionType: activeElection.election.electionType,
+        electionName: activeElection.election.electionName,
+        startDate: activeElection.startDate,
+        endDate: activeElection.endDate,
       },
       result,
       incidentReport,
@@ -556,22 +602,22 @@ export const getSentimentAnalysisService = async (
   electionId,
   groupBy = "state",
   user,
-  election
+  activeElection
 ) => {
   // Restrict sentiment analysis to user's location if it's not a national election
-  const electionData = await ElectionData.find({
-    election: electionId,
-    userRole: "observer",
-    ...(election.electionType === "gubernatorial" ||
-    election.electionType === "house-of-assembly"
-      ? { state: user.state } // Restrict to user's state
-      : election.electionType === "senatorial" ||
-        election.electionType === "house-of-representatives"
-      ? { lga: user.lga } // Restrict to user's LGA for senatorial or house of reps
-      : election.electionType === "lga"
-      ? { ward: user.ward } // Restrict to user's ward for lga elections
-      : {}),
-  }).lean();
+   const electionData = await ElectionData.find({
+     election: activeElection._id,
+     userRole: "observer",
+     ...(activeElection.election.electionType === "gubernatorial" ||
+     activeElection.election.electionType === "house-of-assembly"
+       ? { state: user.state }
+       : activeElection.election.electionType === "senatorial" ||
+         activeElection.election.electionType === "house-of-representatives"
+       ? { lga: user.lga }
+       : activeElection.election.electionType === "lga"
+       ? { ward: user.ward }
+       : {}),
+   }).lean();
 
   // Combine and aggregate sentiment data
   const combinedSentiment = aggregateCombinedSentiment(electionData);
@@ -617,13 +663,17 @@ const aggregateCombinedSentiment = (results) => {
 
 // Helper function to calculate the footer for registered and submitted locations
 
-const calculateFooter = (data, groupBy, election, user) => {
+const calculateFooter = (data, groupBy, activeElection, user) => {
+  if (!activeElection || !activeElection.election) {
+    console.error("Invalid activeElection object:", activeElection);
+    throw new Error("Active election details are missing.");
+  }
+
   let registeredLocations = new Set();
   let submittedLocations = new Set();
 
-  switch (election.electionType) {
+  switch (activeElection.election.electionType) {
     case "national":
-      // Register all states for a national election
       registeredLocations = new Set(
         AllState.map((state) => state.toUpperCase())
       );
@@ -633,19 +683,19 @@ const calculateFooter = (data, groupBy, election, user) => {
       const districtData = lgaData.find(
         (lga) => lga.name.toUpperCase() === user.lga.toUpperCase()
       );
-      // Register LGAs within the user's senatorial or house district
-      registeredLocations = new Set(
-        lgaData
-          .filter(
-            (lga) =>
-              lga.senatorial_district === districtData?.senatorial_district
-          )
-          .map((lga) => lga.name)
-      );
+      if (districtData) {
+        registeredLocations = new Set(
+          lgaData
+            .filter(
+              (lga) =>
+                lga.senatorial_district === districtData.senatorial_district
+            )
+            .map((lga) => lga.name)
+        );
+      }
       break;
     case "gubernatorial":
     case "house-of-assembly":
-      // Register all LGAs in the user's state
       const stateLGAs =
         AllLga.find(
           (state) => state.state.toLowerCase() === user.state.toLowerCase()
@@ -653,7 +703,6 @@ const calculateFooter = (data, groupBy, election, user) => {
       registeredLocations = new Set(stateLGAs);
       break;
     case "lga":
-      // Register all wards in the user's LGA
       const lgaWards =
         AllWard.find(
           (state) => state.state.toLowerCase() === user.state.toLowerCase()
@@ -665,7 +714,6 @@ const calculateFooter = (data, groupBy, election, user) => {
       registeredLocations = new Set();
   }
 
-  // Calculate submitted locations based on unique entries in data
   submittedLocations = new Set(
     data
       .filter((item) => item.partiesVotes?.length || item.selectIncident)
@@ -677,6 +725,7 @@ const calculateFooter = (data, groupBy, election, user) => {
     [`submitted-${groupBy}s`]: submittedLocations.size,
   };
 };
+
 
 
 export const getActivityBoardAndNotificationsService = async () => {

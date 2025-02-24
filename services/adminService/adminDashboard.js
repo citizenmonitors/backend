@@ -1,11 +1,11 @@
 import moment from "moment";
-import mongoose from "mongoose";
 import CompletedUser from "../../models/CompletedUser.js";
 import ElectionData from "../../models/Election/ElectionData.js";
 import  Traffic  from "../../models/DailyTraffic/dailyTraffic.js";
 import  ActiveUser  from "../../models/ActiveMontlyUsers/activeMontlyUsers.js";
 import Election from "../../models/Election/Election.js";
 import transporter from "../../config/email.js";
+import ActiveElection from "../../models/Election/ActiveElection.js";
 
 export const getDashboardData = async () => {
   const today = moment().startOf("day");
@@ -525,34 +525,228 @@ const getTrafficStats = async () => {
 
 export const getAllElectionsService = async () => {
   // Fetch all elections with their results and incident reports
-  const elections = await Election.find()
+  const activeElections = await ActiveElection.find()
+    .populate("election", "electionType electionName")
+    .lean();
 
   // Format and return elections, excluding `electionLocation` and unnecessary fields
-  return elections.map((election) => {
+  return activeElections.map((activeElection) => {
     const {
-      electionLocation,
-      politicalParties,
-      resultsCount,
-      incidentReports,
+      election: electionDetails,
       results,
+      incidentReports,
+      resultsCount,
+      politicalParties,
       ...electionData
-    } = election.toObject();
+    } = activeElection;
 
-
-    return electionData;
+    return {
+      electionType: electionDetails.electionType,
+      electionName: electionDetails.electionName,
+      ...electionData,
+    };
   });
 };
 
 
 
 
+// export const getAdminLiveElectionService = async (electionId) => {
+//   try {
+//     const election = await Election.findById(electionId).lean();
+//     if (!election) throw new Error("Election not found");
+
+//     const { electionName, electionType, startDate, endDate, electionLocation } =
+//       election;
+
+//     // Fetch live election results
+//     const electionResults = await ElectionData.find({
+//       election: electionId,
+//       userRole: "observer",
+//     }).lean();
+
+//     if (electionResults.length === 0) {
+//       return { message: "No live results available for this election." };
+//     }
+
+//     // Group results by location (state, lga, or ward based on election type)
+//     const locationResults = electionResults.reduce((acc, result) => {
+//       const locationKey =
+//         electionType === "national"
+//           ? result.state
+//           : electionType === "gubernatorial"
+//           ? result.state
+//           : result.lga;
+
+//       if (!acc[locationKey]) acc[locationKey] = [];
+//       acc[locationKey].push(result);
+//       return acc;
+//     }, {});
+
+//     // Handle national elections
+//     if (electionType === "national") {
+//       const stateArray = Object.keys(locationResults).map((state) => {
+//         const stateResults = locationResults[state];
+//         const { resultData, aggregateAnalysis } = aggregateResultsAndTopParties(
+//           stateResults,
+//           "state"
+//         );
+//         const footer = calculateFooter(stateResults, "state", electionLocation);
+
+//         return {
+//           state,
+//           chart: resultData,
+//           aggregateAnalysis,
+//           footer,
+//         };
+//       });
+
+//       return {
+//         electionDetails: {
+//           electionId,
+//           electionName,
+//           electionType,
+//           startDate,
+//           endDate,
+//         },
+//         result: stateArray,
+//       };
+//     }
+
+//     // Handle gubernatorial elections
+//     if (electionType === "gubernatorial") {
+//       const uniqueStates = Object.keys(locationResults);
+
+//       if (uniqueStates.length === 1) {
+//         // Single state with results
+//         const stateResults = locationResults[uniqueStates[0]];
+//         const { aggregateAnalysis } = aggregateResultsAndTopParties(
+//           stateResults,
+//           "lga"
+//         );
+
+//         const footer = calculateFooter(stateResults, "lga", electionLocation);
+
+//         return {
+//           electionDetails: {
+//             electionId,
+//             electionName,
+//             electionType,
+//             startDate,
+//             endDate,
+//           },
+//           result: {
+//             aggregateAnalysis,
+//             footer,
+//           },
+//         };
+//       }
+
+//       // Multiple states with results
+//       const stateArray = uniqueStates.map((state) => {
+//         const stateResults = locationResults[state];
+//         const { resultData, aggregateAnalysis } = aggregateResultsAndTopParties(
+//           stateResults,
+//           "lga"
+//         );
+//         const footer = calculateFooter(stateResults, "lga", electionLocation);
+
+//         return {
+//           state,
+//           chart: resultData,
+//           aggregateAnalysis,
+//           footer,
+//         };
+//       });
+
+//       return {
+//         electionDetails: {
+//           electionId,
+//           electionName,
+//           electionType,
+//           startDate,
+//           endDate,
+//         },
+//         result: stateArray,
+//       };
+//     }
+
+//     // Handle other elections (senatorial, house-of-representatives, etc.)
+//     const uniqueLGAs = Object.keys(locationResults);
+
+//     if (uniqueLGAs.length === 1) {
+//       // Single LGA with results
+//       const lgaResults = locationResults[uniqueLGAs[0]];
+//       const { resultData, aggregateAnalysis } = aggregateResultsAndTopParties(
+//         lgaResults,
+//         "ward"
+//       );
+
+//       const footer = calculateFooter(lgaResults, "ward", electionLocation);
+
+//       return {
+//         electionDetails: {
+//           electionId,
+//           electionName,
+//           electionType,
+//           startDate,
+//           endDate,
+//         },
+//         result: {
+//           chart: resultData,
+//           aggregateAnalysis,
+//           footer,
+//         },
+//       };
+//     }
+
+//     // Multiple LGAs with results
+//     const lgaArray = uniqueLGAs.map((lga) => {
+//       const lgaResults = locationResults[lga];
+//       const { resultData, aggregateAnalysis } = aggregateResultsAndTopParties(
+//         lgaResults,
+//         "ward"
+//       );
+//       const footer = calculateFooter(lgaResults, "ward", electionLocation);
+
+//       return {
+//         lga,
+//         chart: resultData,
+//         aggregateAnalysis,
+//         footer,
+//       };
+//     });
+
+//     return {
+//       electionDetails: {
+//         electionId,
+//         electionName,
+//         electionType,
+//         startDate,
+//         endDate,
+//       },
+//       result: lgaArray,
+//     };
+//   } catch (error) {
+//     throw new Error(
+//       `Error fetching admin live election data: ${error.message}`
+//     );
+//   }
+// };
+
+// Helper: Aggregate Results and Top Parties
+
+
+
 export const getAdminLiveElectionService = async (electionId) => {
   try {
-    const election = await Election.findById(electionId).lean();
-    if (!election) throw new Error("Election not found");
+    const activeElection = await ActiveElection.findById(electionId)
+      .populate("election", "electionType electionName")
+      .lean();
+    if (!activeElection) throw new Error("Election not found");
 
-    const { electionName, electionType, startDate, endDate, electionLocation } =
-      election;
+    const { election, startDate, endDate, electionLocation } = activeElection;
+    const { electionType, electionName } = election;
 
     // Fetch live election results
     const electionResults = await ElectionData.find({
@@ -613,13 +807,11 @@ export const getAdminLiveElectionService = async (electionId) => {
       const uniqueStates = Object.keys(locationResults);
 
       if (uniqueStates.length === 1) {
-        // Single state with results
         const stateResults = locationResults[uniqueStates[0]];
         const { aggregateAnalysis } = aggregateResultsAndTopParties(
           stateResults,
           "lga"
         );
-
         const footer = calculateFooter(stateResults, "lga", electionLocation);
 
         return {
@@ -630,14 +822,10 @@ export const getAdminLiveElectionService = async (electionId) => {
             startDate,
             endDate,
           },
-          result: {
-            aggregateAnalysis,
-            footer,
-          },
+          result: { aggregateAnalysis, footer },
         };
       }
 
-      // Multiple states with results
       const stateArray = uniqueStates.map((state) => {
         const stateResults = locationResults[state];
         const { resultData, aggregateAnalysis } = aggregateResultsAndTopParties(
@@ -670,13 +858,11 @@ export const getAdminLiveElectionService = async (electionId) => {
     const uniqueLGAs = Object.keys(locationResults);
 
     if (uniqueLGAs.length === 1) {
-      // Single LGA with results
       const lgaResults = locationResults[uniqueLGAs[0]];
       const { resultData, aggregateAnalysis } = aggregateResultsAndTopParties(
         lgaResults,
         "ward"
       );
-
       const footer = calculateFooter(lgaResults, "ward", electionLocation);
 
       return {
@@ -687,15 +873,10 @@ export const getAdminLiveElectionService = async (electionId) => {
           startDate,
           endDate,
         },
-        result: {
-          chart: resultData,
-          aggregateAnalysis,
-          footer,
-        },
+        result: { chart: resultData, aggregateAnalysis, footer },
       };
     }
 
-    // Multiple LGAs with results
     const lgaArray = uniqueLGAs.map((lga) => {
       const lgaResults = locationResults[lga];
       const { resultData, aggregateAnalysis } = aggregateResultsAndTopParties(
@@ -729,7 +910,6 @@ export const getAdminLiveElectionService = async (electionId) => {
   }
 };
 
-// Helper: Aggregate Results and Top Parties
 const aggregateResultsAndTopParties = (results, groupBy) => {
   const aggregated = {};
   const totalVotesByParty = {};
@@ -768,8 +948,26 @@ const getTopSevenParties = (partiesVotes) => {
 };
 
 // Helper: Calculate Footer
+// const calculateFooter = (data, groupBy, electionLocation) => {
+//   // Ensure electionLocation is an array, fallback to an empty array
+//   const registeredLocations = new Set(
+//     Array.isArray(electionLocation)
+//       ? electionLocation.map((loc) => loc.toUpperCase())
+//       : []
+//   );
+
+//   const submittedLocations = new Set(
+//     data.map((item) => (item[groupBy] || "").toUpperCase())
+//   );
+
+//   return {
+//     [`registered-${groupBy}s`]: registeredLocations.size,
+//     [`submitted-${groupBy}s`]: submittedLocations.size,
+//   };
+// };
+
 const calculateFooter = (data, groupBy, electionLocation) => {
-  // Ensure electionLocation is an array, fallback to an empty array
+  // Ensure electionLocation is valid
   const registeredLocations = new Set(
     Array.isArray(electionLocation)
       ? electionLocation.map((loc) => loc.toUpperCase())
@@ -785,5 +983,3 @@ const calculateFooter = (data, groupBy, electionLocation) => {
     [`submitted-${groupBy}s`]: submittedLocations.size,
   };
 };
-
-

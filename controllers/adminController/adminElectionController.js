@@ -1,8 +1,10 @@
-import { approveObserverService, deleteUserService, downgradeObserverService, getAdminLiveElectionService, getAllElectionsService, getAllObsersverService, getAllUsersService, getUserByIdService } from "../../services/adminService/adminDashboard.js";
+import { approveObserverService, deleteUserService, downgradeObserverService, getAdminLiveElectionService, getAllActiveElectionsService, getAllObsersverService, getAllUsersService, getUserByIdService } from "../../services/adminService/adminDashboard.js";
 import {
+  createEventService,
   deleteFlaggedResults,
   deleteResultOrIncidentService,
     getAllAdminService,
+    getAllElectionTypesService,
     getAllResultService,
     getDashboardDataService,
     getFlaggedResultsService,
@@ -36,7 +38,19 @@ export const getAllAdminController = async (req, res) => {
 
 export const getAllElections = async (req, res) => {
   try {
-    const elections = await getAllElectionsService();
+    const elections = await getAllActiveElectionsService();
+
+    res.status(200).json({ elections });
+  } catch (error) {
+    console.error("Error fetching elections:", error);
+    res
+      .status(500)
+      .json({ message: "Error fetching elections", error: error.message });
+  }
+};
+export const getAllElectionTypes = async (req, res) => {
+  try {
+    const elections = await getAllElectionTypesService();
 
     res.status(200).json({ elections });
   } catch (error) {
@@ -229,3 +243,11 @@ export const getSingleFlaggedElectionController = async (req, res) => {
 
 
 
+export const createEventController = async (req, res) => {
+  try {
+    const event = await createEventService(req.body);
+    res.status(201).json({ message: "Event created successfully", event });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

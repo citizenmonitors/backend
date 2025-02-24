@@ -20,7 +20,6 @@ import {
   updateActiveElections,
   getAllElectionTypesService,
 } from "../../services/Election/electionService.js";
-import { createEventService } from "../../services/adminService/adminElectionService.js";
 
 export const createElection = async (req, res) => {
   try {
@@ -356,11 +355,3 @@ export const checkUserStatusForFlagController = async (req, res) => {
 
 
 
-export const createEventController = async (req, res) => {
-  try {
-    const event = await createEventService(req.body);
-    res.status(201).json({ message: "Event created successfully", event });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};

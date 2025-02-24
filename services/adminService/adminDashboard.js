@@ -523,7 +523,7 @@ const getTrafficStats = async () => {
 };
 
 
-export const getAllElectionsService = async () => {
+export const getAllActiveElectionsService = async () => {
   // Fetch all elections with their results and incident reports
   const activeElections = await ActiveElection.find()
     .populate("election", "electionType electionName")

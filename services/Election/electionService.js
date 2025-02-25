@@ -178,8 +178,8 @@ export const getAllActiveElectionsService = async (userId) => {
         electionType: election.electionType,
         electionName: election.electionName,
         ...electionData,
-        // results: results?.map(({ _id }) => _id) || [],
-        // incidentReports: incidentReports?.map(({ _id }) => _id) || [],
+        results: results?.map(({ _id }) => _id) || [],
+        incidentReports: incidentReports?.map(({ _id }) => _id) || [],
       })
     ),
   };

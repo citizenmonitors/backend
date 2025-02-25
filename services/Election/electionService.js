@@ -39,37 +39,69 @@ export const updateElectionService = async (electionId, data) => {
 
 
 export const activeElections = async (data) => {
-  const { electionId, electionLocation, startDate, endDate, } = data;
+  let { electionId, electionLocation, startDate, endDate } = data;
 
   const existingElection = await Election.findById(electionId);
   if (!existingElection) {
     throw new Error("Election not found");
   }
 
-  try {
-    const activeElection = new ActiveElection({
-      election: electionId,
-      electionLocation,
-      startDate,
-      endDate,
-    });
-
-    const savedElection = await activeElection.save();
-
-    // Remove unnecessary fields before returning
-    const {
-      results,
-      resultsCount,
-      incidentReports,
-      politicalParties,
-      ...electionData
-    } = savedElection.toObject();
-
-    return electionData;
-  } catch (error) {
-    throw new Error(`Failed to create a new active election: ${error.message}`);
+  if (
+    ["national", "house-of-representatives", "senatorial"].includes(
+      existingElection.electionType
+    )
+  ) {
+    electionLocation = null;
+  } else if (
+    ["gubernatorial", "house-of-assembly"].includes(
+      existingElection.electionType
+    )
+  ) {
+    if (!electionLocation) {
+      throw new Error("State election requires a valid state name.");
+    }
+  } else if (["LGA"].includes(existingElection.electionType)) {
+    if (!electionLocation) {
+      throw new Error("LGA election requires a valid LGA name.");
+    }
   }
+
+  const duplicateElection = await ActiveElection.findOne({
+    electionLocation,
+    startDate,
+    endDate,
+  });
+
+  if (duplicateElection) {
+    throw new Error(
+      "An election for this location and date range already exists."
+    );
+  }
+
+  // Create new active election
+  const activeElection = new ActiveElection({
+    election: electionId,
+    electionLocation,
+    startDate,
+    endDate,
+  });
+
+  const savedElection = await activeElection.save();
+
+
+  const {
+    results,
+    resultsCount,
+    incidentReports,
+    politicalParties,
+    ...electionData
+  } = savedElection.toObject();
+
+  return electionData;
 };
+
+
+
 
 export const updateActiveElections = async (electionId, data) => {
 
@@ -100,15 +132,11 @@ export const updateActiveElections = async (electionId, data) => {
 
 
 export const getAllActiveElectionsService = async (userId) => {
-  // Helper function to standardize names by replacing spaces and hyphens with underscores
-  const standardizeName = (name) => {
-    return name.toLowerCase().replace(/[-\s]/g, "_").trim();
-  };
+  const standardizeName = (name) =>
+    name.toLowerCase().replace(/[-\s]/g, "_").trim();
 
   const user = await CompletedUser.findById(userId).lean();
-  if (!user) {
-    throw new Error("User not found");
-  }
+  if (!user) throw new Error("User not found");
 
   console.log(`Fetching elections for user: ${userId}`);
   const userState = standardizeName(user.state);
@@ -116,124 +144,104 @@ export const getAllActiveElectionsService = async (userId) => {
 
   // Fetch all active elections with election details
   const activeElections = await ActiveElection.find()
-    .populate({ path: "results", select: "election user" })
-    .populate({ path: "incidentReports", select: "election user" })
     .populate("election", "electionType electionName")
     .lean();
 
-  // Filter elections based on user's location
-  const relevantElections = activeElections.filter((election) => {
-    const electionType = election.election.electionType.toLowerCase();
-    const electionLocation = election.electionLocation.toLowerCase();
+  const relevantElections = activeElections.filter(
+    ({ election, electionLocation }) => {
+      if (!election) return false; 
 
-    if (
-      ["national", "gubernatorial", "house-of-assembly"].includes(electionType)
-    ) {
-      return electionLocation === userState;
-    } else if (
-      ["senatorial", "house-of-representatives", "lga"].includes(electionType)
-    ) {
-      return electionLocation === userLGA;
+      const electionType = election.electionType.toLowerCase();
+      electionLocation = electionLocation?.toLowerCase();
+
+      if (
+        ["national", "house-of-representatives", "senatorial"].includes(
+          electionType
+        )
+      )
+        return true;
+      if (["gubernatorial", "house-of-assembly"].includes(electionType))
+        return electionLocation === userState;
+      if (["lga"].includes(electionType)) return electionLocation === userLGA;
+      return false;
     }
-    return false;
-  });
+  );
 
-  // Log if no elections were found
   if (relevantElections.length === 0) {
     console.log("No relevant elections found for user.");
     return { elections: [] };
   }
 
-  // Format the response
   return {
-    elections: relevantElections.map((election) => {
-      const {
-        election: electionDetails,
-        electionLocation,
-        politicalParties,
-        resultsCount,
-        incidentReports,
-        results,
-        ...electionData
-      } = election;
-
-      return {
-        electionType: electionDetails.electionType,
-        electionName: electionDetails.electionName,
+    elections: relevantElections.map(
+      ({ election, results,  incidentReports, ...electionData }) => ({
+        electionType: election.electionType,
+        electionName: election.electionName,
         ...electionData,
-        results: results?.map((result) => result._id) || [],
-        incidentReports: incidentReports?.map((report) => report._id) || [],
-      };
-    }),
+        // results: results?.map(({ _id }) => _id) || [],
+        // incidentReports: incidentReports?.map(({ _id }) => _id) || [],
+      })
+    ),
   };
 };
+
+
 
 export const getAllElectionTypesService = async (userId) => {
-  // Helper function to standardize names by replacing spaces and hyphens with underscores
-  const standardizeName = (name) => {
-    return name.toLowerCase().replace(/[-\s]/g, "_").trim();
-  };
+  try {
+    const standardizeName = (name) =>
+      name?.toLowerCase().replace(/[-\s]/g, "_").trim();
 
-  const user = await CompletedUser.findById(userId).lean();
-  if (!user) {
-    throw new Error("User not found");
-  }
+    const user = await CompletedUser.findById(userId).lean();
+    if (!user) throw new Error("User not found");
 
-  console.log(`Fetching elections for user: ${userId}`);
-  const userState = standardizeName(user.state);
-  const userLGA = standardizeName(user.lga);
+    console.log(`Fetching elections for user: ${userId}`);
 
-  // Fetch all active elections with election details
-  const activeElections = await ActiveElection.find()
-    .populate("election", "electionType electionName")
-    .lean();
+    const userState = standardizeName(user.state);
+    const userLGA = standardizeName(user.lga);
 
-  // Filter elections based on user's location
-  const relevantElections = activeElections.filter((election) => {
-    const electionType = election.election.electionType.toLowerCase();
-    const electionLocation = election.electionLocation.toLowerCase();
+    // Fetch all elections safely
+    const elections = await Election.find()
+      .select("electionType electionName")
+      .lean();
 
-    if (
-      ["national", "gubernatorial", "house-of-assembly"].includes(electionType)
-    ) {
-      return electionLocation === userState;
-    } else if (
-      ["senatorial", "house-of-representatives", "lga"].includes(electionType)
-    ) {
-      return electionLocation === userLGA;
+    if (!elections || elections.length === 0) {
+      console.log("No elections found.");
+      return { elections: [] };
     }
-    return false;
-  });
 
-  // Log if no elections were found
-  if (relevantElections.length === 0) {
-    console.log("No relevant elections found for user.");
-    return { elections: [] };
+    // Filter elections safely
+    const relevantElections = elections.filter((election) => {
+      if (!election || !election.electionType) return false;
+
+      const electionType = election.electionType.toLowerCase();
+
+      if (
+        ["national", "house-of-representatives", "senatorial"].includes(
+          electionType
+        )
+      ) {
+        return true; 
+      }
+      if (["gubernatorial", "house-of-assembly"].includes(electionType)) {
+        return userState && userState.length > 0;
+      }
+      if (["lga"].includes(electionType)) {
+        return userLGA && userLGA.length > 0;
+      }
+      return false;
+    });
+
+    console.log("Filtered Elections:", relevantElections);
+
+    return { elections: relevantElections };
+  } catch (error) {
+    console.error("Error fetching elections:", error);
+    return { message: "Error fetching elections", error: error.message };
   }
-
-  // Format the response
-  return {
-    elections: relevantElections.map((election) => {
-      const {
-        election: electionDetails,
-        politicalParties,
-        resultsCount,
-        startDate,
-        endDate,
-        electionLocation,
-        incidentReports,
-        results,
-        ...electionData
-      } = election;
-
-      return {
-        electionType: electionDetails.electionType,
-        electionName: electionDetails.electionName,
-        ...electionData,
-      };
-    }),
-  };
 };
+
+
 
 
 export const getElectionResultById = async (electionId, userId) => {
@@ -258,7 +266,9 @@ export const getElectionResultById = async (electionId, userId) => {
 export const getElectionById = async (electionId, userId) => {
   try {
     // Fetch the election data by ID
-    const activeElection = await ActiveElection.findById(electionId).lean();
+    const activeElection = await ActiveElection.findById(electionId)
+    .populate("election", "electionType electionName")
+    .lean();
     if (!activeElection) {
       throw new Error("Election not found");
     }
@@ -278,11 +288,14 @@ export const getElectionById = async (electionId, userId) => {
     }).lean();
 
     // Create the election data object including political parties, results, and incident reports
-    const { electionLocation, resultsCount, ...electionData } = activeElection;
+    const {election, ...electionData } = activeElection;
+
 
     // Include only required data and format political parties properly
     const formattedElectionData = {
       ...electionData,
+      electionType: election.electionType,
+      electionName: election.electionName,
       politicalParties: politicalParties.map((party) => ({
         name: party.name,
         code: party.code,

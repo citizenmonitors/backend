@@ -351,62 +351,6 @@ export const submitObserverDetails = async ({
   };
 };
 
-// export const authenticateUser = async ({ email, password }) => {
-//   const user = await CompletedUser.findOne({ email });
-//   if (!user) {
-//     throw new Error("The email or password you entered is incorrect");
-//   }
-
-//   const isMatch = await bcrypt.compare(password, user.password);
-//   if (!isMatch) {
-//     throw new Error("The password you entered is incorrect");
-//   }
-//   user.isActive = true;
-//   user.lastLogin = new Date();
-//   await user.save();
-
-//   // Update daily login count
-//   const today = moment().startOf("day").format("DD MM YYYY");
-//   let dailyTraffic = await DailyTraffic.findOne({ date: today });
-
-//   if (!dailyTraffic) {
-//     dailyTraffic = new DailyTraffic({ date: today, loginCount: 0, users: [] });
-//   }
-
-//   if (!dailyTraffic.users) {
-//     dailyTraffic.users = [];
-//   }
-
-//   if (!dailyTraffic.users.includes(user._id)) {
-//     dailyTraffic.loginCount += 1;
-//     dailyTraffic.users.push(user._id);
-//     await dailyTraffic.save();
-//   }
-
-//   // update monthly active users
-
-//   const currentMonth = moment().subtract(1, "month").format("MM YYYY");
-//   let monthlyActive = await monthlyActiveUsers.findOne({ month: currentMonth });
-
-//   if (!monthlyActive) {
-//     monthlyActive = new monthlyActiveUsers({
-//       month: currentMonth,
-//       activeUserCount: 0,
-//       users: [],
-//     });
-//   }
-
-//   if (!monthlyActive.users.includes(user._id)) {
-//     monthlyActive.activeUserCount += 1;
-//     monthlyActive.users.push(user._id);
-//     await monthlyActive.save();
-//   }
-
-//   const token = generateToken({ email: user.email });
-//   const { password: userPassword, ...usersDetails } = user.toObject();
-//   return { token, user: usersDetails };
-// };
-
 export const authenticateUser = async ({ email, password }) => {
   const user = await CompletedUser.findOne({ email });
   if (!user) {
@@ -473,13 +417,6 @@ export const resetUserPassword = async (token, newPassword) => {
   if (!user) {
     throw new Error("Invalid or expired token");
   }
-
-  // const currentTime = moment();
-  // const tokenExpirationTime = moment(user.resetPasswordExpires);
-
-  // if (currentTime.isAfter(tokenExpirationTime)) {
-  //   throw new Error("Token has expired");
-  // }
 
     if (moment().isAfter(moment(user.resetPasswordExpires))) {
       throw new Error("Token has expired.");

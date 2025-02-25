@@ -7,7 +7,7 @@ const ActiveElectionSchema = new mongoose.Schema(
       ref: "Election",
       required: true,
     },
-    electionLocation: { type: String, required: true },
+    electionLocation: { type: String },
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
     results: [{ type: mongoose.Schema.Types.ObjectId, ref: "ElectionData" }],

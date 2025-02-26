@@ -548,6 +548,35 @@ export const getAllActiveElectionsService = async () => {
   });
 };
 
+export const getAllElectionTypesService = async () => {
+  // Fetch all elections with their results and incident reports
+  const activeElections = await ActiveElection.find()
+    .populate("election", "electionType electionName")
+    .lean();
+
+  // Format and return elections, excluding `electionLocation` and unnecessary fields
+  return activeElections.map((activeElection) => {
+    const {
+      election: electionDetails,
+      results,
+      incidentReports,
+      electionLocation,
+      startDate,
+      endDate,
+      resultsCount,
+      politicalParties,
+      ...electionData
+    } = activeElection;
+
+    return {
+      electionType: electionDetails.electionType,
+      electionName: electionDetails.electionName,
+      ...electionData,
+    };
+  });
+};
+
+
 
 
 
@@ -789,6 +818,7 @@ export const getAdminLiveElectionService = async (electionId) => {
           footer,
         };
       });
+      
 
       return {
         electionDetails: {

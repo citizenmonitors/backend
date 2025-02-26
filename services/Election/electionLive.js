@@ -33,9 +33,9 @@ export const getAllOngoingElectionResults = async (userId) => {
 
     const prioritizedTypes = [
       "national",
-      "gubernatorial",
       "senatorial",
       "house-of-representatives",
+      "gubernatorial",
       "house-of-assembly",
       "lga",
     ];
@@ -103,6 +103,8 @@ const handleElectionResult = async (selectedElection, user) => {
       activeElection: selectedElection._id, // Use ActiveElection ID instead
       userRole: "observer",
     }).lean();
+
+    
 
     console.log(`Election results found: ${electionResults.length}`);
 
@@ -333,7 +335,7 @@ export const getLiveElectionService = async (electionId, userId) => {
     let groupBy = "lga";
     let restriction = null;
 
-    switch (activeElection.election.electionType) {
+    switch (activeElection.election?.electionType) {
       case "national":
         groupBy = "state";
         break;
@@ -369,45 +371,55 @@ export const getLiveElectionService = async (electionId, userId) => {
     let sentimentAnalysis = null;
 
     // Fetch election results and sentiment analysis based on location and grouping
-  const electionResults = await ElectionData.find({
-    election: activeElection._id, 
-    userRole: "observer",
-    ...(activeElection.election.electionType === "gubernatorial" ||
-    activeElection.election.electionType === "house-of-assembly"
-      ? { state: user.state }
-      : activeElection.election.electionType === "senatorial"
-      ? { lga: { $in: getLGAsInSenatorialDistrict(user.lga) } }
-      : activeElection.election.electionType === "house-of-representatives"
-      ? { lga: { $in: getLGAsInHouseOfRepsDistrict(user.lga) } }
-      : activeElection.election.electionType === "lga"
-      ? { ward: user.ward }
-      : {}),
-  }).lean();
+ const electionResults = await ElectionData.find({
+   election: activeElection._id,
+   userRole: "observer",
+   ...(activeElection.election?.electionType === "gubernatorial" ||
+   activeElection.election?.electionType === "house-of-assembly"
+     ? { state: user.state }
+     : activeElection.election?.electionType === "senatorial"
+     ? { lga: { $in: getLGAsInSenatorialDistrict(user.lga || "") } }
+     : activeElection.election?.electionType === "house-of-representatives"
+     ? { lga: { $in: getLGAsInHouseOfRepsDistrict(user.lga || "") } }
+     : activeElection.election?.electionType === "lga"
+     ? { ward: user.ward }
+     : {}),
+ }).lean();
 
     if (electionResults.length > 0) {
       const { resultData, aggregateAnalysis } = aggregateResultsAndTopParties(
         electionResults,
         groupBy,
-        activeElection.election.electionType
+        activeElection.election?.electionType
       );
 
       const sentimentData = await getSentimentAnalysisService(
         electionId,
         groupBy,
         user,
-        election
+        activeElection
       );
 
       result =
         activeElection.election.electionType === "national"
           ? resultData.map((stateResult) => ({
               ...stateResult,
-              aggregateAnalysis, // Overall aggregate analysis added to each state
-              footer: calculateFooter(electionResults, groupBy, election, user), // Add footer specific to each state
+              aggregateAnalysis,
+              footer: calculateFooter(
+                electionResults,
+                groupBy,
+                activeElection,
+                user
+              ),
             }))
           : {
               chart: resultData,
-              footer: calculateFooter(electionResults, groupBy, election, user),
+              footer: calculateFooter(
+                electionResults,
+                groupBy,
+                activeElection,
+                user
+              ),
               aggregateAnalysis,
               restriction,
             };
@@ -422,14 +434,14 @@ export const getLiveElectionService = async (electionId, userId) => {
     const incidents = await IncidentReport.find({
       election: electionId,
       userRole: "observer",
-      ...(activeElection.election.electionType === "gubernatorial" ||
-      activeElection.election.electionType === "house-of-assembly"
+      ...(activeElection.election?.electionType === "gubernatorial" ||
+      activeElection.election?.electionType === "house-of-assembly"
         ? { state: user.state }
-        : activeElection.election.electionType === "senatorial"
-        ? { lga: { $in: getLGAsInSenatorialDistrict(user.lga) } }
-        : activeElection.election.electionType === "house-of-representatives"
-        ? { lga: { $in: getLGAsInHouseOfRepsDistrict(user.lga) } }
-        : activeElection.election.electionType === "lga"
+        : activeElection.election?.electionType === "senatorial"
+        ? { lga: { $in: getLGAsInSenatorialDistrict(user.lga || "") } }
+        : activeElection.election?.electionType === "house-of-representatives"
+        ? { lga: { $in: getLGAsInHouseOfRepsDistrict(user.lga || "") } }
+        : activeElection.election?.electionType === "lga"
         ? { ward: user.ward }
         : {}),
     }).lean();
@@ -442,7 +454,7 @@ export const getLiveElectionService = async (electionId, userId) => {
 
       incidentReport = {
         chart: incidentChart,
-        footer: calculateFooter(incidents, groupBy, election, user),
+        footer: calculateFooter(incidents, groupBy, activeElection, user),
         aggregateAnalysis: incidentAggregateAnalysis,
         restriction,
       };
@@ -450,8 +462,8 @@ export const getLiveElectionService = async (electionId, userId) => {
 
     return {
       electionDetails: {
-        electionType: activeElection.election.electionType,
-        electionName: activeElection.election.electionName,
+        electionType: activeElection.election?.electionType,
+        electionName: activeElection.election?.electionName,
         startDate: activeElection.startDate,
         endDate: activeElection.endDate,
       },

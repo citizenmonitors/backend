@@ -30,6 +30,6 @@ const ActiveElectionSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model("activeElection", ActiveElectionSchema);
+export default mongoose.model("ActiveElection", ActiveElectionSchema);
 
 

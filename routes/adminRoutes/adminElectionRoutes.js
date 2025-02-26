@@ -1,7 +1,6 @@
 import express from "express";
 import {
   approveObserverController,
-  createEventController,
   deleteFlaggedResultController,
   deleteUserByIdController,
   deletedResultOrIncidentController,
@@ -32,9 +31,14 @@ router.get("/admin/admins", authMiddleware, isAdmin, getAllAdminController);
 router.get("/admin/dashboard", authMiddleware, isAdmin, getDashboardController);
 router.get("/admin/live-election/:electionId", authMiddleware, isAdmin, getAdminLiveElectionController
 );
-router.get("/admin/active-elections", authMiddleware, isAdmin, getAllElections);
-router.get("/admin/elections", authMiddleware, isAdmin, getAllElectionTypes);
-router.get("/admin/election-type", authMiddleware, isAdmin, getAllElectionTypes);
+// router.get("/admin/active-elections", authMiddleware, isAdmin, getAllElections);
+router.get("/admin/elections", authMiddleware, isAdmin, getAllElections);
+router.get(
+  "/admin/election-types",
+  authMiddleware,
+  isAdmin,
+  getAllElectionTypes
+);
 router.get(
   "/admin/results",
   authMiddleware,
@@ -91,18 +95,6 @@ router.get(
   authMiddleware,
   isAdmin,
   getSingleFlaggedElectionController
-);
-router.get(
-  "/admin/create-event",
-  authMiddleware,
-  isAdmin,
-  createEventController
-);
-router.get(
-  "/admin/create-event",
-  authMiddleware,
-  isAdmin,
-  createEventController
 );
 
 export default router; 

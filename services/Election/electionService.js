@@ -1115,6 +1115,8 @@ export const deleteIncidentReportDataService = async (electionId, userId) => {
 
 export const getUserElectionResultsAndReports = async (userId) => {
   try {
+
+    // const elections = await ActiveElection.find().populate("election", "electionType electionName")
     // Confirm that the user exists
     const user = await CompletedUser.findById(userId);
     if (!user) {
@@ -1123,22 +1125,56 @@ export const getUserElectionResultsAndReports = async (userId) => {
 
     // Fetch election results by user
     const electionResults = await ElectionData.find({ user: userId })
-      .populate(
-        "election",
-        "electionType electionName startDate endDate createdAt updatedAt"
-      )
+    .populate({ path: "election", select: "election startDate endDate createdAt updatedAt", populate: {
+	path: "election",
+	select: "electionType electionName"
+}})
+
       .lean();
 
     // Fetch incident reports by user
     const incidentReports = await IncidentReport.find({ user: userId })
-      .populate(
-        "election",
-        "electionType electionName startDate endDate createdAt updatedAt"
-      )
+      .populate({
+        path: "election",
+        select: "election startDate endDate createdAt updatedAt",
+        populate: {
+          path: "election",
+          select: "electionType electionName",
+        },
+      })
       .lean();
+      
 
-    // Return the results in the required format
-    return { data: { electionResults, incidentReports } };
+     const formattedElectionResults = electionResults.map((result) => ({
+       _id: result._id,
+       ...result, 
+       election: {
+       _id: result.election._id,
+       electionType: result.election?.election?.electionType,
+      electionName: result.election?.election?.electionName,
+      startDate: result.election?.startDate,
+      endDate: result.election?.endDate,
+      createdAt: result.election?.createdAt,
+      updatedAt: result.election?.updatedAt,
+     },
+    }));
+
+
+    const formattedIncidentReports = incidentReports.map((incident) => ({
+      _id: incident._id,
+      ...incident,
+      election: {
+      _id: incident.election._id,
+      electionType: incident.election?.election?.electionType,
+      electionName: incident.election?.election?.electionName,
+      startDate: incident.election?.startDate,
+      endDate: incident.election?.endDate,
+      createdAt: incident.election?.createdAt,
+      updatedAt: incident.election?.updatedAt,
+      },
+    }));
+
+    return { data: { electionResults: formattedElectionResults, incidentReports: formattedIncidentReports } };
   } catch (error) {
     console.error(
       `Error fetching election results and incident reports: ${error.message}`
@@ -1287,7 +1323,7 @@ const fetchResults = async (pollingUnit, userId) => {
     hidden: false,
   })
     .populate({
-      path: "activeElection",
+      path: "election",
      populate: {
       path: "election",
         select: "electionType electionName",
@@ -1302,7 +1338,7 @@ const fetchResults = async (pollingUnit, userId) => {
     hidden: false,
   })
     .populate({
-      path: "activeElection",
+      path: "election",
       populate: {
         path: "election",
         select: "electionType electionName",
@@ -1320,10 +1356,12 @@ const fetchResults = async (pollingUnit, userId) => {
     return {
       electionTypeId: result.election._id,
       electionId: result._id,
-      electionType: result.activeElection?.election?.electionType,
-      electionName: result.activeElection?.election?.electionName,
+      electionType: result.election?.election?.electionType,
+      electionName: result.election?.election?.electionName,
       pollingUnit: result.pollingUnit,
-      electionYear: result.activeElection ? moment(result.activeElection.election.startDate).format("YYYY") : "N/A",
+      electionYear: result.election
+        ? moment(result.election?.startDate).format("YYYY")
+        : "N/A",
       uploadedAt: result.createdAt,
       partiesVotes: result.partiesVotes,
       voteRating: result.voteRating,
@@ -1339,9 +1377,9 @@ const fetchResults = async (pollingUnit, userId) => {
       timeBegan: result.timeBegan,
       isApproved: result.isApproved,
       election: result.election,
-      electionLocation: result.activeElection?.electionLocation || "N/A",
-      startDate: result.activeElection?.startDate || null,
-      endDate: result.activeElection?.endDate || null,
+      electionLocation: result.election?.electionLocation,
+      startDate: result.election?.startDate || null,
+      endDate: result.election?.endDate || null,
     };
   });
 
@@ -1354,13 +1392,12 @@ const fetchResults = async (pollingUnit, userId) => {
     return {
       electionTypeId: report.election._id,
       electionId: report._id,
-      electionType: report.activeElection?.election?.electionType || "N/A",
-      electionName: report.activeElection?.election?.electionName || "N/A",
-      electionYear: report.activeElection
-        ? moment(report.activeElection.startDate).format("YYYY")
+      electionType: report.election?.election?.electionType,
+      electionName: report.election?.election?.electionName,
+      electionYear: report.election
+        ? moment(report.election.startDate).format("YYYY")
         : "N/A",
       pollingUnit: report.pollingUnit,
-      electionYear: moment(report.election.startDate).format("YYYY"),
       uploadedAt: report.createdAt,
       selectIncident: report.selectIncident,
       incidentNote: report.incidentNote,
@@ -1372,9 +1409,9 @@ const fetchResults = async (pollingUnit, userId) => {
       hidden: report.hidden,
       priorityLevel: report.priorityLevel,
       actions: report.actions,
-      electionLocation: report.activeElection?.electionLocation || "N/A",
-      startDate: report.activeElection?.startDate || null,
-      endDate: report.activeElection?.endDate || null,
+      electionLocation: report.election?.electionLocation,
+      startDate: report.election?.startDate || null,
+      endDate: report.election?.endDate || null,
       election: report.election,
     };
   });

@@ -192,7 +192,6 @@ export const getAllActiveElectionsService = async (userId) => {
 
 
 
-
 export const getAllElectionTypesService = async (userId) => {
   try {
     const standardizeName = (name) =>

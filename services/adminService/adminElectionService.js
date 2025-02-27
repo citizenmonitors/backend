@@ -101,7 +101,7 @@ export const getAllResultService = async () => {
             lastName: result.user.lastName || "N/A",
             email: result.user.email || "N/A",
             role: result.user.role || "N/A",
-            electionType: election.election?.electionType || "N/A",
+            election: election.election?.electionType || "N/A",
             electionName: election.election?.electionName || "N/A",
             state: result.state,
             lga: result.lga,
@@ -132,7 +132,7 @@ export const getAllResultService = async () => {
             lastName: incident.user.lastName || "N/A",
             email: incident.user.email || "N/A",
             role: incident.user.role || "N/A",
-            electionType: election.election?.electionType || "N/A",
+            election: election.election?.electionType || "N/A",
             electionName: election.election?.electionName || "N/A",
             state: incident.state,
             lga: incident.lga,
@@ -176,7 +176,7 @@ export const getResultOrIncidentByIdService = async (id) => {
       return {
         result: {
           electionDetails: {
-            electionType: activeElection?.election?.electionType || "N/A",
+            election: activeElection?.election?.electionType || "N/A",
             electionName: activeElection?.election?.electionName || "N/A",
             startDate: activeElection?.startDate || null,
             endDate: activeElection?.endDate || null,
@@ -204,7 +204,7 @@ export const getResultOrIncidentByIdService = async (id) => {
       return {
         incident: {
           electionDetails: {
-            electionType:
+            election:
               activeElectionIncident?.election?.electionType || "N/A",
             electionName:
               activeElectionIncident?.election?.electionName || "N/A",
@@ -352,7 +352,7 @@ export const getSingleFlaggedElectionService = async (id) => {
       return {
         result: {
           electionDetails: {
-            electionType: activeElectionResult?.election?.electionType || "N/A",
+            election: activeElectionResult?.election?.electionType || "N/A",
             electionName: activeElectionResult?.election?.electionName || "N/A",
             startDate: activeElectionResult?.startDate || null,
             endDate: activeElectionResult?.endDate || null,
@@ -412,7 +412,7 @@ export const getSingleFlaggedElectionService = async (id) => {
       return {
         incident: {
           electionDetails: {
-            electionType:
+            election:
               activeElectionIncident?.election?.electionType || "N/A",
             electionName:
               activeElectionIncident?.election?.electionName || "N/A",
@@ -482,7 +482,7 @@ const fetchUpdatedFlaggedResults = async () => {
         lastName: result.user?.lastName || "N/A",
         email: result.user?.email || "N/A",
         role: result.user?.role || "N/A",
-        electionType: election.election?.electionType || "Unknown",
+        election: election.election?.electionType || "Unknown",
         electionName: election.election?.electionName || "Unknown",
         state: result.state,
         lga: result.lga,
@@ -512,7 +512,7 @@ const fetchUpdatedFlaggedResults = async () => {
         lastName: incident.user?.lastName || "N/A",
         email: incident.user?.email || "N/A",
         role: incident.user?.role || "N/A",
-        electionType: election.election?.electionType || "Unknown",
+        election: election.election?.electionType || "Unknown",
         electionName: election.election?.electionName || "Unknown",
         state: incident.state,
         lga: incident.lga,

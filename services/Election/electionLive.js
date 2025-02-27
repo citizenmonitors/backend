@@ -154,8 +154,8 @@ const handleElectionResult = async (results, election, user) => {
       };
     }
   }
-  
-  
+
+
 
   console.log("No results available for this election.");
   return { message: "No results available for this election" };

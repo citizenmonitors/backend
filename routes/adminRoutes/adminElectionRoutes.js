@@ -132,7 +132,7 @@ router.patch(
   AdminController.suspendAdmin
 );
 router.get(
-  "/admin/all-admin",
+  "/admin/get-admins",
   authMiddleware,
   isSuperAdmin,
   AdminController.getAllAdmins

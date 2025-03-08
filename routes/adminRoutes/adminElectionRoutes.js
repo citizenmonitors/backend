@@ -114,19 +114,19 @@ router.get(
 );
 
 router.post(
-  "/admin/invite",
+  "/admin/invite-admin",
   authMiddleware,
   isSuperAdmin,
   AdminController.inviteAdmin
 );
 router.put(
-  "/admin/update-permissions/:adminId",
+  "/admin/update-admin/:adminId",
   authMiddleware,
   isSuperAdmin,
   AdminController.updateAdminPermissions
 );
 router.patch(
-  "/admin/suspend/:adminId",
+  "/admin/suspend-admin/:adminId",
   authMiddleware,
   isSuperAdmin,
   AdminController.suspendAdmin

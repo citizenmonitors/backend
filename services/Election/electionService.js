@@ -12,120 +12,283 @@ import moment from "moment";
 
 const BACKEND_URL = process.env.BACKEND_URL;
 
-export const createElectionService = async (data) => {
-  const { electionType, electionName } = data;
 
-  const existingElection = await Election.findOne({
-    electionType,
-    electionName,
-  });
-  if (existingElection) {
-    throw new Error("Election already exists");
-  }
-
-  const election = new Election({ electionType, electionName });
-  return await election.save();
-};
-
-export const updateElectionService = async (electionId, data) => {
-  const updatedElection = await Election.findByIdAndUpdate(electionId, data, {
-    new: true,
-  });
-  if (!updatedElection) {
-    throw new Error("Election not found");
-  }
-  return updatedElection;
-};
-
-export const activeElections = async (data) => {
-  let { electionId, electionLocation, startDate, endDate } = data;
-
-  const existingElection = await Election.findById(electionId);
-  if (!existingElection) {
-    throw new Error("Election not found");
-  }
-
-  if (
-    ["national", "house-of-representatives", "senatorial"].includes(
-      existingElection.electionType
-    )
-  ) {
-    electionLocation = null;
-  } else if (
-    ["gubernatorial", "house-of-assembly"].includes(
-      existingElection.electionType
-    )
-  ) {
-    if (!electionLocation) {
-      throw new Error("State election requires a valid state name.");
-    }
-  } else if (["LGA"].includes(existingElection.electionType)) {
-    if (!electionLocation) {
-      throw new Error("LGA election requires a valid LGA name.");
-    }
-  }
-
-  const duplicateElection = await ActiveElection.findOne({
-    electionLocation,
-    startDate,
-    endDate,
-  });
-
-  if (duplicateElection) {
-    throw new Error(
-      "An election for this location and date range already exists."
-    );
-  }
-
-  // Create new active election
-  const activeElection = new ActiveElection({
-    election: electionId,
-    electionLocation,
-    startDate,
-    endDate,
-  });
-
-  const savedElection = await activeElection.save();
-
-  const {
-    results,
-    resultsCount,
-    incidentReports,
-    politicalParties,
-    ...electionData
-  } = savedElection.toObject();
-
-  return electionData;
-};
-
-export const updateActiveElections = async (electionId, data) => {
+export const createElectionService = async (data, adminId) => {
   try {
-    const updateElection = await ActiveElection.findByIdAndUpdate(
-      electionId,
-      data,
-      {
-        new: true,
-      }
-    ).lean();
+    const { electionType, electionName } = data;
 
-    if (!updateElection) {
+    // Check if the election already exists
+    const existingElection = await Election.findOne({
+      electionType,
+      electionName,
+    });
+    if (existingElection) {
+      throw new Error("Election already exists");
+    }
+
+    // Create new election
+    const election = new Election({ electionType, electionName });
+    const savedElection = await election.save();
+
+    // Log admin action
+    await AdminLog.create({
+      admin: adminId,
+      action: `Created new election: ${electionName} (${electionType})`,
+      timestamp: new Date(),
+    });
+
+    return {
+      message: "Election created successfully",
+      election: savedElection,
+    };
+  } catch (error) {
+    throw new Error(`Error creating election: ${error.message}`);
+  }
+};
+
+
+export const updateElectionService = async (electionId, data, adminId) => {
+  try {
+    // Update election
+    const updatedElection = await Election.findByIdAndUpdate(electionId, data, {
+      new: true,
+    });
+    if (!updatedElection) {
       throw new Error("Election not found");
     }
 
-    // Remove unnecessary fields before returning
-    const {
-      results,
-      resultsCount,
-      incidentReports,
-      politicalParties,
-      ...electionData
-    } = updateElection;
+    // Log admin action
+    await AdminLog.create({
+      admin: adminId,
+      action: `Updated election: ${updatedElection.electionName} (${updatedElection.electionType})`,
+      timestamp: new Date(),
+    });
 
-    return electionData;
+    return { message: "Election updated successfully", updatedElection };
+  } catch (error) {
+    throw new Error(`Error updating election: ${error.message}`);
+  }
+};
+
+
+// export const activeElections = async (data, adminId) => {
+//   let { electionId, electionLocation, startDate, endDate } = data;
+
+//   const existingElection = await Election.findById(electionId);
+//   if (!existingElection) {
+//     throw new Error("Election not found");
+//   }
+
+//   if (
+//     ["national", "house-of-representatives", "senatorial"].includes(
+//       existingElection.electionType
+//     )
+//   ) {
+//     electionLocation = null;
+//   } else if (
+//     ["gubernatorial", "house-of-assembly"].includes(
+//       existingElection.electionType
+//     )
+//   ) {
+//     if (!electionLocation) {
+//       throw new Error("State election requires a valid state name.");
+//     }
+//   } else if (["LGA"].includes(existingElection.electionType)) {
+//     if (!electionLocation) {
+//       throw new Error("LGA election requires a valid LGA name.");
+//     }
+//   }
+
+//   const duplicateElection = await ActiveElection.findOne({
+//     electionLocation,
+//     startDate,
+//     endDate,
+//   });
+
+//   if (duplicateElection) {
+//     throw new Error(
+//       "An election for this location and date range already exists."
+//     );
+//   }
+
+//   // Create new active election
+//   const activeElection = new ActiveElection({
+//     election: electionId,
+//     electionLocation,
+//     startDate,
+//     endDate,
+//   });
+
+//   const savedElection = await activeElection.save();
+
+//   const {
+//     results,
+//     resultsCount,
+//     incidentReports,
+//     politicalParties,
+//     ...electionData
+//   } = savedElection.toObject();
+
+//   return electionData;
+// };
+
+export const activeElections = async (data, adminId) => {
+  let { electionId, electionLocation, startDate, endDate } = data;
+
+  try {
+    const existingElection = await Election.findById(electionId);
+    if (!existingElection) {
+      throw new Error("Election not found");
+    }
+
+    // Validate election location
+    if (
+      ["national", "house-of-representatives", "senatorial"].includes(
+        existingElection.electionType
+      )
+    ) {
+      electionLocation = null;
+    } else if (
+      ["gubernatorial", "house-of-assembly"].includes(
+        existingElection.electionType
+      )
+    ) {
+      if (!electionLocation) {
+        throw new Error("State election requires a valid state name.");
+      }
+    } else if (["lga"].includes(existingElection.electionType)) {
+      if (!electionLocation) {
+        throw new Error("LGA election requires a valid LGA name.");
+      }
+    }
+
+    // Prevent duplicate elections
+    const duplicateElection = await ActiveElection.findOne({
+      electionLocation,
+      startDate,
+      endDate,
+    });
+
+    if (duplicateElection) {
+      throw new Error(
+        "An election for this location and date range already exists."
+      );
+    }
+
+    // Create new active election
+    const activeElection = new ActiveElection({
+      election: electionId,
+      electionLocation,
+      startDate,
+      endDate,
+    });
+
+    const savedElection = await activeElection.save();
+
+    // Log admin action
+    await AdminLog.create({
+      admin: adminId,
+      action: " Created Activate election",
+      timestamp: new Date(),
+    });
+
+    return {
+      message: "Election activated successfully",
+      activeElection: savedElection,
+    };
+  } catch (error) {
+    throw new Error(`Error activating election: ${error.message}`);
+  }
+};
+
+// export const updateActiveElections = async (electionId, data) => {
+//   try {
+//     const updateElection = await ActiveElection.findByIdAndUpdate(
+//       electionId,
+//       data,
+//       {
+//         new: true,
+//       }
+//     ).lean();
+
+//     if (!updateElection) {
+//       throw new Error("Election not found");
+//     }
+
+//     // Remove unnecessary fields before returning
+//     const {
+//       results,
+//       resultsCount,
+//       incidentReports,
+//       politicalParties,
+//       ...electionData
+//     } = updateElection;
+
+//     return electionData;
+//   } catch (error) {
+//     throw new Error(`Failed to update election: ${error.message}`);
+//   }
+// };
+
+export const updateActiveElections = async (electionId, data, adminId) => {
+  try {
+    const updatedElection = await ActiveElection.findByIdAndUpdate(
+      electionId,
+      data,
+      { new: true }
+    ).lean();
+
+    if (!updatedElection) {
+      throw new Error("Election not found");
+    }
+
+    // Log admin action
+    await AdminLog.create({
+      admin: adminId,
+      action: "Updated active election",
+      timestamp: new Date(),
+    });
+
+
+    return { message: "Election updated successfully", updatedElection };
   } catch (error) {
     throw new Error(`Failed to update election: ${error.message}`);
   }
 };
+
+export const deleteElectionService = async (electionId, adminId) => {
+  const election = await Election.findByIdAndDelete(electionId);
+  if (!election) throw new Error("Election not found");
+
+  // Log admin action
+ await AdminLog.create({
+   admin: adminId,
+   action: "Deleted election",
+   timestamp: new Date(),
+ });
+
+  return { message: "Election deleted successfully" };
+};
+
+export const deleteActiveElectionService = async (
+  activeElectionId,
+  adminId
+) => {
+  const activeElection = await ActiveElection.findByIdAndDelete(
+    activeElectionId
+  );
+  if (!activeElection) throw new Error("Active election not found");
+
+  // Log admin action
+ await AdminLog.create({
+   admin: adminId,
+   action: "Deleted active election",
+   timestamp: new Date(),
+ });
+
+  return { message: "Active election deleted successfully" };
+};
+
 
 export const getAllActiveElectionsService = async (userId) => {
   const standardizeName = (name) =>

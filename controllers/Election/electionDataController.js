@@ -19,27 +19,34 @@ import {
   activeElections,
   updateActiveElections,
   getAllElectionTypesService,
+  deleteElectionService,
+  deleteActiveElectionService,
 } from "../../services/Election/electionService.js";
 
 export const createElection = async (req, res) => {
   try {
-    const election = await createElectionService(req.body);
+    const adminId = req.user._id;
+    const election = await createElectionService({ ...req.body, adminId });
     res.status(201).json(election);
   } catch (error) {
-   if (error.statusCode) {
-     res.status(error.statusCode).json({ message: error.message });
-   } else {
-     res
-       .status(500)
-       .json({ message: "Error creating election", error: error.message });
-   }
+    if (error.statusCode) {
+      res.status(error.statusCode).json({ message: error.message });
+    } else {
+      res
+        .status(500)
+        .json({ message: "Error creating election", error: error.message });
+    }
   }
 };
 
 export const updateElection = async (req, res) => {
   try {
     const { electionId } = req.params;
-    const updatedElection = await updateElectionService(electionId, req.body);
+    const adminId = req.user._id;
+    const updatedElection = await updateElectionService(electionId, {
+      ...req.body,
+      adminId,
+    });
     res.status(200).json(updatedElection);
   } catch (error) {
     res
@@ -50,7 +57,8 @@ export const updateElection = async (req, res) => {
 
 export const createActiveElectionsCon = async (req, res) => {
   try {
-    const activeElection = await activeElections(req.body);
+    const adminId = req.user._id;
+    const activeElection = await activeElections({ ...req.body, adminId });
     res.status(201).json(activeElection);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -59,14 +67,50 @@ export const createActiveElectionsCon = async (req, res) => {
 
 export const updateActiveElectionCon = async (req, res) => {
   try {
-    
     const { electionId } = req.params;
-    const updatedElection = await updateActiveElections(electionId, req.body);
+    const adminId = req.user._id;
+    const updatedElection = await updateActiveElections(electionId, {
+      ...req.body,
+      adminId,
+    });
     res.status(200).json(updatedElection);
   } catch (error) {
-    res.status(500).json({ message:"Error updating election", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error updating election", error: error.message });
   }
-}
+};
+
+export const deleteElection = async (req, res) => {
+  try {
+    const { electionId } = req.params;
+    const adminId = req.user._id;
+
+    const result = await deleteElectionService(electionId, adminId);
+    res.status(200).json(result);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error deleting election", error: error.message });
+  }
+};
+
+export const deleteActiveElection = async (req, res) => {
+  try {
+    const { activeElectionId } = req.params;
+    const adminId = req.user._id;
+
+    const result = await deleteActiveElectionService(activeElectionId, adminId);
+    res.status(200).json(result);
+  } catch (error) {
+    res
+      .status(500)
+      .json({
+        message: "Error deleting active election",
+        error: error.message,
+      });
+  }
+};
 
 export const getAllActiveElections = async (req, res) => {
   try {
@@ -75,7 +119,7 @@ export const getAllActiveElections = async (req, res) => {
 
     const elections = await getAllActiveElectionsService(userId);
 
-    res.status(200).json(elections );
+    res.status(200).json(elections);
   } catch (error) {
     console.error("Error fetching elections:", error);
     res
@@ -90,7 +134,7 @@ export const getAllElectionTypes = async (req, res) => {
 
     const elections = await getAllElectionTypesService(userId);
 
-    res.status(200).json(elections );
+    res.status(200).json(elections);
   } catch (error) {
     console.error("Error fetching elections:", error);
     res
@@ -98,7 +142,6 @@ export const getAllElectionTypes = async (req, res) => {
       .json({ message: "Error fetching elections", error: error.message });
   }
 };
-
 
 export const getElectionResultByIdCont = async (req, res) => {
   try {
@@ -125,10 +168,12 @@ export const getElectionByIdCont = async (req, res) => {
 export const getLiveElectionByIdCont = async (req, res) => {
   try {
     const { electionId } = req.params;
-    const election = await getLiveElectionById(electionId,);
+    const election = await getLiveElectionById(electionId);
     res.status(200).json(election);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching live election details", error });
+    res
+      .status(500)
+      .json({ message: "Error fetching live election details", error });
   }
 };
 
@@ -155,37 +200,35 @@ export const uploadResultData = async (req, res) => {
   }
 };
 
-
 export const updateResultData = async (req, res) => {
- try {
-   const { electionId } = req.params;
-   const userId = req.user._id;
-   const updatedResultData = await updateResultDataService(
-     electionId,
-     userId,
-     req.body,
-     req.files
-   );
-   res.status(200).json(updatedResultData);
- } catch (error) {
-   res
-     .status(500)
-     .json({ message: "Error updating result data", error: error.message });
- }
+  try {
+    const { electionId } = req.params;
+    const userId = req.user._id;
+    const updatedResultData = await updateResultDataService(
+      electionId,
+      userId,
+      req.body,
+      req.files
+    );
+    res.status(200).json(updatedResultData);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error updating result data", error: error.message });
+  }
 };
 
 export const getAllElectionResultsController = async (req, res) => {
-   try {
-     const allResults = await getAllElectionResults();
-     res.status(200).json(allResults);
-   } catch (error) {
-     res.status(500).json({
-       message: "Error fetching all election results",
-       error: error.message,
-     });
-   }
+  try {
+    const allResults = await getAllElectionResults();
+    res.status(200).json(allResults);
+  } catch (error) {
+    res.status(500).json({
+      message: "Error fetching all election results",
+      error: error.message,
+    });
+  }
 };
-
 
 export const uploadIncidentReportData = async (req, res) => {
   // console.log("Body received:", req.body);
@@ -232,7 +275,6 @@ export const updateIncidentReportData = async (req, res) => {
   }
 };
 
-
 export const getUserElectionDataController = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -246,7 +288,7 @@ export const getUserElectionDataController = async (req, res) => {
 export const deleteElectionResultData = async (req, res) => {
   try {
     const { electionId } = req.params;
-    const userId = req.user._id; 
+    const userId = req.user._id;
 
     const response = await deleteElectionResultDataService(electionId, userId);
     res.status(200).json(response);
@@ -257,7 +299,6 @@ export const deleteElectionResultData = async (req, res) => {
   }
 };
 
-
 export const deleteIncidentReportData = async (req, res) => {
   try {
     const { electionId } = req.params;
@@ -265,12 +306,10 @@ export const deleteIncidentReportData = async (req, res) => {
     const response = await deleteIncidentReportDataService(electionId, userId);
     res.status(200).json(response);
   } catch (error) {
-    res
-      .status(400)
-      .json({
-        message: "Error deleting incident report data",
-        error: error.message,
-      });
+    res.status(400).json({
+      message: "Error deleting incident report data",
+      error: error.message,
+    });
   }
 };
 
@@ -322,7 +361,6 @@ export const getResultsAndPerformActionController = async (req, res) => {
   }
 };
 
-
 export const checkUserStatusForFlagController = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -352,6 +390,3 @@ export const checkUserStatusForFlagController = async (req, res) => {
     });
   }
 };
-
-
-

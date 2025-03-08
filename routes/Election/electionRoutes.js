@@ -20,8 +20,15 @@ import {
   createActiveElectionsCon,
   updateActiveElectionCon,
   getAllElectionTypes,
+  deleteElection,
+  deleteActiveElection,
 } from "../../controllers/Election/electionDataController.js";
-import { authMiddleware } from "../../middleware/authMiddleware.js";
+import {
+  authMiddleware,
+  isAdmin,
+  isSuperAdmin,
+  isAuthorized,
+} from "../../middleware/authMiddleware.js";
 import {
   uploadResultDataFiles,
   uploadReportDataFiles,
@@ -52,10 +59,44 @@ router.get(
 );
 router.get("/election/:electionId", authMiddleware, getElectionByIdCont);
 router.get("/live-election/:electionId", authMiddleware, getLiveElectionByIdCont);
-router.post("/election", authMiddleware, createElection);
-router.put("/election/:electionId", authMiddleware, updateElection);
-router.post("/active-elections", authMiddleware, createActiveElectionsCon);
-router.put("/active-elections/:electionId", authMiddleware, updateActiveElectionCon);
+router.post(
+  "/election",
+  authMiddleware,
+  isAuthorized("createElection"),
+  createElection
+);
+router.put(
+  "/election/:electionId",
+  authMiddleware,
+  isAuthorized("updateElection"),
+  updateElection
+);
+router.post(
+  "/active-elections",
+  authMiddleware,
+  isAuthorized("createActiveElection"),
+  createActiveElectionsCon
+);
+router.put(
+  "/active-elections/:electionId",
+  authMiddleware,
+  isAuthorized("updateActiveElection"),
+  updateActiveElectionCon
+);
+
+router.delete(
+  "/election/:electionId",
+  authMiddleware,
+  isAuthorized("deleteElection"),
+  deleteElection
+);
+router.delete(
+  "/active-election/:activeElectionId",
+  authMiddleware,
+  isAuthorized("deleteActiveElection"),
+  deleteActiveElection
+);
+
 
 router.delete(
   "/election/:electionId/results",

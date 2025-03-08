@@ -4,7 +4,10 @@ import { profileImageSchema } from "./UserProfileImage/ProfileImageModel.js";
 
 const completedUserSchema = new mongoose.Schema(
   {
-    role: { type: String, enum: ["observer", "volunteer", "admin"] },
+    role: {
+      type: String,
+      enum: ["observer", "volunteer", "admin", "super-admin"],
+    },
     email: { type: String, required: true, unique: true },
     pendingEmail: String,
     firstName: String,
@@ -37,6 +40,10 @@ const completedUserSchema = new mongoose.Schema(
     resetPasswordExpires: Date,
     password: { type: String, required: true },
     hasSubmittedRoleForm: { type: Boolean, default: false },
+    adminPermissions: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "AdminPermissions",
+    },
   },
   {
     timestamps: true,
@@ -44,5 +51,3 @@ const completedUserSchema = new mongoose.Schema(
 );
 
 export default mongoose.model("CompletedUser", completedUserSchema);
-
-

@@ -100,20 +100,20 @@ export const getResultOrIncidentByController = async (req, res) => {
 
 // Delete result or incident
 export const deletedResultOrIncidentController = async (req, res) => {
-  try {
+ try {
+   const { id } = req.params;
+   const adminId = req.user._id;
 
-    const { id } = req.params;
-
-    // check admin role
-    if(req.user.role !== 'admin') {
-      return res.status(403).json({message: "Access denied"});
-    }
-
-    const message = await deleteResultOrIncidentService(id);
-    res.status(200).json({message})
-  } catch (error) {
-    res.status(500).json({message: error.message})
-  }
+   const result = await deleteResultOrIncidentService(id, adminId);
+   res.status(200).json(result);
+ } catch (error) {
+   res
+     .status(500)
+     .json({
+       message: "Error deleting result or incident",
+       error: error.message,
+     });
+ }
 }
 
 export const getAllUsersController = async (req, res) => {
@@ -205,25 +205,34 @@ export const getFlaggedResultsCon = async (req, res) => {
 }
 
 export const deleteFlaggedResultController = async (req, res) => {
-  try {
-    const { id } = req.params;
+try {
+  const { id } = req.params;
+  const adminId = req.user._id;
 
-    const results = await deleteFlaggedResults(id);
-    res.status(200).json(results);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+  const result = await deleteFlaggedResults(id, adminId);
+  res.status(200).json(result);
+} catch (error) {
+  res
+    .status(500)
+    .json({ message: "Error deleting flagged result", error: error.message });
+}
 };
 
 
 export const restoreFlaggedResultController = async (req, res) => {
   try {
     const { id } = req.params;
+    const adminId = req.user._id;
 
-    const results = await restoreFlaggedResult(id);
-    res.status(200).json(results );
+    const result = await restoreFlaggedResult(id, adminId);
+    res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res
+      .status(500)
+      .json({
+        message: "Error restoring flagged result",
+        error: error.message,
+      });
   }
 };
 

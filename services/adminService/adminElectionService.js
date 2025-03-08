@@ -224,21 +224,37 @@ export const getResultOrIncidentByIdService = async (id) => {
 
 
 // Delete result or incident
-export const deleteResultOrIncidentService = async (id) => {
 
-    try {
-        const result = await ElectionData.findByIdAndDelete(id);
-        if(result) return "Result deleted successfully";
+export const deleteResultOrIncidentService = async (id, adminId) => {
+  try {
+    let deletedType = "";
 
-        const incident = await IncidentReport.findByIdAndDelete(id);
-        if(incident) return "Incident deleted successfully";
-
-        throw new Error('No result or incident found with the given id');
-    } catch (error) {
-        throw new Error('Error deleting result and incident: ${error.message}');
+    const result = await ElectionData.findByIdAndDelete(id);
+    if (result) {
+      deletedType = "Election Result";
+    } else {
+      const incident = await IncidentReport.findByIdAndDelete(id);
+      if (incident) {
+        deletedType = "Incident Report";
+      }
     }
-};
 
+    if (!deletedType) {
+      throw new Error("No result or incident found with the given ID");
+    }
+
+    // Log admin action
+    await AdminLog.create({
+      admin: adminId,
+      action: `Deleted ${deletedType}`,
+      timestamp: new Date(),
+    });
+
+    return { message: `${deletedType} deleted successfully` };
+  } catch (error) {
+    throw new Error(`Error deleting result or incident: ${error.message}`);
+  }
+};
 
 export const getFlaggedResultsService = async () => {
   
@@ -252,9 +268,11 @@ export const getFlaggedResultsService = async () => {
   
 };
 
-export const deleteFlaggedResults = async (id) => {
+
+export const deleteFlaggedResults = async (id, adminId) => {
   try {
-    // Check if the result or incident is flagged before deleting
+    let deletedType = "";
+
     const result = await ElectionData.findOne({ _id: id, flagged: true });
     const incident = await IncidentReport.findOne({ _id: id, flagged: true });
 
@@ -262,24 +280,36 @@ export const deleteFlaggedResults = async (id) => {
       throw new Error("No flagged result found for deletion");
     }
 
-    if (result) await ElectionData.findByIdAndDelete(id);
-    if (incident) await IncidentReport.findByIdAndDelete(id);
+    if (result) {
+      await ElectionData.findByIdAndDelete(id);
+      deletedType = "Flagged Election Result";
+    }
+    if (incident) {
+      await IncidentReport.findByIdAndDelete(id);
+      deletedType = "Flagged Incident Report";
+    }
 
-const results = await fetchUpdatedFlaggedResults();
+    const results = await fetchUpdatedFlaggedResults();
 
 
-    return {
-      message: "Flagged result deleted successfully",
-      results,
-    };
+    // Log admin action
+    await AdminLog.create({
+      admin: adminId,
+      action: `Deleted ${deletedType}`,
+      timestamp: new Date(),
+    });
+
+    return { message: `${deletedType} deleted successfully`, results };
   } catch (error) {
     throw new Error(`Error deleting flagged result: ${error.message}`);
   }
 };
 
-export const restoreFlaggedResult = async (id) => {
+
+export const restoreFlaggedResult = async (id, adminId) => {
   try {
     let updated = false;
+    let restoredType = "";
 
     const result = await ElectionData.findById(id);
     if (result) {
@@ -289,6 +319,7 @@ export const restoreFlaggedResult = async (id) => {
       result.priorityLevel = 0;
       await result.save();
       updated = true;
+      restoredType = "Election Result";
     }
 
     const incident = await IncidentReport.findById(id);
@@ -299,18 +330,27 @@ export const restoreFlaggedResult = async (id) => {
       incident.priorityLevel = 0;
       await incident.save();
       updated = true;
+      restoredType = "Incident Report";
     }
 
     if (!updated) {
       throw new Error("No flagged result or incident found.");
     }
 
-const results = await fetchUpdatedFlaggedResults();
+    const results = await fetchUpdatedFlaggedResults();
 
-    return {
-      message: "Result restored successfully",
-      results,
-    };
+    // Log the restoration
+    await logAdminAction(adminId, `Restored flagged ${restoredType}`, {
+      flaggedId: id,
+    });
+
+    await AdminLog.create({
+      admin: adminId,
+      action: `Restored flagged ${restoredType}`,
+      timestamp: new Date(),
+    });
+
+    return { message: `${restoredType} restored successfully`, results };
   } catch (error) {
     throw new Error(`Error restoring flagged result: ${error.message}`);
   }

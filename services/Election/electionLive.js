@@ -3,11 +3,10 @@ import Election from "../../models/Election/Election.js";
 import ElectionData from "../../models/Election/ElectionData.js";
 import Notification from "../../models/DailyTraffic/Notification.js";
 import IncidentReport from "../../models/Election/IncidentReport.js";
-import lgaData from "../../data/lgaData.json" assert { type: "json" };
-import AllState from "../../state-data/state.json" assert { type: "json" };
-import AllLga from "../../state-data/lga.json" assert { type: "json" };
-import AllWard from "../../state-data/wards.json" assert { type: "json" };
-import moment from "moment";
+import lgaData from "../../data/lgaData.json" with { type: "json" };
+import AllState from "../../state-data/state.json" with { type: "json" };
+import AllLga from "../../state-data/lga.json" with { type: "json" };
+import AllWard from "../../state-data/wards.json" with { type: "json" };
 import ActiveElection from "../../models/Election/ActiveElection.js";
 
 // Service to get all ongoing election results

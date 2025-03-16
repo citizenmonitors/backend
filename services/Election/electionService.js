@@ -9,6 +9,7 @@ import Notification from "../../models/DailyTraffic/Notification.js";
 import File from "../../models/file.js";
 import path from "path";
 import moment from "moment";
+import AdminLog from "../../models/admin/AdminLog.js";
 
 const BACKEND_URL = process.env.BACKEND_URL;
 
@@ -70,67 +71,6 @@ export const updateElectionService = async (electionId, data, adminId) => {
   }
 };
 
-
-// export const activeElections = async (data, adminId) => {
-//   let { electionId, electionLocation, startDate, endDate } = data;
-
-//   const existingElection = await Election.findById(electionId);
-//   if (!existingElection) {
-//     throw new Error("Election not found");
-//   }
-
-//   if (
-//     ["national", "house-of-representatives", "senatorial"].includes(
-//       existingElection.electionType
-//     )
-//   ) {
-//     electionLocation = null;
-//   } else if (
-//     ["gubernatorial", "house-of-assembly"].includes(
-//       existingElection.electionType
-//     )
-//   ) {
-//     if (!electionLocation) {
-//       throw new Error("State election requires a valid state name.");
-//     }
-//   } else if (["LGA"].includes(existingElection.electionType)) {
-//     if (!electionLocation) {
-//       throw new Error("LGA election requires a valid LGA name.");
-//     }
-//   }
-
-//   const duplicateElection = await ActiveElection.findOne({
-//     electionLocation,
-//     startDate,
-//     endDate,
-//   });
-
-//   if (duplicateElection) {
-//     throw new Error(
-//       "An election for this location and date range already exists."
-//     );
-//   }
-
-//   // Create new active election
-//   const activeElection = new ActiveElection({
-//     election: electionId,
-//     electionLocation,
-//     startDate,
-//     endDate,
-//   });
-
-//   const savedElection = await activeElection.save();
-
-//   const {
-//     results,
-//     resultsCount,
-//     incidentReports,
-//     politicalParties,
-//     ...electionData
-//   } = savedElection.toObject();
-
-//   return electionData;
-// };
 
 export const activeElections = async (data, adminId) => {
   let { electionId, electionLocation, startDate, endDate } = data;
@@ -200,35 +140,6 @@ export const activeElections = async (data, adminId) => {
     throw new Error(`Error activating election: ${error.message}`);
   }
 };
-
-// export const updateActiveElections = async (electionId, data) => {
-//   try {
-//     const updateElection = await ActiveElection.findByIdAndUpdate(
-//       electionId,
-//       data,
-//       {
-//         new: true,
-//       }
-//     ).lean();
-
-//     if (!updateElection) {
-//       throw new Error("Election not found");
-//     }
-
-//     // Remove unnecessary fields before returning
-//     const {
-//       results,
-//       resultsCount,
-//       incidentReports,
-//       politicalParties,
-//       ...electionData
-//     } = updateElection;
-
-//     return electionData;
-//   } catch (error) {
-//     throw new Error(`Failed to update election: ${error.message}`);
-//   }
-// };
 
 export const updateActiveElections = async (electionId, data, adminId) => {
   try {

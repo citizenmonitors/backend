@@ -1043,7 +1043,7 @@ export const getAllAdminsService = async () => {
   const admins = await CompletedUser.find({
     role: { $in: ["admin", "super-admin"] },
   })
-    .select("firstName lastName email profileImage ")
+    .select("firstName lastName email role profileImage")
     .lean();
 
   const { totalLogs, logs, statsPercentage } = await processAdminLogs();
@@ -1085,42 +1085,25 @@ export const getAdminLogsService = async (adminId) => {
     );
 };
 
-const processAdminLogs = async () => {
-  const today = moment().startOf("day");
 
-  // ✅ 1. Get Total Logs (All Time)
-  const totalLogs = await AdminLog.countDocuments(); // ✅ Counts all logs in the DB
+// Get admin permission
+export const getSingleAdminService = async (adminId) => {
+  try {
+    const admin = await CompletedUser.findById(adminId)
+      .select("firstName lastName email role")
+      .populate("adminPermissions") 
+      .lean();
 
-  // ✅ 2. Get Logs for the Last 30 Days
-  const logs = await AdminLog.find({
-    createdAt: { $gte: today.clone().subtract(30, "days").toDate() },
-  })
-    .sort({ createdAt: 1 })
-    .lean();
+    if (!admin || !["admin", "super-admin"].includes(admin.role)) {
+      throw new Error("Admin not found or user is not an admin");
+    }
 
-  // ✅ 3. Create 3-day intervals (e.g., 3 days, 6 days, 9 days, ...)
-  const intervals = Array.from({ length: 10 }, (_, idx) => ({
-    start: today.clone().subtract((idx + 1) * 3, "days"),
-    end: today.clone().subtract(idx * 3, "days"),
-  })).reverse(); // Keep in chronological order
-
-  // ✅ 4. Group logs into the 3-day intervals
-  const groupedLogs = intervals.map(({ start, end }) => {
-    return logs.filter((log) =>
-      moment(log.createdAt).isBetween(start, end, null, "[)")
-    ).length;
-  });
-
-  // ✅ 5. Compute Stats Percentage
-  const lastPeriodLogs = groupedLogs[groupedLogs.length - 1] || 0;
-  const statsPercentage = totalLogs
-    ? `${((lastPeriodLogs / totalLogs) * 100).toFixed(2)}%`
-    : "0%";
-
-  return { totalLogs, logs: groupedLogs, statsPercentage };
+    return admin;
+  } catch (error) {
+    throw new Error(`Error fetching admin details: ${error.message}`);
+  }
 };
 
-export default processAdminLogs;
 
 export const logAdminAction = async (adminId, action) => {
   try {
@@ -1133,3 +1116,42 @@ export const logAdminAction = async (adminId, action) => {
     console.error("Failed to log admin action:", error.message);
   }
 };
+
+const processAdminLogs = async () => {
+  const today = moment().startOf("day");
+
+  //  Get Total Logs (All Time)
+  const totalLogs = await AdminLog.countDocuments(); //  Counts all logs in the DB
+
+  //  Get Logs for the Last 30 Days
+  const logs = await AdminLog.find({
+    createdAt: { $gte: today.clone().subtract(30, "days").toDate() },
+  })
+    .sort({ createdAt: 1 })
+    .lean();
+
+  // Create 3-day intervals (e.g., 3 days, 6 days, 9 days, ...)
+  const intervals = Array.from({ length: 10 }, (_, idx) => ({
+    start: today.clone().subtract((idx + 1) * 3, "days"),
+    end: today.clone().subtract(idx * 3, "days"),
+  })).reverse(); // Keep in chronological order
+
+  //  Group logs into the 3-day intervals
+  const groupedLogs = intervals.map(({ start, end }) => {
+    return logs.filter((log) =>
+      moment(log.createdAt).isBetween(start, end, null, "[)")
+    ).length;
+  });
+
+  // Compute Stats Percentage
+  const lastPeriodLogs = groupedLogs[groupedLogs.length - 1] || 0;
+  const statsPercentage = totalLogs
+    ? `${((lastPeriodLogs / totalLogs) * 100).toFixed(2)}%`
+    : "0%";
+
+  return { totalLogs, logs: groupedLogs, statsPercentage };
+};
+
+export default processAdminLogs;
+
+

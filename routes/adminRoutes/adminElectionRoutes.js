@@ -149,5 +149,11 @@ router.get(
   isSuperAdmin,
   AdminController.getAccessControl
 );
+router.get(
+  "/admin/single-admin/:adminId",
+  authMiddleware,
+  isAdmin,
+  AdminController.getSingleAdmin
+);
 
 export default router;

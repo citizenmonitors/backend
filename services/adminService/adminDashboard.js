@@ -1087,22 +1087,43 @@ export const getAdminLogsService = async (adminId) => {
 
 
 // Get admin permission
-export const getSingleAdminService = async (adminId) => {
+export const getSingleAdminService = async (adminId, { role, permissions }) => {
   try {
     const admin = await CompletedUser.findById(adminId)
-      .select("firstName lastName email role")
-      .populate("adminPermissions") 
+      .populate("adminPermissions")
       .lean();
 
     if (!admin || !["admin", "super-admin"].includes(admin.role)) {
       throw new Error("Admin not found or user is not an admin");
     }
 
-    return admin;
+    // Validate role if provided in the request
+    if (role) {
+      if (!["admin", "super-admin"].includes(role)) {
+        throw new Error("Invalid role. Role must be 'admin' or 'super-admin'");
+      }
+      admin.role = role;
+    }
+
+    // Return requested permissions if provided, otherwise return stored permissions
+    const adminPermissions =
+      permissions && Object.keys(permissions).length > 0
+        ? permissions
+        : admin.adminPermissions || {};
+
+    return {
+      _id: admin._id,
+      firstName: admin.firstName,
+      lastName: admin.lastName,
+      email: admin.email,
+      role: admin.role,
+      permissions: adminPermissions,
+    };
   } catch (error) {
     throw new Error(`Error fetching admin details: ${error.message}`);
   }
 };
+
 
 
 export const logAdminAction = async (adminId, action) => {

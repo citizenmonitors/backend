@@ -119,11 +119,14 @@ export const getAdminLogs = async (req, res) => {
 export const getSingleAdmin = async (req, res) => {
   try {
     const { adminId } = req.params;
-    const admin = await AdminService.getSingleAdminService(adminId);
+    const { role, permissions } = req.body; 
+    const admin = await AdminService.getSingleAdminService(adminId, { role, permissions });
+
     res.json(admin);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error fetching admin details", error: error.message });
+    res.status(500).json({
+      message: "Error fetching admin details",
+      error: error.message,
+    });
   }
 };

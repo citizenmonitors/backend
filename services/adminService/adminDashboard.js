@@ -95,10 +95,10 @@ export const getDashboardData = async () => {
   ]);
 
   // Admins
-  const admins = await CompletedUser.find({ role: "admin" })
+  const admins = await CompletedUser.find({ role: { $in: ["admin", "super-admin"]} })
     .sort({ createdAt: -1 })
     .limit(10)
-    .select("email firstName lastName profileImage");
+    .select("email firstName lastName role profileImage");
 
   // Daily Traffic
   const dailyTrafficToday = await Traffic.findOne({ date: today.toDate() });
@@ -1142,36 +1142,39 @@ const processAdminLogs = async () => {
   const today = moment().startOf("day");
 
   //  Get Total Logs (All Time)
-  const totalLogs = await AdminLog.countDocuments(); //  Counts all logs in the DB
+  const totalLogs = await AdminLog.countDocuments();
 
-  //  Get Logs for the Last 30 Days
+  //  Get Logs for the Last 10 Days
   const logs = await AdminLog.find({
-    createdAt: { $gte: today.clone().subtract(30, "days").toDate() },
+    timestamp: { $gte: today.clone().subtract(10, "days").toDate() },
   })
-    .sort({ createdAt: 1 })
+    .sort({ timestamp: 1 })
     .lean();
 
-  // Create 3-day intervals (e.g., 3 days, 6 days, 9 days, ...)
-  const intervals = Array.from({ length: 10 }, (_, idx) => ({
-    start: today.clone().subtract((idx + 1) * 3, "days"),
-    end: today.clone().subtract(idx * 3, "days"),
-  })).reverse(); // Keep in chronological order
 
-  //  Group logs into the 3-day intervals
+  // Create 1-day intervals (Last 10 days)
+  const intervals = Array.from({ length: 10 }, (_, idx) => ({
+    start: today.clone().subtract(idx, "days").startOf("day"),
+    end: today.clone().subtract(idx, "days").endOf("day"),
+  })).reverse(); 
+
+  //  Group logs into the 1-day intervals
   const groupedLogs = intervals.map(({ start, end }) => {
     return logs.filter((log) =>
-      moment(log.createdAt).isBetween(start, end, null, "[)")
+      moment(log.timestamp).isBetween(start, end, null, "[]") 
     ).length;
   });
 
-  // Compute Stats Percentage
-  const lastPeriodLogs = groupedLogs[groupedLogs.length - 1] || 0;
+
+  // Compute Stats Percentage using the last 3 days instead of 1 day
+  const lastPeriodLogs = groupedLogs.slice(-3).reduce((sum, val) => sum + val, 0);
   const statsPercentage = totalLogs
     ? `${((lastPeriodLogs / totalLogs) * 100).toFixed(2)}%`
     : "0%";
 
   return { totalLogs, logs: groupedLogs, statsPercentage };
 };
+
 
 export default processAdminLogs;
 

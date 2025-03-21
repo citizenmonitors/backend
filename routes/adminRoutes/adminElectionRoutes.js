@@ -39,7 +39,7 @@ router.get(
   isAdmin,
   getAdminLiveElectionController
 );
-// router.get("/admin/active-elections", authMiddleware, isAdmin, getAllElections);
+
 router.get("/admin/elections", authMiddleware, isAdmin, getAllElections);
 router.get(
   "/admin/election-types",

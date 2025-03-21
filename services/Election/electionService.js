@@ -218,6 +218,27 @@ export const getAllActiveElectionsService = async (userId) => {
     .populate("results incidentReports")
     .lean();
 
+      // If user is admin or super-admin, return all active elections
+  if (["admin", "super-admin"].includes(user.role)) {
+    return {
+      elections: activeElections.map(
+        ({ election, results, incidentReports, ...electionData }) => ({
+          electionType: election.electionType,
+          electionName: election.electionName,
+          ...electionData,
+          results:
+            results
+              ?.filter(({ user }) => user.toString() === userId.toString())
+              .map(({ _id }) => _id) || [],
+          incidentReports:
+            incidentReports
+              ?.filter(({ user }) => user.toString() === userId.toString())
+              .map(({ _id }) => _id) || [],
+        })
+      ),
+    };
+  }
+
   const relevantElections = activeElections.filter(
     ({ election, electionLocation }) => {
       if (!election) return false;

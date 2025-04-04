@@ -13,6 +13,7 @@ import locationRoutes from "./routes/Location/locationRoutes.js";
 import bankRoutes from "./routes/bankRoutes.js";
 import userRoutes from "./routes/userDashboard/userRoutes.js";
 import adminRoutes from "./routes/adminRoutes/adminElectionRoutes.js";
+import resourcesRoutes from "./routes/Resources/supportRoute.js"
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -30,6 +31,7 @@ app.use("/api/locations", locationRoutes);
 app.use("/api", bankRoutes);
 app.use("/api", userRoutes);
 app.use("/api", adminRoutes);
+app.use("/api", resourcesRoutes);
 
 app.use("/observerid", express.static(path.join(__dirname, "observerId")));
 app.use("/profileimage", express.static(path.join(__dirname, "profileImage")));

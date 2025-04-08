@@ -410,9 +410,9 @@ export const approveObserverService = async (id) => {
       admin: adminId,
       action: "Approved observer",
       details: {
-        observerId,
-        email: observer.email,
-        pollingUnit: observer.pollingUnit,
+        observerId: user._id,
+        email: user.email,
+        pollingUnit: user.pollingUnit,
       },
       timestamp: new Date(),
     });

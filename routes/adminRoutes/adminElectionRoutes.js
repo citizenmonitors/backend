@@ -27,6 +27,7 @@ import {
 } from "../../middleware/authMiddleware.js";
 import { getDashboardController } from "../../controllers/adminController/adminDashboard.js";
 import * as AdminController from "../../controllers/adminController/adminDashboard.js";
+import * as PodcastController from "../../controllers/adminController/podcastController.js";
 
 const router = express.Router();
 
@@ -155,5 +156,11 @@ router.get(
   isAdmin,
   AdminController.getSingleAdmin
 );
+
+router.post("/admin/podcast", authMiddleware, isAdmin, PodcastController.sendPodcast);
+router.patch("/admin/podcast/:id", authMiddleware, isAdmin, PodcastController.editPodcast);
+router.get("/admin/podcast", authMiddleware, isAdmin, PodcastController.getAllPodcasts);
+router.get("/admin/podcast/:id", authMiddleware, PodcastController.getSinglePodcast);
+router.delete("/admin/podcast/:id", authMiddleware, PodcastController.deletePodcast);
 
 export default router;

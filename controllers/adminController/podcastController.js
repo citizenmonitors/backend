@@ -1,0 +1,61 @@
+import * as PodcastService from "../../services/adminService/podcastService.js";
+
+export const sendPodcast = async (req, res) => {
+  try {
+   const adminId = req.user._id; 
+    const podcast = await PodcastService.sendPodcastService({ adminId,
+      ...req.body,
+    });
+    res.status(201).json(podcast);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const editPodcast = async (req, res) => {
+    try {
+      const adminId = req.user._id;
+      const podcastId = req.params.id;
+      const updates = req.body;
+  
+      const updatedPodcast = await PodcastService.editPodcastService({
+        podcastId,
+        updates,
+        adminId,
+      });
+  
+      res.status(200).json(updatedPodcast);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  };
+  
+
+export const getAllPodcasts = async (req, res) => {
+    try {
+      const podcasts = await PodcastService.getAllPodcastsService();
+      res.status(200).json(podcasts);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  };
+  
+
+export const getSinglePodcast = async (req, res) => {
+  try {
+    const podcast = await PodcastService.getSinglePodcastService(req.params.id);
+    res.json(podcast);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};
+
+export const deletePodcast = async (req, res) => {
+  try {
+   const adminId = req.user._id; 
+    const response = await PodcastService.deletePodcastService(req.params.id, adminId);
+    res.json(response);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};

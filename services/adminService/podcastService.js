@@ -123,3 +123,18 @@ export const deletePodcastService = async (id, adminId) => {
   });
   return { message: "Podcast deleted successfully" };
 };
+
+export const getUserInboxService = async (userId) => {
+  const user = await CompletedUser.findById(userId).lean();
+  if (!user || !user.role) throw new Error("User not found or role missing");
+
+  const role = user.role.toLowerCase();
+
+  const inbox = await Podcast.find({
+    recipients: { $in: ["all", role] },
+  })
+    .sort({ createdAt: -1 })
+    .lean();
+
+  return inbox;
+};

@@ -59,3 +59,16 @@ export const deletePodcast = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 };
+
+export const getUserInbox = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const inbox = await PodcastService.getUserInboxService(userId);
+    res.status(200).json({ inbox });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch inbox",
+      error: error.message,
+    });
+  }
+};

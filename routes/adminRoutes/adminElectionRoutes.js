@@ -162,5 +162,6 @@ router.patch("/admin/podcast/:id", authMiddleware, isAdmin, PodcastController.ed
 router.get("/admin/podcast", authMiddleware, isAdmin, PodcastController.getAllPodcasts);
 router.get("/admin/podcast/:id", authMiddleware, PodcastController.getSinglePodcast);
 router.delete("/admin/podcast/:id", authMiddleware, PodcastController.deletePodcast);
+router.get("/admin/podcasts/inbox", authMiddleware, PodcastController.getUserInbox);
 
 export default router;

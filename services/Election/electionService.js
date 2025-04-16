@@ -104,17 +104,17 @@ export const activeElections = async (data, adminId) => {
       }
     }
     
-     const electionType = existingElection.electionType.toLowerCase();
+    //  const electionType = existingElection.electionType.toLowerCase();
 
  // Prevent duplicate elections
  const duplicateElection = await ActiveElection.findOne({
-  electionType,
+  election: electionId,
   electionLocation,
   startDate,
   endDate,
 });
 
-console.log("Duplicate Election:", duplicateElection);
+// console.log("Duplicate Election:", electionId, startDate, endDate);
    
 
     if (duplicateElection) {
@@ -132,6 +132,9 @@ console.log("Duplicate Election:", duplicateElection);
     });
 
     const savedElection = await activeElection.save();
+
+// console.log("savedElection :", savedElection);
+
 
     // Log admin action
     await AdminLog.create({

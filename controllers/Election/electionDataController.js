@@ -171,7 +171,7 @@ export const getLiveElectionByIdCont = async (req, res) => {
   } catch (error) {
     res
       .status(500)
-      .json({ message: "Error fetching live election details", error });
+      .json({ message: "Error fetching live election details", error: error.message, });
   }
 };
 

@@ -101,10 +101,11 @@ export const activeElections = async (data, adminId) => {
         throw new Error("LGA election requires a valid LGA name.");
       }
     }
+    
 
     // Prevent duplicate elections
     const duplicateElection = await ActiveElection.findOne({
-      electionLocation,
+      electionType,
       startDate,
       endDate,
     });

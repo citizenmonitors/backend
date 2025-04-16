@@ -108,6 +108,7 @@ export const activeElections = async (data, adminId) => {
     // Prevent duplicate elections
     const duplicateElection = await ActiveElection.findOne({
       electionType,
+      electionLocation,
       startDate,
       endDate,
     });
@@ -122,6 +123,7 @@ export const activeElections = async (data, adminId) => {
     const activeElection = new ActiveElection({
       election: electionId,
       electionLocation,
+      electionType,
       startDate,
       endDate,
     });

@@ -73,7 +73,7 @@ export const updateElectionService = async (electionId, data, adminId) => {
 
 
 export const activeElections = async (data, adminId) => {
-  let { electionId, electionLocation, electionType, startDate, endDate } = data;
+  let { electionId, electionLocation, startDate, endDate } = data;
 
   try {
     const existingElection = await Election.findById(electionId);
@@ -81,15 +81,7 @@ export const activeElections = async (data, adminId) => {
       throw new Error("Election not found");
     }
 
-     // Prevent duplicate elections
-     const duplicateElection = await ActiveElection.findOne({
-      electionType,
-      electionLocation,
-      startDate,
-      endDate,
-    });
-
-    console.log("Duplicate Election:", electionLocation, startDate, endDate);
+    
 
     // Validate election location
     if (
@@ -112,9 +104,17 @@ export const activeElections = async (data, adminId) => {
       }
     }
     
-    //  const electionType = existingElection.electionType.toLowerCase();
+     const electionType = existingElection.electionType.toLowerCase();
 
+ // Prevent duplicate elections
+ const duplicateElection = await ActiveElection.findOne({
+  electionType,
+  electionLocation,
+  startDate,
+  endDate,
+});
 
+console.log("Duplicate Election:", duplicateElection);
    
 
     if (duplicateElection) {
@@ -127,7 +127,6 @@ export const activeElections = async (data, adminId) => {
     const activeElection = new ActiveElection({
       election: electionId,
       electionLocation,
-      electionType,
       startDate,
       endDate,
     });

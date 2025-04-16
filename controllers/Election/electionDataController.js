@@ -58,7 +58,7 @@ export const updateElection = async (req, res) => {
 export const createActiveElectionsCon = async (req, res) => {
   try {
     const adminId = req.user._id;
-    const activeElection = await activeElections({ ...req.body, adminId });
+    const activeElection = await activeElections(req.body, adminId );
     res.status(201).json(activeElection);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -69,10 +69,8 @@ export const updateActiveElectionCon = async (req, res) => {
   try {
     const { electionId } = req.params;
     const adminId = req.user._id;
-    const updatedElection = await updateActiveElections(electionId, {
-      ...req.body,
-      adminId,
-    });
+    const updatedElection = await updateActiveElections(electionId, req.body, adminId,
+    );
     res.status(200).json(updatedElection);
   } catch (error) {
     res

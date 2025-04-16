@@ -81,6 +81,16 @@ export const activeElections = async (data, adminId) => {
       throw new Error("Election not found");
     }
 
+     // Prevent duplicate elections
+     const duplicateElection = await ActiveElection.findOne({
+      electionType,
+      electionLocation,
+      startDate,
+      endDate,
+    });
+
+    console.log("Duplicate Election:", electionLocation, startDate, endDate);
+
     // Validate election location
     if (
       ["national", "house-of-representatives", "senatorial"].includes(
@@ -105,13 +115,7 @@ export const activeElections = async (data, adminId) => {
     //  const electionType = existingElection.electionType.toLowerCase();
 
 
-    // Prevent duplicate elections
-    const duplicateElection = await ActiveElection.findOne({
-      electionType,
-      electionLocation,
-      startDate,
-      endDate,
-    });
+   
 
     if (duplicateElection) {
       throw new Error(

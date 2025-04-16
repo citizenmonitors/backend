@@ -73,7 +73,7 @@ export const updateElectionService = async (electionId, data, adminId) => {
 
 
 export const activeElections = async (data, adminId) => {
-  let { electionId, electionLocation, startDate, endDate } = data;
+  let { electionId, electionLocation, electionType, startDate, endDate } = data;
 
   try {
     const existingElection = await Election.findById(electionId);
@@ -102,6 +102,8 @@ export const activeElections = async (data, adminId) => {
       }
     }
     
+    //  const electionType = existingElection.electionType.toLowerCase();
+
 
     // Prevent duplicate elections
     const duplicateElection = await ActiveElection.findOne({

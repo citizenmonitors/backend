@@ -1,24 +1,5 @@
 import express from "express";
-import {
-  approveObserverController,
-  deleteFlaggedResultController,
-  deleteUserByIdController,
-  deletedResultOrIncidentController,
-  downgradeObserverController,
-  getAdminLiveElectionController,
-  getAllAdminController,
-  getAllElectionAndIncidentController,
-  getAllElectionTypes,
-  getAllElections,
-  getAllObserver,
-  getAllUsersController,
-  getDashboardDataController,
-  getFlaggedResultsCon,
-  getResultOrIncidentByController,
-  getSingleFlaggedElectionController,
-  getUserByIdController,
-  restoreFlaggedResultController,
-} from "../../controllers/adminController/adminElectionController.js";
+import * as AdminCont from "../../controllers/adminController/adminElectionController.js";
 import {
   authMiddleware,
   isAdmin,
@@ -31,87 +12,85 @@ import * as PodcastController from "../../controllers/adminController/podcastCon
 
 const router = express.Router();
 
-router.get("/admin/", authMiddleware, isAdmin, getDashboardDataController);
-router.get("/admin/admins", authMiddleware, isAuthorized("getAdmins"), getAllAdminController);
+router.get("/admin/", authMiddleware, isAdmin, AdminCont.getDashboardDataController);
+router.get("/admin/admins", authMiddleware, isAuthorized("getAdmins"), AdminCont.getAllAdminController);
 router.get("/admin/dashboard", authMiddleware, isAdmin, getDashboardController);
 router.get(
-  "/admin/live-election/:electionId",
-  authMiddleware,
-  isAdmin,
-  getAdminLiveElectionController
+  "/admin/live-election/:electionId", authMiddleware,
+  isAdmin, AdminCont.getAdminLiveElectionController
 );
 
-router.get("/admin/elections", authMiddleware, isAdmin, getAllElections);
+router.get("/admin/elections", authMiddleware, isAdmin, AdminCont.getAllElections);
 router.get(
   "/admin/election-types",
   authMiddleware,
   isAdmin,
-  getAllElectionTypes
+  AdminCont.getAllElectionTypes
 );
 router.get(
   "/admin/results",
   authMiddleware,
   isAuthorized("viewResults"),
-  getAllElectionAndIncidentController
+  AdminCont.getAllElectionAndIncidentController
 );
 router.get(
   "/admin/result/:id",
   authMiddleware,
   isAuthorized("viewResult"),
-  getResultOrIncidentByController
+  AdminCont.getResultOrIncidentByController
 );
 router.delete(
   "/admin/result/:id",
   authMiddleware,
   isAuthorized("deleteResult"),
-  deletedResultOrIncidentController
+  AdminCont.deletedResultOrIncidentController
 );
-router.get("/admin/users", authMiddleware,   isAuthorized("viewUsers"), getAllUsersController);
-router.get("/admin/user/:id", authMiddleware,   isAuthorized("viewUser"), getUserByIdController);
+router.get("/admin/users", authMiddleware,   isAuthorized("viewUsers"), AdminCont.getAllUsersController);
+router.get("/admin/user/:id", authMiddleware,   isAuthorized("viewUser"), AdminCont.getUserByIdController);
 router.delete(
   "/admin/user/:id",
   authMiddleware,
   isAuthorized("deleteUser"),
-  deleteUserByIdController
+  AdminCont.deleteUserByIdController
 );
 
 router.patch(
   "/admin/approve-observer/:id",
   authMiddleware,
   isAuthorized("approveObserver"),
-  approveObserverController
+  AdminCont.approveObserverController
 );
-router.get("/admin/observers/", authMiddleware, isAdmin, getAllObserver);
+router.get("/admin/observers/", authMiddleware, isAdmin, AdminCont.getAllObserver);
 router.patch(
   "/admin/downgrade-observer/:id",
   authMiddleware,
   isAuthorized("downgradeObserver"),
-  downgradeObserverController
+  AdminCont.downgradeObserverController
 );
 router.get(
   "/admin/flagged-results/",
   authMiddleware,
   isAdmin,
-  getFlaggedResultsCon
+  AdminCont.getFlaggedResultsCon
 );
 router.delete(
   "/admin/delete-flagged/:id",
   authMiddleware,
   isAuthorized("deleteFlagged"),
-  deleteFlaggedResultController
+  AdminCont.deleteFlaggedResultController
 );
 
 router.put(
   "/admin/restore-flagged/:id",
   authMiddleware,
   isAuthorized("restoreFlagged"),
-  restoreFlaggedResultController
+  AdminCont.restoreFlaggedResultController
 );
 router.get(
   "/admin/single-flagged/:id",
   authMiddleware,
   isAdmin,
-  getSingleFlaggedElectionController
+  AdminCont.getSingleFlaggedElectionController
 );
 
 router.post(

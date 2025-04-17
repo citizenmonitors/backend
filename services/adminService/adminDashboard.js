@@ -575,6 +575,21 @@ export const getAllActiveElectionsService = async () => {
     .populate("election", "electionType electionName")
     .lean();
 
+  // Check if there are any active elections
+  if (activeElections.length === 0) {
+    return { message: "No active elections available." };
+  }
+
+  // Check if any elections have results or incident reports
+  const anyHasResults = activeElections.some(election => 
+    election.results && election.results.length > 0);
+  const anyHasIncidents = activeElections.some(election => 
+    election.incidentReports && election.incidentReports.length > 0);
+
+  if (!anyHasResults && !anyHasIncidents) {
+    return { message: "No active elections with results or incident reports available." };
+  }
+
   // Format and return elections, excluding `electionLocation` and unnecessary fields
   return activeElections.map((activeElection) => {
     const {

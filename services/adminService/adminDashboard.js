@@ -587,7 +587,7 @@ export const getAllActiveElectionsService = async () => {
     election.incidentReports && election.incidentReports.length > 0);
 
   if (!anyHasResults && !anyHasIncidents) {
-    return { message: "No active elections with results or incident reports available." };
+    return null;
   }
 
   // Format and return elections, excluding `electionLocation` and unnecessary fields

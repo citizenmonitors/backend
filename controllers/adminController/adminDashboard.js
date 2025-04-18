@@ -1,10 +1,9 @@
-import { getDashboardData } from "../../services/adminService/adminDashboard.js"; 
 import * as AdminService from "../../services/adminService/adminDashboard.js";
 
 
 export const getDashboardController = async (req, res) => {
   try {
-    const data = await getDashboardData();
+    const data = await AdminService.getDashboardData();
     res.status(200).json(data);
   } catch (error) {
     console.error("Error fetching dashboard data:", error);

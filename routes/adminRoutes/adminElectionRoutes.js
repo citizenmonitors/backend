@@ -142,5 +142,6 @@ router.get("/admin/podcast", authMiddleware, isAdmin, PodcastController.getAllPo
 router.get("/admin/podcast/:id", authMiddleware, PodcastController.getSinglePodcast);
 router.delete("/admin/podcast/:id", authMiddleware, PodcastController.deletePodcast);
 router.get("/admin/podcasts/inbox", authMiddleware, PodcastController.getUserInbox);
+router.get("/admin/notification", authMiddleware, isAdmin, AdminCont.adminNotificationController);
 
 export default router;

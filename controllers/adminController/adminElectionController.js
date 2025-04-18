@@ -1,20 +1,10 @@
-import { approveObserverService, deleteUserService, downgradeObserverService, getAdminLiveElectionService, getAllActiveElectionsService, getAllElectionTypesService, getAllObsersverService, getAllUsersService, getUserByIdService } from "../../services/adminService/adminDashboard.js";
-import {
-  deleteFlaggedResults,
-  deleteResultOrIncidentService,
-    getAllAdminService,
-    getAllResultService,
-    getDashboardDataService,
-    getFlaggedResultsService,
-    getResultOrIncidentByIdService,
-    getSingleFlaggedElectionService,
-    restoreFlaggedResult,
-} from "../../services/adminService/adminElectionService.js";
+import * as AdminDashServices from "../../services/adminService/adminDashboard.js";
+import * as AdminService from "../../services/adminService/adminElectionService.js";
 
 
 export const getDashboardDataController = async (req, res) => {
     try {
-        const dashboardData = await getDashboardDataService();
+        const dashboardData = await AdminService.getDashboardDataService();
         res.status(200).json(dashboardData)
     } catch (error) {
         res.status(505),json({error: error.message})
@@ -23,7 +13,7 @@ export const getDashboardDataController = async (req, res) => {
 
 export const getAllAdminController = async (req, res) => {
     try {
-        const admins = await getAllAdminService();
+        const admins = await AdminService.getAllAdminService();
         res.status(200).json(admins);
     } catch (error) {
         res
@@ -35,7 +25,7 @@ export const getAllAdminController = async (req, res) => {
 
 export const getAllElections = async (req, res) => {
   try {
-    const elections = await getAllActiveElectionsService();
+    const elections = await AdminDashServices.getAllActiveElectionsService();
 
     res.status(200).json({ elections });
   } catch (error) {
@@ -48,7 +38,7 @@ export const getAllElections = async (req, res) => {
 
 export const getAllElectionTypes = async (req, res) => {
   try {
-    const elections = await getAllElectionTypesService();
+    const elections = await AdminDashServices.getAllElectionTypesService();
 
     res.status(200).json({ elections });
   } catch (error) {
@@ -59,8 +49,6 @@ export const getAllElectionTypes = async (req, res) => {
   }
 };
 
-
-
 export const getAdminLiveElectionController = async (req, res) => {
   try {
     const { electionId } = req.params;
@@ -68,7 +56,7 @@ export const getAdminLiveElectionController = async (req, res) => {
       return res.status(400).json({ message: "Election ID is required." });
     }
 
-    const result = await getAdminLiveElectionService(electionId);
+    const result = await AdminDashServices.getAdminLiveElectionService(electionId);
 
     return res.status(200).json(result);
   } catch (error) {
@@ -81,7 +69,7 @@ export const getAdminLiveElectionController = async (req, res) => {
 export const getAllElectionAndIncidentController = async (req, res) =>{
   try {
     
-    const results = await getAllResultService();
+    const results = await AdminService.getAllResultService();
     res.status(200).json({results});
   } catch (error) {
     res.status(500).json({message: error.message});
@@ -91,7 +79,7 @@ export const getAllElectionAndIncidentController = async (req, res) =>{
 export const getResultOrIncidentByController = async (req, res) => {
   try {
     const { id } = req.params;
-    const resultOrIncident = await getResultOrIncidentByIdService(id);
+    const resultOrIncident = await AdminService.getResultOrIncidentByIdService(id);
     res.status(200).json({result: resultOrIncident});
   } catch (error) {
     res.status(500).json({message: error.message});
@@ -104,7 +92,7 @@ export const deletedResultOrIncidentController = async (req, res) => {
    const { id } = req.params;
    const adminId = req.user._id;
 
-   const result = await deleteResultOrIncidentService(id, adminId);
+   const result = await AdminService.deleteResultOrIncidentService(id, adminId);
    res.status(200).json(result);
  } catch (error) {
    res
@@ -118,7 +106,7 @@ export const deletedResultOrIncidentController = async (req, res) => {
 
 export const getAllUsersController = async (req, res) => {
   try {
-    const results = await getAllUsersService();
+    const results = await AdminDashServices.getAllUsersService();
     res.status(200).json({results});
   } catch (error) {
     res
@@ -133,7 +121,7 @@ export const getAllUsersController = async (req, res) => {
 export const getUserByIdController = async (req, res) => {
   try {
     const {id} = req.params;
-    const user = await getUserByIdService(id);
+    const user = await AdminDashServices.getUserByIdService(id);
     res.status(200).json(user);
   } catch (error) {
     res
@@ -145,7 +133,7 @@ export const getUserByIdController = async (req, res) => {
 export const deleteUserByIdController = async (req, res) => {
   try {
     const {id} = req.params;
-    const result = await deleteUserService(id);
+    const result = await AdminDashServices.deleteUserService(id);
     res.status(200).json(result);
   } catch (error) {
      res
@@ -158,7 +146,7 @@ export const approveObserverController = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const response = await approveObserverService(id);
+    const response = await AdminDashServices.approveObserverService(id);
 
     res.status(200).json(response);
   } catch (error) {
@@ -169,7 +157,7 @@ export const approveObserverController = async (req, res) => {
 
 export const getAllObserver = async (req, res) => {
   try {
-    const data = await getAllObsersverService();
+    const data = await AdminDashServices.getAllObsersverService();
     res.status(200).json(data);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -187,7 +175,7 @@ export const downgradeObserverController = async (req, res) => {
       return res.status(400).json({ message: "Admin reason is required" });
     }
 
-    const result = await downgradeObserverService(id, adminReason);
+    const result = await AdminDashServices.downgradeObserverService(id, adminReason);
     res.status(200).json(result);
   } catch (error) {
     console.error(`Error in downgradeObserverController: ${error.message}`);
@@ -197,7 +185,7 @@ export const downgradeObserverController = async (req, res) => {
 
 export const getFlaggedResultsCon = async (req, res) => {
   try {
-    const results = await getFlaggedResultsService();
+    const results = await AdminService.getFlaggedResultsService();
     res.status(200).json({results});
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -209,7 +197,7 @@ try {
   const { id } = req.params;
   const adminId = req.user._id;
 
-  const result = await deleteFlaggedResults(id, adminId);
+  const result = await AdminService.deleteFlaggedResults(id, adminId);
   res.status(200).json(result);
 } catch (error) {
   res
@@ -224,7 +212,7 @@ export const restoreFlaggedResultController = async (req, res) => {
     const { id } = req.params;
     const adminId = req.user._id;
 
-    const result = await restoreFlaggedResult(id, adminId);
+    const result = await AdminService.restoreFlaggedResult(id, adminId);
     res.status(200).json(result);
   } catch (error) {
     res
@@ -240,7 +228,7 @@ export const restoreFlaggedResultController = async (req, res) => {
 export const getSingleFlaggedElectionController = async (req, res) => {
   try {
     const { id } = req.params;
-    const resultOrIncident = await getSingleFlaggedElectionService(id);
+    const resultOrIncident = await AdminService.getSingleFlaggedElectionService(id);
     res.status(200).json({ result: resultOrIncident });
   } catch (error) {
     console.error(`Error fetching flagged election: ${error.message}`);
@@ -248,3 +236,12 @@ export const getSingleFlaggedElectionController = async (req, res) => {
   }
 };
 
+
+export const adminNotificationController = async (req, res) =>{
+  try {
+    const notifications = await AdminService.adminNotificationService();
+    res.status(200).json(notifications);
+  } catch (error) {
+    res.status(500).json({message: error.message});
+  }
+}

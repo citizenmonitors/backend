@@ -7,6 +7,7 @@ import Election from "../../models/Election/Election.js";
 import IncidentReport from "../../models/Election/IncidentReport.js";
 import ActiveElection from "../../models/Election/ActiveElection.js";
 import AdminLog from "../../models/admin/AdminLog.js";
+import Notification from "../../models/DailyTraffic/Notification.js";
 
 
 export const getDashboardDataService = async () => {
@@ -583,6 +584,16 @@ const fetchUpdatedFlaggedResults = async () => {
 
 
 
+export const adminNotificationService = async () =>{
+  try {
+       const notifications = await Notification.find({})
+            .sort({ createdAt: -1 })
+            .limit(10)
+            .lean();
 
-
-
+    return notifications;
+  } catch (error) {
+    console.error("Error fetching admin notifications:", error);
+    throw new Error("Failed to fetch admin notifications");
+  }
+}

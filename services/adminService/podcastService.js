@@ -104,29 +104,24 @@ export const getAllPodcastsService = async () => {
   
 
   export const getSinglePodcastService = async (id, userId) => {
-    try {
-      // Fetch the podcast by ID
-      const podcast = await Podcast.findById(id);
-      if (!podcast) throw new Error("Podcast not found");
+    const user = await CompletedUser.findById(userId).lean();
+    if (!user || !user.role) throw new Error("User not found or role missing");
   
-      // Fetch the user's role
-      const user = await CompletedUser.findById(userId).lean();
-      if (!user || !user.role) throw new Error("User not found or role missing");
+    const role = user.role.toLowerCase();
   
-      const role = user.role.toLowerCase();
+    const podcastWithoutReadBy = await Podcast.findById(id).lean();
+    if (!podcastWithoutReadBy) throw new Error("Podcast not found");
   
-      // Check if the user's role is among the recipients
-      if (!podcast.recipients.includes("all") && !podcast.recipients.includes(role)) {
-        throw new Error("You are not authorized to view this podcast");
-      }
-  
-      // Remove the `readBy` field before returning
-      const { readBy, ...podcastWithoutReadBy } = podcast.toObject();
-      return podcastWithoutReadBy;
-    } catch (error) {
-      throw new Error(`Error fetching podcast: ${error.message}`);
+    // Check if user's role is among recipients
+    if (!podcastWithoutReadBy.recipients.includes("all") && !podcastWithoutReadBy.recipients.includes(role)) {
+      throw new Error("You do not have access to this podcast.");
     }
+  
+    // Exclude readBy before returning
+    const { readBy, ...podcast } = podcastWithoutReadBy;
+    return podcast;
   };
+  
 
 export const deletePodcastService = async (id, adminId) => {
   const deleted = await Podcast.findByIdAndDelete(id);
@@ -155,20 +150,20 @@ export const getUserInboxService = async (userId) => {
     .sort({ createdAt: -1 })
     .lean();
 
-    const inboxWithReadStatus = inbox.map((podcast) => {
-      const read = podcast.readBy
-        ? podcast.readBy.some(
+    const  podcast= inbox.map((inboxWithReadStatus) => {
+      const read = inboxWithReadStatus.readBy
+        ? inboxWithReadStatus.readBy.some(
             (readerId) => readerId.toString() === userId.toString()
           )
         : false;
     
-      const { readBy, ...podcastWithoutReadBy } = podcast;
+      const { readBy, ...podcastWithoutReadBy } = inboxWithReadStatus;
     
       return { ...podcastWithoutReadBy, read };
     });
 
   
-    return inboxWithReadStatus;
+    return podcast;
 };
 
 

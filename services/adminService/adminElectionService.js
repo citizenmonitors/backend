@@ -591,19 +591,19 @@ export const adminNotificationService = async (userId) =>{
             .limit(10)
             .lean();
 
-            const notificationReadStatus = notifications.map((notification) => {
-              const read = notification.readBy
-                ? notification.readBy.some(
+            const  notification= notifications.map((notificationReadStatus) => {
+              const read = notificationReadStatus.readBy
+                ? notificationReadStatus.readBy.some(
                     (readerId) => readerId.toString() === userId.toString()
                   )
                 : false;
             
-              const { readBy, ...notificationWithoutReadBy } = notification;
+              const { readBy, ...notificationWithoutReadBy } = notificationReadStatus;
             
               return { ...notificationWithoutReadBy, read };
             });
 
-    return notificationReadStatus;
+    return notification;
   } catch (error) {
     console.error("Error fetching admin notifications:", error);
     throw new Error("Failed to fetch admin notifications");

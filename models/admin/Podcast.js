@@ -14,6 +14,12 @@ const podcastSchema = new mongoose.Schema(
       ref: "CompletedUser",
       required: true,
     },
+    readBy: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "CompletedUser",
+      },
+    ],
   },
   { timestamps: true }
 );

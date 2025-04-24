@@ -584,16 +584,44 @@ const fetchUpdatedFlaggedResults = async () => {
 
 
 
-export const adminNotificationService = async () =>{
+export const adminNotificationService = async (userId) =>{
   try {
        const notifications = await Notification.find({})
             .sort({ createdAt: -1 })
             .limit(10)
             .lean();
 
-    return notifications;
+            const notificationReadStatus = notifications.map((notification) => {
+              const read = notification.readBy
+                ? notification.readBy.some(
+                    (readerId) => readerId.toString() === userId.toString()
+                  )
+                : false;
+            
+              const { readBy, ...notificationWithoutReadBy } = notification;
+            
+              return { ...notificationWithoutReadBy, read };
+            });
+
+    return notificationReadStatus;
   } catch (error) {
     console.error("Error fetching admin notifications:", error);
     throw new Error("Failed to fetch admin notifications");
   }
 }
+
+export const markNotificationAsReadService = async (notificationId, userId) => {
+  const notification = await Notification.findById(notificationId);
+  if (!notification) throw new Error("NotificationId not found");
+
+  const alreadyRead = notification.readBy.some(
+    (readerId) => readerId.toString() === userId.toString()
+  );
+
+  if (!alreadyRead) {
+    notification.readBy.push(userId);
+    await notification.save();
+  }
+
+  return { message: "Notification marked as read" };
+};

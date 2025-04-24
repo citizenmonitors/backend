@@ -239,9 +239,22 @@ export const getSingleFlaggedElectionController = async (req, res) => {
 
 export const adminNotificationController = async (req, res) =>{
   try {
-    const notifications = await AdminService.adminNotificationService();
+    const userId = req.user._id;
+    const notifications = await AdminService.adminNotificationService(userId);
     res.status(200).json(notifications);
   } catch (error) {
     res.status(500).json({message: error.message});
   }
 }
+
+export const markNotificationAsRead = async (req, res) => {
+  try {
+    const { notificationId } = req.params;
+    const userId = req.user._id;
+
+    const result = await AdminService.markNotificationAsReadService(notificationId, userId);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ message: "Error marking notification as read", error: error.message });
+  }
+};

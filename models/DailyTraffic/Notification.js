@@ -11,6 +11,12 @@ const notificationSchema = new mongoose.Schema({
   info: {
     type: String,
   },
+  readBy: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "CompletedUser",
+    },
+  ],
   createdAt: {
     type: Date,
     default: Date.now,

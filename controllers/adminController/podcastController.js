@@ -72,3 +72,15 @@ export const getUserInbox = async (req, res) => {
     });
   }
 };
+
+export const markPodcastAsRead = async (req, res) => {
+  try {
+    const { podcastId } = req.params;
+    const userId = req.user._id;
+
+    const result = await PodcastService.markPodcastAsReadService(podcastId, userId);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ message: "Error marking podcast as read", error: error.message });
+  }
+};

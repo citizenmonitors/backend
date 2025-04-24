@@ -858,7 +858,10 @@ export const getActivityBoardAndNotificationsService = async () => {
     const notifications = await Notification.find({})
       .sort({ createdAt: -1 })
       .limit(10)
-      .lean();
+      .lean()
+      .select("-readBy");
+
+      // const { readBy, ...notificationWithoutReadby } = notifications;
 
     return { activityBoard, notifications };
   } catch (error) {

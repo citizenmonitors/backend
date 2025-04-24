@@ -106,7 +106,9 @@ export const getAllPodcastsService = async () => {
 export const getSinglePodcastService = async (id) => {
   const podcast = await Podcast.findById(id);
   if (!podcast) throw new Error("Podcast not found");
-  return podcast;
+
+  const { readBy, ...podcastWithoutReadBy } = podcast.toObject();
+  return podcastWithoutReadBy;
 };
 
 export const deletePodcastService = async (id, adminId) => {
@@ -136,5 +138,35 @@ export const getUserInboxService = async (userId) => {
     .sort({ createdAt: -1 })
     .lean();
 
-  return inbox;
+    const inboxWithReadStatus = inbox.map((podcast) => {
+      const read = podcast.readBy
+        ? podcast.readBy.some(
+            (readerId) => readerId.toString() === userId.toString()
+          )
+        : false;
+    
+      const { readBy, ...podcastWithoutReadBy } = podcast;
+    
+      return { ...podcastWithoutReadBy, read };
+    });
+
+  
+    return inboxWithReadStatus;
+};
+
+
+export const markPodcastAsReadService = async (podcastId, userId) => {
+  const podcast = await Podcast.findById(podcastId);
+  if (!podcast) throw new Error("Podcast not found");
+
+  const alreadyRead = podcast.readBy.some(
+    (readerId) => readerId.toString() === userId.toString()
+  );
+
+  if (!alreadyRead) {
+    podcast.readBy.push(userId);
+    await podcast.save();
+  }
+
+  return { message: "Podcast marked as read" };
 };

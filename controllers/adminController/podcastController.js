@@ -44,7 +44,7 @@ export const getAllPodcasts = async (req, res) => {
 export const getSinglePodcast = async (req, res) => {
   try {
     const userId = req.user._id;
-    const podcast = await PodcastService.getSinglePodcastService(userId, req.params.id);
+    const podcast = await PodcastService.getSinglePodcastService(req.params.id, userId);
     res.json(podcast);
   } catch (error) {
     res.status(404).json({ message: error.message });

@@ -103,13 +103,30 @@ export const getAllPodcastsService = async () => {
   };
   
 
-export const getSinglePodcastService = async (id) => {
-  const podcast = await Podcast.findById(id);
-  if (!podcast) throw new Error("Podcast not found");
-
-  const { readBy, ...podcastWithoutReadBy } = podcast.toObject();
-  return podcastWithoutReadBy;
-};
+  export const getSinglePodcastService = async (id, userId) => {
+    try {
+      // Fetch the podcast by ID
+      const podcast = await Podcast.findById(id);
+      if (!podcast) throw new Error("Podcast not found");
+  
+      // Fetch the user's role
+      const user = await CompletedUser.findById(userId).lean();
+      if (!user || !user.role) throw new Error("User not found or role missing");
+  
+      const role = user.role.toLowerCase();
+  
+      // Check if the user's role is among the recipients
+      if (!podcast.recipients.includes("all") && !podcast.recipients.includes(role)) {
+        throw new Error("You are not authorized to view this podcast");
+      }
+  
+      // Remove the `readBy` field before returning
+      const { readBy, ...podcastWithoutReadBy } = podcast.toObject();
+      return podcastWithoutReadBy;
+    } catch (error) {
+      throw new Error(`Error fetching podcast: ${error.message}`);
+    }
+  };
 
 export const deletePodcastService = async (id, adminId) => {
   const deleted = await Podcast.findByIdAndDelete(id);

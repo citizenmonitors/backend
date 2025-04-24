@@ -140,10 +140,10 @@ router.post("/admin/podcast", authMiddleware, isAdmin, PodcastController.sendPod
 router.patch("/admin/podcast/:id", authMiddleware, isAdmin, PodcastController.editPodcast);
 router.get("/admin/podcast", authMiddleware, isAdmin, PodcastController.getAllPodcasts);
 router.delete("/admin/podcast/:id", authMiddleware, isAdmin, PodcastController.deletePodcast);
-router.get("/admin/podcast/:id", authMiddleware, PodcastController.getSinglePodcast);
-router.get("/admin/podcasts/inbox", authMiddleware, PodcastController.getUserInbox);
-router.patch("/admin/podcast/mark-read/:podcastId", authMiddleware, PodcastController.markPodcastAsRead);
+router.get("/podcast/:id", authMiddleware, PodcastController.getSinglePodcast);
+router.get("/podcasts/inbox", authMiddleware, PodcastController.getUserInbox);
+router.patch("/podcast/mark-read/:podcastId", authMiddleware, PodcastController.markPodcastAsRead);
+router.get("/admin/notifications", authMiddleware, isAdmin, AdminCont.adminNotificationController);
 router.patch("/admin/notification/mark-read/:notificationId", authMiddleware, isAdmin, AdminCont.markNotificationAsRead);
-router.get("/admin/notification", authMiddleware, isAdmin, AdminCont.adminNotificationController);
 
 export default router;

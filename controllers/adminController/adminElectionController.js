@@ -258,3 +258,15 @@ export const markNotificationAsRead = async (req, res) => {
     res.status(500).json({ message: "Error marking notification as read", error: error.message });
   }
 };
+
+export const deleteNotificationForUser = async (req, res) => {
+  try {
+    const { notificationId } = req.params;
+    const userId = req.user._id;
+
+    const result = await AdminService.deleteNotificationForUserService(notificationId, userId);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting notification", error: error.message });
+  }
+};

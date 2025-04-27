@@ -17,6 +17,12 @@ const notificationSchema = new mongoose.Schema({
       ref: "CompletedUser",
     },
   ],
+  deletedBy: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "CompletedUser",
+    },
+  ],
   createdAt: {
     type: Date,
     default: Date.now,

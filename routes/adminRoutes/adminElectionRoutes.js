@@ -145,5 +145,6 @@ router.get("/podcasts/inbox", authMiddleware, PodcastController.getUserInbox);
 router.patch("/podcast/mark-read/:podcastId", authMiddleware, PodcastController.markPodcastAsRead);
 router.get("/admin/notifications", authMiddleware, isAdmin, AdminCont.adminNotificationController);
 router.patch("/admin/notification/mark-read/:notificationId", authMiddleware, isAdmin, AdminCont.markNotificationAsRead);
+router.patch("/admin/notification/delete/:notificationId", authMiddleware, isAdmin, AdminCont.deleteNotificationForUser);
 
 export default router;

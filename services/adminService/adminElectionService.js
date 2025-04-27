@@ -586,7 +586,9 @@ const fetchUpdatedFlaggedResults = async () => {
 
 export const adminNotificationService = async (userId) =>{
   try {
-       const notifications = await Notification.find({})
+       const notifications = await Notification.find({
+        deletedBy: { $ne: userId },
+       })
             .sort({ createdAt: -1 })
             .limit(10)
             .lean();
@@ -624,4 +626,20 @@ export const markNotificationAsReadService = async (notificationId, userId) => {
   }
 
   return { message: "Notification marked as read" };
+};
+
+
+export const deleteNotificationForUserService = async (notificationId, userId) => {
+  const notification = await Notification.findById(notificationId);
+  if (!notification) throw new Error("Notification not found");
+
+  // If already deleted by user, no action
+  if (notification.deletedBy.includes(userId)) {
+    throw new Error("Notification already removed from your inbox.");
+  }
+
+  notification.deletedBy.push(userId);
+  await notification.save();
+
+  return { message: "Notification removed for user only." };
 };

@@ -11,6 +11,7 @@ import fs from "fs";
 import profileImageModel from "../../models/UserProfileImage/ProfileImageModel.js";
 import { fileURLToPath } from "url";
 import observerIdModel from "../../models/observerIds/observerIdModel.js";
+import { emailChangeNotificationTemplate, emailVerificationCodeTemplate, resendVerificationCodeTemplate } from "../../config/emailTemplates.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -122,6 +123,7 @@ export const updateUserService = async (
       throw new Error("User not found");
     }
 
+    
     // Handle password update
     if (updateData.password) {
       const isMatch = await bcrypt.compare(currentPassword, user.password);
@@ -299,6 +301,7 @@ export const updateUserEmail = async (userId, newEmail) => {
       );
     }
 
+  
     // Check if the new email is already in use
     const emailExistsInCompletedUser = await CompletedUser.findOne({
       email: newEmail,
@@ -320,18 +323,24 @@ export const updateUserEmail = async (userId, newEmail) => {
     user.verificationCodeExpires = moment().add(10, "minutes").toDate();
     user.pendingEmail = newEmail; // Store the new email temporarily
 
+    const currentEmailContent = emailChangeNotificationTemplate(newEmail);
+  
     // Send notification to the current email
     await transporter.sendMail({
+      from: process.env.SMTP_USER,
       to: user.email,
-      subject: "Email Change Request",
-      html: `<p>You have requested to change your email to ${newEmail}. Please check ${newEmail} for the verification code to confirm the change.</p>`,
+      subject: "Email Change Request - Citizen Monitors",
+      html: currentEmailContent,
     });
 
+
+    const newEmailContent = emailVerificationCodeTemplate(verificationCode);
     // Send verification code to the new email
     await transporter.sendMail({
+      from: process.env.SMTP_USER,
       to: newEmail,
-      subject: "Verify Your New Email Address",
-      html: `<p>Your verification code is: ${verificationCode}</p>`,
+      subject: "Verify Your New Email Address - Citizen Monitors",
+      html: newEmailContent,
     });
 
     await user.save();
@@ -414,11 +423,14 @@ export const resendTokenService = async (userId) => {
     user.verificationCodeExpires = moment().add(10, "minutes").toDate();
     await user.save();
 
+
+    const htmlContent = resendVerificationCodeTemplate(verificationCode);
     // Resend verification code to the new email
     await transporter.sendMail({
+      from: process.env.SMTP_USER,
       to: user.pendingEmail,
-      subject: "Resend Verification Code",
-      html: `<p>Your verification code is: ${verificationCode}</p>`,
+      subject: "Resend Verification Code - Citizen Monitors",
+      html: htmlContent,
     });
 
     return {

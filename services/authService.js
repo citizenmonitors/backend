@@ -12,6 +12,7 @@ import moment from "moment";
 import path from "path";
 import ProfileImageModel from "../models/UserProfileImage/ProfileImageModel.js";
 import observerIdModel from "../models/observerIds/observerIdModel.js";
+import { forgotPasswordTemplate, registrationCode, resendCode } from "../config/emailTemplates.js";
 // import { uploadFileToGCS } from "./GoogleCloud/gcsService.js";
 
 const FRONTEND_URL = process.env.FRONTEND_URL;
@@ -54,10 +55,14 @@ export const registerUser = async ({ email, password, confirmPassword }) => {
 
   await user.save();
 
+  const htmlContent = registrationCode(verificationCode);
+
   await transporter.sendMail({
+    from: process.env.SMTP_USER,
     to: email,
-    subject: "Verify your email",
-    html: `<p>Your verification code is: ${verificationCode}</p>`,
+    subject: "Welcome to Citizen Monitors - Verify Your Account",
+    html: htmlContent,
+    // html: `<p>Your verification code is: ${verificationCode}</p>`,
   });
 
   return { message: "Verification code sent to email." };
@@ -105,10 +110,13 @@ export const resendTokenService = async (email) => {
   user.verificationCodeExpires = moment().add(10, "minutes").toDate();
   await user.save();
 
+  const htmlContent = resendCode(verificationCode);
+
   await transporter.sendMail({
+    from: process.env.SMTP_USER,
     to: email,
-    subject: "Verify your email",
-    html: `<p>Your verification code is: ${verificationCode}</p>`,
+    subject: "Resend Verification Code - Citizen Monitors",
+    html: htmlContent,
   });
 
   return { message: "New verification code sent." };
@@ -400,11 +408,13 @@ export const generateResetToken = async (email) => {
   await user.save();
 
   const resetUrl = `${FRONTEND_URL}/auth/reset-password?token=${resetToken}`;
+  const htmlContent = forgotPasswordTemplate(resetUrl);
 
   await transporter.sendMail({
+    from: process.env.SMTP_USER,
     to: email,
-    subject: "Password Reset",
-    html: `<p>You requested a password reset</p><p>Click this <a href="${resetUrl}">link</a> to reset your password</p>`,
+    subject: "Reset Your Password for Your Citizen Monitors Account",
+    html: htmlContent,
   });
 
   return { message: "Password reset link sent to email." };

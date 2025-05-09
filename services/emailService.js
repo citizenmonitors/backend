@@ -6,6 +6,7 @@ export const sendVerificationEmail = async (
   volunteerUrl
 ) => {
   await transporter.sendMail({
+    from: process.env.SMTP_USER,
     to: email,
     subject: "Verify your email",
     html: `

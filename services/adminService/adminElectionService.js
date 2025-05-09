@@ -583,15 +583,24 @@ const fetchUpdatedFlaggedResults = async () => {
 
 
 
-
 export const adminNotificationService = async (userId) =>{
   try {
        const notifications = await Notification.find({
-        deletedBy: { $ne: userId },
+        $and: [
+          { deletedBy: { $ne: userId } },
+          {
+            $or: [
+              { recipients: { $exists: false } },
+              { recipients: { $in: ["admin", "super-admin"] } },
+            ],
+          },
+        ],
        })
             .sort({ createdAt: -1 })
             .limit(10)
-            .lean();
+            .lean()
+            .select("-deletedBy");
+            
 
             const  notification= notifications.map((notificationReadStatus) => {
               const read = notificationReadStatus.readBy

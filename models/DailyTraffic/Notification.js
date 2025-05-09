@@ -11,6 +11,11 @@ const notificationSchema = new mongoose.Schema({
   info: {
     type: String,
   },
+  recipients: {
+    type: [String],
+    enum: ["all", "super-admin", "admin", "observer", "volunteer"],
+    default: undefined,
+  },
   readBy: [
     {
       type: mongoose.Schema.Types.ObjectId,

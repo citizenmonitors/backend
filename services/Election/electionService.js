@@ -1420,6 +1420,13 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
       data.hidden = true;
     }
 
+    await Notification.create({
+      type: "result-upload",
+      body: `Result flagged above 50% threshold.`,
+      info: `Polling Unit: ${user.pollingUnit}, Priority Level: ${priorityLevel}%`,
+      recipients: ["admin", "super-admin"],
+    });
+
     // Save the updated election result or incident report
     await data.save();
 

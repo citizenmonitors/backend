@@ -855,13 +855,16 @@ export const getActivityBoardAndNotificationsService = async () => {
     };
 
     // Fetch the top 10 most recent notifications
-    const notifications = await Notification.find({})
+    const notifications = await Notification.find({
+      $or: [
+        { recipients: { $exists: false } },
+        { recipients: "all" }
+      ]
+    })
       .sort({ createdAt: -1 })
       .limit(10)
       .lean()
       .select("-readBy");
-
-      // const { readBy, ...notificationWithoutReadby } = notifications;
 
     return { activityBoard, notifications };
   } catch (error) {

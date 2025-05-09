@@ -7,6 +7,7 @@ import transporter from "../../config/email.js";
 import ActiveElection from "../../models/Election/ActiveElection.js";
 import AdminPermissions from "../../models/admin/AdminPermissions.js";
 import AdminLog from "../../models/admin/AdminLog.js";
+import { adminRoleInvitationTemplate, adminSuspensionTemplate, approveObserverTemplate, observerDowngradeTemplate, observerRoleAvailableTemplate } from "../../config/emailTemplates.js";
 
 export const getDashboardData = async () => {
   const today = moment().startOf("day");
@@ -348,7 +349,7 @@ export const deleteUserService = async (userId, adminId) => {
   }
 };
 
-export const approveObserverService = async (id) => {
+export const approveObserverService = async (id, adminId) => {
   try {
     // Find the user by ID
     const user = await CompletedUser.findById(id);
@@ -367,11 +368,13 @@ export const approveObserverService = async (id) => {
     await user.save();
 
     // Notify the approved observer via email
+    const htmlContent = approveObserverTemplate(user.firstName, user.pollingUnit);
 
     transporter.sendMail({
+      from: process.env.SMTP_USER,
       to: user.email,
-      subject: "Observer Approval",
-      text: `Dear ${user.firstName},\n\nYour observer account for polling unit ${user.pollingUnit} has been approved.\n\nThank you for your commitment.\n\n Citizen Monitors`,
+      subject: "Observer Approval - Citizen Monitors",
+      html: htmlContent,
     });
 
     // Find all users in the same polling unit
@@ -394,11 +397,13 @@ export const approveObserverService = async (id) => {
         // Remove pending verification for volunteers
         otherUser.pendingObserverVerification = false;
 
+         const htmlContent = observerRoleUpdateTemplate( otherUser.firstName, user.pollingUnit);
         // Notify them about new observer
         transporter.sendMail({
+          from: process.env.SMTP_USER,
           to: otherUser.email,
-          subject: "Observer Notification",
-          text: `Dear ${otherUser.firstName},\n\nAnother observer has been selected for polling unit ${user.pollingUnit}. Your role has been updated to volunteer.\n\nThank you for your understanding.\n\n Citizen Monitors`,
+          subject: "Observer Role Update - Citizen Monitors",
+          html: htmlContent,
         });
       }
 
@@ -450,7 +455,7 @@ export const getAllObsersverService = async () => {
   }
 };
 
-export const downgradeObserverService = async (id, adminReason) => {
+export const downgradeObserverService = async (id, adminReason, adminId) => {
   try {
     // Find the user by ID
     const user = await CompletedUser.findById(id);
@@ -469,11 +474,18 @@ export const downgradeObserverService = async (id, adminReason) => {
     user.pendingObserverVerification = false;
     await user.save();
 
+    
+    const htmlContent = observerDowngradeTemplate(
+      user.firstName,
+      user.pollingUnit,
+      adminReason
+    );
     // Notify the downgraded observer via email
     await transporter.sendMail({
+      from: process.env.SMTP_USER,
       to: user.email,
-      subject: "Observer Role Downgraded",
-      text: `Dear ${user.firstName},\n\nYour observer role for polling unit ${user.pollingUnit} has been downgraded to a volunteer by the Admin.\n\nReason: ${adminReason}\n\nThank you for your understanding.\n\nCitizen Monitors`,
+      subject: "Observer Role Downgraded - Citizen Monitors",
+      html: htmlContent,
     });
 
     // Find all users in the same polling unit
@@ -488,11 +500,16 @@ export const downgradeObserverService = async (id, adminReason) => {
         otherUser.role === "volunteer" &&
         otherUser.pendingObserverVerification
       ) {
-        otherUser.pendingObserverVerification = false; // Remove pending verification
+        otherUser.pendingObserverVerification = false; 
+        const htmlContent = observerRoleAvailableTemplate(
+          otherUser.firstName,
+          user.pollingUnit
+        );
         await transporter.sendMail({
+          from: process.env.SMTP_USER,
           to: otherUser.email,
-          subject: "Observer Role Available",
-          text: `Dear ${otherUser.firstName},\n\nThere is currently no observer in polling unit ${user.pollingUnit}. You can upgrade your account to become an observer for this polling unit.\n\nThank you for your participation.\n\nCitizen Monitors`,
+          subject: "Observer Role Available - Citizen Monitors",
+          html: htmlContent,
         });
       }
 
@@ -892,11 +909,13 @@ export const createAdminService = async (
   user.adminPermissions = adminPermissions._id;
   await user.save();
 
+  const htmlContent = adminRoleInvitationTemplate(user.firstName, role);
   // Send Invitation Email
   await transporter.sendMail({
+    from: process.env.SMTP_USER,
     to: email,
     subject: "Admin Role Invitation - Citizen Monitors",
-    html: `<p>You have been invited as ${role} on Citizen Monitors.</p>`,
+    html: htmlContent,
   });
 
   // Log admin action
@@ -1025,11 +1044,14 @@ export const suspendAdminService = async (adminId, suspendedBy) => {
       timestamp: new Date(),
     });
 
+    const htmlContent = adminSuspensionTemplate(admin.firstName);
+
     // Send notification email
     await transporter.sendMail({
+      from: process.env.SMTP_USER,
       to: admin.email,
       subject: "Your Admin Access Has Been Suspended",
-      text: `Dear ${admin.firstName},\n\nYour admin access has been suspended, and your role has been changed to 'volunteer'.\n\nIf you believe this is a mistake, please contact support.\n\nCitizen Monitors`,
+      html: htmlContent,
     });
 
     return { message: "Admin suspended successfully", updatedAdmin };
@@ -1139,7 +1161,7 @@ export const logAdminAction = async (adminId, action) => {
   }
 };
 
-const processAdminLogs = async () => {
+export const processAdminLogs = async () => {
   const today = moment().startOf("day");
 
   //  Get Total Logs (All Time)
@@ -1177,6 +1199,5 @@ const processAdminLogs = async () => {
 };
 
 
-export default processAdminLogs;
 
 

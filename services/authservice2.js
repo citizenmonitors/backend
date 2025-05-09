@@ -35,6 +35,7 @@ export const registerUser = async ({ email, password, confirmPassword }) => {
   await newUser.save();
 
   await transporter.sendMail({
+    from: process.env.SMTP_USER,
     to: email,
     subject: "Verify your email",
     html: `<p>Your verification code is: <strong>${verificationCode}</strong></p>`,
@@ -131,6 +132,7 @@ export const generateResetToken = async (email) => {
   const resetUrl = `${process.env.BASE_URL}/reset-password?token=${resetToken}`;
 
   await transporter.sendMail({
+    from: process.env.SMTP_USER,
     to: email,
     subject: "Password Reset",
     html: `

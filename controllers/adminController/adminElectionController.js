@@ -133,7 +133,8 @@ export const getUserByIdController = async (req, res) => {
 export const deleteUserByIdController = async (req, res) => {
   try {
     const {id} = req.params;
-    const result = await AdminDashServices.deleteUserService(id);
+    const adminId = req.user._id;
+    const result = await AdminDashServices.deleteUserService(id, adminId);
     res.status(200).json(result);
   } catch (error) {
      res
@@ -145,8 +146,8 @@ export const deleteUserByIdController = async (req, res) => {
 export const approveObserverController = async (req, res) => {
   try {
     const { id } = req.params;
-
-    const response = await AdminDashServices.approveObserverService(id);
+    const adminId = req.user._id;
+    const response = await AdminDashServices.approveObserverService(id, adminId);
 
     res.status(200).json(response);
   } catch (error) {
@@ -166,16 +167,16 @@ export const getAllObserver = async (req, res) => {
 
 export const downgradeObserverController = async (req, res) => {
   try {
-    let { id } = req.params;
+    const { id } = req.params;
     const { adminReason } = req.body;
-
+    const adminId = req.user._id;
 
     // Validate admin reason
     if (!adminReason) {
       return res.status(400).json({ message: "Admin reason is required" });
     }
 
-    const result = await AdminDashServices.downgradeObserverService(id, adminReason);
+    const result = await AdminDashServices.downgradeObserverService(id, adminReason, adminId);
     res.status(200).json(result);
   } catch (error) {
     console.error(`Error in downgradeObserverController: ${error.message}`);

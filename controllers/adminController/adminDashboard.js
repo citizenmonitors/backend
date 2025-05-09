@@ -32,13 +32,6 @@ export const updateAdminPermissions = async (req, res) => {
     const updatedBy = req.user._id; 
     const { role, permissions } = req.body; 
 
-    // Ensure the request contains either role or permissions
-    // if (!role && !permissions) {
-    //   return res
-    //     .status(400)
-    //     .json({ message: "Admin must provide role or permissions to update." });
-    // }
-
     const updatedPermissions = await AdminService.updateAdminPermissionsService(
       adminId,
       updatedBy,

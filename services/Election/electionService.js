@@ -407,6 +407,7 @@ export const getElectionById = async (electionId, userId) => {
       politicalParties: politicalParties.map((party) => ({
         name: party.name,
         code: party.code,
+        logo: party.imageUrl || null,
       })),
       results: result ? [result] : [],
       incidentReports: incidentReport ? [incidentReport] : [],

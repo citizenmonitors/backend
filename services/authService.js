@@ -285,9 +285,9 @@ export const submitObserverDetails = async ({
   }
 
   // Validate the required details
-  if (!phoneNumber || !bankName || !bankAccountNumber || !bankAccountName) {
+  if (!phoneNumber) {
     throw new Error(
-      "Please provide all the required details: phone number, bank name, bank account number, and bank account name."
+      "Please provide your phone number."
     );
   }
 

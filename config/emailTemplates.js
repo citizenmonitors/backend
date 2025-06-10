@@ -192,3 +192,20 @@ export const resendCode = (verificationCode) =>
                                           `,
                                           verifyCode: verificationCode,
                                         });
+
+
+                                        export const supportRequestTemplate = (firstName, lastName, email, phoneNumber, category, message) =>
+                                          baseTemplate({
+                                            title: "New Support Request - Citizen Monitors",
+                                            message: `
+                                              <p><strong>First Name:</strong> ${firstName}</p>
+                                              <p><strong>Last Name:</strong> ${lastName}</p>
+                                              <p><strong>Email:</strong> ${email}</p>
+                                              <p><strong>Phone Number:</strong> ${phoneNumber}</p>
+                                              <p><strong>Category:</strong> ${category}</p>
+                                              <p><strong>Message:</strong> ${message}</p>
+
+                                            `,
+                                          });
+
+                                        

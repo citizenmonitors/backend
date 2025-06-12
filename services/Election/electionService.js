@@ -1313,7 +1313,7 @@ export const deleteIncidentReportDataService = async (electionId, userId) => {
 //       `Error fetching election results and incident reports: ${error.message}`
 //     );
 //     throw new Error(
-//       `Failed to fetch election results and incident reports: ${error.message}`
+//       ` Failed to fetch election results and incident reports: ${error.message}`
 //     );
 //   }
 // };

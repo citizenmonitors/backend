@@ -213,7 +213,6 @@ export const deleteActiveElectionService = async (
   return { message: "Active election deleted successfully" };
 };
 
-
 export const getAllActiveElectionsService = async (userId) => {
   const standardizeName = (name) =>
     name.toLowerCase().replace(/[-\s]/g, "_").trim();
@@ -964,8 +963,26 @@ export const deleteElectionResultDataService = async (electionId, userId) => {
   }
 };
 
+// export const getUserElectionData = async (userId) => {
+//   return await ElectionData.find({ user: userId }).populate("election");
+// };
+
 export const getUserElectionData = async (userId) => {
-  return await ElectionData.find({ user: userId }).populate("election");
+  if (!userId) {
+    throw new Error("User ID is required.");
+  }
+
+  try {
+    const electionData = await ElectionData.find({ user: userId }).populate("election");
+    if (!electionData || electionData.length === 0) {
+      throw new Error("No election data found for the user.");
+    }
+    console.log(userId, electionData);
+    return electionData;
+  } catch (error) {
+    console.error(`Error fetching election data for user ${userId}:`, error.message);
+    throw new Error(`Failed to fetch election data: ${error.message}`);
+  }
 };
 
 export const getAllElectionResults = async () => {
@@ -1223,9 +1240,87 @@ export const deleteIncidentReportDataService = async (electionId, userId) => {
   }
 };
 
+// export const getUserElectionResultsAndReports = async (userId) => {
+//   try {
+//     // Confirm that the user exists
+//     const user = await CompletedUser.findById(userId);
+//     if (!user) {
+//       throw new Error("User not found");
+//     }
+
+//     // Fetch election results by user
+//     const electionResults = await ElectionData.find({ user: userId })
+//       .populate({
+//         path: "election",
+//         select: "election startDate endDate createdAt updatedAt",
+//         populate: {
+//           path: "election",
+//           select: "electionType electionName",
+//         },
+//       })
+
+//       .lean();
+
+//     // Fetch incident reports by user
+//     const incidentReports = await IncidentReport.find({ user: userId })
+//       .populate({
+//         path: "election",
+//         select: "election startDate endDate createdAt updatedAt",
+//         populate: {
+//           path: "election",
+//           select: "electionType electionName",
+//         },
+//       })
+//       .lean();
+
+//     const formattedElectionResults = electionResults.map((result) => ({
+//       _id: result._id,
+//       ...result,
+      
+//       election: {
+//         _id: result.election._id,
+//         electionType: result.election?.election?.electionType,
+//         electionName: result.election?.election?.electionName,
+//         startDate: result.election?.startDate,
+//         endDate: result.election?.endDate,
+//         createdAt: result.election?.createdAt,
+//         updatedAt: result.election?.updatedAt,
+//       },
+//     }));
+
+//     const formattedIncidentReports = incidentReports.map((incident) => ({
+//       _id: incident._id,
+//       ...incident,
+//       election: {
+//         _id: incident.election._id,
+//         electionType: incident.election?.election?.electionType,
+//         electionName: incident.election?.election?.electionName,
+//         startDate: incident.election?.startDate,
+//         endDate: incident.election?.endDate,
+//         createdAt: incident.election?.createdAt,
+//         updatedAt: incident.election?.updatedAt,
+//       },
+//     }));
+
+//     return {
+//       data: {
+//         electionResults: formattedElectionResults,
+//         incidentReports: formattedIncidentReports,
+//       },
+//     };
+//   } catch (error) {
+//     console.error(
+//       `Error fetching election results and incident reports: ${error.message}`
+//     );
+//     throw new Error(
+//       `Failed to fetch election results and incident reports: ${error.message}`
+//     );
+//   }
+// };
+
+
 export const getUserElectionResultsAndReports = async (userId) => {
   try {
-    // const elections = await ActiveElection.find().populate("election", "electionType electionName")
     // Confirm that the user exists
     const user = await CompletedUser.findById(userId);
     if (!user) {
@@ -1257,33 +1352,45 @@ export const getUserElectionResultsAndReports = async (userId) => {
       })
       .lean();
 
-    const formattedElectionResults = electionResults.map((result) => ({
-      _id: result._id,
-      ...result,
-      election: {
-        _id: result.election._id,
-        electionType: result.election?.election?.electionType,
-        electionName: result.election?.election?.electionName,
-        startDate: result.election?.startDate,
-        endDate: result.election?.endDate,
-        createdAt: result.election?.createdAt,
-        updatedAt: result.election?.updatedAt,
-      },
-    }));
+const formattedElectionResults = electionResults.map((result) => {
+  if (!result.election) {
+    console.warn(`Election not found for result ID: ${result._id}`);
+    return null;
+  }
+  return {
+    _id: result._id,
+    ...result,
+    election: {
+      _id: result.election._id,
+      electionType: result.election?.election?.electionType,
+      electionName: result.election?.election?.electionName,
+      startDate: result.election?.startDate,
+      endDate: result.election?.endDate,
+      createdAt: result.election?.createdAt,
+      updatedAt: result.election?.updatedAt,
+    },
+  };
+}).filter(Boolean);
 
-    const formattedIncidentReports = incidentReports.map((incident) => ({
-      _id: incident._id,
-      ...incident,
-      election: {
-        _id: incident.election._id,
-        electionType: incident.election?.election?.electionType,
-        electionName: incident.election?.election?.electionName,
-        startDate: incident.election?.startDate,
-        endDate: incident.election?.endDate,
-        createdAt: incident.election?.createdAt,
-        updatedAt: incident.election?.updatedAt,
-      },
-    }));
+const formattedIncidentReports = incidentReports.map((incident) => {
+  if (!incident.election) {
+    console.warn(`Election not found for incident ID: ${incident._id}`);
+    return null;
+  }
+  return {
+    _id: incident._id,
+    ...incident,
+    election: {
+      _id: incident.election._id,
+      electionType: incident.election?.election?.electionType,
+      electionName: incident.election?.election?.electionName,
+      startDate: incident.election?.startDate,
+      endDate: incident.election?.endDate,
+      createdAt: incident.election?.createdAt,
+      updatedAt: incident.election?.updatedAt,
+    },
+  };
+}).filter(Boolean);
 
     return {
       data: {

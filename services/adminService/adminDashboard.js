@@ -3,7 +3,7 @@ import CompletedUser from "../../models/CompletedUser.js";
 import ElectionData from "../../models/Election/ElectionData.js";
 import Traffic from "../../models/DailyTraffic/dailyTraffic.js";
 import ActiveUser from "../../models/ActiveMontlyUsers/activeMontlyUsers.js";
-import transporter from "../../config/email.js";
+import transporter, { sendEmail } from "../../config/email.js";
 import ActiveElection from "../../models/Election/ActiveElection.js";
 import AdminPermissions from "../../models/admin/AdminPermissions.js";
 import AdminLog from "../../models/admin/AdminLog.js";
@@ -370,11 +370,11 @@ export const approveObserverService = async (id, adminId) => {
     // Notify the approved observer via email
     const htmlContent = approveObserverTemplate(user.firstName, user.pollingUnit);
 
-    transporter.sendMail({
-      from: process.env.SMTP_USER,
+   await sendEmail({
+      from: process.env.ZEPTO_FROM_EMAIL,
       to: user.email,
       subject: "Observer Approval - Citizen Monitors",
-      html: htmlContent,
+      htmlbody: htmlContent,
     });
 
     // Find all users in the same polling unit
@@ -399,11 +399,11 @@ export const approveObserverService = async (id, adminId) => {
 
          const htmlContent = observerRoleUpdateTemplate( otherUser.firstName, user.pollingUnit);
         // Notify them about new observer
-        transporter.sendMail({
-          from: process.env.SMTP_USER,
+         sendEmail({
+          from: process.env.ZEPTO_FROM_EMAIL,
           to: otherUser.email,
           subject: "Observer Role Update - Citizen Monitors",
-          html: htmlContent,
+          htmlbody: htmlContent,
         });
       }
 
@@ -481,11 +481,11 @@ export const downgradeObserverService = async (id, adminReason, adminId) => {
       adminReason
     );
     // Notify the downgraded observer via email
-    await transporter.sendMail({
-      from: process.env.SMTP_USER,
+    await sendEmail({
+      from: process.env.ZEPTO_FROM_EMAIL,
       to: user.email,
       subject: "Observer Role Downgraded - Citizen Monitors",
-      html: htmlContent,
+      htmlbody: htmlContent,
     });
 
     // Find all users in the same polling unit
@@ -505,11 +505,11 @@ export const downgradeObserverService = async (id, adminReason, adminId) => {
           otherUser.firstName,
           user.pollingUnit
         );
-        await transporter.sendMail({
-          from: process.env.SMTP_USER,
+        await sendEmail({
+          from: process.env.ZEPTO_FROM_EMAIL,
           to: otherUser.email,
           subject: "Observer Role Available - Citizen Monitors",
-          html: htmlContent,
+          htmlbody: htmlContent,
         });
       }
 
@@ -911,11 +911,11 @@ export const createAdminService = async (
 
   const htmlContent = adminRoleInvitationTemplate(user.firstName, role);
   // Send Invitation Email
-  await transporter.sendMail({
-    from: process.env.SMTP_USER,
+  await sendEmail({
+    from: process.env.ZEPTO_FROM_EMAIL,
     to: email,
     subject: "Admin Role Invitation - Citizen Monitors",
-    html: htmlContent,
+    htmlbody: htmlContent,
   });
 
   // Log admin action
@@ -1047,11 +1047,11 @@ export const suspendAdminService = async (adminId, suspendedBy) => {
     const htmlContent = adminSuspensionTemplate(admin.firstName);
 
     // Send notification email
-    await transporter.sendMail({
-      from: process.env.SMTP_USER,
+    await sendEmail({
+      from: process.env.ZEPTO_FROM_EMAIL,
       to: admin.email,
       subject: "Your Admin Access Has Been Suspended",
-      html: htmlContent,
+      htmlbody: htmlContent,
     });
 
     return { message: "Admin suspended successfully", updatedAdmin };

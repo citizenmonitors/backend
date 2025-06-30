@@ -177,8 +177,6 @@ export const getLiveElectionByIdCont = async (req, res) => {
 
 export const uploadResultData = async (req, res) => {
   try {
-    //  console.log("Body received:", req.body);
-    //  console.log("Files received:", req.files);
 
     const { electionId } = req.params;
     const userId = req.user._id;
@@ -250,8 +248,8 @@ export const uploadIncidentReportData = async (req, res) => {
 };
 
 export const updateIncidentReportData = async (req, res) => {
-  console.log("Body received:", req.body);
-  console.log("Files received:", req.files);
+  // console.log("Body received:", req.body);
+  // console.log("Files received:", req.files);
   try {
     const { electionId } = req.params;
     const userId = req.user._id;

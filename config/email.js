@@ -1,43 +1,8 @@
 import nodemailer from "nodemailer";
-import { google } from "googleapis";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-// const OAuth2 = google.auth.OAuth2;
-
-// const oauth2Client = new OAuth2(
-//   process.env.GMAIL_CLIENT_ID,
-//   process.env.GMAIL_CLIENT_SECRET,
-//   process.env.GMAIL_REDIRECT_URL || "https://developers.google.com/oauthplayground",
-// );
-
-// oauth2Client.setCredentials({
-//   refresh_token: process.env.GMAIL_REFRESH_TOKEN,
-// });
-
-// const accessToken = oauth2Client.getAccessToken();
-
-// const transporter = nodemailer.createTransport({
-//   service: "gmail",
-//   auth: {
-//     type: "OAuth2",
-//     user: process.env.SMTP_USER,
-//     clientId: process.env.GMAIL_CLIENT_ID,
-//     clientSecret: process.env.GMAIL_CLIENT_SECRET,
-//     refreshToken: process.env.GMAIL_REFRESH_TOKEN,
-//     accessToken,
-//   },
-// });
-
-
-// transporter.verify((error, success) => {
-//   if (error) {
-//     console.log("Error with email transporter configuration:", error);
-//   } else {
-//     console.log("Email transporter is configured correctly");
-//   }
-// });
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST, 
@@ -59,3 +24,57 @@ transporter.verify((error, success) => {
 
 
 export default transporter;
+
+
+// @ts-nocheck
+import { SendMailClient } from "zeptomail";
+// import dotenv from "dotenv";
+
+// dotenv.config();
+
+const url = "api.zeptomail.com/";
+const token = process.env.ZEPTO_API_KEY;
+
+const client = new SendMailClient({ url, token });
+
+/**
+ * Send transactional email via ZeptoMail SDK
+ * @param {Object} options
+ * @param {string} options.to - Recipient email address
+ * @param {string} options.subject - Email subject
+ * @param {string} options.htmlbody - Email HTML content
+ * @param {string} [options.fromName] - Optional sender name
+ * @returns {Promise<Object>}
+ */
+export const sendEmail = async ({
+  to,
+  subject,
+  htmlbody,
+  fromName = "Citizen Monitors",
+}) => {
+  try {
+    const payload = {
+      from: {
+        address: process.env.ZEPTO_FROM_EMAIL,
+        name: fromName,
+      },
+      to: [
+        {
+          email_address: {
+            address: to,
+            name: to,
+          },
+        },
+      ],
+      subject,
+      htmlbody,
+    };
+
+    const response = await client.sendMail(payload);
+    return response;
+  } catch (error) {
+    console.error("ZeptoMail Error:", error.message);
+    throw new Error("Failed to send email via ZeptoMail.");
+  }
+};
+

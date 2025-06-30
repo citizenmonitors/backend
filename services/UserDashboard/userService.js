@@ -5,13 +5,15 @@ import ElectionData from "../../models/Election/ElectionData.js";
 import Election from "../../models/Election/Election.js";
 import bcrypt from "bcryptjs";
 import moment from "moment";
-import transporter from "../../config/email.js";
+import transporter, { sendEmail } from "../../config/email.js";
 import User from "../../models/User.js";
 import fs from "fs";
 import profileImageModel from "../../models/UserProfileImage/ProfileImageModel.js";
 import { fileURLToPath } from "url";
 import observerIdModel from "../../models/observerIds/observerIdModel.js";
 import { emailChangeNotificationTemplate, emailVerificationCodeTemplate, resendVerificationCodeTemplate } from "../../config/emailTemplates.js";
+import { uploadFileToFirebase } from "../../config/firebaseUploader.js";
+import bucket from "../../config/firebaseConfig.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,10 +25,13 @@ export const volunteerToObserverService = async ({ email, details, files }) => {
   if (!user) {
     throw new Error("No account found with this email address");
   }
-  console.log(files);
+  if (user.role == "observer") {
+    throw new Error("You are already an observer.");
+  }
+  // console.log(files);
 
   // Check if at least one observer ID file is provided
-  if (!files || !files["observerId[]"] || files["observerId[]"].length === 0) {
+  if (!files || !files["observerId"] || files["observerId"].length === 0) {
     throw new Error("At least one observer ID file is required for observers.");
   }
 
@@ -79,14 +84,14 @@ export const volunteerToObserverService = async ({ email, details, files }) => {
 
   // Process the observer ID files (one or more files)
   const observerIdFiles = await Promise.all(
-    files["observerId[]"].map(async (file) => {
-      const observerIdPath = `/observerid/${path.basename(file.path)}`;
+    files["observerId"].map(async (file) => {
+      const { publicUrl, filePath, token } = await uploadFileToFirebase(file, "observer_ids");
       const observerIdFile = await observerIdModel.create({
-        location: observerIdPath,
+        location: filePath,
         name: file.originalname,
         type: file.mimetype,
         size: file.size,
-        url: `${process.env.BACKEND_URL}${observerIdPath}`,
+        url: publicUrl,
       });
       return observerIdFile;
     })
@@ -122,7 +127,6 @@ export const updateUserService = async (
     if (!user) {
       throw new Error("User not found");
     }
-
     
     // Handle password update
     if (updateData.password) {
@@ -144,40 +148,53 @@ export const updateUserService = async (
     let profileImageFile;
     if (file && file.profileImage) {
       if (user.profileImage && user.profileImage.location) {
-        const oldImagePath = path.join(
-          __dirname,
-          "../../",
-          user.profileImage.location
-        );
-        console.log("Attempting to delete old profile image at:", oldImagePath);
-
-        if (fs.existsSync(oldImagePath)) {
-          fs.unlink(oldImagePath, (err) => {
-            if (err) {
-              console.error("Error deleting old profile image:", err);
-            } else {
-              console.log("Old profile image deleted successfully");
-            }
-          });
+        const location = user.profileImage.location;
+    
+        if (location.startsWith("profile_images/")) {
+          // Delete from Firebase
+          const oldFile = bucket.file(location);
+          const [exists] = await oldFile.exists();
+    
+          if (exists) {
+            await oldFile.delete();
+            console.log("Deleted old profile image from Firebase:", location);
+          } else {
+            console.log("Old profile image not found in Firebase:", location);
+          }
         } else {
-          console.log("Old profile image not found:", oldImagePath);
+          // Delete from local storage
+          const oldImagePath = path.join(__dirname, "../../", location);
+          if (fs.existsSync(oldImagePath)) {
+            fs.unlink(oldImagePath, (err) => {
+              if (err) {
+                console.error("Error deleting local profile image:", err);
+              } else {
+                console.log("Deleted old local profile image:", oldImagePath);
+              }
+            });
+          } else {
+            console.log("Old local profile image not found:", oldImagePath);
+          }
         }
       }
-
-      // Save the new profile image
-      const profileImagePath = `/profileimage/${path.basename(
-        file.profileImage.path
-      )}`;
+    
+      // Upload new profile image to Firebase
+      const { publicUrl, filePath, token } = await uploadFileToFirebase(file.profileImage, "profile_images");
+    
+      // Save new profile image metadata to DB
       profileImageFile = await profileImageModel.create({
-        location: profileImagePath,
+        location: filePath,
         name: file.profileImage.originalname,
         type: file.profileImage.mimetype,
         size: file.profileImage.size,
-        url: `${BACKEND_URL}${profileImagePath}`,
+        url: publicUrl,
+        token,
       });
-
-      updateData.profileImage = profileImageFile; // Update with the new image
+    
+      // Attach to updateData
+      updateData.profileImage = profileImageFile;
     }
+    
 
     // Check for ongoing elections using moment.js
     const ongoingElections = await Election.find({
@@ -286,8 +303,6 @@ export const updateUserService = async (
   }
 };
 
-
-
 export const updateUserEmail = async (userId, newEmail) => {
   try {
     const user = await CompletedUser.findById(userId);
@@ -326,21 +341,21 @@ export const updateUserEmail = async (userId, newEmail) => {
     const currentEmailContent = emailChangeNotificationTemplate(newEmail);
   
     // Send notification to the current email
-    await transporter.sendMail({
-      from: process.env.SMTP_USER,
+    await sendEmail({
+      from: process.env.ZEPTO_FROM_EMAIL,
       to: user.email,
       subject: "Email Change Request - Citizen Monitors",
-      html: currentEmailContent,
+      htmlbody: currentEmailContent,
     });
 
 
     const newEmailContent = emailVerificationCodeTemplate(verificationCode);
     // Send verification code to the new email
-    await transporter.sendMail({
-      from: process.env.SMTP_USER,
+    await sendEmail({
+      from: process.env.SZEPTO_FROM_EMAIL,
       to: newEmail,
       subject: "Verify Your New Email Address - Citizen Monitors",
-      html: newEmailContent,
+      htmlbody: newEmailContent,
     });
 
     await user.save();
@@ -415,6 +430,7 @@ export const resendTokenService = async (userId) => {
       );
     }
 
+
     const verificationCode = Math.floor(
       100000 + Math.random() * 900000
     ).toString();
@@ -426,11 +442,11 @@ export const resendTokenService = async (userId) => {
 
     const htmlContent = resendVerificationCodeTemplate(verificationCode);
     // Resend verification code to the new email
-    await transporter.sendMail({
-      from: process.env.SMTP_USER,
+    await sendEmail({
+      from: process.env.ZEPTO_FROM_EMAIL,
       to: user.pendingEmail,
       subject: "Resend Verification Code - Citizen Monitors",
-      html: htmlContent,
+      htmlbody: htmlContent,
     });
 
     return {

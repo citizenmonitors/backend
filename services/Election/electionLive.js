@@ -820,8 +820,8 @@ export const getActivityBoardAndNotificationsService = async () => {
     });
 
     // Pending results count considering `isObserverInPollingUnit`
-    const totalPendingResults = await ElectionData.aggregate([
-      { $match: { isApproved: false, userRole: "observer" } },
+    const totalUploadResults = await ElectionData.aggregate([
+      { $match: { userRole: "observer" } },
       {
         $lookup: {
           from: "completedusers",
@@ -837,21 +837,21 @@ export const getActivityBoardAndNotificationsService = async () => {
         },
       },
       {
-        $count: "totalPendingResults",
+        $count: "totalUploadResults",
       },
     ]);
 
     const pendingResultsCount =
-      totalPendingResults.length > 0
-        ? totalPendingResults[0].totalPendingResults
+      totalUploadResults.length > 0
+        ? totalUploadResults[0].totalUploadResults
         : 0;
 
     const activityBoard = {
       "all the total result submitted": totalResults,
       "all the total result submitted by observer": totalObserverResults,
       "all the total result submitted by volunteer": totalVolunteerResults,
-      "all the total approved result": totalApprovedResults,
-      "all the total pending approved result": pendingResultsCount,
+      "all the total approved result": pendingResultsCount,
+      // "all the total pending approved result": pendingResultsCount,
     };
 
     // Fetch the top 10 most recent notifications

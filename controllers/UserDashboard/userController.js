@@ -10,43 +10,9 @@ import upload from "../../config/multer.js";
 
 
 
-// volunteer to observer
-
-// export const volunteerToObserver = [
-//   upload.fields("governmentId"), 
-//   async (req, res) => {
-//     try {
-//       const user = req.user;
-//       const { ...details } = req.body;
-//       const file = req.file; 
-
-//       if (!files) {
-//         return res
-//           .status(400)
-//           .json({ message: "Government ID is required to be an observer" });
-//       }
-
-//       const updatedUser = await volunteerToObserverService({
-//         email: user.email,
-//         details,
-//         files, 
-//       });
-
-//       res.status(200).json({
-//         message: "Volunteer updated to Observer successfully",
-//         user: updatedUser,
-//       });
-//     } catch (err) {
-//       console.error("Error updating user to Observer:", err);
-//       res.status(500).json({
-//         message: "An error occurred while updating user to Observer",
-//       });
-//     }
-//   },
-// ];
 
 export const volunteerToObserver = [
-  upload.fields([{ name: "observerId[]", maxCount: 2 }]), 
+  upload.fields([{ name: "observerId", maxCount: 2 }]), 
   async (req, res) => {
     
     try {
@@ -55,6 +21,7 @@ export const volunteerToObserver = [
       const files = req.files;
 
 console.log(files)
+
 
 
       // Call the service to update the volunteer to observer
@@ -108,6 +75,7 @@ export const updateUser = [
         return res.status(200).json(result);
       }
 
+      
       res.status(200).json(result);
     } catch (error) {
       console.error("Error updating user details:", error);

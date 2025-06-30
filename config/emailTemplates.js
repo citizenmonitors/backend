@@ -11,7 +11,7 @@ const baseTemplate = ({
           <tr>
             <td align="center" style="padding-bottom:20px">
              
-       <img src="https://citizenmonitors.com/assets/svgviewer-png-output.png" alt="svgviewer-png-output.png" width="150" height="50">
+       <img src="citizen-monitors-logo-white.png" alt="citizen-monitors-logo" width="150" height="50">
         </td>
           </tr>
     

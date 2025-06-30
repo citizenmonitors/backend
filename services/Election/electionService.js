@@ -5,11 +5,12 @@ import CompletedUser from "../../models/CompletedUser.js";
 import { politicalParties } from "../../models/Election/PoliticalParty.js";
 import IncidentReport from "../../models/Election/IncidentReport.js";
 import Notification from "../../models/DailyTraffic/Notification.js";
-// import { uploadFilesToGCS } from "../GoogleCloud/gcsService.js";
 import File from "../../models/file.js";
 import path from "path";
 import moment from "moment";
 import AdminLog from "../../models/admin/AdminLog.js";
+import { uploadFileToFirebase } from "../../config/firebaseUploader.js";
+import bucket from "../../config/firebaseConfig.js";
 
 const BACKEND_URL = process.env.BACKEND_URL;
 
@@ -569,43 +570,57 @@ export const uploadResultDataService = async (
     }
 
     // Initialize result picture and video
+
     let resultPicture = null;
     let resultVideo = null;
-
+    
     // Handle the picture file upload (if provided)
     if (files.resultPicture && files.resultPicture.length > 0) {
-      const resultPicturePath = `/resultpicture/${path.basename(
-        files.resultPicture[0].path
-      )}`;
-
+      const { publicUrl, filePath, token } = await uploadFileToFirebase(
+        files.resultPicture[0],
+        "result_pictures"
+      );
+    
       resultPicture = await File.create({
-        location: files.resultPicture[0].path,
+        location: filePath,
         name: files.resultPicture[0].originalname,
         type: files.resultPicture[0].mimetype,
         size: files.resultPicture[0].size,
-        url: `${BACKEND_URL}${resultPicturePath}`,
+        url: publicUrl,
+        token,
       });
     }
-
-    // Handle the video file upload
+    
+    // Handle the video file upload (if provided)
     if (files.resultVideo && files.resultVideo.length > 0) {
-      const resultVideoPath = `/resultvideo/${path.basename(
-        files.resultVideo[0].path
-      )}`;
+      const { publicUrl, filePath, token } = await uploadFileToFirebase(
+        files.resultVideo[0],
+        "result_videos"
+      );
+    
       resultVideo = await File.create({
-        location: files.resultVideo[0].path,
+        location: filePath,
         name: files.resultVideo[0].originalname,
         type: files.resultVideo[0].mimetype,
         size: files.resultVideo[0].size,
-        url: `${BACKEND_URL}${resultVideoPath}`,
+        url: publicUrl,
+        token,
       });
     }
 
-    // Determine if the result should include "isApproved"
-    let isApproved = null;
-    if (user.role === "observer" && user.isObserverInPollingUnit) {
-      isApproved = false;
+    // Validate that both resultPicture and resultVideo are uploaded
+    if (!resultPicture || !resultVideo) {
+      throw new Error(
+        "Both resultPicture and resultVideo must be uploaded."
+      );
     }
+
+    
+    // Determine if the result should include "isApproved"
+    // let isApproved = null;
+    // if (user.role === "observer" && user.isObserverInPollingUnit) {
+    //   isApproved = false;
+    // }
 
     // Create the election data document
     const electionData = new ElectionData({
@@ -627,7 +642,7 @@ export const uploadResultDataService = async (
       rejectedPapers,
       spoiledBallotPapers,
       usedBallotPapers,
-      ...(isApproved !== null && { isApproved }),
+      // ...(isApproved !== null && { isApproved }),
     });
 
     // Save the election result data
@@ -653,13 +668,17 @@ export const uploadResultDataService = async (
     );
     const formattedStateName = toTitleCase(user.state || "State");
 
+    // count result upload
+    const resultUploadCount = await ElectionData.countDocuments({
+      election: electionId,
+    })
     // Determine body and info based on election type
     let uploadNotificationBody = "";
     let uploadNotificationInfo = "";
 
     switch (activeElection.election.electionType) {
       case "national":
-        uploadNotificationBody = `Result uploaded for ${formattedStateName} State`;
+        uploadNotificationBody = `$${resultUploadCount} ${resultUploadCount === 1 ? "Result uploaded" : "Results uploaded"} for ${formattedStateName} State`;
         uploadNotificationInfo = `${formattedElectionName} Election`;
         break;
 
@@ -668,18 +687,18 @@ export const uploadResultDataService = async (
       case "house-of-representatives":
       case "house-of-assembly":
         const formattedLGAName = toTitleCase(user.lga || "LGA");
-        uploadNotificationBody = `Result uploaded for ${formattedLGAName} LGA`;
+        uploadNotificationBody = `$${resultUploadCount} ${resultUploadCount === 1 ? "Result uploaded" : "Results uploaded"} for ${formattedLGAName} LGA`;
         uploadNotificationInfo = `${formattedStateName} State ${formattedElectionName} Election`;
         break;
 
       case "lga":
         const formattedWardName = toTitleCase(user.ward || "Ward");
-        uploadNotificationBody = `Result uploaded for ${formattedWardName} Ward`;
+        uploadNotificationBody = `$${resultUploadCount} ${resultUploadCount === 1 ? "Result uploaded" : "Results uploaded"} for ${formattedWardName} Ward`;
         uploadNotificationInfo = `${formattedStateName} State ${formattedElectionName} Election`;
         break;
 
       default:
-        uploadNotificationBody = `Result uploaded for ${formattedElectionName} Election`;
+        uploadNotificationBody = `$${resultUploadCount} ${resultUploadCount === 1 ? "Result uploaded" : "Results uploaded"} for ${formattedElectionName} Election`;
         uploadNotificationInfo = `${formattedElectionName} Election`;
     }
 
@@ -693,54 +712,54 @@ export const uploadResultDataService = async (
     await uploadNotification.save();
 
     // Create or update pending approval notification
-    const pendingCount = await ElectionData.countDocuments({
-      election: electionId,
-      isApproved: false,
-    });
+    // const pendingCount = await ElectionData.countDocuments({
+    //   election: electionId,
+    //   // isApproved: false,
+    // });
 
-    let pendingNotificationBody = "";
-    let pendingNotificationInfo = "";
+    // let pendingNotificationBody = "";
+    // let pendingNotificationInfo = "";
 
-    switch (activeElection.election.electionType) {
-      case "national":
-        pendingNotificationBody = `${pendingCount} Pending Approval for ${formattedStateName} State`;
-        pendingNotificationInfo = `${formattedElectionName} Election`;
-        break;
+    // switch (activeElection.election.electionType) {
+    //   case "national":
+    //     pendingNotificationBody = `${pendingCount} Pending Approval for ${formattedStateName} State`;
+    //     pendingNotificationInfo = `${formattedElectionName} Election`;
+    //     break;
 
-      case "senatorial":
-      case "gubernatorial":
-      case "house-of-representatives":
-      case "house-of-assembly":
-        const formattedLGANameForPending = toTitleCase(user.lga || "LGA");
-        pendingNotificationBody = `${pendingCount} Pending Approval for ${formattedLGANameForPending} LGA`;
-        pendingNotificationInfo = `${formattedStateName} State ${formattedElectionName} Election`;
-        break;
+    //   case "senatorial":
+    //   case "gubernatorial":
+    //   case "house-of-representatives":
+    //   case "house-of-assembly":
+    //     const formattedLGANameForPending = toTitleCase(user.lga || "LGA");
+    //     pendingNotificationBody = `${pendingCount} Pending Approval for ${formattedLGANameForPending} LGA`;
+    //     pendingNotificationInfo = `${formattedStateName} State ${formattedElectionName} Election`;
+    //     break;
 
-      case "lga":
-        const formattedWardNameForPending = toTitleCase(user.ward || "Ward");
-        pendingNotificationBody = `${pendingCount} Pending Approval for ${formattedWardNameForPending} Ward`;
-        pendingNotificationInfo = `${formattedStateName} State ${formattedElectionName} Election`;
-        break;
+    //   case "lga":
+    //     const formattedWardNameForPending = toTitleCase(user.ward || "Ward");
+    //     pendingNotificationBody = `${pendingCount} Pending Approval for ${formattedWardNameForPending} Ward`;
+    //     pendingNotificationInfo = `${formattedStateName} State ${formattedElectionName} Election`;
+    //     break;
 
-      default:
-        pendingNotificationBody = `${pendingCount} Pending Approval for ${formattedElectionName}`;
-        pendingNotificationInfo = `${formattedElectionName} Election`;
-    }
+    //   default:
+    //     pendingNotificationBody = `${pendingCount} Pending Approval for ${formattedElectionName}`;
+    //     pendingNotificationInfo = `${formattedElectionName} Election`;
+    // }
 
-    // Save pending approval notification
-    const pendingNotification = new Notification({
-      type: "pending-approval",
-      body: pendingNotificationBody,
-      info: pendingNotificationInfo,
-    });
+    // // Save pending approval notification
+    // const pendingNotification = new Notification({
+    //   type: "pending-approval",
+    //   body: pendingNotificationBody,
+    //   info: pendingNotificationInfo,
+    // });
 
-    await pendingNotification.save();
+    // await pendingNotification.save();
 
     // Convert to a plain object and remove isApproved if not applicable
     const resultData = savedResultData.toObject();
-    if (isApproved === null) {
-      delete resultData.isApproved;
-    }
+    // if (isApproved === null) {
+    //   delete resultData.isApproved;
+    // }
 
     // Return the saved result data
     return resultData;
@@ -753,8 +772,8 @@ export const uploadResultDataService = async (
 export const updateResultDataService = async (
   electionId,
   userId,
-  data,
-  files
+  data = {},
+  files = {} 
 ) => {
   try {
     let {
@@ -892,37 +911,81 @@ export const updateResultDataService = async (
         ? usedBallotPapers
         : result.usedBallotPapers;
 
-    // Concurrently create resultPicture and resultVideo if provided
-    const filePromises = [];
 
-    if (files.resultPicture && files.resultPicture.length > 0) {
-      filePromises.push(
-        File.create({
-          location: files.resultPicture[0].path,
-          name: files.resultPicture[0].originalname,
-          type: files.resultPicture[0].mimetype,
-          size: files.resultPicture[0].size,
-        }).then((file) => {
-          result.resultPicture = file;
-        })
-      );
-    }
-
-    if (files.resultVideo && files.resultVideo.length > 0) {
-      filePromises.push(
-        File.create({
-          location: files.resultVideo[0].path,
-          name: files.resultVideo[0].originalname,
-          type: files.resultVideo[0].mimetype,
-          size: files.resultVideo[0].size,
-        }).then((file) => {
-          result.resultVideo = file;
-        })
-      );
-    }
-
-    // Wait for all file operations to complete
-    await Promise.all(filePromises);
+        const filePromises = [];
+        
+        // Update resultPicture if provided
+        if (files.resultPicture && files.resultPicture.length > 0) {
+          filePromises.push(
+            (async () => {
+              // Delete old Firebase file and DB record if exists
+              if (result.resultPicture) {
+                const oldFile = bucket.file(result.resultPicture.location);
+                const [exists] = await oldFile.exists();
+                if (exists) {
+                  await oldFile.delete();
+                  // console.log("Deleted old resultPicture from Firebase:", result.resultPicture.location);
+                }
+                await File.deleteOne({ _id: result.resultPicture._id });
+              }
+        
+              // Upload new file to Firebase
+              const { publicUrl, filePath, token } = await uploadFileToFirebase(files.resultPicture[0], "result_pictures");
+        
+              // Create new File document
+              const newFile = await File.create({
+                location: filePath,
+                name: files.resultPicture[0].originalname,
+                type: files.resultPicture[0].mimetype,
+                size: files.resultPicture[0].size,
+                url: publicUrl,
+                token,
+              });
+        
+              // Update result object reference
+              result.resultPicture = newFile;
+            })()
+          );
+        }
+        
+        
+        // Update resultVideo if provided
+        if (files.resultVideo && files.resultVideo.length > 0) {
+          filePromises.push(
+            (async () => {
+              // Delete old Firebase file and DB record if exists
+              if (result.resultVideo) {
+                const oldFile = bucket.file(result.resultVideo.location);
+                const [exists] = await oldFile.exists();
+                if (exists) {
+                  await oldFile.delete();
+                  // console.log("Deleted old resultVideo from Firebase:", result.resultVideo.location);
+                }
+                await File.deleteOne({ _id: result.resultVideo._id });
+              }
+        
+              // Upload new file to Firebase
+              const { publicUrl, filePath, token } = await uploadFileToFirebase(files.resultVideo[0], "result_videos");
+        
+              // Create new File document
+              const newFile = await File.create({
+                location: filePath,
+                name: files.resultVideo[0].originalname,
+                type: files.resultVideo[0].mimetype,
+                size: files.resultVideo[0].size,
+                url: publicUrl,
+                token,
+              });
+        
+              // Update result object reference
+              result.resultVideo = newFile;
+            })()
+          );
+        }
+        
+        // Wait for all file updates to finish
+        await Promise.all(filePromises);
+        
 
     // Save the updated result data
     const updatedResult = await result.save();
@@ -963,9 +1026,6 @@ export const deleteElectionResultDataService = async (electionId, userId) => {
   }
 };
 
-// export const getUserElectionData = async (userId) => {
-//   return await ElectionData.find({ user: userId }).populate("election");
-// };
 
 export const getUserElectionData = async (userId) => {
   if (!userId) {
@@ -1064,38 +1124,62 @@ export const uploadIncidentReportDataService = async (
     });
     if (existingReport) return existingReport;
 
-    // Validate files
+    const allowedVideoExtensions = [".mp4", ".avi", ".mov", ".webm", ".wmv"];
+    const allowedImageExtensions = [".jpg", ".jpeg", ".png", ".svg"];
+    
+    // Validate file extension
     const validateFile = (file, allowedExtensions) => {
       const ext = path.extname(file.originalname).toLowerCase();
       if (!allowedExtensions.includes(ext)) {
         throw new Error(
-          `Invalid file type. Please upload one of the following: ${allowedExtensions.join(
-            ", "
-          )}`
+          `Invalid file type. Allowed: ${allowedExtensions.join(", ")}`
         );
       }
-      const incidentReportFilePath = `/incidentreport/${path.basename(
-        file.path
-      )}`;
-      return {
-        location: file.path,
-        name: file.originalname,
-        type: file.mimetype,
-        size: file.size,
-        url: `${BACKEND_URL}${incidentReportFilePath}`,
-      };
+      return ext;
     };
 
-    // Process incident videos and pictures
-    const incidentVideos =
-      files["incidentVideos[]"]?.map((file) =>
-        validateFile(file, [".mp4", ".avi", ".mov", ".webm", ".wmv"])
-      ) || [];
+        // Validate that both incidentPicture and incidentVideo are uploaded
+        if (
+          (!files.incidentVideos || files.incidentVideos.length === 0) ||
+          (!files.incidentPictures || files.incidentPictures.length === 0)
+        ) {
+          throw new Error(
+            "Both incidentPicture and incidentVideo must be uploaded."
+          );
+        }
+    
+    // Upload and validate incident videos
+    const incidentVideoPromises =
+      files["incidentVideos"]?.map(async (file) => {
+        validateFile(file, allowedVideoExtensions);
+        const { publicUrl, filePath, token } = await uploadFileToFirebase(file, "incident_videos");
+    
+        return {
+          location: filePath,
+          name: file.originalname,
+          type: file.mimetype,
+          size: file.size,
+          url: publicUrl,
+          token,
+        };
+      }) || [];
+    
+    const incidentPicturePromises =
+      files["incidentPictures"]?.map(async (file) => {
+        validateFile(file, allowedImageExtensions);
+        const { publicUrl, filePath, token } = await uploadFileToFirebase(file, "incident_pictures");
+    
+        return {
+          location: filePath,
+          name: file.originalname,
+          type: file.mimetype,
+          size: file.size,
+          url: publicUrl,
+          token,
+        };
+      }) || [];
+    
 
-    const incidentPictures =
-      files["incidentPictures[]"]?.map((file) =>
-        validateFile(file, [".jpg", ".jpeg", ".png", ".svg"])
-      ) || [];
 
     // Create incident report
     const incidentReport = new IncidentReport({
@@ -1109,8 +1193,8 @@ export const uploadIncidentReportDataService = async (
       selectIncident,
       incidentNote,
       electionRating,
-      incidentPictures: await File.insertMany(incidentPictures),
-      incidentVideos: await File.insertMany(incidentVideos),
+      incidentPictures: await Promise.all(incidentPicturePromises),
+      incidentVideos: await Promise.all(incidentVideoPromises),
     });
 
     // Save and return
@@ -1125,88 +1209,144 @@ export const uploadIncidentReportDataService = async (
   }
 };
 
+
 export const updateIncidentReportDataService = async (
   electionId,
   userId,
-  data,
-  files
+  data = {},
+  files = {},
+  replaceFiles = false
 ) => {
   try {
     const {
       selectIncident,
       incidentNote,
       electionRating,
-      previousIncidentPictures,
-      previousIncidentVideos,
+      keepIncidentVideoIds = [],
+      keepIncidentPictureIds = [],
     } = data;
 
-    // Check if the election exists
+    const allowedVideoExtensions = [".mp4", ".avi", ".mov", ".webm", ".wmv"];
+    const allowedImageExtensions = [".jpg", ".jpeg", ".png", ".svg"];
+
+    const validateFile = (file, allowedExtensions) => {
+      const ext = path.extname(file.originalname).toLowerCase();
+      if (!allowedExtensions.includes(ext)) {
+        throw new Error(
+          `Invalid file type. Allowed: ${allowedExtensions.join(", ")}`
+        );
+      }
+    };
+
     const electionExists = await ActiveElection.findById(electionId);
     if (!electionExists) throw new Error("Election not found");
 
-    // Check user existence
     const user = await CompletedUser.findById(userId);
     if (!user) throw new Error("User not found");
 
-    // Check if the incident report exists and belongs to the user
     const report = await IncidentReport.findOne({
       election: electionId,
       user: userId,
     });
     if (!report) throw new Error("Incident report not found or unauthorized");
 
-    // Helper function to format file details
-    const formatFileDetails = (file) => ({
-      location: file.path,
-      name: file.originalname,
-      type: file.mimetype,
-      size: file.size,
-    });
+    report.selectIncident = selectIncident ?? report.selectIncident;
+    report.incidentNote = incidentNote ?? report.incidentNote;
+    report.electionRating = electionRating ?? report.electionRating;
 
-    // Update report data fields if provided
-    report.selectIncident =
-      selectIncident !== undefined ? selectIncident : report.selectIncident;
-    report.incidentNote =
-      incidentNote !== undefined ? incidentNote : report.incidentNote;
-    report.electionRating =
-      electionRating !== undefined ? electionRating : report.electionRating;
+    // Helper: delete old files not in keepIds
+    const deleteUnkeptFiles = async (existingFiles, keepIds = []) => {
+      const toDelete = existingFiles.filter(
+        (f) => !keepIds.includes(f._id.toString())
+      );
+      await Promise.all(
+        toDelete.map(async (file) => {
+          const oldFile = bucket.file(file.location);
+          const [exists] = await oldFile.exists();
+          if (exists) await oldFile.delete();
+          await File.deleteOne({ _id: file._id });
+        })
+      );
+      return existingFiles.filter((f) => keepIds.includes(f._id.toString()));
+    };
 
-    const incidentVideos = files["incidentVideos[]"];
-    const incidentPictures = files["incidentPictures[]"];
+    // Process incidentPictures
+    if (files.incidentPictures && files.incidentPictures.length > 0) {
+      let keptPictures = [];
 
-    console.log(incidentVideos, incidentPictures);
-    // Handle video files
-    const previousIncidentVideoFiles = previousIncidentVideos?.length
-      ? await File.find({ _id: { $in: previousIncidentVideos } })
-      : [];
-    const newIncidentVideoFiles = incidentVideos?.length
-      ? incidentVideos.map((file) => formatFileDetails(file))
-      : [];
-    const newVideos = newIncidentVideoFiles.length
-      ? await File.insertMany(newIncidentVideoFiles)
-      : [];
+      if (replaceFiles) {
+        // Delete all old
+        await deleteUnkeptFiles(report.incidentPictures);
+      } else {
+        // Delete only unkept
+        keptPictures = await deleteUnkeptFiles(
+          report.incidentPictures,
+          keepIncidentPictureIds
+        );
+      }
 
-    // Merge old and new videos
-    report.incidentVideos = [...previousIncidentVideoFiles, ...newVideos];
+      const newPictures = await Promise.all(
+        files.incidentPictures.map(async (file) => {
+          validateFile(file, allowedImageExtensions);
+          const { publicUrl, filePath, token } = await uploadFileToFirebase(
+            file,
+            "incident_pictures"
+          );
+          return await File.create({
+            location: filePath,
+            name: file.originalname,
+            type: file.mimetype,
+            size: file.size,
+            url: publicUrl,
+            token,
+          });
+        })
+      );
 
-    // Handle picture files
-    const previousIncidentPictureFiles = previousIncidentPictures?.length
-      ? await File.find({ _id: { $in: previousIncidentPictures } })
-      : [];
-    const newIncidentPictureFiles = incidentPictures?.length
-      ? incidentPictures.map((file) => formatFileDetails(file))
-      : [];
-    const newPictures = newIncidentPictureFiles.length
-      ? await File.insertMany(newIncidentPictureFiles)
-      : [];
+      report.incidentPictures = replaceFiles
+        ? newPictures
+        : [...keptPictures, ...newPictures];
+    }
 
-    // Merge old and new pictures
-    report.incidentPictures = [...previousIncidentPictureFiles, ...newPictures];
+    // Process incidentVideos
+    if (files.incidentVideos && files.incidentVideos.length > 0) {
+      let keptVideos = [];
 
-    // Save the updated report
-    return await report.save();
+      if (replaceFiles) {
+        await deleteUnkeptFiles(report.incidentVideos);
+      } else {
+        keptVideos = await deleteUnkeptFiles(
+          report.incidentVideos,
+          keepIncidentVideoIds
+        );
+      }
+
+      const newVideos = await Promise.all(
+        files.incidentVideos.map(async (file) => {
+          validateFile(file, allowedVideoExtensions);
+          const { publicUrl, filePath, token } = await uploadFileToFirebase(
+            file,
+            "incident_videos"
+          );
+          return await File.create({
+            location: filePath,
+            name: file.originalname,
+            type: file.mimetype,
+            size: file.size,
+            url: publicUrl,
+            token,
+          });
+        })
+      );
+
+      report.incidentVideos = replaceFiles
+        ? newVideos
+        : [...keptVideos, ...newVideos];
+    }
+
+    const updatedReport = await report.save();
+    return updatedReport;
   } catch (error) {
-    console.error("Error updating incident report data", error);
     throw new Error(`Failed to update incident report data: ${error.message}`);
   }
 };
@@ -1699,6 +1839,5 @@ export const checkUserSubmissionStatusForFlag = async (userId, actionData) => {
 
   return { hasUploaded: false };
 };
-
 
 

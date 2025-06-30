@@ -101,9 +101,10 @@ export const submitRoleForm = [
 ];
 
 
+
 export const submitObserverDetailsController = [
   upload.fields([
-    { name: "observerId[]", maxCount: 2 }, 
+    { name: "observerId", maxCount: 2 }, 
   ]),
   async (req, res) => {
     try {
@@ -117,7 +118,7 @@ export const submitObserverDetailsController = [
       } = req.body;
 
       // Collect the two observer ID files (PVC front and back)
-      const observerIdFiles = req.files["observerId[]"];
+      const observerIdFiles = req.files["observerId"];
 
 
       // Call the service and pass the observerIdFiles
@@ -190,6 +191,7 @@ export const validateUserSession = async (req, res) => {
     res.status(401).json({ message: err.message });
   }
 };
+
 
 
 

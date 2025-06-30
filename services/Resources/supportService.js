@@ -1,6 +1,6 @@
 import { supportRequestTemplate } from "../../config/emailTemplates.js";
 import SupportRequest from "../../models/Resources/support.js"
-import transporter from "../../config/email.js";
+import transporter, { sendEmail } from "../../config/email.js";
 
 
 export const createSupportRequest = async (data) => {
@@ -18,11 +18,11 @@ export const createSupportRequest = async (data) => {
         data.message
       );
   
-      await transporter.sendMail({
-        from: process.env.SMTP_USER,
+      await sendEmail({
+        from: process.env.ZEPTO_FROM_EMAIL,
         to: "support@citizenmonitors.com",
         subject: `New Support Request from ${data.firstName} ${data.lastName}`,
-        html: emailContent,
+        htmlbody: emailContent,
       });
   
       return supportRequest;

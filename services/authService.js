@@ -5,14 +5,14 @@ import User from "../models/User.js";
 import CompletedUser from "../models/CompletedUser.js";
 import  Traffic  from "../models/DailyTraffic/dailyTraffic.js";
 import  ActiveUser  from "../models/ActiveMontlyUsers/activeMontlyUsers.js";
-import transporter from "../config/email.js";
+import  { sendEmail } from "../config/email.js";
 import { generateToken } from "../utils/generateToken.js";
 import { hashPassword } from "../utils/hashPassword.js";
 import moment from "moment";
-import path from "path";
 import ProfileImageModel from "../models/UserProfileImage/ProfileImageModel.js";
 import observerIdModel from "../models/observerIds/observerIdModel.js";
 import { forgotPasswordTemplate, registrationCode, resendCode } from "../config/emailTemplates.js";
+import { uploadFileToFirebase } from "../config/firebaseUploader.js";
 // import { uploadFileToGCS } from "./GoogleCloud/gcsService.js";
 
 const FRONTEND_URL = process.env.FRONTEND_URL;
@@ -57,11 +57,11 @@ export const registerUser = async ({ email, password, confirmPassword }) => {
 
   const htmlContent = registrationCode(verificationCode);
 
-  await transporter.sendMail({
-    from: process.env.SMTP_USER,
+  await sendEmail({
+    from: process.env.ZEPTO_FROM_EMAIL,
     to: email,
     subject: "Welcome to Citizen Monitors - Verify Your Account",
-    html: htmlContent,
+    htmlbody: htmlContent,
     // html: `<p>Your verification code is: ${verificationCode}</p>`,
   });
 
@@ -112,15 +112,16 @@ export const resendTokenService = async (email) => {
 
   const htmlContent = resendCode(verificationCode);
 
-  await transporter.sendMail({
-    from: process.env.SMTP_USER,
+  await sendEmail({
+    from: process.env.ZEPTO_FROM_EMAIL,
     to: email,
     subject: "Resend Verification Code - Citizen Monitors",
-    html: htmlContent,
+    htmlbody: htmlContent,
   });
 
   return { message: "New verification code sent." };
 };
+
 
 export const submitRoleFormDetails = async ({ email, details, file }) => {
   // Fetch the user by email
@@ -142,23 +143,23 @@ export const submitRoleFormDetails = async ({ email, details, file }) => {
 
   // Handle profile image for the user (only one image, not an array)
   if (file) {
-    const profileImagePath = `/profileimage/${path.basename(file.path)}`;
-
-    // Create the profileImage object
+    const { publicUrl, filePath, token } = await uploadFileToFirebase(file, "profile_images");
+  
     const profileImageFile = await ProfileImageModel.create({
-      location: profileImagePath,
+      location: `profile_images/${file.originalname}`,
       name: file.originalname,
       type: file.mimetype,
       size: file.size,
-      url: `${BACKEND_URL}${profileImagePath}`,
+      url: publicUrl,
     });
 
-    // console.log("Profile image saved:", profileImageFile); 
+    console.log("Profile image saved:", profileImageFile); 
+  
+    details.profileImage = profileImageFile;
 
-    details.profileImage = profileImageFile; 
   } else {
     // Handle the case where no profile image is provided
-    // console.log("No profile image provided or invalid format.");
+    // console.log("No profile image provided");
   }
 
   // Assign general details to the user
@@ -190,7 +191,6 @@ export const submitRoleFormDetails = async ({ email, details, file }) => {
     isObserverInPollingUnit: !!isObserverInPollingUnit,
   };
 };
-
 export const selectUserRole = async (email, role) => {
   // Check if the selected role is valid
   if (!["observer", "volunteer"].includes(role)) {
@@ -277,8 +277,7 @@ export const submitObserverDetails = async ({
   const user = await User.findOne({ email });
   if (!user) {
     throw new Error("User not found.");
-  }
-
+  };
   // Ensure the user has selected the observer role
   if (user.role !== "observer") {
     throw new Error("User is not an observer.");
@@ -297,16 +296,17 @@ export const submitObserverDetails = async ({
   }
 
   // Handle observer ID uploads (saving one or more files)
+
   const observerId = await Promise.all(
     observerIdFiles.map(async (file) => {
-      const observerIdPath = `/observerid/${path.basename(file.path)}`;
+      const { publicUrl, filePath, token } = await uploadFileToFirebase(file, "observer_ids");
 
       const createdFile = await observerIdModel.create({
-        location: observerIdPath,
+        location: filePath,
         name: file.originalname,
         type: file.mimetype,
         size: file.size,
-        url: `${process.env.BACKEND_URL}${observerIdPath}`,
+        url: publicUrl,
       });
 
       return createdFile;
@@ -410,11 +410,11 @@ export const generateResetToken = async (email) => {
   const resetUrl = `${FRONTEND_URL}/auth/reset-password?token=${resetToken}`;
   const htmlContent = forgotPasswordTemplate(resetUrl);
 
-  await transporter.sendMail({
-    from: process.env.SMTP_USER,
+  await sendEmail({
+    from: process.env.ZEPTO_FROM_EMAIL,
     to: email,
     subject: "Reset Your Password for Your Citizen Monitors Account",
-    html: htmlContent,
+    htmlbody: htmlContent,
   });
 
   return { message: "Password reset link sent to email." };

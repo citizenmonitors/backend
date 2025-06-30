@@ -3,7 +3,7 @@ import CompletedUser from "../../models/CompletedUser.js";
 import ElectionData from "../../models/Election/ElectionData.js";
 import Traffic from "../../models/DailyTraffic/dailyTraffic.js";
 import ActiveUser from "../../models/ActiveMontlyUsers/activeMontlyUsers.js";
-import transporter, { sendEmail } from "../../config/email.js";
+import  { sendEmail } from "../../config/email.js";
 import ActiveElection from "../../models/Election/ActiveElection.js";
 import AdminPermissions from "../../models/admin/AdminPermissions.js";
 import AdminLog from "../../models/admin/AdminLog.js";

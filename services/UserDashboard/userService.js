@@ -5,7 +5,7 @@ import ElectionData from "../../models/Election/ElectionData.js";
 import Election from "../../models/Election/Election.js";
 import bcrypt from "bcryptjs";
 import moment from "moment";
-import transporter, { sendEmail } from "../../config/email.js";
+import { sendEmail } from "../../config/email.js";
 import User from "../../models/User.js";
 import fs from "fs";
 import profileImageModel from "../../models/UserProfileImage/ProfileImageModel.js";

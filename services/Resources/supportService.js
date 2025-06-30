@@ -1,6 +1,6 @@
 import { supportRequestTemplate } from "../../config/emailTemplates.js";
 import SupportRequest from "../../models/Resources/support.js"
-import transporter, { sendEmail } from "../../config/email.js";
+import  { sendEmail } from "../../config/email.js";
 
 
 export const createSupportRequest = async (data) => {

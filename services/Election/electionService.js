@@ -209,7 +209,7 @@ export const updateElectionService = async (electionId, data, adminId) => {
 // };
 
 export const activeElections = async (data, adminId) => {
-  let { electionId, electionLocation, startDate, endDate } = data;
+  let { electionId, electionLocation, startDate, endDate, mockElection } = data;
 
   try {
     const existingElection = await Election.findById(electionId);
@@ -231,7 +231,7 @@ export const activeElections = async (data, adminId) => {
     if (duplicate) throw new Error("An election for this location and date range already exists.");
 
     // Save new active election
-    const activeElection = await new ActiveElection({ election: electionId, electionLocation, startDate, endDate }).save();
+    const activeElection = await new ActiveElection({ election: electionId, electionLocation, startDate, endDate, mockElection }).save();
 
     // Log admin action
     await AdminLog.create({

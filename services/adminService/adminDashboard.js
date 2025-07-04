@@ -1201,3 +1201,45 @@ export const processAdminLogs = async () => {
 
 
 
+export const downgradeAllObserverService = async (adminReason) => {
+  try {
+    // Fetch all users with the role "observer"
+    const observers = await CompletedUser.find({ role: "observer" });
+
+    if (!observers || observers.length === 0) {
+      throw new Error("No observers found to downgrade.");
+    }
+
+    // Iterate through each observer and downgrade their role
+    for (const observer of observers) {
+      observer.role = "volunteer";
+      observer.isObserverInPollingUnit = false;
+      observer.pendingObserverVerification = false;
+
+      // Save the updated observer
+      await observer.save();
+
+      // Notify the downgraded observer via email
+      const htmlContent = observerDowngradeTemplate(
+        observer.firstName,
+        observer.pollingUnit,
+        adminReason
+      );
+
+      await sendEmail({
+        from: process.env.ZEPTO_FROM_EMAIL,
+        to: observer.email,
+        subject: "Observer Role Downgraded - Citizen Monitors",
+        htmlbody: htmlContent,
+      });
+    }
+
+    // Return success message
+    return {
+      message: "All observers downgraded successfully",
+    };
+  } catch (error) {
+    console.error(`Error downgrading observers: ${error.message}`);
+    throw new Error(`Error downgrading observers: ${error.message}`);
+  }
+};

@@ -137,6 +137,7 @@ router.get(
 );
 
 router.post("/admin/podcast", authMiddleware, isAdmin, PodcastController.sendPodcast);
+router.post("/admin/newsletter", authMiddleware, PodcastController.sendNewsletter);
 router.patch("/admin/podcast/:id", authMiddleware, isAdmin, PodcastController.editPodcast);
 router.get("/admin/podcast", authMiddleware, isAdmin, PodcastController.getAllPodcasts);
 router.delete("/admin/podcast/:id", authMiddleware, isAdmin, PodcastController.deletePodcast);

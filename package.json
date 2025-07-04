@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "migrate:files": "node ./scripts/migrateFullFilesToFirebase.js"
+    "migrate:files": "node ./scripts/backfillInboxFields.js"
   },
   "keywords": [],
   "author": "",

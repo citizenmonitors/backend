@@ -115,6 +115,6 @@ const upload = multer({
 });
 
 export const uploadIncidentDataFiles = upload.fields([
-  { name: "incidentPictures", maxCount: 10 },
-  { name: "incidentVideo", maxCount: 5 },
+  { name: "incidentPictures[]", maxCount: 10 },
+  { name: "incidentVideos[]", maxCount: 5 },
 ]);

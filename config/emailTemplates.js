@@ -11,7 +11,7 @@ const baseTemplate = ({
           <tr>
             <td align="center" style="padding-bottom:20px">
              
-       <img src="citizen-monitors-logo-white.png" alt="citizen-monitors-logo" width="150" height="50">
+       <img src="https://www.citizenmonitors.com/assets/citizen-monitors-logo.png" alt="citizen-monitors-logo" width="150" height="50">
         </td>
           </tr>
     
@@ -207,5 +207,150 @@ export const resendCode = (verificationCode) =>
 
                                             `,
                                           });
+                                          export const podcastNotificationTemplate = (title, content) =>
+                                            baseTemplate({
+                                              title: "New Podcast Notification - Citizen Monitors",
+                                              message: `
+                                                <p>You have a new podcast in your inbox.</p>
+                                                <p><strong>Title:</strong> ${title}</p>
+                                                <p><strong>Content Preview:</strong> ${content.slice(0, 50)}...</p>
+                                                <p>Please log in to your account to view the full podcast.</p>
+                                              `,
+                                            });
+                                            export const electionNotificationTemplate = (electionName, startDate, endDate) =>
+                                              baseTemplate({
+                                                title: "New Election Live - Citizen Monitors",
+                                                message: `
+                                                  <p>Dear User,</p>
+                                                  <p>A new election <strong>${electionName}</strong> is now live on the Citizen Monitors website.</p>
+                                                  <p><strong>Start Date:</strong> ${startDate}</p>
+                                                  <p><strong>End Date:</strong> ${endDate}</p>
+                                                  <p>Please log in to the website to participate.</p>
+                                                  <p>Thank you,</p>
+                                                  <p>Citizen Monitors</p>
+                                                `,
+                                              });
+                                        export const newsLetterTemplate = () =>
+                                          baseTemplate({
+                                            title: "Citizen Monitors Weekly Newsletter",
+                                            message: `
 
+<div style="margin:0; padding:0; background-color:#f4f4f4; font-family:'Inter', Arial, sans-serif;">
+
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f4f4;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" border="0" style="margin:30px auto; background-color:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+
+          <!-- Header -->
+          <tr>
+            <td align="center" style="background-color:#06BBAF; color:#ffffff; padding:40px 20px;">
+            <h1 style="margin:0; font-size:28px; font-family:'League Spartan', Arial, sans-serif;">Citizen Monitors Weekly Newsletter</h1>
+              <p style="margin:10px 0 0; font-size:16px; font-family:'Inter', sans-serif;">July 2025 Edition</p>
+            </td>
+          </tr>
+
+          <!-- Welcome Message -->
+          <tr>
+            <td style="padding:30px 25px; font-family:'Inter', sans-serif;">
+              <h2 style="color:#333333; margin-top:0; font-family:'League Spartan', Arial, sans-serif;">Hello Citizen Monitors Community! 👋</h2>
+              <p style="font-size:16px; line-height:1.6; color:#555555;">
+                We are excited to bring you the <strong>inaugural edition</strong> of our weekly newsletter! As we gear up for our <strong>first mock election on Saturday, July 12, 2025</strong>, we want to keep you informed and engaged with the latest updates, insights, and opportunities to participate in our mission to enhance democratic processes in Nigeria through data gathering.
+              </p>
+            </td>
+          </tr>
+
+          <!-- What’s Happening -->
+          <tr>
+            <td style="padding:25px; font-family:'Inter', sans-serif;">
+              <h3 style="color:#06BBAF; margin-top:0; font-family:'League Spartan', Arial, sans-serif;">📌 What’s Happening This Week?</h3>
+              <p style="font-size:15px; color:#555555; line-height:1.6;">
+                <strong>Countdown to Mock Elections!</strong><br>
+                Only two weeks to go until our first mock election! This is a crucial opportunity for us to test our platform, gather valuable data, and refine our processes.
+              </p>
+              <ul style="padding-left:20px; color:#555555; line-height:1.8;">
+                <li><strong>Date:</strong> July 12, 2025</li>
+                <li><strong>Time:</strong> 9 AM - 5 PM (local time)</li>
+                <li><strong>Location:</strong> <a href="https://www.citizenmonitors.com" style="color:#06BBAF; text-decoration:none;">www.citizenmonitors.com</a></li>
+              </ul>
+            </td>
+          </tr>
+
+          <!-- Volunteer CTA -->
+          <tr>
+            <td align="center" style="padding:30px 20px;">
+              <a href="https://www.citizenmonitors.com" style="background-color:#06BBAF; color:#ffffff; padding:14px 28px; text-decoration:none; border-radius:6px; font-weight:bold; font-size:16px; display:inline-block; font-family:'Inter', sans-serif;">🚀 Become a Volunteer</a>
+            </td>
+          </tr>
+
+          <!-- Spotlight on Data Gathering -->
+          <tr>
+            <td style="padding:25px; font-family:'Inter', sans-serif;">
+              <h3 style="color:#06BBAF; margin-top:0; font-family:'League Spartan', Arial, sans-serif;">📊 Spotlight on Data Gathering Techniques</h3>
+              <p style="font-size:15px; color:#555555; line-height:1.6;">In preparation for our mock elections, here’s how we’ll be gathering data:</p>
+              <ol style="padding-left:20px; color:#555555; line-height:1.8;">
+                <li><strong>Surveys:</strong> Share feedback, photos, and videos.</li>
+                <li><strong>Real-Time Monitoring:</strong> Track participation and engagement live.</li>
+                <li><strong>Data Analysis:</strong> We’ll analyze insights monthly till the Anambra elections in November 2025.</li>
+              </ol>
+            </td>
+          </tr>
+
+          <!-- Feedback -->
+          <tr>
+            <td style="padding:25px; font-family:'Inter', sans-serif;">
+              <h3 style="color:#06BBAF; margin-top:0; font-family:'League Spartan', Arial, sans-serif;">📝 We Value Your Input!</h3>
+              <p style="font-size:15px; color:#555555; line-height:1.6;">What topics or new features would you like to see? Your feedback helps shape this community.</p>
+              <p style="font-size:15px;">Share at: <a href="mailto:info@citizenmonitors.com" style="color:#06BBAF;">info@citizenmonitors.com</a></p>
+            </td>
+          </tr>
+
+          <!-- Events -->
+          <tr>
+            <td style="padding:25px; font-family:'Inter', sans-serif;">
+              <h3 style="color:#06BBAF; margin-top:0; font-family:'League Spartan', Arial, sans-serif;">📅 Upcoming Events</h3>
+              <ul style="padding-left:20px; color:#555555; line-height:1.8;">
+                <li><strong>Mock Election Training (on X):</strong> July 5, 2025 | 6 PM - 7 PM</li>
+                <li><strong>Weekly Townhall:</strong> July 5, 2025 | 8 AM – 8:30 AM</li>
+              </ul>
+            </td>
+          </tr>
+
+          <!-- Social Links -->
+          <tr>
+            <td align="center" style="padding:25px 20px; background-color:#f9f9f9;">
+              <p style="margin:0; font-size:14px; color:#777; font-family:'Inter', sans-serif;">Follow us for updates:</p>
+              <p style="margin:10px 0;">
+                <a href="https://twitter.com/CitizenMonitors" style="color:#06BBAF; text-decoration:none;">Twitter</a> |
+                <a href="https://facebook.com/CitizenMonitors" style="color:#06BBAF; text-decoration:none;">Facebook</a> |
+                <a href="https://instagram.com/CitizenMonitors" style="color:#06BBAF; text-decoration:none;">Instagram</a>
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="padding:20px; font-size:12px; color:#999; font-family:'Inter', sans-serif;">
+              <p style="margin:0;">Thank you for being part of the Citizen Monitors community!</p>
+              <p style="margin:5px 0;">
+                <a href="https://www.citizenmonitors.com" style="color:#06BBAF; text-decoration:none;">www.citizenmonitors.com</a> | 
+                <a href="mailto:info@citizenmonitors.com" style="color:#06BBAF;">info@citizenmonitors.com</a>
+              </p>
+              <p style="margin:8px 0;">
+                <a href="$[LI:UNSUBSCRIBE]$" style="color:#06BBAF; text-decoration:none;">Unsubscribe</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</div>
+
+                                            `,
+                                          });
+
+                                        
                                         

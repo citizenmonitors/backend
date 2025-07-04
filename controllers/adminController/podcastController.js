@@ -85,3 +85,20 @@ export const markPodcastAsRead = async (req, res) => {
     res.status(500).json({ message: "Error marking podcast as read", error: error.message });
   }
 };
+
+
+export const sendNewsletter = async (req, res) => {
+  try {
+    const { recipients } = req.body;
+    const newsletter = await PodcastService.sendNewsletterService({
+   
+      recipients,
+    });
+    res.status(201).json({
+      message: "Newsletter sent successfully",
+      newsletter,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

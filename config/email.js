@@ -28,9 +28,9 @@
 
 // @ts-nocheck
 import { SendMailClient } from "zeptomail";
-// import dotenv from "dotenv";
+import dotenv from "dotenv";
 
-// dotenv.config();
+dotenv.config();
 
 const url = "api.zeptomail.com/";
 const token = process.env.ZEPTO_API_KEY;
@@ -71,10 +71,12 @@ export const sendEmail = async ({
     };
 
     const response = await client.sendMail(payload);
+    console.log("ZeptoMail connection verified successfully:");
     return response;
   } catch (error) {
     console.error("ZeptoMail Error:", error.message);
     throw new Error("Failed to send email via ZeptoMail.");
   }
 };
+
 

@@ -196,6 +196,15 @@ export const updateUserService = async (
     }
     
 
+        // Handle notifications update
+        if (updateData.notifications) {
+          const { inbox, election, newsletter } = updateData.notifications;
+    
+          if (inbox !== undefined) user.notifications.email.inbox = inbox;
+          if (election !== undefined) user.notifications.email.election = election;
+          if (newsletter !== undefined) user.notifications.email.newsletter = newsletter;
+        }
+
     // Check for ongoing elections using moment.js
     const ongoingElections = await Election.find({
       startDate: { $lte: new Date() },

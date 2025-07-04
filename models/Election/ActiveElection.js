@@ -25,6 +25,10 @@ const ActiveElectionSchema = new mongoose.Schema(
         imageUrl: { type: String },
       },
     ],
+    mockElection: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

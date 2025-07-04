@@ -62,7 +62,6 @@ export const registerUser = async ({ email, password, confirmPassword }) => {
     to: email,
     subject: "Welcome to Citizen Monitors - Verify Your Account",
     htmlbody: htmlContent,
-    // html: `<p>Your verification code is: ${verificationCode}</p>`,
   });
 
   return { message: "Verification code sent to email." };

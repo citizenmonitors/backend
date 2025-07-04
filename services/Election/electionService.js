@@ -11,6 +11,8 @@ import moment from "moment";
 import AdminLog from "../../models/admin/AdminLog.js";
 import { uploadFileToFirebase } from "../../config/firebaseUploader.js";
 import bucket from "../../config/firebaseConfig.js";
+import { electionNotificationTemplate } from "../../config/emailTemplates.js";
+import { sendEmail } from "../../config/email.js";
 
 const BACKEND_URL = process.env.BACKEND_URL;
 
@@ -73,81 +75,214 @@ export const updateElectionService = async (electionId, data, adminId) => {
 };
 
 
+// export const activeElections = async (data, adminId) => {
+//   let { electionId, electionLocation, startDate, endDate } = data;
+
+//   try {
+//     const existingElection = await Election.findById(electionId);
+//     if (!existingElection) {
+//       throw new Error("Election not found");
+//     }
+
+    
+
+//     // Validate election location
+//     if (
+//       ["national", "house-of-representatives", "senatorial"].includes(
+//         existingElection.electionType
+//       )
+//     ) {
+//       electionLocation = null;
+//     } else if (
+//       ["gubernatorial", "house-of-assembly"].includes(
+//         existingElection.electionType
+//       )
+//     ) {
+//       if (!electionLocation) {
+//         throw new Error("State election requires a valid state name.");
+//       }
+//     } else if (["lga"].includes(existingElection.electionType)) {
+//       if (!electionLocation) {
+//         throw new Error("LGA election requires a valid LGA name.");
+//       }
+//     }
+    
+//     //  const electionType = existingElection.electionType.toLowerCase();
+
+//  // Prevent duplicate elections
+//  const duplicateElection = await ActiveElection.findOne({
+//   election: electionId,
+//   electionLocation,
+//   startDate,
+//   endDate,
+// });
+
+// // console.log("Duplicate Election:", electionId, startDate, endDate);
+   
+
+//     if (duplicateElection) {
+//       throw new Error(
+//         "An election for this location and date range already exists."
+//       );
+//     }
+
+//     // Create new active election
+//     const activeElection = new ActiveElection({
+//       election: electionId,
+//       electionLocation,
+//       startDate,
+//       endDate,
+//     });
+
+//     const savedElection = await activeElection.save();
+
+// // console.log("savedElection :", savedElection);
+
+
+//     // Log admin action
+//     await AdminLog.create({
+//       admin: adminId,
+//       action: " Created Activate election",
+//       details: { electionId, data },
+//       timestamp: new Date(),
+//     });
+
+//       // Fetch users based on election type and location
+//     let usersToNotify = [];
+//     if (["national", "house-of-representatives", "senatorial"].includes(existingElection.electionType)) {
+//       // Send to all users with notifications.email.election set to true
+//       usersToNotify = await CompletedUser.find(
+//         { "notifications.email.election": true },
+//         "email"
+//       ).lean();
+//     } else if (["gubernatorial", "house-of-assembly"].includes(existingElection.electionType)) {
+//       // Send to users whose state matches one of the election locations
+//       usersToNotify = await CompletedUser.find(
+//         {
+//           "notifications.email.election": true,
+//           state: { $in: Array.isArray(electionLocation) ? electionLocation : [electionLocation] },
+//         },
+//         "email"
+//       ).lean();
+//     } else if (["lga"].includes(existingElection.electionType)) {
+//       // Send to users whose LGA matches one of the election locations
+//       usersToNotify = await CompletedUser.find(
+//         {
+//           "notifications.email.election": true,
+//           lga: { $in: Array.isArray(electionLocation) ? electionLocation : [electionLocation] },
+//         },
+//         "email"
+//       ).lean();
+//     }
+
+//     const userEmails = usersToNotify.map((user) => user.email);
+//     // const userEmails = ["yunusmustapha2@gmail.com"];
+
+//     // Generate email content using the template
+//     const htmlContent = electionNotificationTemplate(
+//       existingElection.electionName,
+//       startDate,
+//       endDate
+//     );
+
+//     // Send email notifications to users
+//     const emailPromises = userEmails.map((email) =>
+//       sendEmail({
+//         from: process.env.ZEPTO_FROM_EMAIL,
+//         to: email,
+//         subject: `New Election Live: ${existingElection.electionName}`,
+//         htmlbody: htmlContent,
+//       }).catch((err) => {
+//         console.error(`Failed to send email to ${email}:`, err);
+//       })
+//     );
+
+//     await Promise.all(emailPromises);
+
+//     return {
+//       message: "Election activated successfully",
+//       activeElection: savedElection,
+//     };
+//   } catch (error) {
+//     throw new Error(`Error activating election: ${error.message}`);
+//   }
+// };
+
 export const activeElections = async (data, adminId) => {
   let { electionId, electionLocation, startDate, endDate } = data;
 
   try {
     const existingElection = await Election.findById(electionId);
-    if (!existingElection) {
-      throw new Error("Election not found");
-    }
+    if (!existingElection) throw new Error("Election not found");
 
-    
+    const electionType = existingElection.electionType.toLowerCase();
 
-    // Validate election location
-    if (
-      ["national", "house-of-representatives", "senatorial"].includes(
-        existingElection.electionType
-      )
-    ) {
+    // Validate election location requirements
+    if (["national", "house-of-representatives", "senatorial"].includes(electionType)) {
       electionLocation = null;
-    } else if (
-      ["gubernatorial", "house-of-assembly"].includes(
-        existingElection.electionType
-      )
-    ) {
-      if (!electionLocation) {
-        throw new Error("State election requires a valid state name.");
-      }
-    } else if (["lga"].includes(existingElection.electionType)) {
-      if (!electionLocation) {
-        throw new Error("LGA election requires a valid LGA name.");
-      }
-    }
-    
-    //  const electionType = existingElection.electionType.toLowerCase();
-
- // Prevent duplicate elections
- const duplicateElection = await ActiveElection.findOne({
-  election: electionId,
-  electionLocation,
-  startDate,
-  endDate,
-});
-
-// console.log("Duplicate Election:", electionId, startDate, endDate);
-   
-
-    if (duplicateElection) {
-      throw new Error(
-        "An election for this location and date range already exists."
-      );
+    } else if (["gubernatorial", "house-of-assembly"].includes(electionType) && !electionLocation) {
+      throw new Error("State election requires a valid state name.");
+    } else if (electionType === "lga" && !electionLocation) {
+      throw new Error("LGA election requires a valid LGA name.");
     }
 
-    // Create new active election
-    const activeElection = new ActiveElection({
-      election: electionId,
-      electionLocation,
-      startDate,
-      endDate,
-    });
+    // Check for duplicates
+    const duplicate = await ActiveElection.findOne({ election: electionId, electionLocation, startDate, endDate });
+    if (duplicate) throw new Error("An election for this location and date range already exists.");
 
-    const savedElection = await activeElection.save();
-
-// console.log("savedElection :", savedElection);
-
+    // Save new active election
+    const activeElection = await new ActiveElection({ election: electionId, electionLocation, startDate, endDate }).save();
 
     // Log admin action
     await AdminLog.create({
       admin: adminId,
-      action: " Created Activate election",
+      action: "Created Active Election",
       details: { electionId, data },
       timestamp: new Date(),
     });
 
+    // Normalize electionLocation as array if provided
+    const locations = electionLocation ? (Array.isArray(electionLocation) ? electionLocation : [electionLocation]) : [];
+
+    // Build user query based on election type
+    const userQuery = { "notifications.email.election": true };
+
+    if (["gubernatorial", "house-of-assembly"].includes(electionType)) {
+      userQuery.state = { $in: locations };
+    } else if (electionType === "lga") {
+      userQuery.lga = { $in: locations };
+    }
+    console.log("User query would be:", userQuery);
+    // Fetch users to notify
+    const usersToNotify = await CompletedUser.find(userQuery, "email").lean();
+
+    console.log("Matched users count:", usersToNotify.length);
+  console.log("Matched users:", usersToNotify);
+
+ 
+
+
+    const userEmails = usersToNotify.map((useremail) => useremail.email);
+    // const userEmails = ["yunusmustapha2@gmail.com"];
+
+    const htmlContent = electionNotificationTemplate(existingElection.electionName, startDate, endDate);
+
+    const emailPromises = userEmails.map((email) =>
+      sendEmail({
+        from: process.env.ZEPTO_FROM_EMAIL,
+        to: email,
+        subject: `New Election Live: ${existingElection.electionName}`,
+        htmlbody: htmlContent,
+      }).catch((err) => {
+        console.error(`Failed to send email to ${email}:`, err);
+      })
+    );
+
+    await Promise.all(emailPromises);
+
     return {
       message: "Election activated successfully",
-      activeElection: savedElection,
+      activeElection,
     };
   } catch (error) {
     throw new Error(`Error activating election: ${error.message}`);
@@ -687,7 +822,7 @@ export const uploadResultDataService = async (
       case "house-of-representatives":
       case "house-of-assembly":
         const formattedLGAName = toTitleCase(user.lga || "LGA");
-        uploadNotificationBody = `$${resultUploadCount} ${resultUploadCount === 1 ? "Result uploaded" : "Results uploaded"} for ${formattedLGAName} LGA`;
+        uploadNotificationBody = `${resultUploadCount} ${resultUploadCount === 1 ? "Result uploaded" : "Results uploaded"} for ${formattedLGAName} LGA`;
         uploadNotificationInfo = `${formattedStateName} State ${formattedElectionName} Election`;
         break;
 
@@ -1147,6 +1282,7 @@ export const uploadIncidentReportDataService = async (
             "Both incidentPicture and incidentVideo must be uploaded."
           );
         }
+
     
     // Upload and validate incident videos
     const incidentVideoPromises =

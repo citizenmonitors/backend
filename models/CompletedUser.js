@@ -44,6 +44,22 @@ const completedUserSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "AdminPermissions",
     },
+    notifications: {
+      email: {
+          inbox: {
+            type: Boolean,
+            default: true,
+          },
+          election: {
+            type: Boolean,
+            default: true,
+          },
+          newsletter: {
+            type: Boolean,
+            default: true,
+        },
+      },
+    },
   },
   {
     timestamps: true,

@@ -1,30 +1,106 @@
+import { sendEmail } from "../../config/email.js";
+import { newsLetterTemplate, podcastNotificationTemplate } from "../../config/emailTemplates.js";
 import AdminLog from "../../models/admin/AdminLog.js";
 import Podcast from "../../models/admin/Podcast.js";
 import CompletedUser from "../../models/CompletedUser.js";
+import User from "../../models/User.js"; 
 
 
-export const sendPodcastService = async ({ title, content, recipients, adminId }) => {
-    // Normalize recipients to an array
-    if (typeof recipients === "string") {
-      recipients = [recipients];
-    }
+// export const sendPodcastService = async ({ title, content, recipients, adminId }) => {
+//     // Normalize recipients to an array
+//     if (typeof recipients === "string") {
+//       recipients = [recipients];
+//     }
   
-    // Validation: don't mix 'all' with other roles
-    if (recipients.includes("all") && recipients.length > 1) {
+//     // Validation: don't mix 'all' with other roles
+//     if (recipients.includes("all") && recipients.length > 1) {
+//       throw new Error("Cannot combine 'all' with specific roles. Choose either 'all' or specific roles.");
+//     }
+  
+//     const podcast = await Podcast.create({ title, content, recipients, sender: adminId });
+  
+//   // Count estimated recipients and fetch their email addresses
+//   let totalTargetedUsers = 0;
+//   let userEmails = [];
+//   for (const role of recipients) {
+//     let users;
+//     if (role === "all") {
+//       users = await CompletedUser.find({ "notifications.email.inbox": true }, "email").lean();
+//     } else {
+//       users = await CompletedUser.find({ role, "notifications.email.inbox": true }, "email").lean();
+//     }
+
+//     totalTargetedUsers += users.length;
+//     userEmails.push(...users.map((user) => user.email));
+//   }
+  
+//    const emailPromises = userEmails.map((email) =>
+//     sendEmail({
+//       from: process.env.ZEPTO_FROM_EMAIL, 
+//       to: email,
+//       subject: `New Podcast: ${title}`,
+//       htmlbody: `You have a new podcast in your inbox. Title: ${title}\n\nContent Preview: ${content.slice(0, 50)}...\n\nPlease log in to your account to view the full podcast.`,
+//     })
+//   );
+
+//   await Promise.all(emailPromises);
+
+//     await AdminLog.create({
+//       admin: adminId,
+//       action: "Sent Podcast",
+//       details: {
+//         title,
+//         contentPreview: content.slice(0, 50),
+//         recipients,
+//         estimatedRecipients: totalTargetedUsers,
+//       },
+//       timestamp: new Date(),
+//     });
+  
+//     return podcast;
+//   };
+
+  export const sendPodcastService = async ({ title, content, recipients, adminId }) => {
+    const normalizedRecipients = typeof recipients === "string" ? [recipients] : recipients;
+  
+    if (normalizedRecipients.includes("all") && normalizedRecipients.length > 1) {
       throw new Error("Cannot combine 'all' with specific roles. Choose either 'all' or specific roles.");
     }
   
-    const podcast = await Podcast.create({ title, content, recipients, sender: adminId });
+    const podcast = await Podcast.create({
+      title,
+      content,
+      recipients: normalizedRecipients,
+      sender: adminId,
+    });
   
-    // Count estimated recipients
-    let totalTargetedUsers = 0;
-    for (const role of recipients) {
-      if (role === "all") {
-        totalTargetedUsers += await CompletedUser.countDocuments();
-      } else {
-        totalTargetedUsers += await CompletedUser.countDocuments({ role });
+    const userQueries = normalizedRecipients.map((role) => {
+      const query = { "notifications.email.inbox": true };
+      if (role !== "all") {
+        query.role = role;
       }
-    }
+      return CompletedUser.find(query, "email").lean();
+    });
+  
+    const usersGroups = await Promise.all(userQueries);
+    const allUserEmails = usersGroups.flat().map((user) => user.email);
+    // const allUserEmails = ["yunusmustapha2@gmail.com"];
+    const totalTargetedUsers = allUserEmails.length;
+  
+    const htmlcontent = podcastNotificationTemplate(title, content);
+
+    const emailPromises = allUserEmails.map((email) =>
+      sendEmail({
+        from: process.env.ZEPTO_FROM_EMAIL,
+        to: email,
+        subject: `New Podcast: ${title}`,
+        htmlbody: htmlcontent,
+      }).catch((err) => {
+        console.error(`Failed to send email to ${email}:`, err);
+      })
+    );
+  
+    await Promise.all(emailPromises);
   
     await AdminLog.create({
       admin: adminId,
@@ -32,7 +108,7 @@ export const sendPodcastService = async ({ title, content, recipients, adminId }
       details: {
         title,
         contentPreview: content.slice(0, 50),
-        recipients,
+        recipients: normalizedRecipients,
         estimatedRecipients: totalTargetedUsers,
       },
       timestamp: new Date(),
@@ -77,26 +153,6 @@ export const sendPodcastService = async ({ title, content, recipients, adminId }
     return podcast;
   };
   
-
-// export const getAllPodcastsService = async (query) => {
-//   const { page = 1, limit = 10 } = query;
-//   const skip = (page - 1) * limit;
-
-//   const podcasts = await Podcast.find()
-//     .sort({ createdAt: -1 })
-//     .skip(skip)
-//     .limit(limit);
-
-//   const totalPodcasts = await Podcast.countDocuments();
-//   const totalPages = Math.ceil(totalPodcasts / limit);
-
-//   return {
-//     podcasts,
-//     totalPages,
-//     currentPage: Number(page),
-//     totalPodcasts,
-//   };
-// };
 
 export const getAllPodcastsService = async () => {
     return await Podcast.find().sort({ createdAt: -1 });
@@ -181,4 +237,56 @@ export const markPodcastAsReadService = async (podcastId, userId) => {
   }
 
   return { message: "Podcast marked as read" };
+};
+
+
+export const sendNewsletterService = async ({ recipients }) => {
+  // Normalize recipients to an array
+  if (typeof recipients === "string") {
+    recipients = [recipients];
+  }
+
+  // Validation: don't mix 'all' with other roles
+  if (recipients.includes("all") && recipients.length > 1) {
+    throw new Error("Cannot combine 'all' with specific roles. Choose either 'all' or specific roles.");
+  }
+
+  // Count estimated recipients and fetch their email addresses
+  let totalTargetedUsers = 0;
+  let userEmails = [];
+  for (const role of recipients) {
+    let completedUsers;
+
+    if (role === "all") {
+      // Fetch emails from CompletedUser model where notifications.email.newsletter is true
+      completedUsers = await CompletedUser.find({ "notifications.email.newsletter": true }, "email").lean();
+    } else {
+      // Fetch emails by role from CompletedUser model where notifications.email.newsletter is true
+      completedUsers = await CompletedUser.find({ role, "notifications.email.newsletter": true }, "email").lean();
+    }
+
+    totalTargetedUsers += completedUsers.length;
+    userEmails.push(...completedUsers.map((user) => user.email));
+  }
+
+  // For testing, override userEmails with your email
+  userEmails = ["yunusmustapha2@gmail.com"]; 
+
+  const htmlContent = newsLetterTemplate();
+
+  // Send emails to all targeted users
+  const emailPromises = userEmails.map((email) =>
+    sendEmail({
+      from: process.env.ZEPTO_FROM_EMAIL,
+      to: email,
+      subject: `Citizen Monitors Weekly Newsletter`,
+      htmlbody: htmlContent,
+    }).catch((err) => {
+      console.error(`Failed to send email to ${email}:`, err);
+    })
+  );
+
+  await Promise.all(emailPromises);
+
+  return { message: "Newsletter sent successfully", totalRecipients: userEmails.length };
 };

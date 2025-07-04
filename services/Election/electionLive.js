@@ -815,9 +815,9 @@ export const getActivityBoardAndNotificationsService = async () => {
       observerActingAsVolunteers + traditionalVolunteerResults;
 
     // Approved results count
-    const totalApprovedResults = await ElectionData.countDocuments({
-      isApproved: true,
-    });
+    // const totalApprovedResults = await ElectionData.countDocuments({
+    //   isApproved: true,
+    // });
 
     // Pending results count considering `isObserverInPollingUnit`
     const totalUploadResults = await ElectionData.aggregate([

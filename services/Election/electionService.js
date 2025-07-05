@@ -1275,18 +1275,18 @@ export const uploadIncidentReportDataService = async (
 
         // Validate that both incidentPicture and incidentVideo are uploaded
         if (
-          (!files.incidentVideos || files.incidentVideos.length === 0) ||
-          (!files.incidentPictures || files.incidentPictures.length === 0)
+          (!files["incidentVideos[]"] || files["incidentVideos[]"].length === 0) ||
+          (!files["incidentPictures[]"] || files["incidentPictures[]"].length === 0)
         ) {
           throw new Error(
             "Both incidentPicture and incidentVideo must be uploaded."
           );
         }
-
+        
     
     // Upload and validate incident videos
     const incidentVideoPromises =
-      files["incidentVideos"]?.map(async (file) => {
+      files["incidentVideos[]"]?.map(async (file) => {
         validateFile(file, allowedVideoExtensions);
         const { publicUrl, filePath, token } = await uploadFileToFirebase(file, "incident_videos");
     
@@ -1301,7 +1301,7 @@ export const uploadIncidentReportDataService = async (
       }) || [];
     
     const incidentPicturePromises =
-      files["incidentPictures"]?.map(async (file) => {
+      files["incidentPictures[]"]?.map(async (file) => {
         validateFile(file, allowedImageExtensions);
         const { publicUrl, filePath, token } = await uploadFileToFirebase(file, "incident_pictures");
     

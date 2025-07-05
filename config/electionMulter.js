@@ -137,6 +137,6 @@ export const uploadResultDataFiles = upload.fields([
 ]);
 
 export const uploadReportDataFiles = upload.fields([
-  { name: "incidentPictures", maxCount: 5 },
-  { name: "incidentVideos", maxCount: 5 },
+  { name: "incidentPictures[]", maxCount: 5 },
+  { name: "incidentVideos[]", maxCount: 5 },
 ]);

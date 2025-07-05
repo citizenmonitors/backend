@@ -15,8 +15,6 @@ export const getAllOngoingElectionResults = async (userId) => {
     const user = await CompletedUser.findById(userId).lean();
     if (!user) throw new Error("User not found");
 
-    console.log(`Fetching ongoing elections for user: ${userId}`);
-
     let ongoingElections = await ActiveElection.find({
       startDate: { $lte: new Date() },
       endDate: { $gte: new Date() },
@@ -26,7 +24,6 @@ export const getAllOngoingElectionResults = async (userId) => {
       .lean();
 
     if (!ongoingElections || ongoingElections.length === 0) {
-      console.log("No ongoing elections found.");
       return { message: "No ongoing election results" };
     }
 
@@ -67,12 +64,12 @@ export const getAllOngoingElectionResults = async (userId) => {
         user
       );
 
-      console.log("got result", result);
-
       return {
         electionDetails: {
           electionType: highestPriorityType,
           electionName: highestPriorityName,
+          mockElection: highestPriorityElection.mockElection,
+          electionLocation: highestPriorityElection.electionLocation,
           startDate: highestPriorityElection.startDate,
           endDate: highestPriorityElection.endDate,
         },
@@ -82,31 +79,6 @@ export const getAllOngoingElectionResults = async (userId) => {
       return { message: "No ongoing election results" };
     }
 
-    // for (let electionType of prioritizedTypes) {
-    //   const selectedElection = ongoingElections.find(
-    //     (election) =>
-    //       election?.election?.electionType?.toLowerCase() === electionType
-    //   );
-
-    //   if (selectedElection && selectedElection.results.length > 0) {
-    //     console.log(
-    //       `Processing electionType: ${selectedElection.election.electionType}`
-    //     );
-
-    //     const result = await handleElectionResult(selectedElection, user);
-    //     if (result && !result.message) {
-    //       return {
-    //         electionDetails: {
-    //           electionType: selectedElection.election.electionType,
-    //           electionName: selectedElection.election.electionName,
-    //           startDate: selectedElection.startDate,
-    //           endDate: selectedElection.endDate,
-    //         },
-    //         result,
-    //       };
-    //     }
-    //   }
-    // }
   } catch (error) {
     console.error("Error fetching ongoing election results:", error);
     throw new Error(`Error fetching election details: ${error.message}`);
@@ -115,7 +87,7 @@ export const getAllOngoingElectionResults = async (userId) => {
 
 // Helper function to handle election result fetching based on the election type
 const handleElectionResult = async (results, election, user) => {
-  console.log(results.length, election);
+  // console.log(results.length, election);
   if (!election?.electionType) {
     console.warn("Election type is missing in selected election.");
     return { message: "Election type not found" };
@@ -143,7 +115,7 @@ const handleElectionResult = async (results, election, user) => {
       const footer = computeFooter(results, "lga", election, user);
       const restriction = determineRestriction(election.electionType, user);
 
-      console.log({ chart, aggregateAnalysis, footer, restriction });
+      // console.log({ chart, aggregateAnalysis, footer, restriction });
 
       return {
         chart,
@@ -156,7 +128,7 @@ const handleElectionResult = async (results, election, user) => {
 
 
 
-  console.log("No results available for this election.");
+  // console.log("No results available for this election.");
   return { message: "No results available for this election" };
 };
 
@@ -484,6 +456,8 @@ export const getLiveElectionService = async (electionId, userId) => {
       electionDetails: {
         electionType: activeElection.election?.electionType,
         electionName: activeElection.election?.electionName,
+        mockElection: activeElection.mockElection,
+        electionLocation: activeElection.electionLocation,
         startDate: activeElection.startDate,
         endDate: activeElection.endDate,
       },

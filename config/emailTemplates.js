@@ -351,6 +351,84 @@ export const resendCode = (verificationCode) =>
 
                                             `,
                                           });
+                                        export const newsLetterTemplateTwo = () =>
+                                          baseTemplate({
+                                            title: "Citizen Monitors Mock Elections",
+                                            message: `
+<div style="margin:0; padding:0; background-color:#f4f4f4; font-family:'Inter', Arial, sans-serif;">
+
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f4f4;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" border="0" style="margin:30px auto; background-color:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+
+          <!-- Header -->
+          <tr>
+            <td align="center" style="background-color:#06BBAF; color:#ffffff; padding:30px 20px;">
+              <h1 style="margin:0; font-size:28px; font-family:'League Spartan', Arial, sans-serif;">Citizen Monitors Mock Elections!</h1>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding:30px 25px; font-family:'Inter', sans-serif; color:#555555; font-size:16px; line-height:1.6;">
+              <p>Dear Citizen Monitors Community,</p>
+              <p>We are excited to remind you of the opportunity for you to be an active participant in Nigeria’s democratic process!</p>
+
+              <h3 style="color:#06BBAF; margin-top:25px; font-family:'League Spartan', Arial, sans-serif;">📌 Mock Elections Training Schedule</h3>
+              <ul style="padding-left:20px; line-height:1.8;">
+                <li><strong>Saturday, 5th of July, 2025</strong> — 8:00 AM - 8:30 AM (during our town hall on X)</li>
+                <li><strong>Saturday, 12th of July, 2025</strong> — 8:00 AM - 8:30 AM (same time, same space)</li>
+              </ul>
+
+              <p>Follow us on <a href="https://twitter.com/CitizenMonitors" style="color:#06BBAF; text-decoration:none;">X (@CitizenMonitors)</a> to join the conversation.</p>
+
+              <h3 style="color:#06BBAF; margin-top:25px; font-family:'League Spartan', Arial, sans-serif;">What’s on the Agenda?</h3>
+              <p>We’ll be discussing:</p>
+              <ul style="padding-left:20px; line-height:1.8;">
+                <li>The recent political coalition and electoral reforms</li>
+                <li>The electoral process and upcoming elections</li>
+                <li>Your roles and responsibilities as Citizen Monitors</li>
+                <li>How to contribute to free, fair, and transparent elections in Nigeria</li>
+              </ul>
+
+              <p>Whether you’re getting involved for the first time or already familiar with the process, this conversation is for you. Together, we can make a difference!</p>
+
+              <p>We look forward to seeing you tomorrow, next Saturday, and every Saturday — same time!</p>
+
+              <p style="margin-top:25px;">Best regards,</p>
+              <p><a href="mailto:info@citizenmonitors.com" style="color:#06BBAF; text-decoration:none;">info@citizenmonitors.com</a><br>
+              <a href="https://www.citizenmonitors.com" style="color:#06BBAF; text-decoration:none;">www.citizenmonitors.com</a></p>
+
+              <p style="margin-top:25px; font-size:14px; color:#777;">P.S. Feel free to forward this email to anyone interested in participating!</p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="padding:20px; font-size:12px; color:#999; font-family:'Inter', sans-serif;">
+              <p style="margin:0;">Thank you for being part of the Citizen Monitors community.</p>
+              <p style="margin:5px 0;">
+                <a href="https://www.citizenmonitors.com" style="color:#06BBAF; text-decoration:none;">Visit our website</a> | 
+                <a href="mailto:info@citizenmonitors.com" style="color:#06BBAF;">Contact us</a>
+              </p>
+              <p style="margin:8px 0;">
+                <a href="$[LI:UNSUBSCRIBE]$" style="color:#06BBAF; text-decoration:none;">Unsubscribe</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</div>
+
+
+
+                                            `,
+                                          });
 
                                         
                                         

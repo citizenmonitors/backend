@@ -647,7 +647,7 @@ export const getAdminLiveElectionService = async (electionId) => {
       .lean();
     if (!activeElection) throw new Error("Election not found");
 
-    const { election, startDate, endDate, electionLocation } = activeElection;
+    const { election, startDate, endDate, electionLocation, mockElection } = activeElection;
     const { electionType, electionName } = election;
 
     // Fetch live election results
@@ -699,6 +699,8 @@ export const getAdminLiveElectionService = async (electionId) => {
           electionType,
           startDate,
           endDate,
+          electionLocation,
+          mockElection,
         },
         result: stateArray,
       };
@@ -723,6 +725,8 @@ export const getAdminLiveElectionService = async (electionId) => {
             electionType,
             startDate,
             endDate,
+            electionLocation,
+            mockElection,
           },
           result: { aggregateAnalysis, footer },
         };
@@ -751,6 +755,8 @@ export const getAdminLiveElectionService = async (electionId) => {
           electionType,
           startDate,
           endDate,
+          electionLocation,
+          mockElection,
         },
         result: stateArray,
       };
@@ -774,10 +780,13 @@ export const getAdminLiveElectionService = async (electionId) => {
           electionType,
           startDate,
           endDate,
+          electionLocation,
+          mockElection,
         },
         result: { chart: resultData, aggregateAnalysis, footer },
       };
     }
+
 
     const lgaArray = uniqueLGAs.map((lga) => {
       const lgaResults = locationResults[lga];
@@ -802,6 +811,8 @@ export const getAdminLiveElectionService = async (electionId) => {
         electionType,
         startDate,
         endDate,
+        electionLocation,
+        mockElection,
       },
       result: lgaArray,
     };

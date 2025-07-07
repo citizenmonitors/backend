@@ -31,7 +31,7 @@ export const volunteerToObserverService = async ({ email, details, files }) => {
   // console.log(files);
 
   // Check if at least one observer ID file is provided
-  if (!files || !files["observerId"] || files["observerId"].length === 0) {
+  if (!files || !files["observerId[]"] || files["observerId[]"].length === 0) {
     throw new Error("At least one observer ID file is required for observers.");
   }
 
@@ -84,7 +84,7 @@ export const volunteerToObserverService = async ({ email, details, files }) => {
 
   // Process the observer ID files (one or more files)
   const observerIdFiles = await Promise.all(
-    files["observerId"].map(async (file) => {
+    files["observerId[]"].map(async (file) => {
       const { publicUrl, filePath, token } = await uploadFileToFirebase(file, "observer_ids");
       const observerIdFile = await observerIdModel.create({
         location: filePath,

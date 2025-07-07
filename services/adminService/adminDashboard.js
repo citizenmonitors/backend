@@ -657,8 +657,20 @@ export const getAdminLiveElectionService = async (electionId) => {
     }).lean();
 
     if (electionResults.length === 0) {
-      return { message: "No live results available for this election." };
+      return {
+        electionDetails: {
+          electionId,
+          electionName,
+          electionType,
+          startDate,
+          endDate,
+          electionLocation,
+          mockElection,
+        },
+        result: null,
+      };
     }
+    
 
     // Group results by location (state, lga, or ward based on election type)
     const locationResults = electionResults.reduce((acc, result) => {

@@ -744,10 +744,13 @@ export const uploadResultDataService = async (
     }
 
     // Validate that both resultPicture and resultVideo are uploaded
-    if (!resultPicture || !resultVideo) {
-      throw new Error(
-        "Both resultPicture and resultVideo must be uploaded."
-      );
+
+    if (user.role === "observer" && (!resultVideo || resultVideo.length === 0)) {
+      throw new Error("Result video is required for observers.");
+    }
+    
+    if (!resultPicture || resultPicture.length === 0) {
+      throw new Error("Result picture must be uploaded.");
     }
 
     
@@ -813,7 +816,7 @@ export const uploadResultDataService = async (
 
     switch (activeElection.election.electionType) {
       case "national":
-        uploadNotificationBody = `$${resultUploadCount} ${resultUploadCount === 1 ? "Result uploaded" : "Results uploaded"} for ${formattedStateName} State`;
+        uploadNotificationBody = `${resultUploadCount} ${resultUploadCount === 1 ? "Result uploaded" : "Results uploaded"} for ${formattedStateName} State`;
         uploadNotificationInfo = `${formattedElectionName} Election`;
         break;
 
@@ -828,12 +831,12 @@ export const uploadResultDataService = async (
 
       case "lga":
         const formattedWardName = toTitleCase(user.ward || "Ward");
-        uploadNotificationBody = `$${resultUploadCount} ${resultUploadCount === 1 ? "Result uploaded" : "Results uploaded"} for ${formattedWardName} Ward`;
+        uploadNotificationBody = `${resultUploadCount} ${resultUploadCount === 1 ? "Result uploaded" : "Results uploaded"} for ${formattedWardName} Ward`;
         uploadNotificationInfo = `${formattedStateName} State ${formattedElectionName} Election`;
         break;
 
       default:
-        uploadNotificationBody = `$${resultUploadCount} ${resultUploadCount === 1 ? "Result uploaded" : "Results uploaded"} for ${formattedElectionName} Election`;
+        uploadNotificationBody = `${resultUploadCount} ${resultUploadCount === 1 ? "Result uploaded" : "Results uploaded"} for ${formattedElectionName} Election`;
         uploadNotificationInfo = `${formattedElectionName} Election`;
     }
 
@@ -1282,7 +1285,8 @@ export const uploadIncidentReportDataService = async (
             "Both incidentPicture and incidentVideo must be uploaded."
           );
         }
-        
+
+      
     
     // Upload and validate incident videos
     const incidentVideoPromises =
@@ -1607,7 +1611,7 @@ export const getUserElectionResultsAndReports = async (userId) => {
     const electionResults = await ElectionData.find({ user: userId })
       .populate({
         path: "election",
-        select: "election startDate endDate createdAt updatedAt",
+        select: "election startDate endDate mockElection electionLocation createdAt updatedAt",
         populate: {
           path: "election",
           select: "electionType electionName",
@@ -1620,7 +1624,7 @@ export const getUserElectionResultsAndReports = async (userId) => {
     const incidentReports = await IncidentReport.find({ user: userId })
       .populate({
         path: "election",
-        select: "election startDate endDate createdAt updatedAt",
+        select: "election startDate endDate mockElection electionLocation createdAt updatedAt",
         populate: {
           path: "election",
           select: "electionType electionName",
@@ -1642,6 +1646,8 @@ const formattedElectionResults = electionResults.map((result) => {
       electionName: result.election?.election?.electionName,
       startDate: result.election?.startDate,
       endDate: result.election?.endDate,
+      mockElection: result.election?.mockElection,
+      electionLocation: result.election?.electionLocation,
       createdAt: result.election?.createdAt,
       updatedAt: result.election?.updatedAt,
     },
@@ -1662,6 +1668,8 @@ const formattedIncidentReports = incidentReports.map((incident) => {
       electionName: incident.election?.election?.electionName,
       startDate: incident.election?.startDate,
       endDate: incident.election?.endDate,
+      mockElection: incident.election?.mockElection,
+      electionLocation: incident.election?.electionLocation,
       createdAt: incident.election?.createdAt,
       updatedAt: incident.election?.updatedAt,
     },
@@ -1683,6 +1691,7 @@ const formattedIncidentReports = incidentReports.map((incident) => {
     );
   }
 };
+
 
 export const getResultsAndPerformAction = async (userId, actionData) => {
   try {

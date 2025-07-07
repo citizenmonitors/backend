@@ -12,7 +12,7 @@ import upload from "../../config/multer.js";
 
 
 export const volunteerToObserver = [
-  upload.fields([{ name: "observerId", maxCount: 2 }]), 
+  upload.fields([{ name: "observerId[]", maxCount: 2 }]), 
   async (req, res) => {
     
     try {
@@ -20,7 +20,7 @@ export const volunteerToObserver = [
       const { ...details } = req.body;
       const files = req.files;
 
-console.log(files)
+// console.log(files)
 
 
 

@@ -513,6 +513,8 @@ export const downgradeObserverService = async (id, adminReason, adminId) => {
         });
       }
 
+      
+
       // Save changes for other users
       await otherUser.save();
     }

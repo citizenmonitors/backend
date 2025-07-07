@@ -1843,7 +1843,7 @@ const fetchResults = async (pollingUnit, userId) => {
         path: "election",
         select: "electionType electionName",
       },
-      select: "startDate endDate electionLocation",
+      select: "startDate endDate electionLocation mockElection",
     })
     .lean();
 
@@ -1858,7 +1858,7 @@ const fetchResults = async (pollingUnit, userId) => {
         path: "election",
         select: "electionType electionName",
       },
-      select: "startDate endDate electionLocation",
+      select: "startDate endDate electionLocation mockElection",
     })
     .lean();
 

@@ -7,11 +7,11 @@ import path from "path";
 // Validate file extensions
 const fileFilter = (req, file, cb) => {
   const ext = path.extname(file.originalname).toLowerCase();
-  const allowedTypes = [".png", ".jpg", ".jpeg", ".pdf", ".svg"];
+  const allowedTypes = [".png", ".jpg", ".jpeg", ".pdf", ".webp", ".svg"];
   if (allowedTypes.includes(ext)) {
     cb(null, true);
   } else {
-    cb(new Error("Please upload a jpg, jpeg, pdf, png, or svg file."));
+    cb(new Error("Please upload a jpg, jpeg, pdf, png, webp, or svg file."));
   }
 };
 

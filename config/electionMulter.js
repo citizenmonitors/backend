@@ -1,14 +1,12 @@
 
-
-
-
 import multer from "multer";
 import path from "path";
 
-const allowedExtensions = [".png", ".jpg", ".jpeg", ".svg", ".mp4", ".avi", ".mov", ".webm", ".wmv"];
+const allowedExtensions = [".png", ".jpg", ".jpeg", ".webp", ".svg", ".mp4", ".avi", ".mov", ".webm", ".wmv"];
 const allowedMimeTypes = [
   "image/png",
   "image/jpeg",
+  "image/webp",
   "image/svg+xml",
   "video/mp4",
   "video/x-msvideo",
@@ -36,7 +34,7 @@ const fileFilter = (req, file, cb) => {
   } else {
     cb(
       new Error(
-        "Only images (png, jpg, jpeg, svg) and videos are allowed"
+        "Only images (png, jpg, webp, jpeg, svg) and videos are allowed"
       )
     );
   }

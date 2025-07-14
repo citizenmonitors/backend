@@ -122,3 +122,24 @@ export const getSingleAdmin = async (req, res) => {
     });
   }
 };
+
+
+
+
+
+export const getUserEmailsController = async (req, res) => {
+
+  try {
+    const emails = await AdminService.getUserEmailsService();
+    const emailList = emails.join("\n"); 
+
+    res.setHeader("Content-Type", "text/plain");
+    res.status(200).send(emailList);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || "Server Error",
+    });
+  }
+};
+

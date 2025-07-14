@@ -513,7 +513,7 @@ export const downgradeObserverService = async (id, adminReason, adminId) => {
         });
       }
 
-      
+
 
       // Save changes for other users
       await otherUser.save();
@@ -1268,3 +1268,17 @@ export const downgradeAllObserverService = async (adminReason) => {
     throw new Error(`Error downgrading observers: ${error.message}`);
   }
 };
+
+
+
+
+
+export const getUserEmailsService = async () => {
+  try {
+    const emails = await CompletedUser.find({}, "email").lean();
+    return emails.map(user => user.email);  
+  } catch (error) {
+    throw new Error("Failed to retrieve user emails.");
+  }
+};
+

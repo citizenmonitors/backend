@@ -1,5 +1,5 @@
 import { sendEmail } from "../../config/email.js";
-import { newsLetterTemplate, newsLetterTemplateTwo, podcastNotificationTemplate } from "../../config/emailTemplates.js";
+import { newsLetterTemplateThree, podcastNotificationTemplate } from "../../config/emailTemplates.js";
 import AdminLog from "../../models/admin/AdminLog.js";
 import Podcast from "../../models/admin/Podcast.js";
 import CompletedUser from "../../models/CompletedUser.js";
@@ -197,6 +197,7 @@ export const sendNewsletterService = async ({ recipients }) => {
     throw new Error("Cannot combine 'all' with specific roles. Choose either 'all' or specific roles.");
   }
 
+
   // Count estimated recipients and fetch their email addresses
   let totalTargetedUsers = 0;
   let userEmails = [];
@@ -218,7 +219,7 @@ export const sendNewsletterService = async ({ recipients }) => {
   // For testing, override userEmails with your email
   // userEmails = ["yunusmustapha2@gmail.com"]; 
 
-  const htmlContent = newsLetterTemplateTwo();
+  const htmlContent = newsLetterTemplateThree();
 
   // Send emails to all targeted users
   const emailPromises = userEmails.map((email) =>

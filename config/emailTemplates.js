@@ -429,6 +429,96 @@ export const resendCode = (verificationCode) =>
 
                                             `,
                                           });
+                                        export const newsLetterTemplateThree = () =>
+                                          baseTemplate({
+                                            title: "Citizen Monitors Mock Elections",
+                                            message: `
+
+<div style="margin:0; padding:0; background-color:#f4f4f4; font-family:'Inter', Arial, sans-serif;">
+
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f4f4;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" border="0" style="margin:30px auto; background-color:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+
+          <!-- Header -->
+          <tr>
+            <td align="center" style="background-color:#06BBAF; color:#ffffff; padding:30px 20px;">
+              <h1 style="margin:0; font-size:26px; font-family:'League Spartan', Arial, sans-serif;">Citizen Monitors Mock Elections</h1>
+              <p style="margin:10px 0 0; font-size:16px; font-family:'Inter', sans-serif;">Saturday, July 12, 2025</p>
+            </td>
+          </tr>
+
+          <!-- Announcement -->
+          <tr>
+            <td style="padding:30px 25px; font-family:'Inter', sans-serif; color:#555555; font-size:16px; line-height:1.6;">
+              <p>In a significant step towards enhancing democratic engagement and electoral integrity in Nigeria, <strong>Citizen Monitors</strong>, the nation’s pioneer civic tech platform for crowdsourcing and verifying real-time electoral data, will hold <strong>mock elections on Saturday, July 12, 2025, from 9:00 AM to 5:00 PM Nigerian time</strong>.</p>
+              <p>This initiative aims to educate election Observers and Volunteers on promoting transparency and credible elections through authentic result gathering and reporting, providing valuable data for upcoming elections.</p>
+
+              <p>This landmark simulation allows Nigerians nationwide and in the diaspora to practice tracking, reporting, and verifying polling unit-level results. It recreates a real polling environment using actual past election results — offering participants hands-on experience in citizen-led election transparency.</p>
+
+              <blockquote style="border-left:4px solid #06BBAF; margin:20px 0; padding-left:15px; color:#333333; font-size:16px; line-height:1.6;">
+                “These Mock elections are a vital part of empowering citizens and ensuring we’re well-prepared for real elections,” said <strong>Olajumoke Alawode-James</strong>, Spokesperson and Head of Communications for Citizen Monitors. “Participants will learn to navigate the platform and appreciate the significance of citizen engagement in determining election outcomes.”
+              </blockquote>
+
+              <h3 style="color:#06BBAF; font-family:'League Spartan', Arial, sans-serif; margin-top:30px;">📌 Why Join the Mock Elections?</h3>
+              <ul style="padding-left:20px; line-height:1.8;">
+                <li>Familiarise yourself with live results gathering, uploads, and reporting</li>
+                <li>Learn how to track and validate polling unit data</li>
+                <li>Experience collective monitoring on real-time results collation</li>
+                <li>Be part of the movement making Nigerian elections difficult to rig</li>
+              </ul>
+
+              <h3 style="color:#06BBAF; font-family:'League Spartan', Arial, sans-serif; margin-top:30px;">📝 How to Participate:</h3>
+              <ul style="padding-left:20px; line-height:1.8;">
+                <li>Visit <a href="https://www.citizenmonitors.com" style="color:#06BBAF; text-decoration:none;">www.citizenmonitors.com</a></li>
+                <li>Sign up as a volunteer or observer before July 12th, 2025</li>
+                <li>You’ll receive past voting results from INEC’s IREV to post on the platform</li>
+                <li>See collated results in real-time after the mock simulation</li>
+              </ul>
+
+              <p>This is especially valuable for <strong>first-time voters</strong> and citizens eager to actively participate in strengthening Nigeria’s electoral process. Join us in creating a transparent and fair electoral system.</p>
+
+              <h3 style="color:#06BBAF; font-family:'League Spartan', Arial, sans-serif; margin-top:30px;">About Citizen Monitors</h3>
+              <p><strong>Citizen Monitors</strong> is Nigeria’s civic tech platform committed to promoting electoral integrity and civic participation. Through education, outreach, advocacy, and technology, we empower citizens to actively shape Nigeria’s democratic future.</p>
+
+              <h3 style="color:#06BBAF; font-family:'League Spartan', Arial, sans-serif; margin-top:30px;">Media Contact:</h3>
+              <p>
+                <strong>Olajumoke Alawode-James</strong><br>
+                Spokesperson & Head of Communications, Citizen Monitors<br>
+                <a href="mailto:media@citizenmonitors.com" style="color:#06BBAF; text-decoration:none;">media@citizenmonitors.com</a><br>
+                <a href="https://www.citizenmonitors.com" style="color:#06BBAF; text-decoration:none;">www.citizenmonitors.com</a>
+              </p>
+
+              <p style="margin-top:20px; font-size:14px; color:#777;">P.S. Please share this email with others interested in participating in the simulation!</p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="padding:20px; font-size:12px; color:#999; font-family:'Inter', sans-serif;">
+              <p style="margin:0;">Thank you for supporting electoral transparency.</p>
+              <p style="margin:5px 0;">
+                <a href="https://www.citizenmonitors.com" style="color:#06BBAF; text-decoration:none;">Visit our website</a> | 
+                <a href="mailto:info@citizenmonitors.com" style="color:#06BBAF;">Contact us</a>
+              </p>
+              <p style="margin:8px 0;">
+                <a href="$[LI:UNSUBSCRIBE]$" style="color:#06BBAF; text-decoration:none;">Unsubscribe</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</div>
+
+
+
+                                            `,
+                                          });
 
                                         
                                         

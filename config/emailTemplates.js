@@ -519,6 +519,91 @@ export const resendCode = (verificationCode) =>
 
                                             `,
                                           });
+                                        export const newsLetterTemplateFour = () =>
+                                          baseTemplate({
+                                            title: "Citizen Monitors - Weekly Insight",
+                                            message: `
+<div style="margin:0; padding:0; background-color:#f4f4f4; font-family:'Inter', Arial, sans-serif;">
+
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f4f4;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" border="0" style="margin:30px auto;  border-radius:12px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+
+          <!-- Header -->
+          <tr>
+            <td align="center" style="background-color:#06BBAF; color:#ffffff; padding:30px 20px;">
+              <h1 style="margin:0; font-size:26px; font-family:'League Spartan', Arial, sans-serif;">Citizen Monitors – Weekly Insight</h1>
+              <p style="margin:10px 0 0; font-size:16px; font-family:'Inter', sans-serif;">Empowering Democracy Through Data</p>
+            </td>
+          </tr>
+
+          <!-- Announcement -->
+          <tr>
+            <td style="padding:30px 25px; font-family:'Inter', sans-serif; color:#555555; font-size:16px; line-height:1.6;">
+              <h2 style="color:#06BBAF; font-family:'League Spartan', Arial, sans-serif; margin-top:0;">Mock Elections: Real Lessons, Real Momentum</h2>
+
+              <p>Dear Citizen Monitors Community,</p>
+
+              <p>For too long, Nigerians have endured elections marked by irregularities, manipulation, and opacity. From compromised collation centers to vanishing polling unit data, public trust in elections has been consistently eroded. The 2023 elections only deepened this crisis, with many reporting discrepancies between polling unit outcomes and final results, worsened by inaccessible platforms like IReV, post-election.</p>
+
+              <p>The lesson? Civic frustration must be turned into structured civic power. Democracy cannot survive on silence — it thrives on citizen vigilance.</p>
+
+              <p>Last weekend’s <strong>Mock Presidential Elections</strong> on the Citizen Monitors Platform was more than a test. It was proof that technology can shift power back to the people.</p>
+
+              <h3 style="color:#06BBAF; font-family:'League Spartan', Arial, sans-serif; margin-top:30px;">🔎 Quick Highlights from the Mock Election</h3>
+              <ul style="padding-left:20px; line-height:1.8;">
+                <li>✅ 100% of participants believe Citizen Monitors can make elections harder to rig</li>
+                <li>✅ 100% would recommend the platform ahead of 2027</li>
+                <li>✅ 80% completed the process smoothly</li>
+                <li>✅ Live data aggregation across multiple states, visualized instantly on the platform</li>
+              </ul>
+
+              <h3 style="color:#06BBAF; font-family:'League Spartan', Arial, sans-serif; margin-top:30px;">💡 What People Said</h3>
+              <blockquote style="border-left:4px solid #06BBAF; margin:20px 0; padding-left:15px; color:#333333; font-size:16px; line-height:1.6;">
+                “Less steps to uploading reports would help.”<br>
+                “Observers should be properly trained before site access.”<br>
+                “Citizen Monitors will make election rigging very hard.”
+              </blockquote>
+
+              <p>We listened. System tweaks, easier navigation, and streamlined result uploads are underway — because transparency should never feel complicated.</p>
+
+              <p>We demonstrated how citizens can lead election monitoring themselves. <strong>Citizen Monitors is building Nigeria’s first data-governance model for electoral transparency</strong> — live, public, and people-powered.</p>
+
+              <p>With your participation, we will make elections transparent, credible, and citizen-controlled.</p>
+
+              <p><strong>Please tell a friend about us!</strong> Talk about it on social media. Speak boldly about what is possible when we work together. We can all monitor, verify, and protect.</p>
+
+              <p style="margin-top:30px;">Together, let’s forge a new path for democracy in Nigeria!</p>
+
+              <p>Best regards,<br>The Citizen Monitors Team.</p>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="padding:20px; font-size:12px; color:#999; font-family:'Inter', sans-serif;">
+              <p style="margin:0;">Thank you for supporting electoral transparency.</p>
+              <p style="margin:5px 0;">
+                <a href="https://www.citizenmonitors.com" style="color:#06BBAF; text-decoration:none;">Visit our website</a> | 
+                <a href="mailto:info@citizenmonitors.com" style="color:#06BBAF;">Contact us</a>
+              </p>
+              <p style="margin:8px 0;">
+                <a href="$[LI:UNSUBSCRIBE]$" style="color:#06BBAF; text-decoration:none;">Unsubscribe</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</div>
+
+                                            `,
+                                          });
 
                                         
                                         

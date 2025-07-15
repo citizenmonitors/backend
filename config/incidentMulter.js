@@ -15,14 +15,14 @@ const allowedMimeTypes = [
 
 const fileFilter = (req, file, cb) => {
   const ext = path.extname(file.originalname).toLowerCase();
-  console.log(
-    "Checking file:",
-    file.originalname,
-    "with extension:",
-    ext,
-    "and MIME type:",
-    file.mimetype
-  );
+  // console.log(
+  //   "Checking file:",
+  //   file.originalname,
+  //   "with extension:",
+  //   ext,
+  //   "and MIME type:",
+  //   file.mimetype
+  // );
 
   if (
     allowedExtensions.includes(ext) &&

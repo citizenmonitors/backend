@@ -795,57 +795,63 @@ export const uploadResultDataService = async (
     const toTitleCase = (text) => {
       return text
         .split("-")
-        .map(
-          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-        )
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
         .join(" ");
     };
+    
 
     const formattedElectionName = toTitleCase(
-      activeElection.election.electionName || "Election"
+      activeElection.election?.electionName || "Election"
     );
     const formattedStateName = toTitleCase(user.state || "State");
-
-    // count result upload
-    const resultUploadCount = await ElectionData.countDocuments({
-      election: electionId,
-    })
-    // Determine body and info based on election type
+    
+    // Count result uploads
+    const resultUploadCount = await ElectionData.countDocuments({ election: electionId });
+    const resultText = `${resultUploadCount} ${resultUploadCount === 1 ? "Result uploaded" : "Results uploaded"}`;
+    
+    // Determine notification content
     let uploadNotificationBody = "";
     let uploadNotificationInfo = "";
 
-    switch (activeElection.election.electionType) {
+    const electionTypes = activeElection.election?.electionType.toLowerCase();
+
+    
+    switch (electionTypes) {
       case "national":
-        uploadNotificationBody = `${resultUploadCount} ${resultUploadCount === 1 ? "Result uploaded" : "Results uploaded"} for ${formattedStateName} State`;
+        uploadNotificationBody = `${resultText} for ${formattedStateName} State`;
         uploadNotificationInfo = `${formattedElectionName} Election`;
         break;
-
+    
       case "senatorial":
       case "gubernatorial":
       case "house-of-representatives":
-      case "house-of-assembly":
+      case "house-of-assembly": {
         const formattedLGAName = toTitleCase(user.lga || "LGA");
-        uploadNotificationBody = `${resultUploadCount} ${resultUploadCount === 1 ? "Result uploaded" : "Results uploaded"} for ${formattedLGAName} LGA`;
+        uploadNotificationBody = `${resultText} for ${formattedLGAName} LGA`;
         uploadNotificationInfo = `${formattedStateName} State ${formattedElectionName} Election`;
         break;
-
-      case "lga":
+      }
+    
+      case "lga": {
         const formattedWardName = toTitleCase(user.ward || "Ward");
-        uploadNotificationBody = `${resultUploadCount} ${resultUploadCount === 1 ? "Result uploaded" : "Results uploaded"} for ${formattedWardName} Ward`;
+        uploadNotificationBody = `${resultText} for ${formattedWardName} Ward`;
         uploadNotificationInfo = `${formattedStateName} State ${formattedElectionName} Election`;
         break;
-
+      }
+    
       default:
-        uploadNotificationBody = `${resultUploadCount} ${resultUploadCount === 1 ? "Result uploaded" : "Results uploaded"} for ${formattedElectionName} Election`;
+        uploadNotificationBody = `${resultText} for ${formattedElectionName} Election`;
         uploadNotificationInfo = `${formattedElectionName} Election`;
     }
-
+    
     // Create the upload notification
     const uploadNotification = new Notification({
       type: "result-upload",
       body: uploadNotificationBody,
       info: uploadNotificationInfo,
     });
+
+
 
     await uploadNotification.save();
 
@@ -1263,7 +1269,7 @@ export const uploadIncidentReportDataService = async (
     if (existingReport) return existingReport;
 
     const allowedVideoExtensions = [".mp4", ".avi", ".mov", ".webm", ".wmv"];
-    const allowedImageExtensions = [".jpg", ".jpeg", ".png", ".svg"];
+    const allowedImageExtensions = [".jpg", ".jpeg", ".webp", ".png", ".svg"];
     
     // Validate file extension
     const validateFile = (file, allowedExtensions) => {
@@ -1367,7 +1373,7 @@ export const updateIncidentReportDataService = async (
     } = data;
 
     const allowedVideoExtensions = [".mp4", ".avi", ".mov", ".webm", ".wmv"];
-    const allowedImageExtensions = [".jpg", ".jpeg", ".png", ".svg"];
+    const allowedImageExtensions = [".jpg", ".jpeg", ".webp", ".png", ".svg"];
 
     const validateFile = (file, allowedExtensions) => {
       const ext = path.extname(file.originalname).toLowerCase();

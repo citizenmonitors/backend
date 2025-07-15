@@ -1,5 +1,5 @@
 import { sendEmail } from "../../config/email.js";
-import { newsLetterTemplateThree, podcastNotificationTemplate } from "../../config/emailTemplates.js";
+import { newsLetterTemplateFour, podcastNotificationTemplate } from "../../config/emailTemplates.js";
 import AdminLog from "../../models/admin/AdminLog.js";
 import Podcast from "../../models/admin/Podcast.js";
 import CompletedUser from "../../models/CompletedUser.js";
@@ -219,14 +219,14 @@ export const sendNewsletterService = async ({ recipients }) => {
   // For testing, override userEmails with your email
   // userEmails = ["yunusmustapha2@gmail.com"]; 
 
-  const htmlContent = newsLetterTemplateThree();
+  const htmlContent = newsLetterTemplateFour();
 
   // Send emails to all targeted users
   const emailPromises = userEmails.map((email) =>
     sendEmail({
       from: process.env.ZEPTO_FROM_EMAIL,
       to: email,
-      subject: `Citizen Monitors Mock Elections`,
+      subject: `Citizen Monitors - Weekly Insight`,
       htmlbody: htmlContent,
     }).catch((err) => {
       console.error(`Failed to send email to ${email}:`, err);

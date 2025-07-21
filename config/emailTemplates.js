@@ -604,6 +604,57 @@ export const resendCode = (verificationCode) =>
 
                                             `,
                                           });
+                                        export const newsLetterTemplateFive = () =>
+                                          baseTemplate({
+                                            title: "Citizen Monitors Demands INEC Accountability Over Deleted Election Results",
+                                            message: `
+  <div style="margin: 0; padding: 0; background-color: #f7f7f7; font-family: Inter, sans-serif;">
+    <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); overflow: hidden;">
+      <div style="background-color: #06BBAF; color: white; padding: 20px 30px; font-family: 'League Spartan', sans-serif; font-size: 20px; text-align: center; font-weight: bold;">
+        Citizen Monitors Calls For Accountability Following Removal of Election Results from INEC Portal
+      </div>
+      <div style="padding: 30px; font-size: 16px; line-height: 1.6; color: #333333;">
+        <p>Citizen Monitors is raising alarm over the recent removal of all election results (as recent as Ondo and Edo 2024 elections) from the Independent National Electoral Commission (INEC) portal. This unexpected action has raised significant concerns regarding data management, transparency, and the integrity of the electoral process.</p>
+
+        <p>The removal of election results from the INEC portal raises critical questions that must be addressed to ensure public trust in the electoral system. Citizen Monitors is calling on INEC to provide clarity on the following issues:</p>
+
+        <ul style="padding-left: 20px;">
+          <li>Does INEC have a formal data retention policy for election results?</li>
+          <li>If yes, what are the specific terms of this policy – including timelines and access rights?</li>
+          <li>Was this policy ever communicated to Nigerians or published publicly?</li>
+          <li>If no policy exists, was this removal due to a technical glitch or system failure?</li>
+          <li>Did INEC’s hosting arrangement (server payments to Amazon Web Services) expire or lapse?</li>
+          <li>Were these election records archived? If so, where, and how can Nigerians access them?</li>
+        </ul>
+
+        <p>The absence of election results (past or present) on the INEC portal not only undermines the transparency of the electoral process, but also raises concerns about the accessibility of vital information for citizens, stakeholders, and international observers.</p>
+
+        <p>As Nigeria continues to strengthen its democratic processes, it is crucial for INEC to maintain open lines of communication with the public regarding data management practices.</p>
+
+        <p>Citizen Monitors urges INEC to promptly address these questions and provide a comprehensive explanation regarding the removal of the election results. The organisation believes transparency is essential for fostering trust in the electoral system and ensuring all stakeholders can participate meaningfully in Nigeria’s democracy.</p>
+
+        <p>As the country looks ahead to future elections, particularly Anambra gubernatorial elections in November 2025, it is imperative that INEC demonstrates its commitment to accountability and transparency by clearly communicating its policies and practices to Nigerians.</p>
+
+        <p style="margin-top: 30px;">
+          <strong>Olajumoke Alawode-James</strong><br />
+          Spokesperson and Head of Communications, Citizen Monitors<br />
+          <a href="mailto:media@citizenmonitors.com" style="color: #06BBAF;">media@citizenmonitors.com</a>
+        </p>
+      </div>
+
+      <div style="padding: 20px 30px; background-color: #f0f0f0; font-size: 13px; text-align: center; color: #777;">
+        You’re receiving this email because you subscribed to updates from Citizen Monitors.
+        <br />
+       
+        <a href="#" style="color: #06BBAF; text-decoration: none;">Unsubscribe</a>
+      </div>
+    </div>
+  </div>
+
+
+
+                                            `,
+                                          });
 
                                         
                                         

@@ -655,6 +655,79 @@ export const resendCode = (verificationCode) =>
 
                                             `,
                                           });
+                                        export const newsLetterTemplateSix = () =>
+                                          baseTemplate({
+                                            title: "Citizen Monitors Weekly Newsletter",
+                                            message: `
+  <div style="margin: 0; padding: 0; background-color: #ffffff; font-family: Inter, sans-serif;">
+<table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
+  <tr>
+    <td>
+      <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 6px; overflow: hidden;">
+        
+        <!-- Header -->
+    
+        <div style="background-color: #06BBAF; color: white; padding: 20px 30px; font-family: 'League Spartan', sans-serif; font-size: 20px; text-align: center; font-weight: bold;">
+                    <h3 style="color: #ffffff; margin: 0;">Citizen Monitors - Weekly Newsletter</h3>
+                    <h4 style="color: #ffffff; margin: 0;">Lock Down Your Polling Unit</h4>
+
+      </div>
+        <!-- Body -->
+        <tr>
+          <td style="padding: 30px; color: #000000; font-size: 16px; line-height: 1.6;">
+            
+            <p>Dear Citizen Monitors Community,</p>
+            
+            <p>We hope this message finds you well! As we continue to foster a culture of transparency and accountability in our electoral process, we want to emphasize the importance of being proactive, even when elections aren’t on the immediate horizon.</p>
+
+            <p style="font-family: 'League Spartan', sans-serif;"><strong>Why Every Nigerian Should Lock Down Their Polling Unit… Now.</strong></p>
+
+            <p>This week, we’re diving into why now is the perfect time to prepare for the upcoming by-elections and the 2027 general elections, by securing your polling unit with Citizen Monitors.</p>
+            
+            <p style="font-weight: bold; font-family: 'League Spartan', sans-serif;">💡 What Does “Locking Down Your Polling Unit” Mean?</p>
+            
+            <p>Locking down your polling unit means taking personal responsibility for monitoring, documenting, and verifying electoral activities where you vote. You’re not just a voter, you’re now a data guardian.</p>
+            
+            <p style="font-weight: bold; font-family: 'League Spartan', sans-serif;">✅ Why It Matters (Even in an Off-Season)</p>
+            <ul style="padding-left: 20px; margin-top: 10px;">
+              <li>Rigging starts with silence: Most electoral fraud occurs in areas where no one is observing.</li>
+              <li>Early preparation: Getting ready now gives you ample time to train and familiarize yourself with our platform.</li>
+              <li>Access to resources: You’ll gain entry to our peer-review process, mock elections results uploads, and additional resources to enhance your monitoring skills.</li>
+            </ul>
+
+            <p style="font-weight: bold; font-family: 'League Spartan', sans-serif;">📝 Your Action Steps This Week:</p>
+            <ol style="padding-left: 20px; margin-top: 10px;">
+              <li>Log into <a href="https://www.citizenmonitors.com" target="_blank" style="color: #1a73e8;">www.citizenmonitors.com</a></li>
+              <li>Lock down your polling unit.</li>
+              <li>Invite 2 friends to do the same.</li>
+              <li>Bookmark our next mock elections exercise date (details coming soon).</li>
+            </ol>
+
+            <p>While there may not be elections happening this week, democracy doesn’t rest and neither should our preparations. Let’s work together to ensure that every vote counts and that our electoral process is fair and transparent.</p>
+            
+            <p>Thank you for your commitment to safeguarding our democracy!</p>
+            
+            <p>Best regards,</p>
+
+            <p>
+                <strong>The Citizen Monitors Team</strong><br>
+                <div style="display: flex; gap: 5px;"><span>Email: </span> <a href="mailto:info@citizenmonitors.com" style="color:#1a73e8;"> info@citizenmonitors.com</a></div>
+                <div style="display: flex; gap: 5px;"><span>Website: </span> <a href="https://www.citizenmonitors.com" style="color:#1a73e8;"> www.citizenmonitors.com</a></div>
+              </p>
+          </td>
+        </tr>
+        
+
+        
+      </table>
+    </td>
+  </tr>
+</table>
+
+  </div>
+
+                                            `,
+                                          });
 
                                         
                                         

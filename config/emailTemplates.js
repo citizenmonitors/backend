@@ -1,53 +1,63 @@
-const baseTemplate = ({
-    message,
-    buttonText,
-    buttonLink,
-    verifyCode,
-  }) => `
-  <div style="font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt">
-    <table width="100%" cellspacing="0" cellpadding="0" style="background-color:#f4f4f4;padding:20px">
-      <tr><td align="center">
-        <table width="600" style="background:#fff;padding:20px;border-radius:4px">
-          <tr>
-            <td align="center" style="padding-bottom:20px">
-             
-       <img src="https://www.citizenmonitors.com/assets/citizen-monitors-logo.png" alt="citizen-monitors-logo" width="150" height="50">
-        </td>
-          </tr>
-    
-          <tr>
-            <td style="font-size:16px;color:#555;padding-bottom:20px">
-              ${message}
-            </td>
-          </tr>
-          ${
-            verifyCode
-              ? `<tr><td align="center" style="padding-bottom:30px;">
-                  <strong style="background-color:#06bbaf;color:#fff;text-decoration:none;padding:12px 24px;border-radius:4px;font-size:16px;display:inline-block">
-                   ${verifyCode}</strong>
-                </td></tr>`
-              : ""
-          }
-          ${
-            buttonText && buttonLink
-              ? `<tr><td align="center" style="padding-bottom:30px">
-                  <a href="${buttonLink}" style="background-color:#06bbaf;color:#fff;text-decoration:none;padding:12px 24px;border-radius:4px;font-size:16px;display:inline-block" target="_blank">
+const baseTemplate = ({ message, buttonText, buttonLink, verifyCode }) => `
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f4;padding:20px;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10pt;">
+  <tr>
+    <td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;padding:20px;border-radius:4px;">
+        
+        <!-- Logo -->
+        <tr>
+          <td align="center" style="padding-bottom:20px;">
+            <img src="https://www.citizenmonitors.com/assets/citizen-monitors-logo.png" alt="Citizen Monitors Logo" width="150" height="50" style="display:block;">
+          </td>
+        </tr>
+
+        <!-- Main Message -->
+        <tr>
+          <td style="font-size:16px;color:#555555;padding-bottom:20px;">
+            ${message}
+          </td>
+        </tr>
+
+        <!-- Optional Verify Code -->
+        ${
+          verifyCode
+            ? `<tr>
+                <td align="center" style="padding-bottom:30px;">
+                  <strong style="background-color:#06bbaf;color:#ffffff;padding:12px 24px;border-radius:4px;font-size:16px;display:inline-block;">
+                    ${verifyCode}
+                  </strong>
+                </td>
+              </tr>`
+            : ""
+        }
+
+        <!-- Optional Button -->
+        ${
+          buttonText && buttonLink
+            ? `<tr>
+                <td align="center" style="padding-bottom:30px;">
+                  <a href="${buttonLink}" style="background-color:#06bbaf;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:4px;font-size:16px;display:inline-block;" target="_blank">
                     ${buttonText}
                   </a>
-                </td></tr>`
-              : ""
-          }
-          <tr>
-            <td style="font-size:13px;color:#888;border-top:1px solid #e0e0e0;padding-top:20px;text-align:center">
-              © 2025 Citizen Monitors | 
-              <a href="https://citizenmonitors.com" style="color:#1d72b8;text-decoration:none" target="_blank">citizenmonitors.com</a>
-            </td>
-          </tr>
-        </table>
-      </td></tr>
-    </table>
-  </div>
-  `;
+                </td>
+              </tr>`
+            : ""
+        }
+
+        <!-- Footer -->
+        <tr>
+          <td style="font-size:13px;color:#888888;border-top:1px solid #e0e0e0;padding-top:20px;text-align:center;">
+            © 2025 Citizen Monitors | 
+            <a href="https://citizenmonitors.com" style="color:#1d72b8;text-decoration:none;" target="_blank">citizenmonitors.com</a>
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+`;
+
   
   // Forgot password email
   export const forgotPasswordTemplate = (resetLink) =>
@@ -655,79 +665,127 @@ export const resendCode = (verificationCode) =>
 
                                             `,
                                           });
-                                        export const newsLetterTemplateSix = () =>
-                                          baseTemplate({
-                                            title: "Citizen Monitors Weekly Newsletter",
-                                            message: `
-  <div style="margin: 0; padding: 0; background-color: #ffffff; font-family: Inter, sans-serif;">
-<table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
-  <tr>
-    <td>
-      <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 6px; overflow: hidden;">
-        
-        <!-- Header -->
-    
-        <div style="background-color: #06BBAF; color: white; padding: 20px 30px; font-family: 'League Spartan', sans-serif; font-size: 20px; text-align: center; font-weight: bold;">
-                    <h3 style="color: #ffffff; margin: 0;">Citizen Monitors - Weekly Newsletter</h3>
-                    <h4 style="color: #ffffff; margin: 0;">Lock Down Your Polling Unit</h4>
+                                          export const newsLetterTemplateSix = () =>
+                                            baseTemplate({
+                                              title: "Citizen Monitors Weekly Newsletter",
+                                              message: `
+                                          <table cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff; font-family: Arial, sans-serif; padding: 20px 0;">
+                                            <tr>
+                                              <td>
+                                                <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 6px; overflow: hidden;">
+                                          
+                                                  <!-- Header -->
+                                                  <tr>
+                                                    <td style="background-color: #06BBAF; color: white; padding: 20px 30px; font-family: Arial, sans-serif; font-size: 20px; text-align: center; font-weight: bold;">
+                                                      <h3 style="color: #ffffff; margin: 0;">Citizen Monitors - Weekly Newsletter</h3>
+                                                      <h4 style="color: #ffffff; margin: 0;">Lock Down Your Polling Unit</h4>
+                                                    </td>
+                                                  </tr>
+                                          
+                                                  <!-- Body -->
+                                                  <tr>
+                                                    <td style="padding: 30px; color: #000000; font-size: 16px; line-height: 1.6; font-family: Arial, sans-serif;">
+                                                      <p>Dear Citizen Monitors Community,</p>
+                                          
+                                                      <p>We hope this message finds you well! As we continue to foster a culture of transparency and accountability in our electoral process, we want to emphasize the importance of being proactive, even when elections aren’t on the immediate horizon.</p>
+                                          
+                                                      <p><strong>Why Every Nigerian Should Lock Down Their Polling Unit… Now.</strong></p>
+                                          
+                                                      <p>This week, we’re diving into why now is the perfect time to prepare for the upcoming by-elections and the 2027 general elections, by securing your polling unit with Citizen Monitors.</p>
+                                          
+                                                      <p><strong>💡 What Does “Locking Down Your Polling Unit” Mean?</strong></p>
+                                          
+                                                      <p>Locking down your polling unit means taking personal responsibility for monitoring, documenting, and verifying electoral activities where you vote. You’re not just a voter, you’re now a data guardian.</p>
+                                          
+                                                      <p><strong>✅ Why It Matters (Even in an Off-Season)</strong></p>
+                                                      <ul style="padding-left: 20px; margin-top: 10px;">
+                                                        <li>Rigging starts with silence: Most electoral fraud occurs in areas where no one is observing.</li>
+                                                        <li>Early preparation: Getting ready now gives you ample time to train and familiarize yourself with our platform.</li>
+                                                        <li>Access to resources: You’ll gain entry to our peer-review process, mock elections results uploads, and additional resources to enhance your monitoring skills.</li>
+                                                      </ul>
+                                          
+                                                      <p><strong>📝 Your Action Steps This Week:</strong></p>
+                                                      <ol style="padding-left: 20px; margin-top: 10px;">
+                                                        <li>Log into <a href="https://www.citizenmonitors.com" target="_blank" style="color: #1a73e8;">www.citizenmonitors.com</a></li>
+                                                        <li>Lock down your polling unit.</li>
+                                                        <li>Invite 2 friends to do the same.</li>
+                                                        <li>Bookmark our next mock elections exercise date (details coming soon).</li>
+                                                      </ol>
+                                          
+                                                      <p>While there may not be elections happening this week, democracy doesn’t rest and neither should our preparations. Let’s work together to ensure that every vote counts and that our electoral process is fair and transparent.</p>
+                                          
+                                                      <p>Thank you for your commitment to safeguarding our democracy!</p>
+                                          
+                                                      <p>
+                                                        <strong>The Citizen Monitors Team</strong><br />
+                                                        <span>Email:</span> <a href="mailto:info@citizenmonitors.com" style="color:#1a73e8;">info@citizenmonitors.com</a><br />
+                                                        <span>Website:</span> <a href="https://www.citizenmonitors.com" style="color:#1a73e8;">www.citizenmonitors.com</a>
+                                                      </p>
+                                                    </td>
+                                                  </tr>
+                                          
+                                                </table>
+                                              </td>
+                                            </tr>
+                                          </table>
+                                              `,
+                                            });
+                                          
 
-      </div>
-        <!-- Body -->
-        <tr>
-          <td style="padding: 30px; color: #000000; font-size: 16px; line-height: 1.6;">
-            
-            <p>Dear Citizen Monitors Community,</p>
-            
-            <p>We hope this message finds you well! As we continue to foster a culture of transparency and accountability in our electoral process, we want to emphasize the importance of being proactive, even when elections aren’t on the immediate horizon.</p>
-
-            <p style="font-family: 'League Spartan', sans-serif;"><strong>Why Every Nigerian Should Lock Down Their Polling Unit… Now.</strong></p>
-
-            <p>This week, we’re diving into why now is the perfect time to prepare for the upcoming by-elections and the 2027 general elections, by securing your polling unit with Citizen Monitors.</p>
-            
-            <p style="font-weight: bold; font-family: 'League Spartan', sans-serif;">💡 What Does “Locking Down Your Polling Unit” Mean?</p>
-            
-            <p>Locking down your polling unit means taking personal responsibility for monitoring, documenting, and verifying electoral activities where you vote. You’re not just a voter, you’re now a data guardian.</p>
-            
-            <p style="font-weight: bold; font-family: 'League Spartan', sans-serif;">✅ Why It Matters (Even in an Off-Season)</p>
-            <ul style="padding-left: 20px; margin-top: 10px;">
-              <li>Rigging starts with silence: Most electoral fraud occurs in areas where no one is observing.</li>
-              <li>Early preparation: Getting ready now gives you ample time to train and familiarize yourself with our platform.</li>
-              <li>Access to resources: You’ll gain entry to our peer-review process, mock elections results uploads, and additional resources to enhance your monitoring skills.</li>
-            </ul>
-
-            <p style="font-weight: bold; font-family: 'League Spartan', sans-serif;">📝 Your Action Steps This Week:</p>
-            <ol style="padding-left: 20px; margin-top: 10px;">
-              <li>Log into <a href="https://www.citizenmonitors.com" target="_blank" style="color: #1a73e8;">www.citizenmonitors.com</a></li>
-              <li>Lock down your polling unit.</li>
-              <li>Invite 2 friends to do the same.</li>
-              <li>Bookmark our next mock elections exercise date (details coming soon).</li>
-            </ol>
-
-            <p>While there may not be elections happening this week, democracy doesn’t rest and neither should our preparations. Let’s work together to ensure that every vote counts and that our electoral process is fair and transparent.</p>
-            
-            <p>Thank you for your commitment to safeguarding our democracy!</p>
-            
-            <p>Best regards,</p>
-
-            <p>
-                <strong>The Citizen Monitors Team</strong><br>
-                <div style="display: flex; gap: 5px;"><span>Email: </span> <a href="mailto:info@citizenmonitors.com" style="color:#1a73e8;"> info@citizenmonitors.com</a></div>
-                <div style="display: flex; gap: 5px;"><span>Website: </span> <a href="https://www.citizenmonitors.com" style="color:#1a73e8;"> www.citizenmonitors.com</a></div>
-              </p>
-          </td>
-        </tr>
-        
-
-        
-      </table>
-    </td>
-  </tr>
-</table>
-
-  </div>
-
+                                            export const newsLetterTemplateSeven = () =>
+                                              baseTemplate({
+                                                title: "Citizen Monitors Weekly Newsletter",
+                                                message: `
+                                            <table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
+                                              <tr>
+                                                <td>
+                                                  <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 6px; overflow: hidden;">
+                                            
+                                                    <!-- Header -->
+                                                    <tr>
+                                                      <td style="background-color: #06BBAF; color: white; padding: 20px 30px; text-align: center; font-size: 20px; font-weight: bold;">
+                                                        <h3 style="color: #ffffff; margin: 0;">Citizen Monitors - Weekly Newsletter</h3>
+                                                        <h4 style="color: #ffffff; margin: 0;">Nothing’s Happening? That’s When the Real Work Begins</h4>
+                                                      </td>
+                                                    </tr>
+                                            
+                                                    <!-- Body -->
+                                                    <tr>
+                                                      <td style="padding: 30px; color: #000000; font-size: 16px; line-height: 1.6;">
+                                                        <p>Dear Citizen Monitors Community,</p>
+                                            
+                                                        <p>It’s been a quiet week in the headlines — but silence doesn’t mean safety.</p>
+                                            
+                                                        <p><strong>INEC is silent. Politicians are regrouping. But, so are we?</strong><br>While the noise fades, Citizen Monitors is doubling down.</p>
+                                            
+                                                        <ul style="padding-left: 20px; margin-top: 10px;">
+                                                          <li>We’re upgrading our platform ahead of the next mock elections.</li>
+                                                          <li>More polling units are getting locked in by everyday citizens.</li>
+                                                          <li>New features are in testing — to make uploads easier, faster, smarter.</li>
+                                                        </ul>
+                                            
+                                                        <p>If you’ve signed up already, now’s the time to explore your dashboard.</p>
+                                            
+                                                        <p>If you haven’t yet, the earlier you lock your polling unit, the better.</p>
+                                            
+                                                        <p><strong>Because when the next election comes, there won’t be time to start preparing.</strong><br>There’ll only be time to act.</p>
+                                            
+                                                        <p style="font-weight: bold;">📅 Mark Your Calendar:</p>
+                                                        <p>Our next mock election is around the corner — a full national simulation to test the system and sharpen your civic muscle.</p>
+                                            
+                                                        <p><strong>🔗 Sign up. Lock down. Tell your family. Tell a friend. Be ready.</strong></p>
+                                            
+                                                        <p><a href="https://www.citizenmonitors.com" target="_blank" style="color: #1a73e8;">👉 www.citizenmonitors.com</a></p>
+                                            
+                                                        <p>Yours in vigilance,</p>
+                                                        <p><strong>The Citizen Monitors Team</strong></p>
+                                                      </td>
+                                                    </tr>
+                                                  </table>
+                                                </td>
+                                              </tr>
+                                            </table>
                                             `,
-                                          });
-
-                                        
+                                              });
+                                                    
                                         

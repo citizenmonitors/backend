@@ -773,7 +773,7 @@ export const resendCode = (verificationCode) =>
                                                         <p style="font-weight: bold;">📅 Mark Your Calendar:</p>
                                                         <p>Our next mock election is around the corner — a full national simulation to test the system and sharpen your civic muscle.</p>
                                             
-                                                        <p><strong>🔗 Sign up. Lock down. Tell your family. Tell a friend. Be ready.</strong></p>
+                                                        <p><strong>🔗  Sign up. Lock down. Tell your family. Tell a friend. Be ready.</strong></p>
                                             
                                                         <p><a href="https://www.citizenmonitors.com" target="_blank" style="color: #1a73e8;">👉 www.citizenmonitors.com</a></p>
                                             

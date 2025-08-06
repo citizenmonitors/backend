@@ -41,7 +41,7 @@ export const sendEmail = async ({
       ],
       subject,
       htmlbody,
-      // bounce_address: process.env.ZEPTO_BOUNCE_EMAIL,
+      bounce_address: process.env.ZEPTO_BOUNCE_EMAIL,
 
     };
 

@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const url = "api.zeptomail.com/";
+const url = "https://api.zeptomail.com/";
 const token = process.env.ZEPTO_API_KEY;
 
 const client = new SendMailClient({ url, token });
@@ -41,7 +41,7 @@ export const sendEmail = async ({
       ],
       subject,
       htmlbody,
-      bounce_address: process.env.ZEPTO_BOUNCE_EMAIL,
+      // bounce_address: process.env.ZEPTO_BOUNCE_EMAIL,
 
     };
 
@@ -49,7 +49,7 @@ export const sendEmail = async ({
     console.log("ZeptoMail connection verified successfully:");
     return response;
   } catch (error) {
-    console.error("ZeptoMail Error:", error.message);
+    console.error("ZeptoMail Error:", error?.response?.data || error.message);
     throw new Error("Failed to send email via ZeptoMail.");
   }
 };

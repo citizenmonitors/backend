@@ -1,5 +1,8 @@
 import { sendEmail } from "../../config/email.js";
-import { newsLetterTemplateSeven, podcastNotificationTemplate } from "../../config/emailTemplates.js";
+import { newsLetterTemplateUpcoming, podcastNotificationTemplate } from "../../config/emailTemplates.js";
+import schedule from "node-schedule";
+import { toZonedTime } from "date-fns-tz";
+import { format } from "date-fns";
 import AdminLog from "../../models/admin/AdminLog.js";
 import Podcast from "../../models/admin/Podcast.js";
 import CompletedUser from "../../models/CompletedUser.js";
@@ -186,7 +189,7 @@ export const markPodcastAsReadService = async (podcastId, userId) => {
 };
 
 
-export const sendNewsletterService = async ({ recipients }) => {
+export const sendNewsletterService = async ({ recipients, scheduleTime }) => {
   // Normalize recipients to an array
   if (typeof recipients === "string") {
     recipients = [recipients];
@@ -197,43 +200,66 @@ export const sendNewsletterService = async ({ recipients }) => {
     throw new Error("Cannot combine 'all' with specific roles. Choose either 'all' or specific roles.");
   }
 
+  const sendEmails = async () => {
+    // Count estimated recipients and fetch their email addresses
+    let totalTargetedUsers = 0;
+    let userEmails = [];
+    for (const role of recipients) {
+      let completedUsers;
 
-  // Count estimated recipients and fetch their email addresses
-  let totalTargetedUsers = 0;
-  let userEmails = [];
-  for (const role of recipients) {
-    let completedUsers;
+      if (role === "all") {
+        // Fetch emails from CompletedUser model where notifications.email.newsletter is true
+        completedUsers = await CompletedUser.find({ "notifications.email.newsletter": true }, "email").lean();
+      } else {
+        // Fetch emails by role from CompletedUser model where notifications.email.newsletter is true
+        completedUsers = await CompletedUser.find({ role, "notifications.email.newsletter": true }, "email").lean();
+      }
 
-    if (role === "all") {
-      // Fetch emails from CompletedUser model where notifications.email.newsletter is true
-      completedUsers = await CompletedUser.find({ "notifications.email.newsletter": true }, "email").lean();
-    } else {
-      // Fetch emails by role from CompletedUser model where notifications.email.newsletter is true
-      completedUsers = await CompletedUser.find({ role, "notifications.email.newsletter": true }, "email").lean();
+      totalTargetedUsers += completedUsers.length;
+      userEmails.push(...completedUsers.map((user) => user.email));
     }
+  
 
-    totalTargetedUsers += completedUsers.length;
-    userEmails.push(...completedUsers.map((user) => user.email));
+    // For testing, override userEmails with your email
+    userEmails = ["yunusmustapha2@gmail.com", "citizenmonitors@yahoo.com", "oluwaloninyo@yahoo.com"]; 
+  
+
+    const htmlContent = newsLetterTemplateUpcoming();
+
+    // Send emails to all targeted users
+    const emailPromises = userEmails.map((email) =>
+      sendEmail({
+        from: process.env.ZEPTO_FROM_EMAIL,
+        to: email,
+        subject: `Citizen Monitors Weekly Newsletter`,
+        htmlbody: htmlContent,
+      }).catch((err) => {
+        console.error(`Failed to send email to ${email}:`, err);
+      })
+    );
+
+    await Promise.all(emailPromises);
+
+    console.log(`Newsletter sent successfully to ${userEmails.length} recipients.`);
+    return { totalRecipients: userEmails.length };
+  };
+
+  if (scheduleTime) {
+    // Convert scheduleTime to Nigeria time zone
+    const nigeriaTimeZone = "Africa/Lagos";
+    const nigeriaTime = toZonedTime(new Date(scheduleTime), nigeriaTimeZone);
+    const formattedTime = format(nigeriaTime, "yyyy-MM-dd HH:mm:ssXXX", { timeZone: nigeriaTimeZone });
+
+    // Schedule the email sending
+    schedule.scheduleJob(nigeriaTime, async () => {
+      console.log(`Scheduled newsletter sending at ${formattedTime} (Nigeria Time)`);
+      await sendEmails();
+    });
+
+    return { message: "Newsletter scheduled successfully", scheduleTime: formattedTime };
+  } else {
+    // Send immediately if no scheduleTime is provided
+    const result = await sendEmails();
+    return { message: "Newsletter sent successfully", ...result };
   }
-
-  // For testing, override userEmails with your email
-  userEmails = ["yunusmustapha2@gmail.com" ]; 
-
-  const htmlContent = newsLetterTemplateSeven();
-
-  // Send emails to all targeted users
-  const emailPromises = userEmails.map((email) =>
-    sendEmail({
-      from: process.env.ZEPTO_FROM_EMAIL,
-      to: email,
-      subject: `Citizen Monitors Weekly Newsletter`,
-      htmlbody: htmlContent,
-    }).catch((err) => {
-      console.error(`Failed to send email to ${email}:`, err);
-    })
-  );
-
-  await Promise.all(emailPromises);
-
-  return { message: "Newsletter sent successfully", totalRecipients: userEmails.length };
 };

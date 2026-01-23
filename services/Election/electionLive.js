@@ -151,8 +151,6 @@ const fetchGroupedElectionResults = async (
   );
 };
 
-
-
 // Groups election results by state and includes aggregate analysis if needed
 const groupByStateAndAggregate = (
   results,

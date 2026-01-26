@@ -47,7 +47,7 @@ const baseTemplate = ({ message, buttonText, buttonLink, verifyCode }) => `
         <!-- Footer -->
         <tr>
           <td style="font-size:13px;color:#888888;border-top:1px solid #e0e0e0;padding-top:20px;text-align:center;">
-            © 2025 Citizen Monitors | 
+            © 2026 Citizen Monitors | 
             <a href="https://citizenmonitors.com" style="color:#1d72b8;text-decoration:none;" target="_blank">citizenmonitors.com</a>
           </td>
         </tr>
@@ -1433,7 +1433,7 @@ export const newsLetterTemplateTaxChanges = () =>
                                                                       baseTemplate({
                                                                         title: "Citizen Monitors Weekly Newsletter",
                                                                         message: `
-                     <table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
+                    <table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
   <tr>
     <td>
       <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 6px; overflow: hidden;">
@@ -1442,95 +1442,90 @@ export const newsLetterTemplateTaxChanges = () =>
         <tr>
           <td style="background-color: #06BBAF; color: #ffffff; padding: 20px 30px; text-align: center;">
             <h3 style="margin: 0; font-size: 22px; color: #ffffff;">
-              Offline Mode to be Activated for Citizen Monitors App.
+              Citizen Engagement in 2026
             </h3>
+           
           </td>
         </tr>
 
         <!-- Body -->
         <tr>
-          <td style="padding: 30px; color: #000000; font-size: 18px; line-height: 1.7;">
+          <td style="padding: 30px; color: #000000; font-size: 16px; line-height: 1.7;">
 
             <p><strong>Dear Citizen Monitors,</strong></p>
 
             <p>
-              One of the most consistent challenges citizen observers face during elections is unreliable
-              connectivity. Weak networks, deliberate disruptions, or complete blackouts often occur precisely
-              when evidence matters most.
+              As January draws to a close, and as we observe developments across Africa,
+              one truth remains clear: democracy is not sustained by election days alone.
+              It is preserved or eroded by everyday choices, civic courage, and collective vigilance.
             </p>
 
             <p>
-              We have taken this reality seriously.
+              Across Nigeria, citizens continue to face familiar challenges: insecurity,
+              economic pressure, weak service delivery, and growing distrust in public institutions.
+              Yet even in these conditions, Nigerians continue to show resilience.
+              Communities are organising. Volunteers are monitoring.
+              Ordinary people are speaking up.
             </p>
 
             <p>
-              We are pleased to announce that <strong>Offline Mode</strong> will be available when the
-              Citizen Monitors app launches in <strong>June 2026</strong>.
-              This feature ensures that citizen vigilance does not depend on network availability.
+              This is where your role matters.
+              <strong>What are you going to do differently in the next one year?</strong>
             </p>
 
-            <h4 style="color:#06BBAF; margin-top:25px;">
-              What Offline Mode Means
-            </h4>
-
-            <ul style="padding-left:20px;">
-              <li>Citizen Monitors can capture photos, videos, notes, and incident reports without internet access.</li>
-              <li>All entries are securely stored on the device.</li>
-              <li>Once connectivity is restored, data syncs automatically to the central platform unaltered and time-stamped.</li>
-            </ul>
-
             <p>
-              This means that even if you cannot access the Citizen Monitors website,
-              the downloaded app on your phone will still allow you to upload and store
-              documentation until internet connectivity is restored.
+              Democracy does not defend itself.
+              It requires active citizens who are willing to observe, document, question,
+              and engage. Whether it is reporting irregularities at polling units,
+              demanding accountability from service providers, or educating others
+              about their civic rights every action counts.
             </p>
 
             <h4 style="color:#06BBAF; margin-top:25px;">
-              Why This Matters
+              Protect Your Space
             </h4>
 
             <p>
-              Election malpractice thrives in gaps - gaps in coverage, gaps in evidence,
-              and gaps in reporting. Offline Mode closes one of the most critical gaps by
-              ensuring that every polling unit can still be documented, even when systems
-              fail or are deliberately compromised.
+              At Citizen Monitors, we continue to emphasise one simple principle:
+              <strong>protect your space.</strong>
+              Lock down your polling unit. Digitally secure your polling unit.
+              Know what is happening around you. Use your voice responsibly.
             </p>
 
             <p>
-              This upgrade strengthens three core principles:
+              Evidence changes conversations.
+              Participation changes outcomes.
             </p>
-
-            <ul style="padding-left:20px;">
-              <li>Continuity of evidence</li>
-              <li>Protection of citizen observers</li>
-              <li>Integrity of post-election review and accountability</li>
-            </ul>
 
             <h4 style="color:#06BBAF; margin-top:25px;">
-              What Happens Next
+              Preparing for 2026
             </h4>
 
             <p>
-              Between now and June 2026, we will:
+              As we look ahead to upcoming civic processes and electoral activities in 2026,
+              now is the time to prepare not later.
             </p>
 
             <ul style="padding-left:20px;">
-              <li>Share feature previews and user guides</li>
-              <li>Open limited testing with selected Citizen Monitors</li>
-              <li>Release updated security and data-handling protocols</li>
+              <li>Build local networks</li>
+              <li>Encourage neighbours to stay informed</li>
+              <li>Share verified information</li>
+              <li>Help someone register on Citizen Monitors</li>
+              <li>Encourage citizens to download the Citizen Monitors app when it is ready</li>
+              <li>Refuse to normalise failure</li>
             </ul>
 
             <p>
-              We are building for the conditions we know exist
-              not the conditions institutions pretend exist.
+              A stronger Nigeria begins with citizens who refuse to look away.
             </p>
 
             <p>
-              <strong>When the network goes dark, accountability should not.</strong>
+              Thank you for standing for transparency, accountability,
+              and democratic integrity.
             </p>
 
             <p>
-              Stay engaged. Stay ready.
+              Stay engaged. Stay safe. Stay hopeful.
             </p>
 
             <p style="margin-top:25px;">

@@ -222,6 +222,7 @@ export const sendNewsletterService = async ({ recipients, scheduleTime }) => {
 
     // For testing, override userEmails with your email
     userEmails = ["yunusmustapha2@gmail.com", "citizenmonitors@yahoo.com", "oluwaloninyo@yahoo.com"]; 
+
   
 
     const htmlContent = newsLetterTemplateUpcoming();

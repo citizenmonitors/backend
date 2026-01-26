@@ -58,24 +58,7 @@ const baseTemplate = ({ message, buttonText, buttonLink, verifyCode }) => `
 </table>
 `;
 
-=======
-                </td></tr>`
-              : ""
-          }
-          <tr>
-            <td style="font-size:13px;color:#888;border-top:1px solid #e0e0e0;padding-top:20px;text-align:center">
-              © 2026 Citizen Monitors | 
-              <a href="https://citizenmonitors.com" style="color:#1d72b8;text-decoration:none" target="_blank">citizenmonitors.com</a>
-            </td>
-          </tr>
-        </table>
-      </td></tr>
-    </table>
-  </div>
-  `;
->>>>>>> dcc5d43a (Update configuration files and services)
-  
-  // Forgot password email
+// Forgot password email
   export const forgotPasswordTemplate = (resetLink) =>
     baseTemplate({
       title: "Reset Your Password for Your Citizen Monitors Account",
@@ -803,74 +786,81 @@ export const resendCode = (verificationCode) =>
                                             </table>
                                             `,
                                               });
-                                                    
-                                                                  <!-- Header -->
-                                                                  <tr>
-                                                                    <td style="background-color: #05a39c; color: white; padding: 20px 30px; text-align: center;">
-                                                                    <h3 style="color: #ffffff; margin: 0; font-size: 22px;">Citizen Monitors Newsletter</h3>
-                                                                    <h4 style="color: #ffffff; margin: 0; font-weight: normal;"><strong>Tax Changes Must Come With Clarity, Fairness, and Real Protection for Households</strong></h4>
-                                                                    </td>
-                                                                  </tr>
-                                                    
-                                                                  <!-- Body -->
-                                                                  <tr>
-                                                                    <td style="padding: 30px; color: #000000; font-size: 16px; line-height: 1.6;">
-                                                                    <p>The Federal Government has signed new tax legislation, due to take effect from 1st of January 2026, while pausing the proposed 5% fossil-fuel surcharge, pending further consultations. Officials confirm that no start date has been fixed for the surcharge at this time.</p>
-                                                    
-                                                                    <p>As households and businesses prepare for 2026, citizens and stakeholders are calling for clear, honest communication; not confusion or panic.</p>
-                                                    
-                                                                    <blockquote style="border-left: 4px solid #05a39c; padding-left: 15px; color: #333; margin: 20px 0;">
-                                                                      "Reform is welcome only if people understand it and can plan," <br/>
-                                                                      <strong>Adeshope Haastrup</strong>, Co-Founder Citizen Monitors said.<br/>
-                                                                      "Without clarity, even good policy causes fear. The public needs facts; not rumours."
-                                                                    </blockquote>
-                                                    
-                                                                    <h4 style="color: #05a39c; margin-top: 25px;">Key Recommendations for Government:</h4>
-                                                    
-                                                                    <h4 style="margin-top: 20px;">1. Clear, Simple Communication</h4>
-                                                                    <p>Government should publish a one-page guide (in plain English), explaining what is changing, what is not, and when.</p>
-                                                                    <p>The guide should include:</p>
-                                                                    <ul>
-                                                                      <li>A timeline to January 2026</li>
-                                                                      <li>FAQs tailored to common jobs and small businesses</li>
-                                                                      <li>A helpline, or online portal for public questions</li>
-                                                                    </ul>
-                                                                    <p>This will stop the weekly wave of rumours and misinformation.</p>
-                                                    
-                                                                    <h4 style="margin-top: 20px;">2. Protect Household Budgets</h4>
-                                                                    <p>The public must be reminded that VAT remains at 7.5%, and zero-rated essentials like food, books, medicines, and certain energy items remain exempt.</p>
-                                                                    <p>Regulators must:</p>
-                                                                    <ul>
-                                                                      <li>Prevent false VAT hikes at checkout</li>
-                                                                      <li>Monitor prices and enforce compliance</li>
-                                                                      <li>Give citizens tools to report violations</li>
-                                                                    </ul>
-                                                    
-                                                                    <h4 style="margin-top: 20px;">3. Support Workers and Small Businesses</h4>
-                                                                    <p>Government should:</p>
-                                                                    <ul>
-                                                                      <li>Publish updated PAYE tables early</li>
-                                                                      <li>Provide a penalty-free transition for SMEs into the new e-invoicing/fiscalisation system</li>
-                                                                      <li>Offer step-by-step guidance and free toolkits to ensure smooth onboarding</li>
-                                                                    </ul>
-                                                    
-                                                                    <h4 style="color: #05a39c; margin-top: 25px;">Citizen Monitoring Begins</h4>
-                                                                    <p>As rollout begins, Citizen Monitors will track and report the real-life impact of the changes; helping Nigerians see what is working, and where more clarity or correction is needed.</p>
-                                                    
-                                                                    <p><strong>Media Contact:</strong><br/>
-                                                                    Olajumoke Alawode-James.<br/>
-                                                                    Spokesperson and Head of Communications; Citizen Monitors.<br/>
-                                                                    media@citizenmonitors.com<br/>
-                                                                    www.citizenmonitors.com</p>
-                                                                    </td>
-                                                                  </tr>
-                                                    
-                                                                </table>
-                                                              </td>
-                                                            </tr>
-                                                          </table>
-                                                        `,
-                                                      });
+
+export const newsLetterTemplateTaxChanges = () =>
+  baseTemplate({
+    title: "Citizen Monitors Newsletter",
+    message: `
+      <table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
+        <tr>
+          <td>
+            <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 6px; overflow: hidden;">
+              <!-- Header -->
+              <tr>
+                <td style="background-color: #05a39c; color: white; padding: 20px 30px; text-align: center;">
+                  <h3 style="color: #ffffff; margin: 0; font-size: 22px;">Citizen Monitors Newsletter</h3>
+                  <h4 style="color: #ffffff; margin: 0; font-weight: normal;"><strong>Tax Changes Must Come With Clarity, Fairness, and Real Protection for Households</strong></h4>
+                </td>
+              </tr>
+              
+              <!-- Body -->
+              <tr>
+                <td style="padding: 30px; color: #000000; font-size: 16px; line-height: 1.6;">
+                  <p>The Federal Government has signed new tax legislation, due to take effect from 1st of January 2026, while pausing the proposed 5% fossil-fuel surcharge, pending further consultations. Officials confirm that no start date has been fixed for the surcharge at this time.</p>
+                  
+                  <p>As households and businesses prepare for 2026, citizens and stakeholders are calling for clear, honest communication; not confusion or panic.</p>
+                  
+                  <blockquote style="border-left: 4px solid #05a39c; padding-left: 15px; color: #333; margin: 20px 0;">
+                    "Reform is welcome only if people understand it and can plan," <br/>
+                    <strong>Adeshope Haastrup</strong>, Co-Founder Citizen Monitors said.<br/>
+                    "Without clarity, even good policy causes fear. The public needs facts; not rumours."
+                  </blockquote>
+                  
+                  <h4 style="color: #05a39c; margin-top: 25px;">Key Recommendations for Government:</h4>
+                  
+                  <h4 style="margin-top: 20px;">1. Clear, Simple Communication</h4>
+                  <p>Government should publish a one-page guide (in plain English), explaining what is changing, what is not, and when.</p>
+                  <p>The guide should include:</p>
+                  <ul>
+                    <li>A timeline to January 2026</li>
+                    <li>FAQs tailored to common jobs and small businesses</li>
+                    <li>A helpline, or online portal for public questions</li>
+                  </ul>
+                  <p>This will stop the weekly wave of rumours and misinformation.</p>
+                  
+                  <h4 style="margin-top: 20px;">2. Protect Household Budgets</h4>
+                  <p>The public must be reminded that VAT remains at 7.5%, and zero-rated essentials like food, books, medicines, and certain energy items remain exempt.</p>
+                  <p>Regulators must:</p>
+                  <ul>
+                    <li>Prevent false VAT hikes at checkout</li>
+                    <li>Monitor prices and enforce compliance</li>
+                    <li>Give citizens tools to report violations</li>
+                  </ul>
+                  
+                  <h4 style="margin-top: 20px;">3. Support Workers and Small Businesses</h4>
+                  <p>Government should:</p>
+                  <ul>
+                    <li>Publish updated PAYE tables early</li>
+                    <li>Provide a penalty-free transition for SMEs into the new e-invoicing/fiscalisation system</li>
+                    <li>Offer step-by-step guidance and free toolkits to ensure smooth onboarding</li>
+                  </ul>
+                  
+                  <h4 style="color: #05a39c; margin-top: 25px;">Citizen Monitoring Begins</h4>
+                  <p>As rollout begins, Citizen Monitors will track and report the real-life impact of the changes; helping Nigerians see what is working, and where more clarity or correction is needed.</p>
+                  
+                  <p><strong>Media Contact:</strong><br/>
+                  Olajumoke Alawode-James.<br/>
+                  Spokesperson and Head of Communications; Citizen Monitors.<br/>
+                  media@citizenmonitors.com<br/>
+                  www.citizenmonitors.com</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    `,
+  });
                                                     
 
                                                       export const newsLetterTemplateProtest40 = () =>
@@ -1565,5 +1555,3 @@ export const resendCode = (verificationCode) =>
 
                                                                       `,
                                                                       });
-                                                                    
->>>>>>> dcc5d43a (Update configuration files and services)

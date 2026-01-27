@@ -5,11 +5,12 @@ services:
     plan: starter
     buildCommand: npm install
     startCommand: npm start
+    # Root directory - empty means root of repository (not "src")
+    # This fixes the error: Could not read package.json: Error: ENOENT: no such file or directory, open '/opt/render/project/src/package.json'
+    rootDir: ""
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 4000
-    # Root directory should be empty (root of repo) not "src"
-    rootDir: .
+      # PORT is automatically provided by Render, but we set default in server.js
+      # MongoDB and other env vars should be set in Render dashboard
 

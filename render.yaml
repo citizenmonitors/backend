@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: citizen-monitors-backend
+    env: node
+    plan: starter
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+    # Root directory should be empty (root of repo) not "src"
+    rootDir: .
+

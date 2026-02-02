@@ -1433,7 +1433,7 @@ export const newsLetterTemplateTaxChanges = () =>
                                                                       baseTemplate({
                                                                         title: "Citizen Monitors Weekly Newsletter",
                                                                         message: `
-                    <table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
+                  <table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
   <tr>
     <td>
       <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 6px; overflow: hidden;">
@@ -1442,90 +1442,86 @@ export const newsLetterTemplateTaxChanges = () =>
         <tr>
           <td style="background-color: #06BBAF; color: #ffffff; padding: 20px 30px; text-align: center;">
             <h3 style="margin: 0; font-size: 22px; color: #ffffff;">
-              Citizen Engagement in 2026
+              Government Is Interested in Your Money
             </h3>
-           
+            <h4 style="margin: 5px 0 0; font-weight: normal; color: #ffffff;">
+              Citizen Engagement Beyond Election Day
+            </h4>
           </td>
         </tr>
 
         <!-- Body -->
         <tr>
-          <td style="padding: 30px; color: #000000; font-size: 16px; line-height: 1.7;">
+          <td style="padding: 30px; color: #000000; font-size: 18px; line-height: 1.7;">
 
             <p><strong>Dear Citizen Monitors,</strong></p>
 
             <p>
-              As January draws to a close, and as we observe developments across Africa,
-              one truth remains clear: democracy is not sustained by election days alone.
-              It is preserved or eroded by everyday choices, civic courage, and collective vigilance.
+              Every day, government policies quietly reach into your pocket through taxes, levies, tariffs, service charges, and inflationary decisions.
             </p>
 
             <p>
-              Across Nigeria, citizens continue to face familiar challenges: insecurity,
-              economic pressure, weak service delivery, and growing distrust in public institutions.
-              Yet even in these conditions, Nigerians continue to show resilience.
-              Communities are organising. Volunteers are monitoring.
-              Ordinary people are speaking up.
+              The truth is simple:
+              <strong>government is deeply interested in your money.</strong>
             </p>
 
             <p>
-              This is where your role matters.
-              <strong>What are you going to do differently in the next one year?</strong>
+              But here’s the more important question:
+              <strong>how involved are you in governance?</strong>
             </p>
 
             <p>
-              Democracy does not defend itself.
-              It requires active citizens who are willing to observe, document, question,
-              and engage. Whether it is reporting irregularities at polling units,
-              demanding accountability from service providers, or educating others
-              about their civic rights every action counts.
+              Too often, citizens engage only at election time.
+              Yet the real decisions that shape our daily lives happen long after votes are counted in budgets, regulations, contracts, and enforcement practices.
+              When citizens step back, accountability weakens.
+              When citizens engage, governance improves.
+            </p>
+
+            <p>
+              Being involved does not require holding public office.
+              It starts with staying informed, asking questions,
+              demanding transparency, and monitoring how public resources are used.
+              It means paying attention to proposed laws,
+              speaking up when policies are unjust,
+              and supporting civic efforts that promote accountability.
             </p>
 
             <h4 style="color:#06BBAF; margin-top:25px;">
-              Protect Your Space
+              Participation Is the Difference
             </h4>
 
             <p>
-              At Citizen Monitors, we continue to emphasise one simple principle:
-              <strong>protect your space.</strong>
-              Lock down your polling unit. Digitally secure your polling unit.
-              Know what is happening around you. Use your voice responsibly.
-            </p>
-
-            <p>
-              Evidence changes conversations.
-              Participation changes outcomes.
+              At Citizen Monitors, we believe governance works best when citizens participate
+              consistently not occasionally.
+              From tracking public projects to questioning questionable policies,
+              every action counts.
+              Silence, on the other hand, is often interpreted as consent.
             </p>
 
             <h4 style="color:#06BBAF; margin-top:25px;">
-              Preparing for 2026
+              This Week’s Civic Challenge
             </h4>
-
-            <p>
-              As we look ahead to upcoming civic processes and electoral activities in 2026,
-              now is the time to prepare not later.
-            </p>
 
             <ul style="padding-left:20px;">
-              <li>Build local networks</li>
-              <li>Encourage neighbours to stay informed</li>
-              <li>Share verified information</li>
-              <li>Help someone register on Citizen Monitors</li>
-              <li>Encourage citizens to download the Citizen Monitors app when it is ready</li>
-              <li>Refuse to normalise failure</li>
+              <li>Follow a public policy issue that affects you</li>
+              <li>Ask your representative a direct question</li>
+              <li>Share verified information with your community</li>
+              <li>Support citizen-led accountability initiatives</li>
+              <li>Help someone register on <a href="https://www.citizenmonitors.com" style="color:#06BBAF; text-decoration:none;">www.citizenmonitors.com</a></li>
             </ul>
 
             <p>
-              A stronger Nigeria begins with citizens who refuse to look away.
+              Democracy does not thrive on apathy.
+              It survives on participation.
             </p>
 
             <p>
-              Thank you for standing for transparency, accountability,
-              and democratic integrity.
+              If government is interested in your money,
+              you should be equally interested in how government is run.
             </p>
 
             <p>
-              Stay engaged. Stay safe. Stay hopeful.
+              Stay engaged. Stay informed. Stay involved.
             </p>
 
             <p style="margin-top:25px;">
@@ -1545,6 +1541,7 @@ export const newsLetterTemplateTaxChanges = () =>
     </td>
   </tr>
 </table>
+
 
 
 

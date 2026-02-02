@@ -1,7 +1,7 @@
 import { sendEmail } from "../../config/email.js";
 import { newsLetterTemplateUpcoming, podcastNotificationTemplate } from "../../config/emailTemplates.js";
 import schedule from "node-schedule";
-import { toZonedTime } from "date-fns-tz";
+import { utcToZonedTime } from "date-fns-tz";
 import { format } from "date-fns";
 import AdminLog from "../../models/admin/AdminLog.js";
 import Podcast from "../../models/admin/Podcast.js";
@@ -248,7 +248,7 @@ export const sendNewsletterService = async ({ recipients, scheduleTime }) => {
   if (scheduleTime) {
     // Convert scheduleTime to Nigeria time zone
     const nigeriaTimeZone = "Africa/Lagos";
-    const nigeriaTime = toZonedTime(new Date(scheduleTime), nigeriaTimeZone);
+    const nigeriaTime = utcToZonedTime(new Date(scheduleTime), nigeriaTimeZone);
     const formattedTime = format(nigeriaTime, "yyyy-MM-dd HH:mm:ssXXX", { timeZone: nigeriaTimeZone });
 
     // Schedule the email sending

@@ -1547,3 +1547,70 @@ export const newsLetterTemplateTaxChanges = () =>
 
                                                                       `,
                                                                       });
+
+export const newsLetterTemplateETransmission = () =>
+  baseTemplate({
+    title: "Citizen Monitors Weekly Newsletter",
+    message: `
+      <table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
+        <tr>
+          <td>
+            <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 6px; overflow: hidden;">
+
+              <!-- Header -->
+              <tr>
+                <td style="background-color: #06BBAF; color: white; padding: 20px 30px; text-align: center;">
+                  <h3 style="color: #ffffff; margin: 0; font-size: 22px;">E-Transmission or Manual Collation; which should supersede?</h3>
+                </td>
+              </tr>
+
+              <!-- Body -->
+              <tr>
+                <td style="padding: 30px; color: #000000; font-size: 18px; line-height: 1.7;">
+
+                  <p><strong>Dear Citizen Monitors,</strong></p>
+
+                  <p>As Nigeria prepares for future elections, a critical question remains: should manual collation continue alongside electronic transmission, or has the time come for one to clearly prevail especially in legal disputes?</p>
+
+                  <p>This is often framed as a manual versus electronic debate. In truth, the real issue is <strong>data integrity</strong>. Electronic transmission was introduced to reduce human interference between polling units and final results, limiting manipulation and restoring trust.</p>
+
+                  <p>The BVAS already has the capacity for electronic input and transmission of results. The challenge is not technology, but process. Manual collation still operates as a parallel and often dominant system, creating dangerous ambiguity. <strong>Where two systems coexist, the weaker one becomes the loophole.</strong></p>
+
+                  <h4 style="color: #06BBAF; margin-top: 25px;">The Hard Truth About Electronic Transmission</h4>
+
+                  <p>If results are manipulated at the source on Form EC8, the same false figures can be entered into BVAS and electronically transmitted, giving fraud a digital seal of legitimacy. This exposes a hard truth: <strong>electronic collation is only as credible as the data fed into it.</strong> When votes are cast, counted, and first recorded manually, technology merely conveys compromised data.</p>
+
+                  <h4 style="color: #06BBAF; margin-top: 25px;">The Real Reform Question</h4>
+
+                  <p>The real reform question, therefore, is not whether electronic transmission should replace manual collation, but whether manual data input should exist at all. If electronic transmission is adopted, it must supersede manual collation not merely accompany it. Otherwise, reform becomes performance.</p>
+
+                  <p>Only electronic voting, where votes are captured directly at the point of casting, can truly secure electronic collation. A dual system creates the illusion of reform while preserving old vulnerabilities.</p>
+
+                  <h4 style="color: #06BBAF; margin-top: 25px;">Democracy Cannot Be Protected by Half-Measures</h4>
+
+                  <p>At Citizen Monitors, we believe democracy cannot be protected by half-measures. Nigerians deserve election results that are traceable, verifiable, and resistant to manipulation from origin to outcome.</p>
+
+                  <p>The integrity of our elections depends on asking hard questions:</p>
+                  <ul style="padding-left: 20px; line-height: 1.8;">
+                    <li>Who benefits from manual collation?</li>
+                    <li>What role should it still play, if any?</li>
+                    <li>And what does genuine reform truly require?</li>
+                  </ul>
+
+                  <p>Stay engaged. Stay informed. Demand integrity and clarity.</p>
+
+                  <p style="margin-top: 25px;"><strong>With Regards,</strong><br>
+                  <strong>Citizen Monitors</strong><br>
+                  Guardians of Truth</p>
+
+                  <p style="color: #06BBAF; margin-top: 10px;">📱 @CitizenMonitors (X / IG / FB / YouTube)</p>
+
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+      </table>
+      `,
+  });

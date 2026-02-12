@@ -7,7 +7,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "migrate:files": "node ./scripts/backfillInboxFields.js"
+    "migrate:files": "node ./scripts/backfillInboxFields.js",
+    "export:users": "node ./scripts/exportUsersToExcel.js"
   },
   "keywords": [],
   "author": "",
@@ -33,6 +34,7 @@
     "nodemon": "^3.1.0",
     "redis": "^4.7.0",
     "uuid": "^10.0.0",
+    "xlsx": "^0.18.5",
     "zeptomail": "^6.2.1"
   },
   "devDependencies": {

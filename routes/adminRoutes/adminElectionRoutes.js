@@ -9,6 +9,7 @@ import {
 import { getDashboardController } from "../../controllers/adminController/adminDashboard.js";
 import * as AdminController from "../../controllers/adminController/adminDashboard.js";
 import * as PodcastController from "../../controllers/adminController/podcastController.js";
+import * as AdminSpeakerSlotsController from "../../controllers/speakerSlots/adminSpeakerSlotsController.js";
 
 const router = express.Router();
 
@@ -148,6 +149,19 @@ router.get("/admin/notifications", authMiddleware, isAdmin, AdminCont.adminNotif
 router.patch("/admin/notification/mark-read/:notificationId", authMiddleware, isAdmin, AdminCont.markNotificationAsRead);
 router.patch("/admin/notification/delete/:notificationId", authMiddleware, isAdmin, AdminCont.deleteNotificationForUser);
 router.get("/admin/emails", authMiddleware, isAdmin, AdminController.getUserEmailsController);
+
+// Speaker slots (72-Hour X Space)
+router.get("/admin/speaker-slots/events", authMiddleware, isAdmin, AdminSpeakerSlotsController.getEvents);
+router.get("/admin/speaker-slots/events/:eventId/schedule", authMiddleware, isAdmin, AdminSpeakerSlotsController.getSchedule);
+router.get("/admin/speaker-slots/events/:eventId/bookings", authMiddleware, isAdmin, AdminSpeakerSlotsController.getConfirmedBookings);
+router.get("/admin/speaker-slots/events/:eventId/export", authMiddleware, isAdmin, AdminSpeakerSlotsController.exportCsv);
+router.patch("/admin/speaker-slots/bookings/:bookingId", authMiddleware, isAdmin, AdminSpeakerSlotsController.patchBooking);
+router.delete("/admin/speaker-slots/bookings/:bookingId", authMiddleware, isAdmin, AdminSpeakerSlotsController.deleteBooking);
+router.post("/admin/speaker-slots/events/:eventId/slots", authMiddleware, isAdmin, AdminSpeakerSlotsController.createSlots);
+router.get("/admin/speaker-slots/events/:eventId/slots", authMiddleware, isAdmin, AdminSpeakerSlotsController.getSlots);
+router.delete("/admin/speaker-slots/slots/:slotId", authMiddleware, isAdmin, AdminSpeakerSlotsController.deleteSlot);
+router.post("/admin/speaker-slots/events/:eventId/invites", authMiddleware, isAdmin, AdminSpeakerSlotsController.createInvites);
+router.post("/admin/speaker-slots/reminders/send", authMiddleware, isAdmin, AdminSpeakerSlotsController.sendReminders);
 
 export default router;
 

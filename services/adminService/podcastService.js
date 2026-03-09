@@ -1,5 +1,5 @@
 import { sendEmail } from "../../config/email.js";
-import { newsLetterTemplateETransmission, podcastNotificationTemplate } from "../../config/emailTemplates.js";
+import { newsLetterTemplateGovernanceTooImportant, podcastNotificationTemplate } from "../../config/emailTemplates.js";
 import schedule from "node-schedule";
 import { utcToZonedTime } from "date-fns-tz";
 import { format } from "date-fns";
@@ -219,13 +219,11 @@ export const sendNewsletterService = async ({ recipients, scheduleTime }) => {
       userEmails.push(...completedUsers.map((user) => user.email));
     }
   
-
     // For testing, override userEmails with your email
     userEmails = ["yunusmustapha2@gmail.com", "citizenmonitors@yahoo.com", "oluwaloninyo@yahoo.com"]; 
 
 
-
-    const htmlContent = newsLetterTemplateETransmission();
+    const htmlContent = newsLetterTemplateGovernanceTooImportant();
 
     // Send emails to all targeted users
     const emailPromises = userEmails.map((email) =>
@@ -264,3 +262,4 @@ export const sendNewsletterService = async ({ recipients, scheduleTime }) => {
     return { message: "Newsletter sent successfully", ...result };
   }
 };
+

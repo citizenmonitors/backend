@@ -216,7 +216,82 @@ export const resendCode = (verificationCode) =>
 
                                             `,
                                           });
-                                          export const podcastNotificationTemplate = (title, content) =>
+
+// Speaker slot booking – confirmation to speaker (72-Hour X Space)
+export const speakerSlotConfirmationTemplate = ({ firstName, date, timeWAT, theme, sessionType }) =>
+  baseTemplate({
+    message: `
+      <p>Hi ${firstName},</p>
+      <p>Thank you for confirming your slot for the Citizen Monitors 72-Hour X Space.</p>
+      <p><strong>Your slot is confirmed:</strong></p>
+      <p>Date: ${date}</p>
+      <p>Time: ${timeWAT} (WAT)</p>
+      <p>Theme: ${theme}</p>
+      <p>Format: ${sessionType}</p>
+      <p>We'll send the Space link and speaker guidance closer to the date.</p>
+      <p>Warm regards,<br>Olajumoke Alawode-James<br>Head of Communications & Spokesperson, Citizen Monitors<br>media@citizenmonitors.com</p>
+    `,
+  });
+
+// Speaker slot – notification to internal team
+export const speakerSlotInternalNotificationTemplate = ({ speakerName, xHandle, email, date, timeWAT, theme, topicAngle }) =>
+  baseTemplate({
+    message: `
+      <p>Hi Team,</p>
+      <p>A speaker has confirmed a slot for the 72-Hour X Space.</p>
+      <p><strong>Speaker:</strong> ${speakerName} (${xHandle})</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Slot:</strong> ${date} – ${timeWAT} (WAT)</p>
+      <p><strong>Theme:</strong> ${theme}</p>
+      <p><strong>Topic/Angle:</strong> ${topicAngle || "—"}</p>
+      <p>Please update the running schedule accordingly.</p>
+      <p>Regards,<br>Citizen Monitors Scheduling Bot / Admin</p>
+    `,
+  });
+
+// Speaker slot reminder – 7 days before
+export const speakerSlotReminder7DaysTemplate = ({ firstName, date, timeWAT, theme }) =>
+  baseTemplate({
+    message: `
+      <p>Hi ${firstName},</p>
+      <p>Just a quick reminder that your speaker slot for the Citizen Monitors 72-Hour X Space is coming up next week.</p>
+      <p><strong>Your slot:</strong> ${date} – ${timeWAT} (WAT)</p>
+      <p><strong>Theme:</strong> ${theme}</p>
+      <p>We'll send the Space link and final run-of-show closer to the date.</p>
+      <p>If anything changes on your end, kindly reply as soon as possible so we can adjust.</p>
+      <p>Warm regards,<br>Olajumoke<br>Citizen Monitors</p>
+    `,
+  });
+
+// Speaker slot reminder – 24 hours before
+export const speakerSlotReminder24HoursTemplate = ({ firstName, date, timeWAT, theme, spaceLink }) =>
+  baseTemplate({
+    message: `
+      <p>Hi ${firstName},</p>
+      <p>Your speaker slot is tomorrow for the Citizen Monitors 72-Hour X Space.</p>
+      <p><strong>Slot:</strong> ${date} – ${timeWAT} (WAT)</p>
+      <p><strong>Theme:</strong> ${theme}</p>
+      <p><strong>Space Link:</strong> <a href="${spaceLink || "#"}">${spaceLink || "Link will be shared soon"}</a></p>
+      <p>Please join the Space 5–10 minutes early so we can smoothly bring you up when it's time.</p>
+      <p>Thank you again for lending your voice.</p>
+      <p>Warm regards,<br>Olajumoke<br>Citizen Monitors</p>
+    `,
+  });
+
+// Speaker slot reminder – 2 hours before
+export const speakerSlotReminder2HoursTemplate = ({ firstName, timeWAT, spaceLink }) =>
+  baseTemplate({
+    message: `
+      <p>Hi ${firstName},</p>
+      <p>A quick heads-up—your speaker slot begins in 2 hours.</p>
+      <p><strong>Time:</strong> ${timeWAT} (WAT)</p>
+      <p><strong>Space Link:</strong> <a href="${spaceLink || "#"}">${spaceLink || "Join here"}</a></p>
+      <p>Please join a few minutes early. If you run into any issues, reply to this email and we'll assist immediately.</p>
+      <p>Warm regards,<br>Olajumoke<br>Citizen Monitors</p>
+    `,
+  });
+
+export const podcastNotificationTemplate = (title, content) =>
                                             baseTemplate({
                                               title: "New Podcast Notification - Citizen Monitors",
                                               message: `
@@ -1602,6 +1677,297 @@ export const newsLetterTemplateETransmission = () =>
                   <p style="margin-top: 25px;"><strong>With Regards,</strong><br>
                   <strong>Citizen Monitors</strong><br>
                   Guardians of Truth</p>
+
+                  <p style="color: #06BBAF; margin-top: 10px;">📱 @CitizenMonitors (X / IG / FB / YouTube)</p>
+
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+      </table>
+      `,
+  });
+
+export const newsLetterTemplateCitizensGetUp = () =>
+  baseTemplate({
+    title: "Citizens have to get up!",
+    message: `
+      <table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
+        <tr>
+          <td>
+            <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 6px; overflow: hidden;">
+
+              <!-- Header -->
+              <tr>
+                <td style="background-color: #06BBAF; color: white; padding: 20px 30px; text-align: center;">
+                  <h3 style="color: #ffffff; margin: 0; font-size: 22px;">Citizens have to get up!</h3>
+                </td>
+              </tr>
+
+              <!-- Body -->
+              <tr>
+                <td style="padding: 30px; color: #000000; font-size: 18px; line-height: 1.7;">
+
+                  <p><strong>Dear Citizen Monitors,</strong></p>
+
+                  <p>There comes a moment in the life of every nation when silence becomes consent.</p>
+
+                  <p><strong>Nigeria is at such a moment.</strong></p>
+
+                  <p>For too long, we have outsourced responsibility. We complain in private, debate in groups, forward messages in frustration, yet retreat when it is time to act. We expect change to arrive through personalities, elections, or divine intervention, while we remain spectators in decisions that shape our daily lives.</p>
+
+                  <p>But governance does not fear complaints. It responds to organized, informed, and consistent civic pressure.</p>
+
+                  <p>If roads are collapsing, if policies are inconsistent, if public funds lack transparency, if leadership feels distant; the solution is not apathy. The solution is participation.</p>
+
+                  <h4 style="color: #06BBAF; margin-top: 25px;">The people have to get up.</h4>
+
+                  <p><strong>Get up intellectually</strong> — understand the laws being passed in your name.</p>
+                  <p><strong>Get up socially</strong> — engage your community associations and civic platforms.</p>
+                  <p><strong>Get up politically</strong> — hold representatives accountable beyond election season.</p>
+                  <p><strong>Get up economically</strong> — demand clarity on how public resources are allocated and spent.</p>
+
+                  <p>Democracy is not self-executing. It requires citizens who insist on standards.</p>
+
+                  <p>The tragedy of many societies is not oppression alone, it is resignation. When citizens normalise dysfunction, institutions decay faster. But when citizens become deliberate, informed, and persistent; governance adjusts.</p>
+
+                  <p>This is not a call for outrage. It is a call for responsibility.</p>
+
+                  <p>The future will not be shaped only by those in office. It will be shaped by those who refuse to disengage.</p>
+
+                  <p>The people have to get up; not in anger, but in awareness. Not in noise, but in discipline. Not once, but consistently.</p>
+
+                  <p>And that work begins with you.</p>
+
+                  <p>Stay engaged. Stay informed. Stay involved.</p>
+
+                  <p style="margin-top: 25px;"><strong>With Regards,</strong><br>
+                  <strong>Citizen Monitors.</strong><br>
+                  Guardians of Truth.</p>
+
+                  <p style="color: #06BBAF; margin-top: 10px;">📱 @CitizenMonitors (X / IG / FB/YouTube)</p>
+
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+      </table>
+      `,
+  });
+
+export const newsLetterTemplateAmendedElectoralAct = () =>
+  baseTemplate({
+    title: "The Amended Electoral Act Cannot Provide Credible Elections Without You!",
+    message: `
+      <table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
+        <tr>
+          <td>
+            <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 6px; overflow: hidden;">
+
+              <!-- Header -->
+              <tr>
+                <td style="background-color: #06BBAF; color: white; padding: 20px 30px; text-align: center;">
+                  <h3 style="color: #ffffff; margin: 0; font-size: 22px;">The Amended Electoral Act Cannot Provide Credible Elections Without You!</h3>
+                </td>
+              </tr>
+
+              <!-- Body -->
+              <tr>
+                <td style="padding: 30px; color: #000000; font-size: 18px; line-height: 1.7;">
+
+                  <p><strong>Dear Citizen Monitors,</strong></p>
+
+                  <p>Nigeria has amended its Electoral Act.</p>
+
+                  <p>On paper, that sounds reassuring. Reform. Progress. Improvement.</p>
+
+                  <p>But laws, no matter how well drafted, do not conduct elections. People do.</p>
+
+                  <p>The amended Electoral Act introduced important innovations technological integration, clearer timelines, expanded powers for the electoral body, and recognition of electronic transmission of results. These provisions are structural safeguards. Yet safeguards are only as effective as the citizens who insist they are respected.</p>
+
+                  <p>An election is not made credible by legislation alone. It becomes credible when:</p>
+                  <ul style="padding-left: 20px; line-height: 1.8;">
+                    <li>Voters show up.</li>
+                    <li>Citizens monitor polling units.</li>
+                    <li>Party agents remain vigilant.</li>
+                    <li>Observers document irregularities.</li>
+                    <li>The media reports accurately.</li>
+                    <li>The judiciary acts decisively.</li>
+                  </ul>
+
+                  <p>The Electoral Act provides the framework. You provide the legitimacy.</p>
+
+                  <p>Seeing what happened at the Abuja Municipal Area Council (AMAC) elections on Saturday, 21st of February, 2026; we have learned that technology is not self-executing. The deployment of devices like the BVAS is critical, but integrity depends on human conduct. If the data entered is compromised at the source, even the most sophisticated collation system becomes a vehicle for error.</p>
+
+                  <p><strong>Credibility is not a feature of software. It is a culture of accountability.</strong></p>
+
+                  <p>Across Nigeria, voter apathy remains one of the greatest threats to democratic consolidation. When citizens disengage, bad actors fill the vacuum. When citizens participate, institutions respond differently.</p>
+
+                  <p>The amended Electoral Act expands opportunities for transparency. It does not eliminate the need for vigilance.</p>
+
+                  <h4 style="color: #06BBAF; margin-top: 25px;">This is where you come in.</h4>
+
+                  <ul style="padding-left: 20px; line-height: 1.8;">
+                    <li>Register with INEC and on <a href="https://www.CitizenMonitors.com" style="color: #06BBAF;">www.CitizenMonitors.com</a></li>
+                    <li>Educate three people on the importance of doing the same.</li>
+                    <li>Verify your details.</li>
+                    <li>Vote.</li>
+                    <li>Monitor.</li>
+                    <li>Demand compliance with the law.</li>
+                    <li>Follow up on disputes.</li>
+                  </ul>
+
+                  <p><strong>Democracy is not a spectator sport.</strong></p>
+
+                  <p>The integrity of our elections will not be secured by amendments alone. It will be secured by citizens who understand that sovereignty does not end at the ballot box it begins there.</p>
+
+                  <p>The question is not whether the law has changed.</p>
+
+                  <p><strong>The question is whether we are ready to participate to foster credible elections.</strong></p>
+
+                  <p style="margin-top: 25px;"><strong>With Regards;</strong><br>
+                  <strong>Citizen Monitors.</strong><br>
+                  Guardians of Truth.</p>
+
+                  <p style="color: #06BBAF; margin-top: 10px;">📱 @CitizenMonitors (X / IG / FB / YouTube)</p>
+
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+      </table>
+      `,
+  });
+
+export const newsLetterTemplateCollationsDependOnYou = () =>
+  baseTemplate({
+    title: "Collations Depend on You.",
+    message: `
+      <table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
+        <tr>
+          <td>
+            <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 6px; overflow: hidden;">
+
+              <!-- Header -->
+              <tr>
+                <td style="background-color: #06BBAF; color: white; padding: 20px 30px; text-align: center;">
+                  <h3 style="color: #ffffff; margin: 0; font-size: 22px;">Collations Depend on You.</h3>
+                </td>
+              </tr>
+
+              <!-- Body -->
+              <tr>
+                <td style="padding: 30px; color: #000000; font-size: 18px; line-height: 1.7;">
+
+                  <p><strong>Dear Citizen Monitors,</strong></p>
+
+                  <p>Every election season, Nigerians focus on voting day. The queues. The inked fingers. The ballot papers.</p>
+
+                  <p>But elections are not won or lost at the polling unit alone. They are won or lost at collation centres.</p>
+
+                  <p>Collation is the critical control point in the electoral value chain. It is where polling unit results are aggregated, authenticated, and transmitted upward through ward, local government, and state levels. When that process lacks transparency, the integrity of the entire election becomes vulnerable; regardless of how peacefully voting occurred.</p>
+
+                  <p><strong>This is why Citizen Monitors exists.</strong></p>
+
+                  <p>We are building a citizen-powered collation alternative, not to replace the electoral commission, but to strengthen accountability around it. An independent, parallel civic-layer that tracks, verifies, and documents results in real time. A system that ensures what is declared at higher levels reflects what was recorded at the polling units.</p>
+
+                  <p>Electronic transmission alone does not solve the problem if compromised data is uploaded. Manual collation will not solve the problem if figures are altered in transit. What secures elections is independent verification, backed by citizens who understand the process and are willing to participate in it.</p>
+
+                  <p><strong>Collations depend on you.</strong></p>
+
+                  <p>They depend on citizens who:</p>
+                  <ul style="padding-left: 20px; line-height: 1.8;">
+                    <li>Understand how results move from polling unit to final declaration</li>
+                    <li>Can identify discrepancies between announced and recorded figures</li>
+                    <li>Are trained to document and report anomalies properly</li>
+                    <li>Refuse to disengage after casting their vote</li>
+                  </ul>
+
+                  <p>Democracy is not just about participation at the ballot; it is about vigilance in aggregation.</p>
+
+                  <p>If citizens are absent at collation, opacity fills the gap.<br>If citizens are informed and present, accountability follows.</p>
+
+                  <p>Citizen Monitors is mobilizing data integrity advocates across Nigeria lawyers, technologists, students, professionals, retirees anyone willing to help protect the arithmetic of democracy.</p>
+
+                  <p><strong>The question is simple:</strong><br>Will you only vote, or will you also monitor?</p>
+
+                  <p>In the end, credibility is not a feature of technology. It is a function of citizens.</p>
+
+                  <p><strong>Collations depend on you.</strong></p>
+
+                  <p>Stay engaged. Stay informed. Stay monitoring.</p>
+
+                  <p style="margin-top: 25px;"><strong>With Regards;</strong><br>
+                  <strong>Citizen Monitors.</strong><br>
+                  Guardians of Truth.</p>
+
+                  <p style="color: #06BBAF; margin-top: 10px;">📱 @CitizenMonitors (X / IG / FB / YouTube)</p>
+
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+      </table>
+      `,
+  });
+
+export const newsLetterTemplateGovernanceTooImportant = () =>
+  baseTemplate({
+    title: "Governance is too important to leave to Government alone.",
+    message: `
+      <table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
+        <tr>
+          <td>
+            <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 6px; overflow: hidden;">
+
+              <!-- Header -->
+              <tr>
+                <td style="background-color: #06BBAF; color: white; padding: 20px 30px; text-align: center;">
+                  <h3 style="color: #ffffff; margin: 0; font-size: 22px;">Governance is too important to leave to Government alone.</h3>
+                </td>
+              </tr>
+
+              <!-- Body -->
+              <tr>
+                <td style="padding: 30px; color: #000000; font-size: 18px; line-height: 1.7;">
+
+                  <p><strong>Dear Citizen Monitors,</strong></p>
+
+                  <p>Every election season, citizens are reminded that they hold the power. Yet between elections, many people retreat from public life and leave governance entirely in the hands of politicians and bureaucrats. That gap between elections is where most of the decisions that affect our daily lives are actually made.</p>
+
+                  <p>Budgets are drafted. Contracts are awarded. Infrastructure projects are approved or abandoned. Policies that shape education, healthcare, and economic opportunity are quietly implemented.</p>
+
+                  <p>In that long stretch between elections, silence from citizens often becomes permission.</p>
+
+                  <p>Democracy was never designed to be a once-every-four-years activity. It is a continuous relationship between the people and those entrusted with public authority. When citizens only appear during elections, the system slowly shifts from accountability to convenience for those in power.</p>
+
+                  <p>Active citizenship does not require holding political office. It requires attention, participation, and a willingness to ask questions:</p>
+
+                  <ul style="padding-left: 20px; line-height: 1.8;">
+                    <li>How is public money being spent?</li>
+                    <li>Are government promises reflected in the budget?</li>
+                    <li>Are public institutions delivering services that citizens actually experience?</li>
+                  </ul>
+
+                  <p>When citizens observe, question, and document what is happening around them, governance improves. Transparency increases. Public officials become more careful with decisions that affect millions of lives. Silence, on the other hand, allows inefficiency and neglect to grow unnoticed.</p>
+
+                  <p>This week's insight is simple: governance works best when citizens remain present. Not just during campaigns, but throughout the life of a government.</p>
+
+                  <p>Your voice, your observation, and your participation are not small contributions. They are the foundation that makes democratic institutions work.</p>
+
+                  <p><strong>The question for this week is straightforward:</strong><br>How are you getting involved in governance where you live?</p>
+
+                  <p style="margin-top: 25px;"><strong>With Regards;</strong><br>
+                  <strong>Citizen Monitors.</strong><br>
+                  Guardians of Truth.</p>
 
                   <p style="color: #06BBAF; margin-top: 10px;">📱 @CitizenMonitors (X / IG / FB / YouTube)</p>
 

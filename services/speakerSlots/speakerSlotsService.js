@@ -11,8 +11,8 @@ import {
 import mongoose from "mongoose";
 
 const DEFAULT_NOTIFY_EMAILS = [
-  // "olajumoke@citizenmonitors.com",
-  // "adeshope@citizenmonitors.com",
+  "olajumoke@citizenmonitors.com",
+  "adeshope@citizenmonitors.com",
   "yunus@citizenmonitors.com",
 ];
 function getNotifyEmails() {

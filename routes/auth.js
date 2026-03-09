@@ -11,18 +11,31 @@ import {
   resetPassword,
   submitObserverDetailsController,
 } from "../controllers/authController.js";
+import {
+  handleValidationErrors,
+  registerValidation,
+  verifyEmailValidation,
+  resendTokenValidation,
+  pickRoleValidation,
+  signInValidation,
+  forgotPasswordValidation,
+  resetPasswordValidation,
+  submitDetailsValidation,
+  submitObserverDetailsValidation,
+} from "../validators/authValidators.js";
+import upload from "../config/multer.js";
 
 const router = express.Router();
 
-router.post("/register", register);
-router.post("/verify-email", verifyEmail);
-router.post("/resend-token", resendToken);
-router.post("/select-role", pickRole);
-router.post("/submit-details",  submitRoleForm);
-router.post("/submit-role", submitObserverDetailsController);
-router.post("/signin", signIn);
+router.post("/register", registerValidation, handleValidationErrors, register);
+router.post("/verify-email", verifyEmailValidation, handleValidationErrors, verifyEmail);
+router.post("/resend-token", resendTokenValidation, handleValidationErrors, resendToken);
+router.post("/select-role", pickRoleValidation, handleValidationErrors, pickRole);
+router.post("/submit-details", upload.single("profileImage"), submitDetailsValidation, handleValidationErrors, submitRoleForm);
+router.post("/submit-role", upload.fields([{ name: "observerId[]", maxCount: 2 }]), submitObserverDetailsValidation, handleValidationErrors, submitObserverDetailsController);
+router.post("/signin", signInValidation, handleValidationErrors, signIn);
 router.post("/validate", validateUserSession);
-router.post("/forgot-password", forgotPassword);
-router.post("/reset-password", resetPassword);
+router.post("/forgot-password", forgotPasswordValidation, handleValidationErrors, forgotPassword);
+router.post("/reset-password", resetPasswordValidation, handleValidationErrors, resetPassword);
 
 export default router;

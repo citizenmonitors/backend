@@ -22,6 +22,7 @@ import {
   deleteElectionService,
   deleteActiveElectionService,
 } from "../../services/Election/electionService.js";
+import { isValidObjectId } from "../../utils/validators.js";
 
 export const createElection = async (req, res) => {
   try {
@@ -42,6 +43,9 @@ export const createElection = async (req, res) => {
 export const updateElection = async (req, res) => {
   try {
     const { electionId } = req.params;
+    if (!isValidObjectId(electionId)) {
+      return res.status(400).json({ message: "Invalid election ID" });
+    }
     const adminId = req.user._id;
     const updatedElection = await updateElectionService(electionId, {
       ...req.body,
@@ -68,6 +72,9 @@ export const createActiveElectionsCon = async (req, res) => {
 export const updateActiveElectionCon = async (req, res) => {
   try {
     const { electionId } = req.params;
+    if (!isValidObjectId(electionId)) {
+      return res.status(400).json({ message: "Invalid election ID" });
+    }
     const adminId = req.user._id;
     const updatedElection = await updateActiveElections(electionId, req.body, adminId,
     );
@@ -82,6 +89,9 @@ export const updateActiveElectionCon = async (req, res) => {
 export const deleteElection = async (req, res) => {
   try {
     const { electionId } = req.params;
+    if (!isValidObjectId(electionId)) {
+      return res.status(400).json({ message: "Invalid election ID" });
+    }
     const adminId = req.user._id;
 
     const result = await deleteElectionService(electionId, adminId);
@@ -96,6 +106,9 @@ export const deleteElection = async (req, res) => {
 export const deleteActiveElection = async (req, res) => {
   try {
     const { activeElectionId } = req.params;
+    if (!isValidObjectId(activeElectionId)) {
+      return res.status(400).json({ message: "Invalid active election ID" });
+    }
     const adminId = req.user._id;
 
     const result = await deleteActiveElectionService(activeElectionId, adminId);
@@ -144,6 +157,9 @@ export const getAllElectionTypes = async (req, res) => {
 export const getElectionResultByIdCont = async (req, res) => {
   try {
     const { electionId } = req.params;
+    if (!isValidObjectId(electionId)) {
+      return res.status(400).json({ message: "Invalid election ID" });
+    }
     const userId = req.user._id;
     const result = await getElectionResultById(electionId, userId);
     res.status(200).json(result);
@@ -155,6 +171,9 @@ export const getElectionResultByIdCont = async (req, res) => {
 export const getElectionByIdCont = async (req, res) => {
   try {
     const { electionId } = req.params;
+    if (!isValidObjectId(electionId)) {
+      return res.status(400).json({ message: "Invalid election ID" });
+    }
     const userId = req.user._id;
     const election = await getElectionById(electionId, userId);
     res.status(200).json(election);
@@ -166,6 +185,9 @@ export const getElectionByIdCont = async (req, res) => {
 export const getLiveElectionByIdCont = async (req, res) => {
   try {
     const { electionId } = req.params;
+    if (!isValidObjectId(electionId)) {
+      return res.status(400).json({ message: "Invalid election ID" });
+    }
     const election = await getLiveElectionById(electionId);
     res.status(200).json(election);
   } catch (error) {
@@ -177,8 +199,10 @@ export const getLiveElectionByIdCont = async (req, res) => {
 
 export const uploadResultData = async (req, res) => {
   try {
-
     const { electionId } = req.params;
+    if (!isValidObjectId(electionId)) {
+      return res.status(400).json({ message: "Invalid election ID" });
+    }
     const userId = req.user._id;
     const resultData = await uploadResultDataService(
       electionId,
@@ -199,6 +223,9 @@ export const uploadResultData = async (req, res) => {
 export const updateResultData = async (req, res) => {
   try {
     const { electionId } = req.params;
+    if (!isValidObjectId(electionId)) {
+      return res.status(400).json({ message: "Invalid election ID" });
+    }
     const userId = req.user._id;
     const updatedResultData = await updateResultDataService(
       electionId,
@@ -227,10 +254,11 @@ export const getAllElectionResultsController = async (req, res) => {
 };
 
 export const uploadIncidentReportData = async (req, res) => {
-  // console.log("Body received:", req.body);
-  // console.log("Files received:", req.files);
   try {
     const { electionId } = req.params;
+    if (!isValidObjectId(electionId)) {
+      return res.status(400).json({ message: "Invalid election ID" });
+    }
     const report = await uploadIncidentReportDataService(
       electionId,
       req.user._id,
@@ -248,10 +276,11 @@ export const uploadIncidentReportData = async (req, res) => {
 };
 
 export const updateIncidentReportData = async (req, res) => {
-  // console.log("Body received:", req.body);
-  // console.log("Files received:", req.files);
   try {
     const { electionId } = req.params;
+    if (!isValidObjectId(electionId)) {
+      return res.status(400).json({ message: "Invalid election ID" });
+    }
     const userId = req.user._id;
 
     const report = await updateIncidentReportDataService(
@@ -284,6 +313,9 @@ export const getUserElectionDataController = async (req, res) => {
 export const deleteElectionResultData = async (req, res) => {
   try {
     const { electionId } = req.params;
+    if (!isValidObjectId(electionId)) {
+      return res.status(400).json({ message: "Invalid election ID" });
+    }
     const userId = req.user._id;
 
     const response = await deleteElectionResultDataService(electionId, userId);
@@ -298,6 +330,9 @@ export const deleteElectionResultData = async (req, res) => {
 export const deleteIncidentReportData = async (req, res) => {
   try {
     const { electionId } = req.params;
+    if (!isValidObjectId(electionId)) {
+      return res.status(400).json({ message: "Invalid election ID" });
+    }
     const userId = req.user._id;
     const response = await deleteIncidentReportDataService(electionId, userId);
     res.status(200).json(response);
@@ -332,6 +367,9 @@ export const getResultsAndPerformActionController = async (req, res) => {
   try {
     const userId = req.user._id;
     const { electionId, action, dataType, flagReason } = req.body;
+    if (electionId && !isValidObjectId(electionId)) {
+      return res.status(400).json({ message: "Invalid election ID" });
+    }
 
     const actionData = action
       ? { electionId, action, dataType, flagReason }
@@ -362,11 +400,13 @@ export const checkUserStatusForFlagController = async (req, res) => {
     const userId = req.user._id;
     const { electionId, action, dataType } = req.body;
 
-    // Validate required fields
     if (!electionId || !action || !dataType) {
       return res.status(400).json({
         message: "Election ID, action, and data type are required.",
       });
+    }
+    if (!isValidObjectId(electionId)) {
+      return res.status(400).json({ message: "Invalid election ID" });
     }
 
     // Call the service to check submission status

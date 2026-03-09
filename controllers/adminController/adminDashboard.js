@@ -1,4 +1,5 @@
 import * as AdminService from "../../services/adminService/adminDashboard.js";
+import { isValidObjectId } from "../../utils/validators.js";
 
 
 export const getDashboardController = async (req, res) => {
@@ -29,6 +30,9 @@ export const inviteAdmin = async (req, res) => {
 export const updateAdminPermissions = async (req, res) => {
   try {
     const { adminId } = req.params;
+    if (!isValidObjectId(adminId)) {
+      return res.status(400).json({ message: "Invalid admin ID" });
+    }
     const updatedBy = req.user._id; 
     const { role, permissions } = req.body; 
 
@@ -53,6 +57,9 @@ export const updateAdminPermissions = async (req, res) => {
 export const suspendAdmin = async (req, res) => {
   try {
     const { adminId } = req.params;
+    if (!isValidObjectId(adminId)) {
+      return res.status(400).json({ message: "Invalid admin ID" });
+    }
     const suspendedBy = req.user._id;
 
     const updatedAdmin = await AdminService.suspendAdminService(
@@ -97,7 +104,11 @@ export const getAccessControl = async (req, res) => {
 
 export const getAdminLogs = async (req, res) => {
   try {
-    const data = await AdminService.getAdminLogsService(req.params.adminId);
+    const adminId = req.params.adminId;
+    if (!isValidObjectId(adminId)) {
+      return res.status(400).json({ message: "Invalid admin ID" });
+    }
+    const data = await AdminService.getAdminLogsService(adminId);
     res.json(data);
   } catch (error) {
     res.status(500).json({
@@ -111,6 +122,9 @@ export const getAdminLogs = async (req, res) => {
 export const getSingleAdmin = async (req, res) => {
   try {
     const { adminId } = req.params;
+    if (!isValidObjectId(adminId)) {
+      return res.status(400).json({ message: "Invalid admin ID" });
+    }
     const { role, permissions } = req.body; 
     const admin = await AdminService.getSingleAdminService(adminId, { role, permissions });
 

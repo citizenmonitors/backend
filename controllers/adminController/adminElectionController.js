@@ -1,5 +1,6 @@
 import * as AdminDashServices from "../../services/adminService/adminDashboard.js";
 import * as AdminService from "../../services/adminService/adminElectionService.js";
+import { isValidObjectId } from "../../utils/validators.js";
 
 
 export const getDashboardDataController = async (req, res) => {
@@ -7,7 +8,7 @@ export const getDashboardDataController = async (req, res) => {
         const dashboardData = await AdminService.getDashboardDataService();
         res.status(200).json(dashboardData)
     } catch (error) {
-        res.status(505),json({error: error.message})
+        res.status(500).json({ error: error.message });
     }
 }
 
@@ -52,8 +53,8 @@ export const getAllElectionTypes = async (req, res) => {
 export const getAdminLiveElectionController = async (req, res) => {
   try {
     const { electionId } = req.params;
-    if (!electionId) {
-      return res.status(400).json({ message: "Election ID is required." });
+    if (!electionId || !isValidObjectId(electionId)) {
+      return res.status(400).json({ message: "Valid election ID is required." });
     }
 
     const result = await AdminDashServices.getAdminLiveElectionService(electionId);
@@ -79,6 +80,9 @@ export const getAllElectionAndIncidentController = async (req, res) =>{
 export const getResultOrIncidentByController = async (req, res) => {
   try {
     const { id } = req.params;
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({ message: "Invalid ID" });
+    }
     const resultOrIncident = await AdminService.getResultOrIncidentByIdService(id);
     res.status(200).json({result: resultOrIncident});
   } catch (error) {
@@ -90,6 +94,9 @@ export const getResultOrIncidentByController = async (req, res) => {
 export const deletedResultOrIncidentController = async (req, res) => {
  try {
    const { id } = req.params;
+   if (!isValidObjectId(id)) {
+     return res.status(400).json({ message: "Invalid ID" });
+   }
    const adminId = req.user._id;
 
    const result = await AdminService.deleteResultOrIncidentService(id, adminId);
@@ -120,7 +127,10 @@ export const getAllUsersController = async (req, res) => {
 
 export const getUserByIdController = async (req, res) => {
   try {
-    const {id} = req.params;
+    const { id } = req.params;
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({ message: "Invalid ID" });
+    }
     const user = await AdminDashServices.getUserByIdService(id);
     res.status(200).json(user);
   } catch (error) {
@@ -132,7 +142,10 @@ export const getUserByIdController = async (req, res) => {
 
 export const deleteUserByIdController = async (req, res) => {
   try {
-    const {id} = req.params;
+    const { id } = req.params;
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({ message: "Invalid ID" });
+    }
     const adminId = req.user._id;
     const result = await AdminDashServices.deleteUserService(id, adminId);
     res.status(200).json(result);
@@ -146,6 +159,9 @@ export const deleteUserByIdController = async (req, res) => {
 export const approveObserverController = async (req, res) => {
   try {
     const { id } = req.params;
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({ message: "Invalid ID" });
+    }
     const adminId = req.user._id;
     const response = await AdminDashServices.approveObserverService(id, adminId);
 
@@ -168,6 +184,9 @@ export const getAllObserver = async (req, res) => {
 export const downgradeObserverController = async (req, res) => {
   try {
     const { id } = req.params;
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({ message: "Invalid ID" });
+    }
     const { adminReason } = req.body;
     const adminId = req.user._id;
 
@@ -196,6 +215,9 @@ export const getFlaggedResultsCon = async (req, res) => {
 export const deleteFlaggedResultController = async (req, res) => {
 try {
   const { id } = req.params;
+  if (!isValidObjectId(id)) {
+    return res.status(400).json({ message: "Invalid ID" });
+  }
   const adminId = req.user._id;
 
   const result = await AdminService.deleteFlaggedResults(id, adminId);
@@ -211,6 +233,9 @@ try {
 export const restoreFlaggedResultController = async (req, res) => {
   try {
     const { id } = req.params;
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({ message: "Invalid ID" });
+    }
     const adminId = req.user._id;
 
     const result = await AdminService.restoreFlaggedResult(id, adminId);
@@ -229,6 +254,9 @@ export const restoreFlaggedResultController = async (req, res) => {
 export const getSingleFlaggedElectionController = async (req, res) => {
   try {
     const { id } = req.params;
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({ message: "Invalid ID" });
+    }
     const resultOrIncident = await AdminService.getSingleFlaggedElectionService(id);
     res.status(200).json({ result: resultOrIncident });
   } catch (error) {
@@ -251,6 +279,9 @@ export const adminNotificationController = async (req, res) =>{
 export const markNotificationAsRead = async (req, res) => {
   try {
     const { notificationId } = req.params;
+    if (!isValidObjectId(notificationId)) {
+      return res.status(400).json({ message: "Invalid notification ID" });
+    }
     const userId = req.user._id;
 
     const result = await AdminService.markNotificationAsReadService(notificationId, userId);
@@ -263,6 +294,9 @@ export const markNotificationAsRead = async (req, res) => {
 export const deleteNotificationForUser = async (req, res) => {
   try {
     const { notificationId } = req.params;
+    if (!isValidObjectId(notificationId)) {
+      return res.status(400).json({ message: "Invalid notification ID" });
+    }
     const userId = req.user._id;
 
     const result = await AdminService.deleteNotificationForUserService(notificationId, userId);

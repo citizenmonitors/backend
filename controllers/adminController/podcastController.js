@@ -1,4 +1,5 @@
 import * as PodcastService from "../../services/adminService/podcastService.js";
+import { isValidObjectId } from "../../utils/validators.js";
 
 export const sendPodcast = async (req, res) => {
   try {
@@ -14,8 +15,11 @@ export const sendPodcast = async (req, res) => {
 
 export const editPodcast = async (req, res) => {
     try {
-      const adminId = req.user._id;
       const podcastId = req.params.id;
+      if (!isValidObjectId(podcastId)) {
+        return res.status(400).json({ message: "Invalid podcast ID" });
+      }
+      const adminId = req.user._id;
       const updates = req.body;
   
       const updatedPodcast = await PodcastService.editPodcastService({
@@ -43,8 +47,12 @@ export const getAllPodcasts = async (req, res) => {
 
 export const getSinglePodcast = async (req, res) => {
   try {
+    const id = req.params.id;
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({ message: "Invalid podcast ID" });
+    }
     const userId = req.user._id;
-    const podcast = await PodcastService.getSinglePodcastService(req.params.id, userId);
+    const podcast = await PodcastService.getSinglePodcastService(id, userId);
     res.json(podcast);
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -53,8 +61,12 @@ export const getSinglePodcast = async (req, res) => {
 
 export const deletePodcast = async (req, res) => {
   try {
-   const adminId = req.user._id; 
-    const response = await PodcastService.deletePodcastService(req.params.id, adminId);
+   const id = req.params.id;
+   if (!isValidObjectId(id)) {
+     return res.status(400).json({ message: "Invalid podcast ID" });
+   }
+   const adminId = req.user._id;
+    const response = await PodcastService.deletePodcastService(id, adminId);
     res.json(response);
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -77,6 +89,9 @@ export const getUserInbox = async (req, res) => {
 export const markPodcastAsRead = async (req, res) => {
   try {
     const { podcastId } = req.params;
+    if (!isValidObjectId(podcastId)) {
+      return res.status(400).json({ message: "Invalid podcast ID" });
+    }
     const userId = req.user._id;
 
     const result = await PodcastService.markPodcastAsReadService(podcastId, userId);

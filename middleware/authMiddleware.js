@@ -16,13 +16,15 @@ export const authMiddleware = async (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await CompletedUser.findOne({ email: decoded.email }).lean(); 
+    const decoded = jwt.verify(token, process.env.JWT_SECRET, { algorithms: ["HS256"] });
+    const user = await CompletedUser.findOne({ email: decoded.email })
+      .populate("adminPermissions")
+      .lean();
     if (!user) {
       return res.status(401).json({ message: "Invalid or expired token" });
     }
-
     req.user = user;
+    req.user.permissions = user.adminPermissions && typeof user.adminPermissions === "object" ? user.adminPermissions : {};
     next();
   } catch (err) {
     if (err.name === "TokenExpiredError") {

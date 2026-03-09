@@ -1,9 +1,12 @@
 import { getActivityBoardAndNotificationsService, getAllOngoingElectionResults, getLiveElectionService } from "../../services/Election/electionLive.js";
-
+import { isValidObjectId } from "../../utils/validators.js";
 
 // Controller to handle fetching unified election details
 export const getLiveElectionDetails = async (req, res) => {
   const { electionId } = req.params;
+  if (!isValidObjectId(electionId)) {
+    return res.status(400).json({ message: "Invalid election ID" });
+  }
   const userId = req.user._id;
 
   try {

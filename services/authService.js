@@ -158,11 +158,17 @@ export const submitRoleFormDetails = async ({ email, details, file }) => {
 
   } else {
     // Handle the case where no profile image is provided
-    // console.log("No profile image provided");
   }
 
-  // Assign general details to the user
-  Object.assign(user, details);
+  const allowedFields = [
+    "firstName", "lastName", "gender", "dateOfBirth", "state", "lga", "ward", "pollingUnit",
+    "isRegisteredVoter", "isPoliticalPartyMember", "isElectionWitnessReady", "isOpenToSurvey", "profileImage",
+  ];
+  const safeDetails = {};
+  for (const key of allowedFields) {
+    if (details[key] !== undefined) safeDetails[key] = details[key];
+  }
+  Object.assign(user, safeDetails);
   user.isVerified = true;
   user.hasSubmittedRoleForm = true;
 
@@ -441,7 +447,7 @@ export const resetUserPassword = async (token, newPassword) => {
 
 export const validateTokenService = async (token) => {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET, { algorithms: ["HS256"] });
     const user = await CompletedUser.findOne({ email: decoded.email });
     if (!user) {
       throw new Error("Invalid token");

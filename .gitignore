@@ -4,3 +4,8 @@ governmentID
 electionsData
 electionsIncident
 .qodo
+
+# Firebase / GCP keys - never commit
+config/firebaseServiceAccountKey.json
+*-service-account*.json
+*.pem

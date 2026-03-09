@@ -37,18 +37,6 @@ import { getActivityBoardAndNotifications, getLiveElectionDetails, getOngoingEle
 
 const router = express.Router();
 
-// Middleware to log fields
-const logFields = (req, res, next) => {
-  console.log("Body:", req.body);
-  console.log("Files:", req.files);
-  req.files.forEach((file) => {
-    console.log(
-      `File fieldname: ${file.fieldname}, originalname: ${file.originalname}`
-    );
-  });
-  next();
-};
-
 router.get("/", authMiddleware, getAllActiveElections);
 router.get("/election-types", authMiddleware, getAllElectionTypes);
 router.get("/results", authMiddleware, getAllElectionResultsController);

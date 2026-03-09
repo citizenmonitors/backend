@@ -10,7 +10,6 @@ import {
   validateTokenService,
   submitObserverDetails,
 } from "../services/authService.js";
-import upload from "../config/multer.js";
 
 export const register = async (req, res) => {
   try {
@@ -67,82 +66,63 @@ export const pickRole = async (req, res) => {
   }
 };
 
-export const submitRoleForm = [
-  upload.single("profileImage"), 
-  async (req, res) => {
-    try {
-      const { email, ...details } = req.body;
-      const file = req.file; 
+export const submitRoleForm = async (req, res) => {
+  try {
+    const { email, ...details } = req.body;
+    const file = req.file;
 
-      if (!email) {
-        return res.status(400).json({ message: "Email is required" });
-      }
-
-      // Call the service with the email, details, and the file
-      const { user, isObserverInPollingUnit } =
-        await submitRoleFormDetails({
-          email,
-          details,
-          file, 
-        });
-
-      // Send response
-      res.status(200).json({
-        message:
-          "Details submitted successfully. You can now select your role.",
-        user,
-        isObserverInPollingUnit,
-      });
-    } catch (err) {
-      console.error(err);
-      res.status(400).json({ message: err.message });
-    }
-  },
-];
-
-
-
-export const submitObserverDetailsController = [
-  upload.fields([
-    { name: "observerId[]", maxCount: 2 }, 
-  ]),
-  async (req, res) => {
-    try {
-      const {
+    const { user, isObserverInPollingUnit } =
+      await submitRoleFormDetails({
         email,
-        phoneNumber,
-        bankName,
-        bankAccountNumber,
-        bankAccountName,
-        token,
-      } = req.body;
-
-      // Collect the two observer ID files (PVC front and back)
-      const observerIdFiles = req.files["observerId[]"];
-
-
-      // Call the service and pass the observerIdFiles
-      const result = await submitObserverDetails({
-        email,
-        observerIdFiles,
-        phoneNumber,
-        bankName,
-        bankAccountNumber,
-        bankAccountName,
+        details,
+        file,
       });
 
-      // Send response
-      return res.status(200).json({
-        message: result.message,
-        token: result.token,
-        user: result.user,
-      });
-    } catch (err) {
-      console.error(err);
-      res.status(400).json({ message: err.message });
-    }
-  },
-];
+    res.status(200).json({
+      message:
+        "Details submitted successfully. You can now select your role.",
+      user,
+      isObserverInPollingUnit,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: err.message });
+  }
+};
+
+
+
+export const submitObserverDetailsController = async (req, res) => {
+  try {
+    const {
+      email,
+      phoneNumber,
+      bankName,
+      bankAccountNumber,
+      bankAccountName,
+    } = req.body;
+
+    const observerIdFiles = req.files?.["observerId[]"];
+
+    const result = await submitObserverDetails({
+      email,
+      observerIdFiles,
+      phoneNumber,
+      bankName,
+      bankAccountNumber,
+      bankAccountName,
+    });
+
+    return res.status(200).json({
+      message: result.message,
+      token: result.token,
+      user: result.user,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: err.message });
+  }
+};
 
 
 export const signIn = async (req, res) => {

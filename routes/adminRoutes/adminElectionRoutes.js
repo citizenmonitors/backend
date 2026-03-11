@@ -61,6 +61,12 @@ router.patch(
   isAuthorized("approveObserver"),
   AdminCont.approveObserverController
 );
+router.patch(
+  "/admin/unapprove-observer/:id",
+  authMiddleware,
+  isAuthorized("unapproveObserver"),
+  AdminCont.unapproveObserverController
+);
 router.get("/admin/observers/", authMiddleware, isAdmin, AdminCont.getAllObserver);
 router.patch(
   "/admin/downgrade-observer/:id",

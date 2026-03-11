@@ -40,6 +40,7 @@ app.use(
     origin: (origin, cb) => {
       if (!origin) return cb(null, true);
       if (isDev && allowedOrigins.length === 0) return cb(null, true);
+      if (/^https?:\/\/localhost(:\d+)?$/i.test(origin)) return cb(null, true);
       if (allowedOrigins.includes(origin)) return cb(null, true);
       cb(null, false);
     },

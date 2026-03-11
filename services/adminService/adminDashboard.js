@@ -1,13 +1,14 @@
 import moment from "moment";
 import CompletedUser from "../../models/CompletedUser.js";
 import ElectionData from "../../models/Election/ElectionData.js";
+import IncidentReport from "../../models/Election/IncidentReport.js";
 import Traffic from "../../models/DailyTraffic/dailyTraffic.js";
 import ActiveUser from "../../models/ActiveMontlyUsers/activeMontlyUsers.js";
 import  { sendEmail } from "../../config/email.js";
 import ActiveElection from "../../models/Election/ActiveElection.js";
 import AdminPermissions from "../../models/admin/AdminPermissions.js";
 import AdminLog from "../../models/admin/AdminLog.js";
-import { adminRoleInvitationTemplate, adminSuspensionTemplate, approveObserverTemplate, observerDowngradeTemplate, observerRoleAvailableTemplate } from "../../config/emailTemplates.js";
+import { adminRoleInvitationTemplate, adminSuspensionTemplate, approveObserverTemplate, observerDowngradeTemplate, observerRoleAvailableTemplate, observerNotApprovedInvalidPvcTemplate } from "../../config/emailTemplates.js";
 
 export const getDashboardData = async () => {
   const today = moment().startOf("day");
@@ -452,6 +453,68 @@ export const getAllObsersverService = async () => {
     };
   } catch (error) {
     throw new Error(`Error fetching observers: ${error.message}`);
+  }
+};
+
+// Unapprove = reject a pending observer (e.g. invalid PVC). Change role to volunteer and clear observer details.
+export const unapproveObserverService = async (id, adminId) => {
+  try {
+    const user = await CompletedUser.findById(id);
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    if (user.role !== "observer") {
+      throw new Error("User is not an observer");
+    }
+
+    if (!user.pendingObserverVerification) {
+      throw new Error("User is not pending verification; only pending observers can be unapproved");
+    }
+
+    // Change role to volunteer and remove observer-specific details
+    user.role = "volunteer";
+    user.isObserverInPollingUnit = false;
+    user.pendingObserverVerification = false;
+    user.observerId = [];
+    user.phoneNumber = undefined;
+    user.bankName = undefined;
+    user.bankAccountNumber = undefined;
+    user.bankAccountName = undefined;
+    await user.save();
+
+    const htmlContent = observerNotApprovedInvalidPvcTemplate(user.firstName);
+    await sendEmail({
+      from: process.env.ZEPTO_FROM_EMAIL,
+      to: user.email,
+      subject: "Observer Application Not Approved - Citizen Monitors",
+      htmlbody: htmlContent,
+    });
+
+    await AdminLog.create({
+      admin: adminId,
+      action: "Unapproved observer (invalid PVC)",
+      details: {
+        observerId: user._id,
+        email: user.email,
+        pollingUnit: user.pollingUnit,
+      },
+      timestamp: new Date(),
+    });
+
+    const observers = await CompletedUser.find({ role: "observer" })
+      .select(
+        "_id firstName lastName email state role gender createdAt pendingObserverVerification isObserverInPollingUnit observerId phoneNumber bankName bankAccountName bankAccountNumber"
+      )
+      .lean();
+
+    return {
+      message: "Observer unapproved successfully",
+      observers,
+    };
+  } catch (error) {
+    throw new Error(`Error unapproving observer: ${error.message}`);
   }
 };
 

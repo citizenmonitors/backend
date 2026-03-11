@@ -138,6 +138,20 @@ export const resendCode = (verificationCode) =>
                       `,
                     });
 
+                    export const observerNotApprovedInvalidPvcTemplate = (firstName) =>
+                    baseTemplate({
+                      title: "Observer Application Not Approved - Citizen Monitors",
+                      message: `
+                        <p>Dear ${firstName},</p>
+                        <p>We regret to inform you that your account has not been approved to be an observer at this time.</p>
+                        <p>This is because the PVC (Permanent Voter Card) you submitted could not be verified as valid.</p>
+                        <p>You can upgrade your account by submitting a valid PVC. Please log in and update your details with a valid PVC to reapply for observer status.</p>
+                        <p>Thank you for your interest in supporting transparency and accountability in the electoral process.</p>
+                        <p>Best regards,</p>
+                        <p><b>Citizen Monitors</b></p>
+                      `,
+                    });
+
                     export const adminRoleInvitationTemplate = (firstName, role) =>
                         baseTemplate({
                           title: "Admin Role Invitation - Citizen Monitors",

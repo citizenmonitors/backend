@@ -16,6 +16,7 @@ const adminPermissionsSchema = new mongoose.Schema(
     viewUser: { type: Boolean, default: false },
     deleteUser: { type: Boolean, default: false },
     approveObserver: { type: Boolean, default: false },
+    unapproveObserver: { type: Boolean, default: false },
     downgradeObserver: { type: Boolean, default: false },
     deleteFlagged: { type: Boolean, default: false },
     restoreFlagged: { type: Boolean, default: false },

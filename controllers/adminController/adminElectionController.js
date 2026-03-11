@@ -179,7 +179,22 @@ export const getAllObserver = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-}
+};
+
+export const unapproveObserverController = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({ message: "Invalid ID" });
+    }
+    const adminId = req.user._id;
+    const result = await AdminDashServices.unapproveObserverService(id, adminId);
+    res.status(200).json(result);
+  } catch (error) {
+    console.error(`Error in unapproveObserverController: ${error.message}`);
+    res.status(500).json({ message: error.message });
+  }
+};
 
 export const downgradeObserverController = async (req, res) => {
   try {

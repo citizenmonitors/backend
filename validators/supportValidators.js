@@ -26,7 +26,7 @@ export const createSupportValidation = [
     .withMessage("Last name is required")
     .isLength({ max: MAX_NAME })
     .withMessage(`Last name must be at most ${MAX_NAME} characters`),
-  body("email").isEmail().normalizeEmail().withMessage("Valid email is required"),
+  body("email").isEmail().normalizeEmail({ gmail_remove_dots: false }).withMessage("Valid email is required"),
   body("phoneNumber")
     .trim()
     .notEmpty()

@@ -13,7 +13,7 @@ export const handleValidationErrors = (req, res, next) => {
 
 // ---- Register ----
 export const registerValidation = [
-  body("email").isEmail().normalizeEmail().withMessage("Valid email is required"),
+  body("email").isEmail().normalizeEmail({ gmail_remove_dots: false }).withMessage("Valid email is required"),
   body("password")
     .isLength({ min: 8 })
     .withMessage("Password must be at least 8 characters"),
@@ -25,7 +25,7 @@ export const registerValidation = [
 
 // ---- Verify email ----
 export const verifyEmailValidation = [
-  body("email").isEmail().normalizeEmail().withMessage("Valid email is required"),
+  body("email").isEmail().normalizeEmail({ gmail_remove_dots: false }).withMessage("Valid email is required"),
   body("verificationCode")
     .notEmpty()
     .trim()
@@ -35,12 +35,12 @@ export const verifyEmailValidation = [
 
 // ---- Resend token ----
 export const resendTokenValidation = [
-  body("email").isEmail().normalizeEmail().withMessage("Valid email is required"),
+  body("email").isEmail().normalizeEmail({ gmail_remove_dots: false }).withMessage("Valid email is required"),
 ];
 
 // ---- Select role (pickRole) ----
 export const pickRoleValidation = [
-  body("email").isEmail().normalizeEmail().withMessage("Valid email is required"),
+  body("email").isEmail().normalizeEmail({ gmail_remove_dots: false }).withMessage("Valid email is required"),
   body("role")
     .isIn(["observer", "volunteer"])
     .withMessage("Role must be observer or volunteer"),
@@ -48,13 +48,13 @@ export const pickRoleValidation = [
 
 // ---- Sign in ----
 export const signInValidation = [
-  body("email").isEmail().normalizeEmail().withMessage("Valid email is required"),
+  body("email").isEmail().normalizeEmail({ gmail_remove_dots: false }).withMessage("Valid email is required"),
   body("password").notEmpty().withMessage("Password is required"),
 ];
 
 // ---- Forgot password ----
 export const forgotPasswordValidation = [
-  body("email").isEmail().normalizeEmail().withMessage("Valid email is required"),
+  body("email").isEmail().normalizeEmail({ gmail_remove_dots: false }).withMessage("Valid email is required"),
 ];
 
 // ---- Reset password ----
@@ -67,11 +67,11 @@ export const resetPasswordValidation = [
 
 // ---- Submit details (role form) - email only; other fields validated by service ----
 export const submitDetailsValidation = [
-  body("email").isEmail().normalizeEmail().withMessage("Valid email is required"),
+  body("email").isEmail().normalizeEmail({ gmail_remove_dots: false }).withMessage("Valid email is required"),
 ];
 
 // ---- Submit observer details ----
 export const submitObserverDetailsValidation = [
-  body("email").isEmail().normalizeEmail().withMessage("Valid email is required"),
+  body("email").isEmail().normalizeEmail({ gmail_remove_dots: false }).withMessage("Valid email is required"),
   body("phoneNumber").notEmpty().trim().withMessage("Phone number is required"),
 ];

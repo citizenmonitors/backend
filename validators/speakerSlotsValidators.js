@@ -12,7 +12,7 @@ export const bookSlotValidation = [
   body("inviteToken").trim().notEmpty().withMessage("Invite token is required"),
   body("slotId").trim().notEmpty().withMessage("Slot is required"),
   body("fullName").trim().notEmpty().withMessage("Full name is required").isLength({ max: 200 }),
-  body("email").isEmail().normalizeEmail().withMessage("Valid email is required"),
+  body("email").isEmail().normalizeEmail({ gmail_remove_dots: false }).withMessage("Valid email is required"),
   body("xHandle").trim().notEmpty().withMessage("X handle is required").isLength({ max: 100 }),
   body("bioLink").optional({ values: "falsy" }).trim().isLength({ max: 500 }),
   body("topicAngle").optional({ values: "falsy" }).trim().isLength({ max: 500 }),

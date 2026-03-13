@@ -172,4 +172,3 @@ router.post("/admin/speaker-slots/reminders/send", authMiddleware, isAdmin, Admi
 export default router;
 
 
-

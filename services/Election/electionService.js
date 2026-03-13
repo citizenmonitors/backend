@@ -351,7 +351,19 @@ export const deleteActiveElectionService = async (
 
 export const getAllActiveElectionsService = async (userId) => {
   const standardizeName = (name) =>
-    name.toLowerCase().replace(/[-\s]/g, "_").trim();
+    String(name || "")
+      .toLowerCase()
+      .replace(/[-\s]/g, "_")
+      .trim();
+
+  /** LGA compare: user.lga often slug "260-ihala", electionLocation often "IHALA" or "IDO / OSI" */
+  const normalizeLgaKey = (raw) => {
+    if (!raw) return "";
+    let s = String(raw).toLowerCase().trim();
+    s = s.replace(/^\d+[-_\s]+/, "");
+    s = s.replace(/[/\s,-]+/g, "_").replace(/_+/g, "_").replace(/^_|_$/g, "");
+    return s;
+  };
 
   const user = await CompletedUser.findById(userId).lean();
   if (!user) throw new Error("User not found");
@@ -359,6 +371,9 @@ export const getAllActiveElectionsService = async (userId) => {
   console.log(`Fetching elections for user: ${userId}`);
   const userState = standardizeName(user.state);
   const userLGA = standardizeName(user.lga);
+  const userLgaKeys = new Set(
+    [userLGA, normalizeLgaKey(user.lga), standardizeName(user.lga)].filter(Boolean)
+  );
 
   // Fetch all active elections with election details
   const activeElections = await ActiveElection.find()
@@ -388,11 +403,19 @@ export const getAllActiveElectionsService = async (userId) => {
   }
 
   const relevantElections = activeElections.filter(
-    ({ election, electionLocation }) => {
+    ({ election, electionLocation: loc }) => {
       if (!election) return false;
 
-      const electionType = election.electionType.toLowerCase();
-      electionLocation = electionLocation?.toLowerCase();
+      const electionType = String(election.electionType || "")
+        .toLowerCase()
+        .trim();
+      const normalizedLocation = standardizeName(loc || "");
+      const electionLgaKey = normalizeLgaKey(loc);
+      const electionLgaKeys = new Set(
+        [normalizedLocation, electionLgaKey, standardizeName(loc || "")].filter(
+          Boolean
+        )
+      );
 
       if (
         ["national", "house-of-representatives", "senatorial"].includes(
@@ -401,8 +424,16 @@ export const getAllActiveElectionsService = async (userId) => {
       )
         return true;
       if (["gubernatorial", "house-of-assembly"].includes(electionType))
-        return electionLocation === userState;
-      if (["lga"].includes(electionType)) return electionLocation === userLGA;
+        return normalizedLocation === userState;
+      // DB may store "LGA" (any case)
+      if (electionType === "lga") {
+        for (const uk of userLgaKeys) {
+          for (const ek of electionLgaKeys) {
+            if (uk && ek && uk === ek) return true;
+          }
+        }
+        return false;
+      }
       return false;
     }
   );

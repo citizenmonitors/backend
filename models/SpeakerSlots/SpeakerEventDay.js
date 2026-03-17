@@ -6,6 +6,7 @@ const speakerEventDaySchema = new mongoose.Schema(
     label: { type: String, required: true },
     date: { type: String, required: true },
     theme: { type: String, required: true },
+    description: { type: String, default: "" },
     sortOrder: { type: Number, required: true, default: 1 },
   },
   { timestamps: true }

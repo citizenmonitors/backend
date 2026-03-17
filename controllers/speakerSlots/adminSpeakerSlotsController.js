@@ -1,5 +1,6 @@
 import * as AdminSpeakerSlotsService from "../../services/speakerSlots/adminSpeakerSlotsService.js";
 import { sendDueReminders } from "../../services/speakerSlots/speakerReminderService.js";
+import { ensureDefaultSpeakerEvent } from "../../services/speakerSlots/seedSpeakerEvent.js";
 import { isValidObjectId } from "../../utils/validators.js";
 
 export async function getEvents(req, res) {
@@ -7,6 +8,56 @@ export async function getEvents(req, res) {
     const events = await AdminSpeakerSlotsService.getEvents();
     return res.json(events);
   } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "An error occurred." });
+  }
+}
+
+export async function getDays(req, res) {
+  try {
+    const { eventId } = req.params;
+    if (!isValidObjectId(eventId)) return res.status(400).json({ message: "Invalid event ID." });
+    const days = await AdminSpeakerSlotsService.getDays(eventId);
+    if (!days) return res.status(404).json({ message: "Event not found." });
+    return res.json(days);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "An error occurred." });
+  }
+}
+
+export async function createDay(req, res) {
+  try {
+    const { eventId } = req.params;
+    const { date, label, theme, description, sortOrder } = req.body;
+    if (!isValidObjectId(eventId)) return res.status(400).json({ message: "Invalid event ID." });
+    if (!date || !label || !theme) return res.status(400).json({ message: "date, label, and theme are required." });
+    const day = await AdminSpeakerSlotsService.createDay(eventId, req.body);
+    if (!day) return res.status(404).json({ message: "Event not found." });
+    return res.status(201).json(day);
+  } catch (err) {
+    if (err.message === "Invalid date format.") return res.status(400).json({ message: "Invalid date format. Use YYYY-MM-DD, ISO date string, or timestamp." });
+    console.error(err);
+    return res.status(500).json({ message: "An error occurred." });
+  }
+}
+
+export async function patchDay(req, res) {
+  try {
+    const { eventId, dayId } = req.params;
+    const { date, label, theme, description, sortOrder } = req.body;
+    if (!isValidObjectId(eventId) || !isValidObjectId(dayId)) return res.status(400).json({ message: "Invalid event or day ID." });
+    const updates = {};
+    if (date !== undefined) updates.date = date;
+    if (label !== undefined) updates.label = label;
+    if (theme !== undefined) updates.theme = theme;
+    if (description !== undefined) updates.description = description;
+    if (sortOrder !== undefined) updates.sortOrder = sortOrder;
+    const day = await AdminSpeakerSlotsService.updateDay(eventId, dayId, updates);
+    if (!day) return res.status(404).json({ message: "Day not found." });
+    return res.json(day);
+  } catch (err) {
+    if (err.message === "Invalid date format.") return res.status(400).json({ message: "Invalid date format. Use YYYY-MM-DD, ISO date string, or timestamp." });
     console.error(err);
     return res.status(500).json({ message: "An error occurred." });
   }
@@ -105,12 +156,16 @@ export async function deleteSlot(req, res) {
 export async function createSlots(req, res) {
   try {
     const { eventId } = req.params;
-    const slotsPayload = Array.isArray(req.body) ? req.body : req.body.slots || [];
+    let slotsPayload = Array.isArray(req.body) ? req.body : req.body.slots;
+    if (slotsPayload == null && req.body && typeof req.body === "object" && (req.body.startTime != null || req.body.date != null))
+      slotsPayload = [req.body];
+    slotsPayload = slotsPayload || [];
     if (!isValidObjectId(eventId)) return res.status(400).json({ message: "Invalid event ID." });
     const created = await AdminSpeakerSlotsService.createSlots(eventId, slotsPayload);
     if (!created) return res.status(404).json({ message: "Event not found." });
     return res.status(201).json({ slots: created });
   } catch (err) {
+    if (err.message === "Invalid date format.") return res.status(400).json({ message: "Invalid date format. Use YYYY-MM-DD, ISO date string, or timestamp." });
     console.error(err);
     return res.status(500).json({ message: "An error occurred." });
   }
@@ -151,6 +206,21 @@ export async function sendReminders(req, res) {
       sent24h: results.sent24h,
       sent2h: results.sent2h,
       errors: results.errors,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "An error occurred." });
+  }
+}
+
+/** Re-run speaker-slots seed: creates event, 3 days, slots, and one invite (from seed JSON). */
+export async function runSeed(req, res) {
+  try {
+    const event = await ensureDefaultSpeakerEvent();
+    if (!event) return res.status(500).json({ message: "Seed failed." });
+    return res.status(201).json({
+      message: "Speaker slots data created.",
+      event: { id: event._id, name: event.name, slug: event.slug },
     });
   } catch (err) {
     console.error(err);

@@ -241,7 +241,6 @@ export const speakerSlotConfirmationTemplate = ({ firstName, date, timeWAT, them
       <p>Date: ${date}</p>
       <p>Time: ${timeWAT} (WAT)</p>
       <p>Theme: ${theme}</p>
-      <p>Format: ${sessionType}</p>
       <p>We'll send the Space link and speaker guidance closer to the date.</p>
       <p>Warm regards,<br>Olajumoke Alawode-James<br>Head of Communications & Spokesperson, Citizen Monitors<br>media@citizenmonitors.com</p>
     `,
@@ -257,7 +256,6 @@ export const speakerSlotInternalNotificationTemplate = ({ speakerName, xHandle, 
       <p><strong>Email:</strong> ${email}</p>
       <p><strong>Slot:</strong> ${date} – ${timeWAT} (WAT)</p>
       <p><strong>Theme:</strong> ${theme}</p>
-      <p><strong>Topic/Angle:</strong> ${topicAngle || "—"}</p>
       <p>Please update the running schedule accordingly.</p>
       <p>Regards,<br>Citizen Monitors Scheduling Bot / Admin</p>
     `,
@@ -1775,7 +1773,7 @@ export const newsLetterTemplateCitizensGetUp = () =>
 
 export const newsLetterTemplateAmendedElectoralAct = () =>
   baseTemplate({
-    title: "The Amended Electoral Act Cannot Provide Credible Elections Without You!",
+    title: "Amended Electoral Act 2026: The Citizens Role in Credible Elections.",
     message: `
       <table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
         <tr>
@@ -1785,69 +1783,84 @@ export const newsLetterTemplateAmendedElectoralAct = () =>
               <!-- Header -->
               <tr>
                 <td style="background-color: #06BBAF; color: white; padding: 20px 30px; text-align: center;">
-                  <h3 style="color: #ffffff; margin: 0; font-size: 22px;">The Amended Electoral Act Cannot Provide Credible Elections Without You!</h3>
+                  <h3 style="color: #ffffff; margin: 0; font-size: 22px;">Amended Electoral Act 2026: The Citizens Role in Credible Elections.</h3>
                 </td>
               </tr>
 
               <!-- Body -->
               <tr>
-                <td style="padding: 30px; color: #000000; font-size: 18px; line-height: 1.7;">
+                <td style="padding: 30px; color: #000000; font-size: 16px; line-height: 1.7;">
 
                   <p><strong>Dear Citizen Monitors,</strong></p>
 
-                  <p>Nigeria has amended its Electoral Act.</p>
+                  <p>As conversations around the Amended Electoral Act 2026 continue, one question stands out: <strong>What role can ordinary citizens play in ensuring credible elections?</strong> Credible elections depend not only on laws, but on citizens.</p>
 
-                  <p>On paper, that sounds reassuring. Reform. Progress. Improvement.</p>
+                  <p>Electoral laws may define the framework, but citizen participation determines whether those laws work in practice. From voter registration to result verification, Nigerians have several practical ways to strengthen the integrity of elections.</p>
 
-                  <p>But laws, no matter how well drafted, do not conduct elections. People do.</p>
+                  <h4 style="color: #06BBAF; margin-top: 20px;">1. Register and Verify Your Voter Status</h4>
+                  <p>Ensure you have a valid Permanent Voter Card (PVC) and confirm your details before elections.</p>
 
-                  <p>The amended Electoral Act introduced important innovations technological integration, clearer timelines, expanded powers for the electoral body, and recognition of electronic transmission of results. These provisions are structural safeguards. Yet safeguards are only as effective as the citizens who insist they are respected.</p>
+                  <h4 style="color: #06BBAF; margin-top: 20px;">2. Stay Informed</h4>
+                  <p>Understand how voting, counting, and result transmission work. <strong>An informed electorate is harder to manipulate.</strong></p>
 
-                  <p>An election is not made credible by legislation alone. It becomes credible when:</p>
+                  <h4 style="color: #06BBAF; margin-top: 20px;">3. Serve as Election Observers or Volunteers</h4>
+                  <p>After voting, remain at the polling unit to observe vote counting and the announcement of results.</p>
+                  <p><strong>Observers help by:</strong></p>
                   <ul style="padding-left: 20px; line-height: 1.8;">
-                    <li>Voters show up.</li>
-                    <li>Citizens monitor polling units.</li>
-                    <li>Party agents remain vigilant.</li>
-                    <li>Observers document irregularities.</li>
-                    <li>The media reports accurately.</li>
-                    <li>The judiciary acts decisively.</li>
+                    <li>Monitoring polling unit procedures.</li>
+                    <li>Documenting irregularities.</li>
+                    <li>Reporting compliance with electoral guidelines.</li>
                   </ul>
+                  <p>Citizen observation strengthens transparency and deters malpractice.</p>
 
-                  <p>The Electoral Act provides the framework. You provide the legitimacy.</p>
-
-                  <p>Seeing what happened at the Abuja Municipal Area Council (AMAC) elections on Saturday, 21st of February, 2026; we have learned that technology is not self-executing. The deployment of devices like the BVAS is critical, but integrity depends on human conduct. If the data entered is compromised at the source, even the most sophisticated collation system becomes a vehicle for error.</p>
-
-                  <p><strong>Credibility is not a feature of software. It is a culture of accountability.</strong></p>
-
-                  <p>Across Nigeria, voter apathy remains one of the greatest threats to democratic consolidation. When citizens disengage, bad actors fill the vacuum. When citizens participate, institutions respond differently.</p>
-
-                  <p>The amended Electoral Act expands opportunities for transparency. It does not eliminate the need for vigilance.</p>
-
-                  <h4 style="color: #06BBAF; margin-top: 25px;">This is where you come in.</h4>
-
+                  <h4 style="color: #06BBAF; margin-top: 20px;">4. Monitor Polling Unit Results</h4>
+                  <p>Under Nigeria’s electoral process, results originate at the polling unit.</p>
+                  <p><strong>Citizens can:</strong></p>
                   <ul style="padding-left: 20px; line-height: 1.8;">
-                    <li>Register with INEC and on <a href="https://www.CitizenMonitors.com" style="color: #06BBAF;">www.CitizenMonitors.com</a></li>
-                    <li>Educate three people on the importance of doing the same.</li>
-                    <li>Verify your details.</li>
-                    <li>Vote.</li>
-                    <li>Monitor.</li>
-                    <li>Demand compliance with the law.</li>
-                    <li>Follow up on disputes.</li>
+                    <li>Stay at the polling unit after voting.</li>
+                    <li>Observe vote counting.</li>
+                    <li>Record the results announced at the unit.</li>
                   </ul>
+                  <p>When citizens independently document results, it becomes harder for figures to be altered later in the collation process.</p>
 
-                  <p><strong>Democracy is not a spectator sport.</strong></p>
+                  <h4 style="color: #06BBAF; margin-top: 20px;">5. Use Technology to Report Irregularities</h4>
+                  <p>Modern elections increasingly rely on digital tools.</p>
+                  <p><strong>Citizens can:</strong></p>
+                  <ul style="padding-left: 20px; line-height: 1.8;">
+                    <li>Report incidents such as vote buying or intimidation.</li>
+                    <li>Upload verified polling unit results on Citizen Monitors.</li>
+                  </ul>
+                  <p>This creates a distributed system of accountability beyond official institutions.</p>
 
-                  <p>The integrity of our elections will not be secured by amendments alone. It will be secured by citizens who understand that sovereignty does not end at the ballot box it begins there.</p>
+                  <h4 style="color: #06BBAF; margin-top: 20px;">6. Reject Vote Buying</h4>
+                  <p>The credibility of elections begins with voters refusing to sell their votes.</p>
 
-                  <p>The question is not whether the law has changed.</p>
+                  <h4 style="color: #06BBAF; margin-top: 20px;">7. Hold Leaders Accountable Between Elections</h4>
+                  <p>Participation does not end after votes are counted.</p>
+                  <p><strong>Citizens should:</strong></p>
+                  <ul style="padding-left: 20px; line-height: 1.8;">
+                    <li>Track campaign promises.</li>
+                    <li>Engage elected representatives.</li>
+                    <li>Support reforms that strengthen electoral integrity.</li>
+                  </ul>
+                  <p>Accountability between election cycles strengthens the credibility of the next one.</p>
 
-                  <p><strong>The question is whether we are ready to participate to foster credible elections.</strong></p>
+                  <h4 style="color: #06BBAF; margin-top: 25px;">The Bottom Line</h4>
+                  <p>Credible elections are not produced by institutions alone. They emerge from active citizens who participate, observe, and demand transparency.</p>
+                  <p>As Nigeria approaches the next electoral cycle, the responsibility for protecting democracy will not rest solely with electoral bodies; it will rest with citizens who choose to participate responsibly.</p>
+                  <p>Because in the end, <strong>the credibility of elections depends on the vigilance of the people.</strong></p>
 
                   <p style="margin-top: 25px;"><strong>With Regards;</strong><br>
                   <strong>Citizen Monitors.</strong><br>
-                  Guardians of Truth.</p>
+                  <em>Guardians of Truth.</em></p>
 
-                  <p style="color: #06BBAF; margin-top: 10px;">📱 @CitizenMonitors (X / IG / FB / YouTube)</p>
+                <p style="margin-top: 15px; color: #06BBAF;">
+  📱 @CitizenMonitors —
+  <a href="https://x.com/citizenmonitors" style="color: #06BBAF; text-decoration: none;">X</a> |
+  <a href="https://www.instagram.com/citizenmonitors" style="color: #06BBAF; text-decoration: none;">Instagram</a> |
+  <a href="https://facebook.com/citizenmonitors" style="color: #06BBAF; text-decoration: none;">Facebook</a> |
+  <a href="https://www.youtube.com/@citizenmonitors" style="color: #06BBAF; text-decoration: none;">YouTube</a>
+</p>
 
                 </td>
               </tr>

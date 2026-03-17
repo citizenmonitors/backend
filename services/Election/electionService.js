@@ -489,6 +489,7 @@ export const getAllElectionTypesService = async (userId) => {
       return { elections: [] };
     }
 
+    
     // Filter elections safely
     const relevantElections = elections.filter((election) => {
       if (!election || !election.electionType) return false;
@@ -1179,6 +1180,16 @@ export const deleteElectionResultDataService = async (electionId, userId) => {
       throw new Error("User not found");
     }
 
+    const election = await ActiveElection.findById(electionId).select("endDate");
+    if (!election) {
+      throw new Error("Election not found");
+    }
+    const electionIsOver =
+      election.endDate && new Date(election.endDate).getTime() <= Date.now();
+    if (user.role === "observer" && electionIsOver) {
+      throw new Error("Election is over. Observers cannot delete result data.");
+    }
+
     // Find the result data and ensure it belongs to the requesting user
     const result = await ElectionData.findOneAndDelete({
       election: electionId,
@@ -1534,6 +1545,18 @@ export const deleteIncidentReportDataService = async (electionId, userId) => {
     const user = await CompletedUser.findById(userId);
     if (!user) {
       throw new Error("User not found");
+    }
+
+    const election = await ActiveElection.findById(electionId).select("endDate");
+    if (!election) {
+      throw new Error("Election not found");
+    }
+    const electionIsOver =
+      election.endDate && new Date(election.endDate).getTime() <= Date.now();
+    if (user.role === "observer" && electionIsOver) {
+      throw new Error(
+        "Election is over. Observers cannot delete incident reports."
+      );
     }
 
     // Find the incident report and ensure it belongs to the requesting user

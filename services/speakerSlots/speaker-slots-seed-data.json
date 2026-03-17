@@ -4,17 +4,16 @@
     "slug": "72hr-x-space"
   },
   "days": [
-    { "id": "day1", "name": "Day 1", "theme": "People Focus", "date": "2025-04-10" },
-    { "id": "day2", "name": "Day 2", "theme": "People Power", "date": "2025-04-11" },
-    { "id": "day3", "name": "Day 3", "theme": "People Protest", "date": "2025-04-12" }
+    { "id": "day1", "name": "Day 1", "theme": "People Focus", "date": "2026-05-01" },
+    { "id": "day2", "name": "Day 2", "theme": "People Power", "date": "2026-05-02" },
+    { "id": "day3", "name": "Day 3", "theme": "People Protest", "date": "2026-05-03" }
   ],
   "slots": [
-    { "dayId": "day1", "startTime": "09:00", "endTime": "10:00", "theme": "People Focus", "capacity": 1, "sessionType": "keynote" },
-    { "dayId": "day1", "startTime": "11:00", "endTime": "12:00", "theme": "People Focus", "capacity": 3, "sessionType": "panel" },
-    { "dayId": "day1", "startTime": "14:00", "endTime": "15:00", "theme": "People Focus", "capacity": 1, "sessionType": "keynote" },
-    { "dayId": "day2", "startTime": "09:00", "endTime": "10:00", "theme": "People Power", "capacity": 1, "sessionType": "keynote" },
-    { "dayId": "day2", "startTime": "12:00", "endTime": "13:00", "theme": "People Power", "capacity": 2, "sessionType": "panel" },
-    { "dayId": "day3", "startTime": "10:00", "endTime": "11:00", "theme": "People Protest", "capacity": 1, "sessionType": "keynote" },
-    { "dayId": "day3", "startTime": "15:00", "endTime": "16:00", "theme": "People Protest", "capacity": 3, "sessionType": "panel" }
+    { "dayId": "day1", "startTime": "09:00", "endTime": "11:00", "theme": "People Focus", "capacity": 6, "sessionType": "panel" },
+    { "dayId": "day1", "startTime": "11:00", "endTime": "13:00", "theme": "People Focus", "capacity": 6, "sessionType": "panel" },
+    { "dayId": "day2", "startTime": "09:00", "endTime": "11:00", "theme": "People Power", "capacity": 6, "sessionType": "panel" },
+    { "dayId": "day2", "startTime": "11:00", "endTime": "13:00", "theme": "People Power", "capacity": 6, "sessionType": "panel" },
+    { "dayId": "day3", "startTime": "10:00", "endTime": "12:00", "theme": "People Protest", "capacity": 6, "sessionType": "panel" },
+    { "dayId": "day3", "startTime": "15:00", "endTime": "17:00", "theme": "People Protest", "capacity": 6, "sessionType": "panel" }
   ]
 }

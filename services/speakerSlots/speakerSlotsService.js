@@ -191,7 +191,7 @@ export async function bookSlot(data) {
       date,
       timeWAT,
       theme: slot.theme,
-      sessionType: slot.sessionType || "keynote",
+      
     });
     await sendEmail({
       to: email,
@@ -210,7 +210,7 @@ export async function bookSlot(data) {
       date,
       timeWAT,
       theme: slot.theme,
-      topicAngle: booking.topicAngle,
+      
     });
     const subject = `New Speaker Slot Confirmed – ${fullName} (${slot.theme})`;
     for (const to of getNotifyEmails()) {

@@ -157,7 +157,11 @@ router.patch("/admin/notification/delete/:notificationId", authMiddleware, isAdm
 router.get("/admin/emails", authMiddleware, isAdmin, AdminController.getUserEmailsController);
 
 // Speaker slots (72-Hour X Space)
+router.post("/admin/speaker-slots/seed", authMiddleware, isAdmin, AdminSpeakerSlotsController.runSeed);
 router.get("/admin/speaker-slots/events", authMiddleware, isAdmin, AdminSpeakerSlotsController.getEvents);
+router.get("/admin/speaker-slots/events/:eventId/days", authMiddleware, isAdmin, AdminSpeakerSlotsController.getDays);
+router.post("/admin/speaker-slots/events/:eventId/days", authMiddleware, isAdmin, AdminSpeakerSlotsController.createDay);
+router.patch("/admin/speaker-slots/events/:eventId/days/:dayId", authMiddleware, isAdmin, AdminSpeakerSlotsController.patchDay);
 router.get("/admin/speaker-slots/events/:eventId/schedule", authMiddleware, isAdmin, AdminSpeakerSlotsController.getSchedule);
 router.get("/admin/speaker-slots/events/:eventId/bookings", authMiddleware, isAdmin, AdminSpeakerSlotsController.getConfirmedBookings);
 router.get("/admin/speaker-slots/events/:eventId/export", authMiddleware, isAdmin, AdminSpeakerSlotsController.exportCsv);

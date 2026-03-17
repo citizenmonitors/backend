@@ -4,6 +4,7 @@ governmentID
 electionsData
 electionsIncident
 .qodo
+.env.example
 
 # Firebase / GCP keys - never commit
 config/firebaseServiceAccountKey.json

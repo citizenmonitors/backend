@@ -1,0 +1,1 @@
+{"version":3,"file":"formatFileDetails.js","sourceRoot":"","sources":["../../utils/formatFileDetails.ts"],"names":[],"mappings":"AAQA,MAAM,CAAC,MAAM,iBAAiB,GAAG,CAAC,IAAe,EAAE,EAAE,CAAC,CAAC;IACrD,QAAQ,EAAE,IAAI,EAAE,IAAI;IACpB,IAAI,EAAE,IAAI,EAAE,YAAY;IACxB,IAAI,EAAE,IAAI,EAAE,QAAQ;IACpB,IAAI,EAAE,IAAI,EAAE,IAAI;IAChB,GAAG,EAAE,IAAI,EAAE,GAAG;CACf,CAAC,CAAC"}

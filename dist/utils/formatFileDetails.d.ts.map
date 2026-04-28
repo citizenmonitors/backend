@@ -1,0 +1,1 @@
+{"version":3,"file":"formatFileDetails.d.ts","sourceRoot":"","sources":["../../utils/formatFileDetails.ts"],"names":[],"mappings":"AAAA,KAAK,SAAS,GAAG;IACf,IAAI,CAAC,EAAE,MAAM,CAAC;IACd,YAAY,CAAC,EAAE,MAAM,CAAC;IACtB,QAAQ,CAAC,EAAE,MAAM,CAAC;IAClB,IAAI,CAAC,EAAE,MAAM,CAAC;IACd,GAAG,CAAC,EAAE,MAAM,CAAC;CACd,CAAC;AAEF,eAAO,MAAM,iBAAiB,GAAI,MAAM,SAAS;;;;;;CAM/C,CAAC"}

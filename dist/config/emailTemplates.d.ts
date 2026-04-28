@@ -1,0 +1,97 @@
+type SpeakerSlotConfirmationInput = {
+    firstName: string;
+    date: string;
+    timeWAT: string;
+    theme: string;
+    sessionType?: string;
+};
+type SpeakerSlotInternalNotificationInput = {
+    speakerName: string;
+    xHandle: string;
+    email: string;
+    date: string;
+    timeWAT: string;
+    theme: string;
+    topicAngle?: string;
+};
+type SpeakerSlotReminder7DaysInput = {
+    firstName: string;
+    date: string;
+    timeWAT: string;
+    theme: string;
+};
+type SpeakerSlotReminder24HoursInput = {
+    firstName: string;
+    date: string;
+    timeWAT: string;
+    theme: string;
+    spaceLink?: string;
+};
+type SpeakerSlotReminder2HoursInput = {
+    firstName: string;
+    timeWAT: string;
+    spaceLink?: string;
+};
+type UserActivitySummaryInput = {
+    dateRange: string;
+    login: number;
+    signup: number;
+    observer: number;
+    volunteer: number;
+    result: number;
+    incident: number;
+    flagged: number;
+    volunteerToObserver: number;
+    total: number;
+};
+export declare const forgotPasswordTemplate: (resetLink: string) => string;
+export declare const registrationCode: (verificationCode: string) => string;
+export declare const resendCode: (verificationCode: string) => string;
+/** Mobile app: password reset via OTP (expires in 5 minutes; set in service). */
+export declare const passwordResetOtpTemplate: (otp: string) => string;
+export declare const mobileFeedbackTemplate: (email: string, title: string, message: string) => string;
+export declare const approveObserverTemplate: (firstName: string, pollingUnit: string) => string;
+export declare const observerRoleUpdateTemplate: (firstName: string, pollingUnit: string) => string;
+export declare const observerDowngradeTemplate: (firstName: string, pollingUnit: string, adminReason: string) => string;
+export declare const observerRoleAvailableTemplate: (firstName: string, pollingUnit: string) => string;
+export declare const observerNotApprovedInvalidPvcTemplate: (firstName: string) => string;
+export declare const adminRoleInvitationTemplate: (firstName: string, role: string) => string;
+export declare const adminSuspensionTemplate: (firstName: string) => string;
+export declare const emailChangeNotificationTemplate: (newEmail: string) => string;
+export declare const emailVerificationCodeTemplate: (verificationCode: string) => string;
+export declare const resendVerificationCodeTemplate: (verificationCode: string) => string;
+export declare const supportRequestTemplate: (firstName: string, lastName: string, email: string, phoneNumber: string, category: string, message: string) => string;
+export declare const speakerSlotConfirmationTemplate: ({ firstName, date, timeWAT, theme, sessionType }: SpeakerSlotConfirmationInput) => string;
+export declare const speakerSlotInternalNotificationTemplate: ({ speakerName, xHandle, email, date, timeWAT, theme, topicAngle }: SpeakerSlotInternalNotificationInput) => string;
+export declare const speakerSlotReminder7DaysTemplate: ({ firstName, date, timeWAT, theme }: SpeakerSlotReminder7DaysInput) => string;
+export declare const speakerSlotReminder24HoursTemplate: ({ firstName, date, timeWAT, theme, spaceLink }: SpeakerSlotReminder24HoursInput) => string;
+export declare const speakerSlotReminder2HoursTemplate: ({ firstName, timeWAT, spaceLink }: SpeakerSlotReminder2HoursInput) => string;
+export declare const podcastNotificationTemplate: (title: string, content: string) => string;
+export declare const electionNotificationTemplate: (electionName: string, startDate: string, endDate: string) => string;
+export declare const newsLetterTemplate: () => string;
+export declare const newsLetterTemplateTwo: () => string;
+export declare const newsLetterTemplateThree: () => string;
+export declare const newsLetterTemplateFour: () => string;
+export declare const newsLetterTemplateFive: () => string;
+export declare const newsLetterTemplateSix: () => string;
+export declare const newsLetterTemplateSeven: () => string;
+export declare const newsLetterTemplateTaxChanges: () => string;
+export declare const newsLetterTemplateProtest40: () => string;
+export declare const newsLetterTemplateCredible33: () => string;
+export declare const newsLetterTemplateINEC26: () => string;
+export declare const userActivitySummaryTemplate: ({ dateRange, login, signup, observer, volunteer, result, incident, flagged, volunteerToObserver, total }: UserActivitySummaryInput) => string;
+export declare const newsLetterTemplateCrediblePeople: () => string;
+export declare const newsLetterTemplateAnambraObservers: () => string;
+export declare const newsLetterTemplateAllRoadsLeadToAnambra: () => string;
+export declare const newsLetterTemplateAnambra2025Results: () => string;
+export declare const newsLetterTemplateUpcoming: () => string;
+export declare const newsLetterTemplateETransmission: () => string;
+export declare const newsLetterTemplateCitizensGetUp: () => string;
+export declare const newsletterFooterTemplate: (unsubscribeLink?: string) => string;
+export declare const newsLetterTemplateAmendedElectoralAct: () => string;
+export declare const newsLetterTemplateNigeriansOppositionSpearhead: () => string;
+export declare const newsLetterTemplateInecIndependence: () => string;
+export declare const newsLetterTemplateInecChairmanAmupitanResign: () => string;
+export declare const newsLetterTemplateInecForensicAudit: () => string;
+export {};
+//# sourceMappingURL=emailTemplates.d.ts.map

@@ -1,0 +1,96 @@
+import express from "express";
+import { authMiddleware } from "../../middleware/authMiddleware.ts";
+import { handleValidationErrors } from "../../validators/authValidators.ts";
+import {
+  getElectionVaultMobile,
+  generateAnonymousUsernameMobile,
+  getMyProfileMobile,
+  getNotificationSettingsMobile,
+  locatePollingUnitMobile,
+  publicViewerToVolunteerMobile,
+  submitFeedbackMobile,
+  setAnonymousIdentityToggleMobile,
+  upsertObserverDataMobile,
+  updateMyPasswordMobile,
+  updateMyProfileMobile,
+  updateNotificationSettingsMobile,
+  volunteerToObserverMobile,
+} from "../../controllers/mobile/profileController.ts";
+import {
+  mobileFeedbackValidation,
+  mobileAnonymousIdentityToggleValidation,
+  mobileNotificationUpdateValidation,
+  mobileObserverDataValidation,
+  mobilePollingUnitLookupValidation,
+  mobileUpdatePasswordValidation,
+} from "../../validators/mobile/profileValidators.ts";
+
+const router = express.Router();
+
+router.get("/me", authMiddleware, getMyProfileMobile);
+router.put("/me", authMiddleware, ...updateMyProfileMobile);
+router.put(
+  "/me/password",
+  authMiddleware,
+  mobileUpdatePasswordValidation,
+  handleValidationErrors,
+  updateMyPasswordMobile
+);
+
+router.put(
+  "/upgrade/volunteer-to-observer",
+  authMiddleware,
+  ...volunteerToObserverMobile
+);
+router.put(
+  "/observer-data",
+  authMiddleware,
+  mobileObserverDataValidation,
+  handleValidationErrors,
+  ...upsertObserverDataMobile
+);
+router.put(
+  "/upgrade/public-viewer-to-volunteer",
+  authMiddleware,
+  publicViewerToVolunteerMobile
+);
+router.post(
+  "/me/anonymous-username/generate",
+  authMiddleware,
+  generateAnonymousUsernameMobile
+);
+router.put(
+  "/me/anonymous-identity",
+  authMiddleware,
+  mobileAnonymousIdentityToggleValidation,
+  handleValidationErrors,
+  setAnonymousIdentityToggleMobile
+);
+
+router.get("/election-vault", authMiddleware, getElectionVaultMobile);
+router.post(
+  "/polling-unit/lookup",
+  authMiddleware,
+  mobilePollingUnitLookupValidation,
+  handleValidationErrors,
+  locatePollingUnitMobile
+);
+
+router.get("/notifications", authMiddleware, getNotificationSettingsMobile);
+router.put(
+  "/notifications",
+  authMiddleware,
+  mobileNotificationUpdateValidation,
+  handleValidationErrors,
+  updateNotificationSettingsMobile
+);
+
+router.post(
+  "/feedback",
+  authMiddleware,
+  mobileFeedbackValidation,
+  handleValidationErrors,
+  submitFeedbackMobile
+);
+
+export default router;

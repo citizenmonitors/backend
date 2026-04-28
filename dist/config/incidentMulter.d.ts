@@ -1,0 +1,2 @@
+export declare const uploadIncidentDataFiles: import("express").RequestHandler<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
+//# sourceMappingURL=incidentMulter.d.ts.map

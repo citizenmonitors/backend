@@ -1,0 +1,57 @@
+import mongoose from "mongoose";
+import { profileImageSchema } from "./UserProfileImage/ProfileImageModel.js";
+
+const userSchema = new mongoose.Schema({
+  role: { type: String, enum: ["observer", "volunteer", "public-viewer"] },
+  email: { type: String, required: true, unique: true },
+  pendingEmail: String,
+  firstName: String,
+  lastName: String,
+  gender: String,
+  dateOfBirth: String,
+  nationality: String,
+  profileImage: profileImageSchema,
+  state: String,
+  lga: String,
+  ward: String,
+  pollingUnit: String,
+  isRegisteredVoter: Boolean,
+  isPoliticalPartyMember: Boolean,
+  isElectionWitnessReady: Boolean,
+  isOpenToSurvey: Boolean,
+  whyYouJoinUs: String,
+  isObserverInPollingUnit: Boolean,
+  pendingObserverVerification: Boolean,
+  // Observer specific fields
+  governmentId: String,
+  phoneNumber: String,
+  bankName: String,
+  bankAccountNumber: String,
+  bankAccountName: String,
+  password: { type: String, required: true },
+  isVerified: { type: Boolean, default: false },
+  // verificationToken: { type: String },
+  verificationCode: { type: String },
+  verificationCodeExpires: { type: Date, required: false },
+  resetPasswordOTP: String,
+  resetPasswordOTPExpires: Date,
+  hasSubmittedRoleForm: { type: Boolean, default: false },
+  hasSetPassword: { type: Boolean, default: true },
+  mobileMeta: {
+    platform: String,
+    deviceId: String,
+    appVersion: String,
+    pushToken: String,
+    lastLoginAt: Date,
+  },
+  authProviders: {
+    google: {
+      googleId: String,
+      emailVerified: Boolean,
+      linkedAt: Date,
+    },
+  },
+});
+
+export default mongoose.model("User", userSchema);
+

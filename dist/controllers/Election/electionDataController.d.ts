@@ -1,0 +1,25 @@
+import type { Request, Response } from "express";
+import type { AuthenticatedRequest } from "../../types/authenticatedRequest.ts";
+export declare const createElection: (req: AuthenticatedRequest, res: Response) => Promise<void>;
+export declare const updateElection: (req: AuthenticatedRequest, res: Response) => Promise<Response<any, Record<string, any>> | undefined>;
+export declare const createActiveElectionsCon: (req: AuthenticatedRequest, res: Response) => Promise<void>;
+export declare const updateActiveElectionCon: (req: AuthenticatedRequest, res: Response) => Promise<Response<any, Record<string, any>> | undefined>;
+export declare const deleteElection: (req: AuthenticatedRequest, res: Response) => Promise<Response<any, Record<string, any>> | undefined>;
+export declare const deleteActiveElection: (req: AuthenticatedRequest, res: Response) => Promise<Response<any, Record<string, any>> | undefined>;
+export declare const getAllActiveElections: (req: AuthenticatedRequest, res: Response) => Promise<void>;
+export declare const getAllElectionTypes: (req: AuthenticatedRequest, res: Response) => Promise<void>;
+export declare const getElectionResultByIdCont: (req: AuthenticatedRequest, res: Response) => Promise<Response<any, Record<string, any>> | undefined>;
+export declare const getElectionByIdCont: (req: AuthenticatedRequest, res: Response) => Promise<Response<any, Record<string, any>> | undefined>;
+export declare const getLiveElectionByIdCont: (req: AuthenticatedRequest, res: Response) => Promise<Response<any, Record<string, any>> | undefined>;
+export declare const uploadResultData: (req: AuthenticatedRequest, res: Response) => Promise<Response<any, Record<string, any>> | undefined>;
+export declare const updateResultData: (req: AuthenticatedRequest, res: Response) => Promise<Response<any, Record<string, any>> | undefined>;
+export declare const getAllElectionResultsController: (_req: Request, res: Response) => Promise<void>;
+export declare const uploadIncidentReportData: (req: AuthenticatedRequest, res: Response) => Promise<Response<any, Record<string, any>> | undefined>;
+export declare const updateIncidentReportData: (req: AuthenticatedRequest, res: Response) => Promise<Response<any, Record<string, any>> | undefined>;
+export declare const getUserElectionDataController: (req: AuthenticatedRequest, res: Response) => Promise<void>;
+export declare const deleteElectionResultData: (req: AuthenticatedRequest, res: Response) => Promise<Response<any, Record<string, any>> | undefined>;
+export declare const deleteIncidentReportData: (req: AuthenticatedRequest, res: Response) => Promise<Response<any, Record<string, any>> | undefined>;
+export declare const getUserElectionResultsAndReportsCon: (req: AuthenticatedRequest, res: Response) => Promise<void>;
+export declare const getResultsAndPerformActionController: (req: AuthenticatedRequest, res: Response) => Promise<Response<any, Record<string, any>>>;
+export declare const checkUserStatusForFlagController: (req: AuthenticatedRequest, res: Response) => Promise<Response<any, Record<string, any>>>;
+//# sourceMappingURL=electionDataController.d.ts.map

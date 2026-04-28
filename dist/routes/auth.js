@@ -1,0 +1,17 @@
+import express from "express";
+import { register, verifyEmail, resendToken, submitRoleForm, signIn, pickRole, validateUserSession, forgotPassword, resetPassword, submitObserverDetailsController, } from "../controllers/authController.js";
+import { handleValidationErrors, registerValidation, verifyEmailValidation, resendTokenValidation, pickRoleValidation, signInValidation, forgotPasswordValidation, resetPasswordValidation, submitDetailsValidation, submitObserverDetailsValidation, } from "../validators/authValidators.js";
+import upload from "../config/multer.js";
+const router = express.Router();
+router.post("/register", registerValidation, handleValidationErrors, register);
+router.post("/verify-email", verifyEmailValidation, handleValidationErrors, verifyEmail);
+router.post("/resend-token", resendTokenValidation, handleValidationErrors, resendToken);
+router.post("/select-role", pickRoleValidation, handleValidationErrors, pickRole);
+router.post("/submit-details", upload.single("profileImage"), submitDetailsValidation, handleValidationErrors, submitRoleForm);
+router.post("/submit-role", upload.fields([{ name: "observerId[]", maxCount: 2 }]), submitObserverDetailsValidation, handleValidationErrors, submitObserverDetailsController);
+router.post("/signin", signInValidation, handleValidationErrors, signIn);
+router.post("/validate", validateUserSession);
+router.post("/forgot-password", forgotPasswordValidation, handleValidationErrors, forgotPassword);
+router.post("/reset-password", resetPasswordValidation, handleValidationErrors, resetPassword);
+export default router;
+//# sourceMappingURL=auth.js.map

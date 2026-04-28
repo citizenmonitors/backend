@@ -4,3 +4,8 @@ uploads
 observerId
 profileImage
 assets 
+.env
+.env.*
+config/firebaseServiceAccountKey.json
+*-service-account*.json
+*.pem

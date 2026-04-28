@@ -1,0 +1,28 @@
+import mongoose from "mongoose";
+const likeUserSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "CompletedUser",
+        required: true,
+    },
+}, { _id: false });
+const collationDiscussionCommentSchema = new mongoose.Schema({
+    post: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "CollationDiscussionPost",
+        required: true,
+        index: true,
+    },
+    author: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "CompletedUser",
+        required: true,
+        index: true,
+    },
+    body: { type: String, required: true, trim: true, maxlength: 8000 },
+    useAnonymousDisplay: { type: Boolean, default: false },
+    likes: [likeUserSchema],
+}, { timestamps: true });
+collationDiscussionCommentSchema.index({ post: 1, createdAt: -1 });
+export default mongoose.model("CollationDiscussionComment", collationDiscussionCommentSchema);
+//# sourceMappingURL=CollationDiscussionComment.js.map

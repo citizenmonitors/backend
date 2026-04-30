@@ -29,6 +29,7 @@ import {
   mobileVerifyEmailValidation,
 } from "../../validators/mobile/authValidators.ts";
 
+
 const router = express.Router();
 
 router.post("/register", mobileRegisterValidation, handleValidationErrors, registerMobile);
@@ -46,4 +47,5 @@ router.post("/submit-details", upload.single("profileImage"), mobileSubmitDetail
 router.post("/observer-role", upload.fields([{ name: "observerId[]", maxCount: 2 }]), mobileSubmitObserverDetailsValidation, handleValidationErrors, submitObserverDetailsMobile);
 
 export default router;
+
 

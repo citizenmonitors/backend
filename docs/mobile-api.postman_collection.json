@@ -1,0 +1,406 @@
+{
+  "info": {
+    "name": "Citizen Monitors Mobile API (Production)",
+    "_postman_id": "2ad5b94f-8e4a-48b2-8f2d-0f4a9f4f9c01",
+    "description": "Mobile API collection for production testing.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://citizen-monitors.onrender.com/api/v1/mobile"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "activeElectionId",
+      "value": ""
+    },
+    {
+      "key": "notificationId",
+      "value": ""
+    },
+    {
+      "key": "postId",
+      "value": ""
+    },
+    {
+      "key": "commentId",
+      "value": ""
+    },
+    {
+      "key": "targetId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"Password@123\",\n  \"confirmPassword\": \"Password@123\",\n  \"platform\": \"android\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/register"
+          }
+        },
+        {
+          "name": "Verify Email",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"verificationCode\": \"123456\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/verify-email"
+          }
+        },
+        {
+          "name": "Sign In",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"Password@123\",\n  \"platform\": \"android\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/signin"
+          }
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/forgot-password"
+          }
+        },
+        {
+          "name": "Reset Password (OTP)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"otp\": \"123456\",\n  \"password\": \"NewPassword@123\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/reset-password"
+          }
+        },
+        {
+          "name": "Validate Session",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/validate"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile",
+      "item": [
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/profile/me"
+          }
+        },
+        {
+          "name": "Update Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"Password@123\",\n  \"newPassword\": \"NewPassword@123\",\n  \"confirmPassword\": \"NewPassword@123\"\n}"
+            },
+            "url": "{{baseUrl}}/profile/me/password"
+          }
+        },
+        {
+          "name": "Get Notification Preferences",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/profile/notifications"
+          }
+        },
+        {
+          "name": "Update Notification Preferences",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pollingUnitActivity\": true,\n  \"discussionReplies\": true,\n  \"resultAggregated\": true\n}"
+            },
+            "url": "{{baseUrl}}/profile/notifications"
+          }
+        },
+        {
+          "name": "Submit Feedback",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Feedback\",\n  \"message\": \"Great app\"\n}"
+            },
+            "url": "{{baseUrl}}/profile/feedback"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Locations & Banks",
+      "item": [
+        {
+          "name": "States",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{baseUrl}}/locations/states"
+          }
+        },
+        {
+          "name": "LGAs",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{baseUrl}}/locations/states/Lagos/local_governments"
+          }
+        },
+        {
+          "name": "Banks",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{baseUrl}}/banks"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Elections",
+      "item": [
+        {
+          "name": "Active Elections",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/elections/active?status=all"
+          }
+        },
+        {
+          "name": "Live Carousel",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/elections/live-carousel"
+          }
+        },
+        {
+          "name": "My Submission",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/elections/{{activeElectionId}}/my-submission"
+          }
+        },
+        {
+          "name": "Delete Result",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/elections/{{activeElectionId}}/results"
+          }
+        },
+        {
+          "name": "Delete Incident",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/elections/{{activeElectionId}}/report"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Collation",
+      "item": [
+        {
+          "name": "Get Collation",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/elections/{{activeElectionId}}/collation"
+          }
+        },
+        {
+          "name": "Collation User Action",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"electionId\": \"{{targetId}}\",\n  \"action\": \"agree\",\n  \"dataType\": \"election\"\n}"
+            },
+            "url": "{{baseUrl}}/elections/{{activeElectionId}}/collation/user-action"
+          }
+        },
+        {
+          "name": "Report Thread Comments",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/elections/{{activeElectionId}}/report-thread/election-result/{{targetId}}/comments"
+          }
+        },
+        {
+          "name": "Post Report Thread Comment",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"body\": \"Observed same update.\",\n  \"useAnonymousDisplay\": false\n}"
+            },
+            "url": "{{baseUrl}}/elections/{{activeElectionId}}/report-thread/election-result/{{targetId}}/comments"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pulse",
+      "item": [
+        {
+          "name": "List Pulse Posts",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/pulse/posts?page=1&limit=20"
+          }
+        },
+        {
+          "name": "Like Pulse Post",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/pulse/posts/{{postId}}/like"
+          }
+        },
+        {
+          "name": "Get Pulse Comments",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/pulse/posts/{{postId}}/comments"
+          }
+        },
+        {
+          "name": "Post Pulse Comment",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"body\": \"Thanks for the update\",\n  \"useAnonymousDisplay\": false\n}"
+            },
+            "url": "{{baseUrl}}/pulse/posts/{{postId}}/comments"
+          }
+        },
+        {
+          "name": "Like Pulse Comment",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/pulse/posts/{{postId}}/comments/{{commentId}}/like"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "List Notifications",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/notifications?page=1&limit=20"
+          }
+        },
+        {
+          "name": "Get Notification Detail",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/notifications/{{notificationId}}"
+          }
+        },
+        {
+          "name": "Mark Notification Read",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/notifications/{{notificationId}}/read"
+          }
+        },
+        {
+          "name": "Mark All Notifications Read",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/notifications/read-all"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Get Dashboard",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/dashboard"
+          }
+        }
+      ]
+    }
+  ]
+}

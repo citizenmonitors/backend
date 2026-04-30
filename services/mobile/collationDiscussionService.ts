@@ -11,7 +11,6 @@ import { uploadFileToFirebase } from "../../config/firebaseUploader.ts";
 import { dispatchNotificationToUsers } from "./notificationDispatchService.ts";
 
 type Id = Types.ObjectId | string;
-type VisibilityScope = "ward" | "lga";
 
 type AuthorLean = {
   _id?: Id;
@@ -35,31 +34,6 @@ const uploadDiscussionMedia = async (
     files.map((file) => uploadFileToFirebase(file, folder))
   );
   return uploads.map((u) => u.publicUrl);
-};
-
-const normalizeLocationKey = (value: unknown): string =>
-  String(value ?? "")
-    .trim()
-    .toLowerCase();
-
-const assertUserPulseLocation = (
-  user: {
-    state?: string | null;
-    lga?: string | null;
-    ward?: string | null;
-  },
-  visibilityScope: VisibilityScope
-) => {
-  const state = normalizeLocationKey(user.state);
-  const lga = normalizeLocationKey(user.lga);
-  const ward = normalizeLocationKey(user.ward);
-  if (!state || !lga) {
-    throw new Error("Complete your state and LGA in profile to use Pulse");
-  }
-  if (visibilityScope === "ward" && !ward) {
-    throw new Error("Complete your ward in profile to post to ward Pulse");
-  }
-  return { state, lga, ward };
 };
 
 export const formatCollationAuthorDisplay = (
@@ -257,35 +231,18 @@ export const listDiscussionPosts = async (
   page = 1,
   limit = 20
 ) => {
-  const { user } = await assertMobileCollationAccess(activeElectionId, userId);
+  await assertMobileCollationAccess(activeElectionId, userId);
   const skip = Math.max(0, (page - 1) * limit);
   const safeLimit = Math.min(50, Math.max(1, limit));
-  const viewerLoc = assertUserPulseLocation(user, "lga");
-  const visibilityFilter = {
-    activeElection: activeElectionId,
-    $or: [
-      {
-        visibilityScope: "lga",
-        audienceState: viewerLoc.state,
-        audienceLga: viewerLoc.lga,
-      },
-      {
-        visibilityScope: "ward",
-        audienceState: viewerLoc.state,
-        audienceLga: viewerLoc.lga,
-        audienceWard: viewerLoc.ward,
-      },
-    ],
-  };
 
   const [rows, total] = await Promise.all([
-    CollationDiscussionPost.find(visibilityFilter)
+    CollationDiscussionPost.find({ activeElection: activeElectionId })
       .populate("author", "firstName lastName anonymousUsername")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(safeLimit)
       .lean(),
-    CollationDiscussionPost.countDocuments(visibilityFilter),
+    CollationDiscussionPost.countDocuments({ activeElection: activeElectionId }),
   ]);
 
   const mapped = rows.map((row) => {
@@ -299,7 +256,6 @@ export const listDiscussionPosts = async (
       body: row.body,
       imageUrls: row.imageUrls ?? [],
       videoUrls: row.videoUrls ?? [],
-      visibilityScope: row.visibilityScope ?? "lga",
       allowSocialShare: row.allowSocialShare ?? false,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
@@ -323,7 +279,6 @@ export const createDiscussionPost = async (
     body: string;
     imageUrls?: string[];
     videoUrls?: string[];
-    visibilityScope?: VisibilityScope;
     allowSocialShare?: boolean;
     useAnonymousDisplay?: boolean;
   },
@@ -336,9 +291,6 @@ export const createDiscussionPost = async (
 
   const author = await CompletedUser.findById(userId).lean();
   if (!author) throw new Error("User not found");
-  const visibilityScope: VisibilityScope =
-    input.visibilityScope === "ward" ? "ward" : "lga";
-  const audienceLoc = assertUserPulseLocation(author, visibilityScope);
   const useAnonymous = Boolean(input.useAnonymousDisplay);
   if (useAnonymous && !author.anonymousUsername) {
     throw new Error("Set an anonymous username before posting anonymously");
@@ -365,10 +317,6 @@ export const createDiscussionPost = async (
       ...(input.videoUrls?.filter(Boolean).slice(0, 3) ?? []),
       ...uploadedVideoUrls,
     ].slice(0, 3),
-    visibilityScope,
-    audienceState: audienceLoc.state,
-    audienceLga: audienceLoc.lga,
-    audienceWard: visibilityScope === "ward" ? audienceLoc.ward : undefined,
     allowSocialShare: Boolean(input.allowSocialShare),
     useAnonymousDisplay: useAnonymous,
     likes: [],
@@ -388,7 +336,6 @@ export const createDiscussionPost = async (
     body: row.body,
     imageUrls: row.imageUrls ?? [],
     videoUrls: row.videoUrls ?? [],
-    visibilityScope: row.visibilityScope ?? "lga",
     allowSocialShare: row.allowSocialShare ?? false,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,

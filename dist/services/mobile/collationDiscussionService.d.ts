@@ -1,6 +1,5 @@
 import type { Types } from "mongoose";
 type Id = Types.ObjectId | string;
-type VisibilityScope = "ward" | "lga";
 type AuthorLean = {
     _id?: Id;
     firstName?: string | null;
@@ -66,7 +65,6 @@ export declare const listDiscussionPosts: (activeElectionId: string, userId: Id,
         body: string;
         imageUrls: string[];
         videoUrls: string[];
-        visibilityScope: "lga" | "ward";
         allowSocialShare: boolean;
         createdAt: NativeDate;
         updatedAt: NativeDate;
@@ -86,7 +84,6 @@ export declare const createDiscussionPost: (activeElectionId: string, userId: Id
     body: string;
     imageUrls?: string[];
     videoUrls?: string[];
-    visibilityScope?: VisibilityScope;
     allowSocialShare?: boolean;
     useAnonymousDisplay?: boolean;
 }, media?: {
@@ -97,7 +94,6 @@ export declare const createDiscussionPost: (activeElectionId: string, userId: Id
     body: string;
     imageUrls: string[];
     videoUrls: string[];
-    visibilityScope: "lga" | "ward";
     allowSocialShare: boolean;
     createdAt: NativeDate;
     updatedAt: NativeDate;

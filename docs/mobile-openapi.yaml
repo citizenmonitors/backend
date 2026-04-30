@@ -1,0 +1,978 @@
+openapi: 3.0.3
+info:
+  title: Citizen Monitors Mobile API
+  version: 1.0.0
+  description: Production mobile API for Citizen Monitors.
+servers:
+  - url: https://citizen-monitors.onrender.com/api/v1/mobile
+    description: Production
+tags:
+  - name: Auth
+  - name: Profile
+  - name: Locations
+  - name: Banks
+  - name: Elections
+  - name: Collation
+  - name: Pulse
+  - name: Notifications
+  - name: Dashboard
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+    AuthTokenResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          type: object
+          additionalProperties: true
+        message:
+          type: string
+    NotificationPreferences:
+      type: object
+      properties:
+        pollingUnitActivity: { type: boolean }
+        electionDayAlert: { type: boolean }
+        discussionReplies: { type: boolean }
+        resultAggregated: { type: boolean }
+        reportConfirmed: { type: boolean }
+        reportFlagged: { type: boolean }
+        securityAlerts: { type: boolean }
+        newsletter: { type: boolean }
+paths:
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Register mobile user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password, confirmPassword]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8 }
+                confirmPassword: { type: string, minLength: 8 }
+                platform: { type: string, enum: [ios, android] }
+                deviceId: { type: string }
+                appVersion: { type: string }
+                pushToken: { type: string }
+      responses:
+        "201":
+          description: Registered
+          content: { application/json: { schema: { $ref: "#/components/schemas/MessageResponse" } } }
+  /auth/verify-email:
+    post:
+      tags: [Auth]
+      summary: Verify email with code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, verificationCode]
+              properties:
+                email: { type: string, format: email }
+                verificationCode: { type: string, minLength: 6, maxLength: 6 }
+      responses:
+        "200": { description: Verified }
+  /auth/resend-token:
+    post:
+      tags: [Auth]
+      summary: Resend verification code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: { type: string, format: email }
+      responses:
+        "200": { description: Sent }
+  /auth/signin:
+    post:
+      tags: [Auth]
+      summary: Sign in mobile user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
+                platform: { type: string, enum: [ios, android] }
+                deviceId: { type: string }
+                appVersion: { type: string }
+                pushToken: { type: string }
+      responses:
+        "200":
+          description: Authenticated
+          content: { application/json: { schema: { $ref: "#/components/schemas/AuthTokenResponse" } } }
+  /auth/google/continue:
+    post:
+      tags: [Auth]
+      summary: Continue with Google
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [idToken]
+              properties:
+                idToken: { type: string }
+                platform: { type: string, enum: [ios, android] }
+                deviceId: { type: string }
+                appVersion: { type: string }
+                pushToken: { type: string }
+      responses:
+        "200": { description: Google auth success }
+  /auth/set-password:
+    post:
+      tags: [Auth]
+      summary: Set password after Google auth
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [password, confirmPassword]
+              properties:
+                password: { type: string, minLength: 8 }
+                confirmPassword: { type: string, minLength: 8 }
+      responses:
+        "200": { description: Password set }
+  /auth/validate:
+    post:
+      tags: [Auth]
+      summary: Validate active session
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200": { description: Session valid }
+  /auth/forgot-password:
+    post:
+      tags: [Auth]
+      summary: Send reset OTP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: { type: string, format: email }
+      responses:
+        "200": { description: OTP sent }
+  /auth/resend-forgot-password-otp:
+    post:
+      tags: [Auth]
+      summary: Resend reset OTP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: { type: string, format: email }
+      responses:
+        "200": { description: OTP resent }
+  /auth/reset-password:
+    post:
+      tags: [Auth]
+      summary: Reset password with OTP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, otp, password]
+              properties:
+                email: { type: string, format: email }
+                otp: { type: string, minLength: 6, maxLength: 6 }
+                password: { type: string, minLength: 8 }
+      responses:
+        "200": { description: Password reset }
+  /auth/select-role:
+    post:
+      tags: [Auth]
+      summary: Select user role
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, role]
+              properties:
+                email: { type: string, format: email }
+                role: { type: string, enum: [observer, volunteer, public-viewer] }
+      responses:
+        "200": { description: Role selected }
+  /auth/submit-details:
+    post:
+      tags: [Auth]
+      summary: Submit profile details (with optional image)
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: { type: string }
+                firstName: { type: string }
+                lastName: { type: string }
+                nationality: { type: string }
+                whyYouJoinUs: { type: string }
+                profileImage:
+                  type: string
+                  format: binary
+      responses:
+        "200": { description: Details submitted }
+  /auth/observer-role:
+    post:
+      tags: [Auth]
+      summary: Submit observer details
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [email, phoneNumber]
+              properties:
+                email: { type: string }
+                phoneNumber: { type: string }
+                bankName: { type: string }
+                bankAccountNumber: { type: string }
+                bankAccountName: { type: string }
+                observerId[]:
+                  type: array
+                  items: { type: string, format: binary }
+      responses:
+        "200": { description: Observer details submitted }
+
+  /locations/states:
+    get:
+      tags: [Locations]
+      summary: List states
+      responses: { "200": { description: OK } }
+  /locations/states/{state}/local_governments:
+    get:
+      tags: [Locations]
+      summary: List LGAs in state
+      parameters:
+        - in: path
+          name: state
+          required: true
+          schema: { type: string }
+      responses: { "200": { description: OK } }
+  /locations/states/{state}/local_governments/{lga}/wards:
+    get:
+      tags: [Locations]
+      summary: List wards in LGA
+      parameters:
+        - in: path
+          name: state
+          required: true
+          schema: { type: string }
+        - in: path
+          name: lga
+          required: true
+          schema: { type: string }
+      responses: { "200": { description: OK } }
+  /locations/states/{state}/local_governments/{lga}/wards/{ward}/polling_units:
+    get:
+      tags: [Locations]
+      summary: List polling units in ward
+      parameters:
+        - in: path
+          name: state
+          required: true
+          schema: { type: string }
+        - in: path
+          name: lga
+          required: true
+          schema: { type: string }
+        - in: path
+          name: ward
+          required: true
+          schema: { type: string }
+      responses: { "200": { description: OK } }
+
+  /banks:
+    get:
+      tags: [Banks]
+      summary: List banks
+      responses: { "200": { description: OK } }
+
+  /profile/me:
+    get:
+      tags: [Profile]
+      summary: Get current profile
+      security: [{ bearerAuth: [] }]
+      responses: { "200": { description: OK } }
+    put:
+      tags: [Profile]
+      summary: Update profile
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                firstName: { type: string }
+                lastName: { type: string }
+                phoneNumber: { type: string }
+                state: { type: string }
+                lga: { type: string }
+                ward: { type: string }
+                pollingUnit: { type: string }
+                nationality: { type: string }
+                whyYouJoinUs: { type: string }
+                profileImage: { type: string, format: binary }
+      responses: { "200": { description: Updated } }
+  /profile/me/password:
+    put:
+      tags: [Profile]
+      summary: Update password
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [currentPassword, newPassword, confirmPassword]
+              properties:
+                currentPassword: { type: string }
+                newPassword: { type: string, minLength: 8 }
+                confirmPassword: { type: string, minLength: 8 }
+      responses: { "200": { description: Updated } }
+  /profile/upgrade/volunteer-to-observer:
+    put:
+      tags: [Profile]
+      summary: Upgrade volunteer to observer
+      security: [{ bearerAuth: [] }]
+      responses: { "200": { description: Upgraded } }
+  /profile/observer-data:
+    put:
+      tags: [Profile]
+      summary: Add or update observer data
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                phoneNumber: { type: string }
+                bankName: { type: string }
+                bankAccountNumber: { type: string }
+                bankAccountName: { type: string }
+                replaceObserverIds: { type: boolean }
+                observerId[]:
+                  type: array
+                  items: { type: string, format: binary }
+      responses: { "200": { description: Updated } }
+  /profile/upgrade/public-viewer-to-volunteer:
+    put:
+      tags: [Profile]
+      summary: Upgrade public-viewer to volunteer
+      security: [{ bearerAuth: [] }]
+      responses: { "200": { description: Upgraded } }
+  /profile/me/anonymous-username/generate:
+    post:
+      tags: [Profile]
+      summary: Generate anonymous username
+      security: [{ bearerAuth: [] }]
+      responses: { "200": { description: Generated } }
+  /profile/me/anonymous-identity:
+    put:
+      tags: [Profile]
+      summary: Toggle anonymous identity
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [enabled]
+              properties:
+                enabled: { type: boolean }
+      responses: { "200": { description: Updated } }
+  /profile/election-vault:
+    get:
+      tags: [Profile]
+      summary: Get user submission vault
+      security: [{ bearerAuth: [] }]
+      responses: { "200": { description: OK } }
+  /profile/polling-unit/lookup:
+    post:
+      tags: [Profile]
+      summary: Lookup exact polling unit
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [state, lga, ward]
+              properties:
+                state: { type: string }
+                lga: { type: string }
+                ward: { type: string }
+                pollingUnit: { type: string }
+      responses: { "200": { description: OK } }
+  /profile/notifications:
+    get:
+      tags: [Profile]
+      summary: Get notification settings
+      security: [{ bearerAuth: [] }]
+      responses: { "200": { description: OK } }
+    put:
+      tags: [Profile]
+      summary: Update notification settings
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/NotificationPreferences" }
+      responses: { "200": { description: Updated } }
+  /profile/feedback:
+    post:
+      tags: [Profile]
+      summary: Submit feedback
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, message]
+              properties:
+                title: { type: string }
+                message: { type: string, minLength: 5 }
+      responses: { "201": { description: Submitted } }
+
+  /elections/active:
+    get:
+      tags: [Elections]
+      summary: List active elections
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: query
+          name: status
+          schema: { type: string, enum: [all, live, upcoming, concluded] }
+      responses: { "200": { description: OK } }
+  /elections/live-carousel:
+    get:
+      tags: [Elections]
+      summary: List live elections for carousel
+      security: [{ bearerAuth: [] }]
+      responses: { "200": { description: OK } }
+  /elections/{activeElectionId}/my-submission:
+    get:
+      tags: [Elections]
+      summary: Get current user submission for active election
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: activeElectionId
+          required: true
+          schema: { type: string }
+      responses: { "200": { description: OK } }
+  /elections/{activeElectionId}/results:
+    post:
+      tags: [Elections]
+      summary: Submit election result
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: activeElectionId
+          required: true
+          schema: { type: string }
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                resultPicture: { type: string, format: binary }
+                resultVideo: { type: string, format: binary }
+                uploadLocation: { type: string, description: JSON/stringified JSON }
+      responses: { "201": { description: Created } }
+    put:
+      tags: [Elections]
+      summary: Update election result
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: activeElectionId
+          required: true
+          schema: { type: string }
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                resultPicture: { type: string, format: binary }
+                resultVideo: { type: string, format: binary }
+      responses: { "200": { description: Updated } }
+    delete:
+      tags: [Elections]
+      summary: Delete election result
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: activeElectionId
+          required: true
+          schema: { type: string }
+      responses: { "200": { description: Deleted } }
+  /elections/{activeElectionId}/report:
+    post:
+      tags: [Elections]
+      summary: Submit incident report
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: activeElectionId
+          required: true
+          schema: { type: string }
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [selectIncident, incidentNote]
+              properties:
+                selectIncident: { type: string }
+                incidentNote: { type: string }
+                incidentPictures[]:
+                  type: array
+                  items: { type: string, format: binary }
+                incidentVideos[]:
+                  type: array
+                  items: { type: string, format: binary }
+                uploadLocation: { type: string }
+      responses: { "201": { description: Created } }
+    put:
+      tags: [Elections]
+      summary: Update incident report
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: activeElectionId
+          required: true
+          schema: { type: string }
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                selectIncident: { type: string }
+                incidentNote: { type: string }
+                incidentPictures[]:
+                  type: array
+                  items: { type: string, format: binary }
+                incidentVideos[]:
+                  type: array
+                  items: { type: string, format: binary }
+      responses: { "200": { description: Updated } }
+    delete:
+      tags: [Elections]
+      summary: Delete incident report
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: activeElectionId
+          required: true
+          schema: { type: string }
+      responses: { "200": { description: Deleted } }
+
+  /elections/{activeElectionId}/collation:
+    get:
+      tags: [Collation]
+      summary: Get collation bundle
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: activeElectionId
+          required: true
+          schema: { type: string }
+      responses: { "200": { description: OK } }
+  /elections/{activeElectionId}/collation/user-action:
+    post:
+      tags: [Collation]
+      summary: Agree/flag/unagree collation item
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: activeElectionId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [electionId, action, dataType]
+              properties:
+                electionId: { type: string }
+                action: { type: string, enum: [agree, flag, unagree] }
+                dataType: { type: string, enum: [election, incident] }
+                flagReason: { type: string }
+      responses: { "200": { description: Updated } }
+  /elections/{activeElectionId}/report-thread/{targetType}/{targetId}/comments:
+    get:
+      tags: [Collation]
+      summary: List report-thread comments
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: activeElectionId
+          required: true
+          schema: { type: string }
+        - in: path
+          name: targetType
+          required: true
+          schema: { type: string, enum: [election-result, incident-report] }
+        - in: path
+          name: targetId
+          required: true
+          schema: { type: string }
+      responses: { "200": { description: OK } }
+    post:
+      tags: [Collation]
+      summary: Add report-thread comment
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: activeElectionId
+          required: true
+          schema: { type: string }
+        - in: path
+          name: targetType
+          required: true
+          schema: { type: string, enum: [election-result, incident-report] }
+        - in: path
+          name: targetId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [body]
+              properties:
+                body: { type: string }
+                useAnonymousDisplay: { type: boolean }
+      responses: { "201": { description: Created } }
+  /elections/{activeElectionId}/report-thread/comments/{commentId}/like:
+    post:
+      tags: [Collation]
+      summary: Like/unlike report-thread comment
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: activeElectionId
+          required: true
+          schema: { type: string }
+        - in: path
+          name: commentId
+          required: true
+          schema: { type: string }
+      responses: { "200": { description: Updated } }
+  /elections/{activeElectionId}/discussion/posts:
+    get:
+      tags: [Collation]
+      summary: List election discussion posts
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: activeElectionId
+          required: true
+          schema: { type: string }
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 20 }
+      responses: { "200": { description: OK } }
+    post:
+      tags: [Collation]
+      summary: Create election discussion post
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: activeElectionId
+          required: true
+          schema: { type: string }
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [body]
+              properties:
+                body: { type: string }
+                visibilityScope: { type: string, enum: [ward, lga] }
+                allowSocialShare: { type: boolean }
+                useAnonymousDisplay: { type: boolean }
+                images[]:
+                  type: array
+                  items: { type: string, format: binary }
+                videos[]:
+                  type: array
+                  items: { type: string, format: binary }
+      responses: { "201": { description: Created } }
+  /elections/{activeElectionId}/discussion/posts/{postId}/like:
+    post:
+      tags: [Collation]
+      summary: Like/unlike discussion post
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: activeElectionId
+          required: true
+          schema: { type: string }
+        - in: path
+          name: postId
+          required: true
+          schema: { type: string }
+      responses: { "200": { description: Updated } }
+  /elections/{activeElectionId}/discussion/posts/{postId}/comments:
+    get:
+      tags: [Collation]
+      summary: List discussion comments
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: activeElectionId
+          required: true
+          schema: { type: string }
+        - in: path
+          name: postId
+          required: true
+          schema: { type: string }
+      responses: { "200": { description: OK } }
+    post:
+      tags: [Collation]
+      summary: Add discussion comment
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: activeElectionId
+          required: true
+          schema: { type: string }
+        - in: path
+          name: postId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [body]
+              properties:
+                body: { type: string }
+                useAnonymousDisplay: { type: boolean }
+      responses: { "201": { description: Created } }
+  /elections/{activeElectionId}/discussion/posts/{postId}/comments/{commentId}/like:
+    post:
+      tags: [Collation]
+      summary: Like/unlike discussion comment
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: activeElectionId
+          required: true
+          schema: { type: string }
+        - in: path
+          name: postId
+          required: true
+          schema: { type: string }
+        - in: path
+          name: commentId
+          required: true
+          schema: { type: string }
+      responses: { "200": { description: Updated } }
+
+  /pulse/posts:
+    get:
+      tags: [Pulse]
+      summary: List pulse posts
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 20 }
+      responses: { "200": { description: OK } }
+    post:
+      tags: [Pulse]
+      summary: Create pulse post
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [body]
+              properties:
+                body: { type: string }
+                visibilityScope: { type: string, enum: [ward, lga], default: lga }
+                useAnonymousDisplay: { type: boolean }
+                image: { type: string, format: binary }
+      responses: { "201": { description: Created } }
+  /pulse/posts/{postId}/like:
+    post:
+      tags: [Pulse]
+      summary: Like/unlike pulse post
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema: { type: string }
+      responses: { "200": { description: Updated } }
+  /pulse/posts/{postId}/comments:
+    get:
+      tags: [Pulse]
+      summary: List pulse post comments
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema: { type: string }
+      responses: { "200": { description: OK } }
+    post:
+      tags: [Pulse]
+      summary: Add pulse post comment
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [body]
+              properties:
+                body: { type: string }
+                useAnonymousDisplay: { type: boolean }
+      responses: { "201": { description: Created } }
+  /pulse/posts/{postId}/comments/{commentId}/like:
+    post:
+      tags: [Pulse]
+      summary: Like/unlike pulse comment
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema: { type: string }
+        - in: path
+          name: commentId
+          required: true
+          schema: { type: string }
+      responses: { "200": { description: Updated } }
+
+  /notifications:
+    get:
+      tags: [Notifications]
+      summary: List notifications with unread count
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 20 }
+      responses: { "200": { description: OK } }
+  /notifications/{notificationId}:
+    get:
+      tags: [Notifications]
+      summary: Get notification detail and mark read
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: notificationId
+          required: true
+          schema: { type: string }
+      responses: { "200": { description: OK } }
+  /notifications/{notificationId}/read:
+    post:
+      tags: [Notifications]
+      summary: Mark one notification read
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: notificationId
+          required: true
+          schema: { type: string }
+      responses: { "200": { description: Updated } }
+  /notifications/read-all:
+    post:
+      tags: [Notifications]
+      summary: Mark all notifications read
+      security: [{ bearerAuth: [] }]
+      responses: { "200": { description: Updated } }
+
+  /dashboard:
+    get:
+      tags: [Dashboard]
+      summary: Get mobile dashboard payload
+      security: [{ bearerAuth: [] }]
+      responses: { "200": { description: OK } }

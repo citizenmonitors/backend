@@ -16,11 +16,7 @@ declare const _default: mongoose.Model<{
     }>;
     imageUrls: string[];
     videoUrls: string[];
-    visibilityScope: "lga" | "ward";
     allowSocialShare: boolean;
-    audienceState?: string | null | undefined;
-    audienceLga?: string | null | undefined;
-    audienceWard?: string | null | undefined;
 }, {}, {}, {}, mongoose.Document<unknown, {}, {
     createdAt: NativeDate;
     updatedAt: NativeDate;
@@ -38,11 +34,7 @@ declare const _default: mongoose.Model<{
     }>;
     imageUrls: string[];
     videoUrls: string[];
-    visibilityScope: "lga" | "ward";
     allowSocialShare: boolean;
-    audienceState?: string | null | undefined;
-    audienceLga?: string | null | undefined;
-    audienceWard?: string | null | undefined;
 }> & {
     createdAt: NativeDate;
     updatedAt: NativeDate;
@@ -60,11 +52,7 @@ declare const _default: mongoose.Model<{
     }>;
     imageUrls: string[];
     videoUrls: string[];
-    visibilityScope: "lga" | "ward";
     allowSocialShare: boolean;
-    audienceState?: string | null | undefined;
-    audienceLga?: string | null | undefined;
-    audienceWard?: string | null | undefined;
 } & {
     _id: mongoose.Types.ObjectId;
 } & {
@@ -88,11 +76,7 @@ declare const _default: mongoose.Model<{
     }>;
     imageUrls: string[];
     videoUrls: string[];
-    visibilityScope: "lga" | "ward";
     allowSocialShare: boolean;
-    audienceState?: string | null | undefined;
-    audienceLga?: string | null | undefined;
-    audienceWard?: string | null | undefined;
 }, mongoose.Document<unknown, {}, mongoose.FlatRecord<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
@@ -110,11 +94,7 @@ declare const _default: mongoose.Model<{
     }>;
     imageUrls: string[];
     videoUrls: string[];
-    visibilityScope: "lga" | "ward";
     allowSocialShare: boolean;
-    audienceState?: string | null | undefined;
-    audienceLga?: string | null | undefined;
-    audienceWard?: string | null | undefined;
 }>> & mongoose.FlatRecord<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
@@ -132,11 +112,7 @@ declare const _default: mongoose.Model<{
     }>;
     imageUrls: string[];
     videoUrls: string[];
-    visibilityScope: "lga" | "ward";
     allowSocialShare: boolean;
-    audienceState?: string | null | undefined;
-    audienceLga?: string | null | undefined;
-    audienceWard?: string | null | undefined;
 }> & {
     _id: mongoose.Types.ObjectId;
 } & {

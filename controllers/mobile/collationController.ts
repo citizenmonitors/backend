@@ -226,7 +226,6 @@ export const postDiscussionPostMobile = async (req: Request, res: Response) => {
       body?: unknown;
       imageUrls?: unknown;
       videoUrls?: unknown;
-      visibilityScope?: unknown;
       allowSocialShare?: unknown;
       useAnonymousDisplay?: unknown;
     };
@@ -236,7 +235,6 @@ export const postDiscussionPostMobile = async (req: Request, res: Response) => {
       body,
       imageUrls: Array.isArray(b.imageUrls) ? b.imageUrls.map(String) : undefined,
       videoUrls: Array.isArray(b.videoUrls) ? b.videoUrls.map(String) : undefined,
-      visibilityScope: b.visibilityScope === "ward" ? "ward" : "lga",
       allowSocialShare: toBooleanIfBooleanLike(b.allowSocialShare),
       useAnonymousDisplay: toBooleanIfBooleanLike(b.useAnonymousDisplay),
     }, {

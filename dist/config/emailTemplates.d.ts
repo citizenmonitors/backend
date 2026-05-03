@@ -93,5 +93,6 @@ export declare const newsLetterTemplateNigeriansOppositionSpearhead: () => strin
 export declare const newsLetterTemplateInecIndependence: () => string;
 export declare const newsLetterTemplateInecChairmanAmupitanResign: () => string;
 export declare const newsLetterTemplateInecForensicAudit: () => string;
+export declare const newsLetterTemplatePoliceBrutalityLeadershipOrInstitutional: () => string;
 export {};
 //# sourceMappingURL=emailTemplates.d.ts.map

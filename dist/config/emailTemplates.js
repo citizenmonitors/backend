@@ -2070,4 +2070,56 @@ export const newsLetterTemplateInecForensicAudit = () => baseTemplate({
       </table>
       `,
 });
+export const newsLetterTemplatePoliceBrutalityLeadershipOrInstitutional = () => baseTemplate({
+    title: "Police Brutality in Nigeria; Leadership or Institutional Failure?",
+    message: `
+      <table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
+        <tr>
+          <td>
+            <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 6px; overflow: hidden;">
+
+              <!-- Header -->
+              <tr>
+                <td style="background-color: #06BBAF; color: white; padding: 20px 30px; text-align: center;">
+                  <h3 style="color: #ffffff; margin: 0; font-size: 22px;">Police Brutality in Nigeria; Leadership or Institutional Failure?</h3>
+                </td>
+              </tr>
+
+              <!-- Body -->
+              <tr>
+                <td style="padding: 30px; color: #000000; font-size: 18px; line-height: 1.7;">
+
+                  <p><strong>Dear Citizen Monitors,</strong></p>
+
+                  <p>Police brutality in Nigeria is no longer a peripheral concern, it is a defining test of governance, accountability, and the social contract between citizens and the state. The question we must confront is why it persists: is this primarily a failure of leadership, or a deeper institutional breakdown?</p>
+
+                  <p>At first glance, leadership appears to be the obvious culprit. Political leaders set the tone for law enforcement culture. They appoint key officials, determine reform priorities, and signal, through action or silence, what behaviour is tolerated. When misconduct is met with delayed responses, opaque investigations, or outright denial, it sends a clear message down the chain of command: accountability is negotiable.</p>
+
+                  <p>Yet, reducing police brutality to leadership failure alone risks oversimplifying a far more entrenched issue. The Nigerian policing system operates within structural constraints that have evolved over decades; underfunding, inadequate training, weak internal disciplinary mechanisms, and a culture that often prioritizes force over service. These are not problems that emerge overnight, nor are they solved by rhetoric alone.</p>
+
+                  <p>Institutionally, there are critical gaps. Oversight bodies frequently lack independence or enforcement power. Complaint systems are either inaccessible or ineffective, leaving victims without meaningful recourse. Recruitment processes do not always emphasize psychological evaluation or community-oriented policing values. The result is a system where misconduct can occur with minimal risk of consequence.</p>
+
+                  <p>However, institutions do not reform themselves. Leadership remains the catalyst, or barrier, to systemic change. Where leadership is decisive, reforms tend to follow: clearer use-of-force policies, transparent disciplinary procedures, investment in training, and the integration of technology such as body cameras. Where leadership is absent or complicit, institutional decay accelerates.</p>
+
+                  <h4 style="color: #06BBAF; margin-top: 20px;">So, which is it; leadership or institutional failure?</h4>
+
+                  <p>In reality, the two are inseparable. Weak leadership allows institutional flaws to fester; fragile institutions, in turn, limit the effectiveness of even well-intentioned leaders. Addressing police brutality requires a dual approach: leadership that is willing to enforce accountability without hesitation, and institutional reform that embeds accountability into the system itself.</p>
+
+                  <p>This is not merely a policing issue, it is a governance issue. It speaks to how power is exercised, how justice is administered, and how citizens are valued. Sustainable change will demand more than public outrage; it will require policy consistency, civic engagement, and a redefinition of policing as a service rather than a force.</p>
+
+                  <p>The path forward is clear, even if it is not easy: reform leadership incentives, strengthen institutional safeguards, and centre the rights and dignity of citizens at every level of law enforcement.</p>
+
+                  <p>Until then, the question will remain, not just unanswered, but unresolved.</p>
+
+                  ${newsletterFooterTemplate()}
+
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+      </table>
+      `,
+});
 //# sourceMappingURL=emailTemplates.js.map

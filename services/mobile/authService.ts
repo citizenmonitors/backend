@@ -274,13 +274,12 @@ export const mobileSelectRole = async (email: string, role: string) => {
 
 export const mobileSubmitObserverDetails = async (input: {
   email: string;
-  observerIdFiles: MulterLikeFile[];
-  phoneNumber: string;
-  bankName?: string;
-  bankAccountNumber?: string;
-  bankAccountName?: string;
+  observerIdFiles?: MulterLikeFile[];
 }) => {
-  return submitObserverDetails(input);
+  return submitObserverDetails({
+    email: input.email,
+    observerIdFiles: input.observerIdFiles,
+  });
 };
 
 export const mobileSignIn = async (

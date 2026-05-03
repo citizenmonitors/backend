@@ -194,7 +194,10 @@ export const mobileSelectRole = async (email, role) => {
     return selectUserRole(email, role);
 };
 export const mobileSubmitObserverDetails = async (input) => {
-    return submitObserverDetails(input);
+    return submitObserverDetails({
+        email: input.email,
+        observerIdFiles: input.observerIdFiles,
+    });
 };
 export const mobileSignIn = async (payload, mobileMeta) => {
     const existingUser = await CompletedUser.findOne({ email: payload.email }).lean();

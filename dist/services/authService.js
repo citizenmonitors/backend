@@ -214,7 +214,8 @@ export const selectUserRole = async (email, role) => {
         message: "Observer role selected. Please fill in additional details.",
     };
 };
-export const submitObserverDetails = async ({ email, observerIdFiles, phoneNumber, bankName, bankAccountNumber, bankAccountName, }) => {
+export const submitObserverDetails = async ({ email, observerIdFiles: observerIdFilesInput, phoneNumber, bankName, bankAccountNumber, bankAccountName, }) => {
+    const observerIdFiles = observerIdFilesInput ?? [];
     // Fetch the user by email
     const user = await User.findOne({ email });
     if (!user) {
@@ -224,27 +225,19 @@ export const submitObserverDetails = async ({ email, observerIdFiles, phoneNumbe
     if (user.role !== "observer") {
         throw new Error("User is not an observer.");
     }
-    // Validate the required details
-    if (!phoneNumber) {
-        throw new Error("Please provide your phone number.");
-    }
-    // Ensure that at least one observer ID file is provided
-    if (!observerIdFiles || observerIdFiles.length === 0) {
-        throw new Error("At least one PVC file is required for observers.");
-    }
-    // Handle observer ID uploads (saving one or more files)
-    const observerId = await Promise.all(observerIdFiles.map(async (file) => {
-        const { publicUrl, filePath, token } = await uploadFileToFirebase(file, "observer_ids");
-        const createdFile = await observerIdModel.create({
-            location: filePath,
-            name: file.originalname,
-            type: file.mimetype,
-            size: file.size,
-            url: publicUrl,
-        });
-        return createdFile;
-    }));
-    // Prepare the observer details for CompletedUser
+    const observerId = observerIdFiles.length === 0
+        ? []
+        : await Promise.all(observerIdFiles.map(async (file) => {
+            const { publicUrl, filePath, token } = await uploadFileToFirebase(file, "observer_ids");
+            const createdFile = await observerIdModel.create({
+                location: filePath,
+                name: file.originalname,
+                type: file.mimetype,
+                size: file.size,
+                url: publicUrl,
+            });
+            return createdFile;
+        }));
     const completedUserData = {
         email: user.email,
         firstName: user.firstName,
@@ -262,10 +255,14 @@ export const submitObserverDetails = async ({ email, observerIdFiles, phoneNumbe
         isOpenToSurvey: user.isOpenToSurvey,
         profileImage: user.profileImage,
         observerId,
-        phoneNumber,
-        bankName,
-        bankAccountNumber,
-        bankAccountName,
+        ...(phoneNumber?.trim() ? { phoneNumber: phoneNumber.trim() } : {}),
+        ...(bankName?.trim() ? { bankName: bankName.trim() } : {}),
+        ...(bankAccountNumber?.trim()
+            ? { bankAccountNumber: bankAccountNumber.trim() }
+            : {}),
+        ...(bankAccountName?.trim()
+            ? { bankAccountName: bankAccountName.trim() }
+            : {}),
         password: user.password,
         isObserverInPollingUnit: false,
         pendingObserverVerification: true,

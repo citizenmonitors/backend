@@ -206,13 +206,10 @@ export const submitObserverDetailsMobile = async (
     const result = await mobileSubmitObserverDetails({
       email: req.body.email,
       observerIdFiles,
-      phoneNumber: req.body.phoneNumber,
-      bankName: req.body.bankName,
-      bankAccountNumber: req.body.bankAccountNumber,
-      bankAccountName: req.body.bankAccountName,
     });
     return res.status(200).json(result);
   } catch (error) {
     return res.status(400).json({ message: getErrorMessage(error) });
   }
 };
+

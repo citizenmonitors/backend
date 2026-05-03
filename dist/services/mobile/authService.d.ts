@@ -357,11 +357,7 @@ export declare const mobileSelectRole: (email: string, role: string) => Promise<
 }>;
 export declare const mobileSubmitObserverDetails: (input: {
     email: string;
-    observerIdFiles: MulterLikeFile[];
-    phoneNumber: string;
-    bankName?: string;
-    bankAccountNumber?: string;
-    bankAccountName?: string;
+    observerIdFiles?: MulterLikeFile[];
 }) => Promise<{
     message: string;
     token: string;

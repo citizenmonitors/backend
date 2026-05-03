@@ -41,8 +41,8 @@ type SubmitRoleFormInput = {
 
 type SubmitObserverDetailsInput = {
   email: string;
-  observerIdFiles: MulterLikeFile[];
-  phoneNumber: string;
+  observerIdFiles?: MulterLikeFile[];
+  phoneNumber?: string;
   bankName?: string;
   bankAccountNumber?: string;
   bankAccountName?: string;
@@ -314,12 +314,14 @@ export const selectUserRole = async (email: string, role: string) => {
 
 export const submitObserverDetails = async ({
   email,
-  observerIdFiles,
+  observerIdFiles: observerIdFilesInput,
   phoneNumber,
   bankName,
   bankAccountNumber,
   bankAccountName,
 }: SubmitObserverDetailsInput) => {
+  const observerIdFiles = observerIdFilesInput ?? [];
+
   // Fetch the user by email
   const user = await User.findOne({ email });
   if (!user) {
@@ -330,42 +332,33 @@ export const submitObserverDetails = async ({
     throw new Error("User is not an observer.");
   }
 
-  // Validate the required details
-  if (!phoneNumber) {
-    throw new Error(
-      "Please provide your phone number."
-    );
-  }
+  const observerId =
+    observerIdFiles.length === 0
+      ? []
+      : await Promise.all(
+          observerIdFiles.map(async (file) => {
+            const { publicUrl, filePath, token } = await uploadFileToFirebase(
+              file,
+              "observer_ids"
+            );
 
-  // Ensure that at least one observer ID file is provided
-  if (!observerIdFiles || observerIdFiles.length === 0) {
-    throw new Error("At least one PVC file is required for observers.");
-  }
+            const createdFile = await observerIdModel.create({
+              location: filePath,
+              name: file.originalname,
+              type: file.mimetype,
+              size: file.size,
+              url: publicUrl,
+            });
 
-  // Handle observer ID uploads (saving one or more files)
+            return createdFile;
+          })
+        );
 
-  const observerId = await Promise.all(
-    observerIdFiles.map(async (file) => {
-      const { publicUrl, filePath, token } = await uploadFileToFirebase(file, "observer_ids");
-
-      const createdFile = await observerIdModel.create({
-        location: filePath,
-        name: file.originalname,
-        type: file.mimetype,
-        size: file.size,
-        url: publicUrl,
-      });
-
-      return createdFile;
-    })
-  );
-
-  // Prepare the observer details for CompletedUser
   const completedUserData = {
     email: user.email,
     firstName: user.firstName,
     lastName: user.lastName,
-    role: "observer",
+    role: "observer" as const,
     gender: user.gender,
     dateOfBirth: user.dateOfBirth,
     state: user.state,
@@ -377,11 +370,15 @@ export const submitObserverDetails = async ({
     isElectionWitnessReady: user.isElectionWitnessReady,
     isOpenToSurvey: user.isOpenToSurvey,
     profileImage: user.profileImage,
-    observerId, 
-    phoneNumber,
-    bankName,
-    bankAccountNumber,
-    bankAccountName,
+    observerId,
+    ...(phoneNumber?.trim() ? { phoneNumber: phoneNumber.trim() } : {}),
+    ...(bankName?.trim() ? { bankName: bankName.trim() } : {}),
+    ...(bankAccountNumber?.trim()
+      ? { bankAccountNumber: bankAccountNumber.trim() }
+      : {}),
+    ...(bankAccountName?.trim()
+      ? { bankAccountName: bankAccountName.trim() }
+      : {}),
     password: user.password,
     isObserverInPollingUnit: false,
     pendingObserverVerification: true,

@@ -107,6 +107,5 @@ export const mobileSubmitObserverDetailsValidation = [
         .isEmail()
         .normalizeEmail({ gmail_remove_dots: false })
         .withMessage("Valid email is required"),
-    body("phoneNumber").notEmpty().trim().withMessage("Phone number is required"),
 ];
 //# sourceMappingURL=authValidators.js.map

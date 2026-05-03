@@ -1,6 +1,10 @@
 import Notification from "../../models/DailyTraffic/Notification.js";
 import Podcast from "../../models/admin/Podcast.js";
 import CollationDiscussionPost from "../../models/Election/CollationDiscussionPost.js";
+import CollationDiscussionComment from "../../models/Election/CollationDiscussionComment.js";
+import CollationReportComment from "../../models/Election/CollationReportComment.js";
+import PulsePost from "../../models/Pulse/PulsePost.js";
+import PulseComment from "../../models/Pulse/PulseComment.js";
 import { getMobileLiveElectionsCarousel } from "./electionService.js";
 const roleVisibilityFilter = (userId, role) => ({
     $and: [
@@ -37,6 +41,36 @@ const relativeTime = (date) => {
     const days = Math.floor(hrs / 24);
     return `${days} day${days > 1 ? "s" : ""} ago`;
 };
+const normalizeLocationKey = (value) => String(value ?? "")
+    .trim()
+    .toLowerCase();
+const buildPulseVisibilityFilter = (user) => {
+    const state = normalizeLocationKey(user.state);
+    const lga = normalizeLocationKey(user.lga);
+    const ward = normalizeLocationKey(user.ward);
+    if (!state || !lga)
+        return null;
+    return {
+        $or: [
+            {
+                visibilityScope: "lga",
+                audienceState: state,
+                audienceLga: lga,
+            },
+            {
+                visibilityScope: "ward",
+                audienceState: state,
+                audienceLga: lga,
+                audienceWard: ward,
+            },
+        ],
+    };
+};
+const resolveAuthorName = (author) => author?.firstName
+    ? `${author.firstName} ${author.lastName ?? ""}`.trim()
+    : author?.anonymousUsername
+        ? `@${author.anonymousUsername}`
+        : "Member";
 export const getMobileDashboard = async (user) => {
     const userId = String(user._id ?? "");
     if (!userId)
@@ -44,18 +78,14 @@ export const getMobileDashboard = async (user) => {
     const role = String(user.role ?? "");
     const liveElections = await getMobileLiveElectionsCarousel(user);
     const liveIds = liveElections.map((e) => e.id);
-    const [electionNotifications, collationNotifications, discussions, insights] = await Promise.all([
-        Notification.find({
-            ...roleVisibilityFilter(userId, role),
-            type: { $in: ["election-day-alert", "result-aggregated"] },
-        })
-            .sort({ createdAt: -1 })
-            .limit(10)
-            .lean(),
+    const pulseVisibility = buildPulseVisibilityFilter(user);
+    const [electionNotifications, discussionPosts, pulsePosts, reportThreadComments, insights] = await Promise.all([
         Notification.find({
             ...roleVisibilityFilter(userId, role),
             type: {
                 $in: [
+                    "election-day-alert",
+                    "result-aggregated",
                     "result-upload",
                     "incident-upload",
                     "report-confirmed",
@@ -65,10 +95,24 @@ export const getMobileDashboard = async (user) => {
             },
         })
             .sort({ createdAt: -1 })
-            .limit(10)
+            .limit(20)
             .lean(),
         liveIds.length
             ? CollationDiscussionPost.find({ activeElection: { $in: liveIds } })
+                .populate("author", "firstName lastName anonymousUsername")
+                .sort({ createdAt: -1 })
+                .limit(10)
+                .lean()
+            : Promise.resolve([]),
+        pulseVisibility
+            ? PulsePost.find(pulseVisibility)
+                .populate("author", "firstName lastName anonymousUsername")
+                .sort({ createdAt: -1 })
+                .limit(10)
+                .lean()
+            : Promise.resolve([]),
+        liveIds.length
+            ? CollationReportComment.find({ activeElection: { $in: liveIds } })
                 .populate("author", "firstName lastName anonymousUsername")
                 .sort({ createdAt: -1 })
                 .limit(10)
@@ -81,41 +125,79 @@ export const getMobileDashboard = async (user) => {
             .limit(10)
             .lean(),
     ]);
+    const [discussionCommentCounts, pulseCommentCounts] = await Promise.all([
+        discussionPosts.length
+            ? CollationDiscussionComment.aggregate([
+                { $match: { post: { $in: discussionPosts.map((p) => p._id) } } },
+                { $group: { _id: "$post", count: { $sum: 1 } } },
+            ])
+            : Promise.resolve([]),
+        pulsePosts.length
+            ? PulseComment.aggregate([
+                { $match: { post: { $in: pulsePosts.map((p) => p._id) } } },
+                { $group: { _id: "$post", count: { $sum: 1 } } },
+            ])
+            : Promise.resolve([]),
+    ]);
+    const discussionCommentCountByPost = new Map(discussionCommentCounts.map((entry) => [String(entry._id), entry.count]));
+    const pulseCommentCountByPost = new Map(pulseCommentCounts.map((entry) => [String(entry._id), entry.count]));
     return {
         liveElections,
-        electionUpdates: electionNotifications.map((n) => ({
+        electionUpdates: electionNotifications
+            .map((n) => ({
             id: String(n._id),
             type: n.type,
             title: n.body ?? "",
             info: n.info ?? "",
             timeAgo: relativeTime(n.createdAt),
             createdAt: n.createdAt,
-        })),
-        collationUpdates: collationNotifications.map((n) => ({
-            id: String(n._id),
-            type: n.type,
-            title: n.body ?? "",
-            info: n.info ?? "",
-            timeAgo: relativeTime(n.createdAt),
-            createdAt: n.createdAt,
-        })),
-        pulseAndDiscourse: discussions.map((p) => {
+        }))
+            .slice(0, 10),
+        collationUpdates: discussionPosts.map((p) => {
             const author = p.author;
-            const authorName = author?.firstName
-                ? `${author.firstName} ${author.lastName ?? ""}`.trim()
-                : author?.anonymousUsername
-                    ? `@${author.anonymousUsername}`
-                    : "Member";
             return {
                 id: String(p._id),
+                source: "collation-discussion",
                 activeElectionId: String(p.activeElection),
                 body: p.body,
                 imageUrl: Array.isArray(p.imageUrls) ? p.imageUrls[0] : undefined,
                 likesCount: Array.isArray(p.likes) ? p.likes.length : 0,
-                commentsCount: 0,
-                authorName,
+                commentsCount: discussionCommentCountByPost.get(String(p._id)) ?? 0,
+                authorName: resolveAuthorName(author),
                 timeAgo: relativeTime(p.createdAt),
                 createdAt: p.createdAt,
+            };
+        }),
+        pulseAndDiscourse: [
+            ...pulsePosts.map((p) => {
+                const author = p.author;
+                return {
+                    id: String(p._id),
+                    source: "pulse",
+                    body: p.body,
+                    imageUrl: p.imageUrl,
+                    likesCount: Array.isArray(p.likes) ? p.likes.length : 0,
+                    commentsCount: pulseCommentCountByPost.get(String(p._id)) ?? 0,
+                    authorName: resolveAuthorName(author),
+                    timeAgo: relativeTime(p.createdAt),
+                    createdAt: p.createdAt,
+                };
+            }),
+        ]
+            .sort((a, b) => new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime())
+            .slice(0, 10),
+        reportThreadUpdates: reportThreadComments.map((c) => {
+            const author = c.author;
+            return {
+                id: String(c._id),
+                targetType: c.targetType,
+                targetId: String(c.targetId),
+                activeElectionId: String(c.activeElection),
+                body: c.body,
+                likesCount: Array.isArray(c.likes) ? c.likes.length : 0,
+                authorName: resolveAuthorName(author),
+                timeAgo: relativeTime(c.createdAt),
+                createdAt: c.createdAt,
             };
         }),
         latestNewsAndInsights: insights.map((i) => ({

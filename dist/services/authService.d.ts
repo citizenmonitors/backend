@@ -19,8 +19,8 @@ type SubmitRoleFormInput = {
 };
 type SubmitObserverDetailsInput = {
     email: string;
-    observerIdFiles: MulterLikeFile[];
-    phoneNumber: string;
+    observerIdFiles?: MulterLikeFile[];
+    phoneNumber?: string;
     bankName?: string;
     bankAccountNumber?: string;
     bankAccountName?: string;
@@ -199,7 +199,7 @@ export declare const selectUserRole: (email: string, role: string) => Promise<{
     token?: undefined;
     user?: undefined;
 }>;
-export declare const submitObserverDetails: ({ email, observerIdFiles, phoneNumber, bankName, bankAccountNumber, bankAccountName, }: SubmitObserverDetailsInput) => Promise<{
+export declare const submitObserverDetails: ({ email, observerIdFiles: observerIdFilesInput, phoneNumber, bankName, bankAccountNumber, bankAccountName, }: SubmitObserverDetailsInput) => Promise<{
     message: string;
     token: string;
     user: {

@@ -35,6 +35,7 @@ import mobileElectionRoutes from "./routes/mobile/electionRoutes.ts";
 import mobileNotificationRoutes from "./routes/mobile/notificationRoutes.ts";
 import mobileDashboardRoutes from "./routes/mobile/dashboardRoutes.ts";
 import mobilePulseRoutes from "./routes/mobile/pulseRoutes.ts";
+import { inhouseApiAccessMiddleware } from "./middleware/inhouseApiAccessMiddleware.ts";
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -74,6 +75,16 @@ app.use("/api/auth", authLimiter);
 
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
+
+// In-house API gate: when INHOUSE_API_ACCESS_TOKEN is set, require header
+// `X-Inhouse-Access-Token` on all `/api/*` routes (separate from user JWT).
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const path = req.path ?? "";
+  if (!path.startsWith("/api")) {
+    return next();
+  }
+  return inhouseApiAccessMiddleware(req, res, next);
+});
 
 app.get("/health/live", (_req: Request, res: Response) => {
   res.status(200).json({ status: "ok" });

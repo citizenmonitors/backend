@@ -16,6 +16,7 @@ import {
   togglePostCommentLike,
   toggleReportCommentLike,
 } from "../../services/mobile/collationDiscussionService.ts";
+import { invalidateCacheByPrefixes } from "../../utils/cache.ts";
 
 const errMsg = (e: unknown): string => (e instanceof Error ? e.message : String(e));
 
@@ -23,6 +24,10 @@ const requireUserId = (req: AuthenticatedRequest): string => {
   const id = req.user?._id;
   if (id == null) throw new Error("Authentication required");
   return String(id);
+};
+
+const invalidateMobileReadCaches = async (userId: string): Promise<void> => {
+  await invalidateCacheByPrefixes([`mobile:elections:${userId}:`, `mobile:dashboard:${userId}:`]);
 };
 
 const toBooleanIfBooleanLike = (value: unknown): boolean => {
@@ -168,6 +173,7 @@ export const postReportThreadCommentMobile = async (req: Request, res: Response)
       body,
       useAnonymousDisplay,
     });
+    await invalidateMobileReadCaches(userId);
     return res.status(201).json({ comment });
   } catch (error) {
     const message = errMsg(error);
@@ -191,6 +197,7 @@ export const postReportCommentLikeMobile = async (req: Request, res: Response) =
     }
     const userId = requireUserId(r);
     const comment = await toggleReportCommentLike(activeElectionId, userId, commentId);
+    await invalidateMobileReadCaches(userId);
     return res.status(200).json({ comment });
   } catch (error) {
     return res.status(400).json({ message: errMsg(error) });
@@ -245,6 +252,7 @@ export const postDiscussionPostMobile = async (req: Request, res: Response) => {
         | { buffer: Buffer; mimetype: string; originalname: string }[]
         | undefined),
     });
+    await invalidateMobileReadCaches(userId);
     return res.status(201).json({ post });
   } catch (error) {
     return res.status(400).json({ message: errMsg(error) });
@@ -261,6 +269,7 @@ export const postDiscussionPostLikeMobile = async (req: Request, res: Response) 
     }
     const userId = requireUserId(r);
     const data = await toggleDiscussionPostLike(activeElectionId, userId, postId);
+    await invalidateMobileReadCaches(userId);
     return res.status(200).json(data);
   } catch (error) {
     return res.status(400).json({ message: errMsg(error) });
@@ -301,6 +310,7 @@ export const postDiscussionPostCommentMobile = async (req: Request, res: Respons
       body,
       useAnonymousDisplay,
     });
+    await invalidateMobileReadCaches(userId);
     return res.status(201).json({ comment });
   } catch (error) {
     return res.status(400).json({ message: errMsg(error) });
@@ -327,6 +337,7 @@ export const postDiscussionPostCommentLikeMobile = async (req: Request, res: Res
       postId,
       commentId
     );
+    await invalidateMobileReadCaches(userId);
     return res.status(200).json({ comment });
   } catch (error) {
     return res.status(400).json({ message: errMsg(error) });

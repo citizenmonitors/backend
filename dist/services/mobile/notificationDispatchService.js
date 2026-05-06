@@ -1,5 +1,8 @@
 import CompletedUser from "../../models/CompletedUser.js";
 import Notification from "../../models/DailyTraffic/Notification.js";
+import { invalidateAllMobileReadCaches } from "../../utils/cache.js";
+import { getSocketServer } from "../realtime/socketBus.js";
+import { userRoomName } from "../realtime/socketServer.js";
 const withDefaults = (role, current) => ({
     pollingUnitActivity: current.pollingUnitActivity ?? true,
     electionDayAlert: current.electionDayAlert ?? false,
@@ -18,6 +21,22 @@ const roleFilter = (recipients) => {
     }
     return { role: { $in: recipients } };
 };
+const emitRealtimeNotification = (input) => {
+    const io = getSocketServer();
+    if (!io)
+        return;
+    const payload = {
+        id: String(input.notification._id),
+        type: input.notification.type,
+        preferenceKey: input.notification.preferenceKey,
+        body: input.notification.body,
+        info: input.notification.info,
+        createdAt: input.notification.createdAt ?? new Date(),
+    };
+    for (const userId of input.targetUserIds) {
+        io.to(userRoomName(userId)).emit("notification:new", payload);
+    }
+};
 export const dispatchMobileNotification = async (input) => {
     const users = await CompletedUser.find({ ...roleFilter(input.recipients), ...(input.audienceQuery ?? {}) }, "_id role notifications.mobile").lean();
     const targetUsers = users
@@ -31,7 +50,7 @@ export const dispatchMobileNotification = async (input) => {
     if (targetUsers.length === 0) {
         return null;
     }
-    return Notification.create({
+    const notification = await Notification.create({
         type: input.type,
         preferenceKey: input.preferenceKey,
         body: input.body,
@@ -39,6 +58,12 @@ export const dispatchMobileNotification = async (input) => {
         recipients: input.recipients,
         targetUsers,
     });
+    emitRealtimeNotification({
+        notification,
+        targetUserIds: targetUsers.map((id) => String(id)),
+    });
+    await invalidateAllMobileReadCaches();
+    return notification;
 };
 export const dispatchNotificationToUsers = async (input) => {
     const ids = Array.from(new Set(input.userIds.filter(Boolean)));
@@ -55,12 +80,18 @@ export const dispatchNotificationToUsers = async (input) => {
         .map((user) => user._id);
     if (targetUsers.length === 0)
         return null;
-    return Notification.create({
+    const notification = await Notification.create({
         type: input.type,
         preferenceKey: input.preferenceKey,
         body: input.body,
         info: input.info,
         targetUsers,
     });
+    emitRealtimeNotification({
+        notification,
+        targetUserIds: targetUsers.map((id) => String(id)),
+    });
+    await invalidateAllMobileReadCaches();
+    return notification;
 };
 //# sourceMappingURL=notificationDispatchService.js.map

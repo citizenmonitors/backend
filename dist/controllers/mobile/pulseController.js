@@ -1,11 +1,15 @@
 import { asParamString, isValidObjectId } from "../../utils/validators.js";
 import { addPulsePostComment, createPulsePost, listPulsePostComments, listPulsePosts, togglePulseCommentLike, togglePulsePostLike, } from "../../services/mobile/pulseService.js";
+import { invalidateCacheByPrefixes } from "../../utils/cache.js";
 const errMsg = (e) => (e instanceof Error ? e.message : String(e));
 const requireUserId = (req) => {
     const id = req.user?._id;
     if (id == null)
         throw new Error("Authentication required");
     return String(id);
+};
+const invalidateMobileReadCaches = async (userId) => {
+    await invalidateCacheByPrefixes([`mobile:elections:${userId}:`, `mobile:dashboard:${userId}:`]);
 };
 const toBooleanIfBooleanLike = (value) => {
     if (typeof value === "boolean")
@@ -50,6 +54,7 @@ export const postPulsePostMobile = async (req, res) => {
             visibilityScope: b.visibilityScope === "ward" ? "ward" : "lga",
             useAnonymousDisplay: toBooleanIfBooleanLike(b.useAnonymousDisplay),
         }, { image });
+        await invalidateMobileReadCaches(userId);
         return res.status(201).json({ post });
     }
     catch (error) {
@@ -70,6 +75,7 @@ export const postPulsePostLikeMobile = async (req, res) => {
             return res.status(400).json({ message: "Invalid post id" });
         const userId = requireUserId(r);
         const data = await togglePulsePostLike(userId, postId);
+        await invalidateMobileReadCaches(userId);
         return res.status(200).json(data);
     }
     catch (error) {
@@ -119,6 +125,7 @@ export const postPulsePostCommentMobile = async (req, res) => {
             body,
             useAnonymousDisplay,
         });
+        await invalidateMobileReadCaches(userId);
         return res.status(201).json({ comment });
     }
     catch (error) {
@@ -143,6 +150,7 @@ export const postPulseCommentLikeMobile = async (req, res) => {
         }
         const userId = requireUserId(r);
         const comment = await togglePulseCommentLike(userId, postId, commentId);
+        await invalidateMobileReadCaches(userId);
         return res.status(200).json({ comment });
     }
     catch (error) {

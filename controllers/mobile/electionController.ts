@@ -14,6 +14,7 @@ import {
   uploadResultDataService,
 } from "../../services/Election/electionService.ts";
 import { isValidObjectId } from "../../utils/validators.ts";
+import { invalidateCacheByPrefixes } from "../../utils/cache.ts";
 
 type ElectionStatus = "all" | "live" | "upcoming" | "concluded";
 type ElectionScope = "all" | "polling-unit";
@@ -30,6 +31,12 @@ const requireUserId = (req: AuthenticatedRequest): string => {
     throw new Error("Authentication required");
   }
   return String(userId);
+};
+
+const invalidateMobileReadCaches = async (req: AuthenticatedRequest): Promise<void> => {
+  const userId = String(req.user?._id ?? "");
+  if (!userId) return;
+  await invalidateCacheByPrefixes([`mobile:elections:${userId}:`, `mobile:dashboard:${userId}:`]);
 };
 
 export const getActiveElectionsMobile = async (req: Request, res: Response) => {
@@ -121,6 +128,7 @@ export const submitElectionResultMobile = async (req: Request, res: Response) =>
       r.body,
       r.files as Parameters<typeof uploadResultDataService>[3]
     );
+    await invalidateMobileReadCaches(r);
     return res.status(201).json(result);
   } catch (error) {
     return res.status(500).json({
@@ -143,6 +151,7 @@ export const updateElectionResultMobile = async (req: Request, res: Response) =>
       r.body,
       r.files as Parameters<typeof updateResultDataService>[3]
     );
+    await invalidateMobileReadCaches(r);
     return res.status(200).json(result);
   } catch (error) {
     return res.status(500).json({
@@ -163,6 +172,7 @@ export const deleteElectionResultMobile = async (req: Request, res: Response) =>
       electionId,
       requireUserId(r)
     );
+    await invalidateMobileReadCaches(r);
     return res.status(200).json(response);
   } catch (error) {
     return res.status(400).json({
@@ -185,6 +195,7 @@ export const submitIncidentReportMobile = async (req: Request, res: Response) =>
       r.body,
       r.files as Parameters<typeof uploadIncidentReportDataService>[3]
     );
+    await invalidateMobileReadCaches(r);
     return res.status(201).json(report);
   } catch (error) {
     return res.status(500).json({
@@ -207,6 +218,7 @@ export const updateIncidentReportMobile = async (req: Request, res: Response) =>
       r.body,
       r.files as Parameters<typeof updateIncidentReportDataService>[3]
     );
+    await invalidateMobileReadCaches(r);
     return res.status(200).json(report);
   } catch (error) {
     return res.status(500).json({
@@ -227,6 +239,7 @@ export const deleteIncidentReportMobile = async (req: Request, res: Response) =>
       electionId,
       requireUserId(r)
     );
+    await invalidateMobileReadCaches(r);
     return res.status(200).json(response);
   } catch (error) {
     return res.status(400).json({

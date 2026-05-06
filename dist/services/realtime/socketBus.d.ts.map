@@ -1,0 +1,1 @@
+{"version":3,"file":"socketBus.d.ts","sourceRoot":"","sources":["../../../services/realtime/socketBus.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,MAAM,EAAE,MAAM,WAAW,CAAC;AAIxC,eAAO,MAAM,eAAe,GAAI,IAAI,MAAM,KAAG,IAE5C,CAAC;AAEF,eAAO,MAAM,eAAe,QAAO,MAAM,GAAG,IAAkB,CAAC"}

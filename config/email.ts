@@ -14,6 +14,13 @@ export interface SendEmailOptions {
   htmlbody: string;
   textbody?: string;
   fromName?: string;
+  /**
+   * Adds RFC 2369 List-Unsubscribe and disables Zepto click/open tracking for this send.
+   * Recommended for newsletters and bulk-style mail (helps some providers, e.g. Yahoo).
+   */
+  listUnsubscribeUrl?: string;
+  trackClicks?: boolean;
+  trackOpens?: boolean;
 }
 const htmlToPlainText = (html: string): string =>
   html
@@ -38,12 +45,32 @@ export const sendEmail = async ({
   htmlbody,
   textbody,
   fromName = "Citizen Monitors",
+  listUnsubscribeUrl,
+  trackClicks,
+  trackOpens,
 }: SendEmailOptions): Promise<unknown> => {
   try {
+    const fromAddress = process.env.ZEPTO_FROM_EMAIL;
+    if (!fromAddress) {
+      throw new Error("ZEPTO_FROM_EMAIL is not set.");
+    }
+
     const fallbackTextBody = textbody ?? htmlToPlainText(htmlbody);
-    const payload = {
+
+    const replyToAddress = process.env.ZEPTO_REPLY_TO_EMAIL?.trim();
+    const replyTo =
+      replyToAddress && replyToAddress.length > 0
+        ? [
+            {
+              address: replyToAddress,
+              name: process.env.ZEPTO_REPLY_TO_NAME?.trim() || "Citizen Monitors",
+            },
+          ]
+        : undefined;
+
+    const payload: Record<string, unknown> = {
       from: {
-        address: process.env.ZEPTO_FROM_EMAIL,
+        address: fromAddress,
         name: fromName,
       },
       to: [
@@ -58,6 +85,21 @@ export const sendEmail = async ({
       htmlbody,
       textbody: fallbackTextBody,
     };
+
+    if (replyTo) {
+      payload.reply_to = replyTo;
+    }
+
+    if (listUnsubscribeUrl?.trim()) {
+      payload.mime_headers = {
+        "List-Unsubscribe": `<${listUnsubscribeUrl.trim()}>`,
+      };
+      payload.track_clicks = false;
+      payload.track_opens = false;
+    } else {
+      if (trackClicks !== undefined) payload.track_clicks = trackClicks;
+      if (trackOpens !== undefined) payload.track_opens = trackOpens;
+    }
 
     const response = await client.sendMail(payload);
     console.log("ZeptoMail connection verified successfully:");

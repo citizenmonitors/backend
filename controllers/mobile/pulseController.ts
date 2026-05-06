@@ -9,6 +9,7 @@ import {
   togglePulseCommentLike,
   togglePulsePostLike,
 } from "../../services/mobile/pulseService.ts";
+import { invalidateCacheByPrefixes } from "../../utils/cache.ts";
 
 const errMsg = (e: unknown): string => (e instanceof Error ? e.message : String(e));
 
@@ -16,6 +17,10 @@ const requireUserId = (req: AuthenticatedRequest): string => {
   const id = req.user?._id;
   if (id == null) throw new Error("Authentication required");
   return String(id);
+};
+
+const invalidateMobileReadCaches = async (userId: string): Promise<void> => {
+  await invalidateCacheByPrefixes([`mobile:elections:${userId}:`, `mobile:dashboard:${userId}:`]);
 };
 
 const toBooleanIfBooleanLike = (value: unknown): boolean => {
@@ -70,6 +75,7 @@ export const postPulsePostMobile = async (req: Request, res: Response) => {
       },
       { image }
     );
+    await invalidateMobileReadCaches(userId);
     return res.status(201).json({ post });
   } catch (error) {
     const message = errMsg(error);
@@ -91,6 +97,7 @@ export const postPulsePostLikeMobile = async (req: Request, res: Response) => {
     if (!isValidObjectId(postId)) return res.status(400).json({ message: "Invalid post id" });
     const userId = requireUserId(r);
     const data = await togglePulsePostLike(userId, postId);
+    await invalidateMobileReadCaches(userId);
     return res.status(200).json(data);
   } catch (error) {
     const message = errMsg(error);
@@ -139,6 +146,7 @@ export const postPulsePostCommentMobile = async (req: Request, res: Response) =>
       body,
       useAnonymousDisplay,
     });
+    await invalidateMobileReadCaches(userId);
     return res.status(201).json({ comment });
   } catch (error) {
     const message = errMsg(error);
@@ -165,6 +173,7 @@ export const postPulseCommentLikeMobile = async (req: Request, res: Response) =>
     }
     const userId = requireUserId(r);
     const comment = await togglePulseCommentLike(userId, postId, commentId);
+    await invalidateMobileReadCaches(userId);
     return res.status(200).json({ comment });
   } catch (error) {
     const message = errMsg(error);

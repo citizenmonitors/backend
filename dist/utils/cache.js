@@ -52,4 +52,30 @@ export const getOrSetCache = async (key, ttlSeconds, producer) => {
     }
     return value;
 };
+export const invalidateCacheByPrefix = async (prefix) => {
+    for (const key of memoryCache.keys()) {
+        if (key.startsWith(prefix)) {
+            memoryCache.delete(key);
+        }
+    }
+    if (!redisClient.isOpen)
+        return;
+    try {
+        for await (const key of redisClient.scanIterator({
+            MATCH: `${prefix}*`,
+            COUNT: 100,
+        })) {
+            await redisClient.del(String(key));
+        }
+    }
+    catch {
+        // Best-effort invalidation; request flow should not fail if cache cleanup fails.
+    }
+};
+export const invalidateCacheByPrefixes = async (prefixes) => {
+    await Promise.all(prefixes.map((prefix) => invalidateCacheByPrefix(prefix)));
+};
+export const invalidateAllMobileReadCaches = async () => {
+    await invalidateCacheByPrefixes(["mobile:elections:", "mobile:dashboard:"]);
+};
 //# sourceMappingURL=cache.js.map

@@ -1,5 +1,5 @@
 import { sendEmail } from "../../config/email.js";
-import { newsLetterTemplateInecForensicAudit, podcastNotificationTemplate } from "../../config/emailTemplates.js";
+import { newsLetterTemplatePoliceBrutalityLeadershipOrInstitutional, podcastNotificationTemplate } from "../../config/emailTemplates.js";
 import schedule from "node-schedule";
 import { utcToZonedTime } from "date-fns-tz";
 import { format } from "date-fns";
@@ -7,6 +7,7 @@ import mongoose from "mongoose";
 import AdminLog from "../../models/admin/AdminLog.js";
 import Podcast from "../../models/admin/Podcast.js";
 import CompletedUser from "../../models/CompletedUser.js";
+import { invalidateAllMobileReadCaches } from "../../utils/cache.js";
 const toObjectId = (id) => id instanceof mongoose.Types.ObjectId ? id : new mongoose.Types.ObjectId(id);
 const requireId = (id, field) => {
     if (!id)
@@ -60,6 +61,7 @@ export const sendPodcastService = async ({ title, content, recipients, adminId, 
         },
         timestamp: new Date(),
     });
+    await invalidateAllMobileReadCaches();
     return podcast;
 };
 export const editPodcastService = async ({ podcastId, updates, adminId, }) => {
@@ -85,6 +87,7 @@ export const editPodcastService = async ({ podcastId, updates, adminId, }) => {
         },
         timestamp: new Date(),
     });
+    await invalidateAllMobileReadCaches();
     return podcast;
 };
 export const getAllPodcastsService = async () => {
@@ -121,6 +124,7 @@ export const deletePodcastService = async (id, adminId) => {
         },
         timestamp: new Date(),
     });
+    await invalidateAllMobileReadCaches();
     return { message: "Podcast deleted successfully" };
 };
 export const getUserInboxService = async (userId) => {
@@ -182,12 +186,15 @@ export const sendNewsletterService = async ({ recipients, scheduleTime, }) => {
             "oluwaloninyo@yahoo.com",
             "yunusmustapha01@yahoo.com",
         ];
-        const htmlContent = newsLetterTemplateInecForensicAudit();
+        const htmlContent = newsLetterTemplatePoliceBrutalityLeadershipOrInstitutional();
+        const listUnsubscribeUrl = process.env.NEWSLETTER_UNSUBSCRIBE_URL?.trim() ||
+            "https://www.citizenmonitors.com/portal/settings/notifications";
         // Send emails to all targeted users
         const emailPromises = userEmails.map((email) => sendEmail({
             to: email,
-            subject: `INEC Forensic Audit; Real or Imagined?`,
+            subject: `Police Brutality in Nigeria; Leadership or Institutional Failure?`,
             htmlbody: htmlContent,
+            listUnsubscribeUrl,
         }).catch((err) => {
             console.error(`Failed to send email to ${email}:`, err);
         }));

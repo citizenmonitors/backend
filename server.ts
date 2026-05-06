@@ -11,6 +11,7 @@ if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
 
 import path from "path";
 import { fileURLToPath } from "url";
+import http from "http";
 import express from "express";
 import type { NextFunction, Request, Response } from "express";
 import bodyParser from "body-parser";
@@ -36,6 +37,8 @@ import mobileNotificationRoutes from "./routes/mobile/notificationRoutes.ts";
 import mobileDashboardRoutes from "./routes/mobile/dashboardRoutes.ts";
 import mobilePulseRoutes from "./routes/mobile/pulseRoutes.ts";
 import { inhouseApiAccessMiddleware } from "./middleware/inhouseApiAccessMiddleware.ts";
+import { initSocketServer } from "./services/realtime/socketServer.ts";
+import { setSocketServer } from "./services/realtime/socketBus.ts";
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -168,5 +171,9 @@ app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
 });
 
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+const httpServer = http.createServer(app);
+const io = initSocketServer(httpServer);
+setSocketServer(io);
+
+httpServer.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 

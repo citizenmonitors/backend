@@ -1,12 +1,16 @@
 import { asParamString, isValidObjectId } from "../../utils/validators.js";
 import { getMobileCollationBundle, mobileCollationUserAction, } from "../../services/mobile/collationBundleService.js";
 import { addPostComment, addReportThreadComment, createDiscussionPost, listDiscussionPosts, listPostComments, listReportThreadComments, toggleDiscussionPostLike, togglePostCommentLike, toggleReportCommentLike, } from "../../services/mobile/collationDiscussionService.js";
+import { invalidateCacheByPrefixes } from "../../utils/cache.js";
 const errMsg = (e) => (e instanceof Error ? e.message : String(e));
 const requireUserId = (req) => {
     const id = req.user?._id;
     if (id == null)
         throw new Error("Authentication required");
     return String(id);
+};
+const invalidateMobileReadCaches = async (userId) => {
+    await invalidateCacheByPrefixes([`mobile:elections:${userId}:`, `mobile:dashboard:${userId}:`]);
 };
 const toBooleanIfBooleanLike = (value) => {
     if (typeof value === "boolean")
@@ -140,6 +144,7 @@ export const postReportThreadCommentMobile = async (req, res) => {
             body,
             useAnonymousDisplay,
         });
+        await invalidateMobileReadCaches(userId);
         return res.status(201).json({ comment });
     }
     catch (error) {
@@ -163,6 +168,7 @@ export const postReportCommentLikeMobile = async (req, res) => {
         }
         const userId = requireUserId(r);
         const comment = await toggleReportCommentLike(activeElectionId, userId, commentId);
+        await invalidateMobileReadCaches(userId);
         return res.status(200).json({ comment });
     }
     catch (error) {
@@ -208,6 +214,7 @@ export const postDiscussionPostMobile = async (req, res) => {
             images: r.files?.["images[]"],
             videos: r.files?.["videos[]"],
         });
+        await invalidateMobileReadCaches(userId);
         return res.status(201).json({ post });
     }
     catch (error) {
@@ -224,6 +231,7 @@ export const postDiscussionPostLikeMobile = async (req, res) => {
         }
         const userId = requireUserId(r);
         const data = await toggleDiscussionPostLike(activeElectionId, userId, postId);
+        await invalidateMobileReadCaches(userId);
         return res.status(200).json(data);
     }
     catch (error) {
@@ -263,6 +271,7 @@ export const postDiscussionPostCommentMobile = async (req, res) => {
             body,
             useAnonymousDisplay,
         });
+        await invalidateMobileReadCaches(userId);
         return res.status(201).json({ comment });
     }
     catch (error) {
@@ -282,6 +291,7 @@ export const postDiscussionPostCommentLikeMobile = async (req, res) => {
         }
         const userId = requireUserId(r);
         const comment = await togglePostCommentLike(activeElectionId, userId, postId, commentId);
+        await invalidateMobileReadCaches(userId);
         return res.status(200).json({ comment });
     }
     catch (error) {

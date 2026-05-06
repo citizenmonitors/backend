@@ -1,5 +1,8 @@
 import CompletedUser from "../../models/CompletedUser.ts";
 import Notification from "../../models/DailyTraffic/Notification.ts";
+import { invalidateAllMobileReadCaches } from "../../utils/cache.ts";
+import { getSocketServer } from "../realtime/socketBus.ts";
+import { userRoomName } from "../realtime/socketServer.ts";
 
 export type MobileNotificationPreferenceKey =
   | "pollingUnitActivity"
@@ -41,6 +44,34 @@ const roleFilter = (recipients: RecipientRole[]) => {
   return { role: { $in: recipients } };
 };
 
+const emitRealtimeNotification = (input: {
+  notification: {
+    _id: unknown;
+    type?: string | null;
+    preferenceKey?: string | null;
+    body?: string | null;
+    info?: string | null;
+    createdAt?: Date | string;
+  };
+  targetUserIds: string[];
+}): void => {
+  const io = getSocketServer();
+  if (!io) return;
+
+  const payload = {
+    id: String(input.notification._id),
+    type: input.notification.type,
+    preferenceKey: input.notification.preferenceKey,
+    body: input.notification.body,
+    info: input.notification.info,
+    createdAt: input.notification.createdAt ?? new Date(),
+  };
+
+  for (const userId of input.targetUserIds) {
+    io.to(userRoomName(userId)).emit("notification:new", payload);
+  }
+};
+
 export const dispatchMobileNotification = async (input: {
   type:
     | "result-upload"
@@ -77,7 +108,7 @@ export const dispatchMobileNotification = async (input: {
     return null;
   }
 
-  return Notification.create({
+  const notification = await Notification.create({
     type: input.type,
     preferenceKey: input.preferenceKey,
     body: input.body,
@@ -85,6 +116,12 @@ export const dispatchMobileNotification = async (input: {
     recipients: input.recipients,
     targetUsers,
   });
+  emitRealtimeNotification({
+    notification,
+    targetUserIds: targetUsers.map((id) => String(id)),
+  });
+  await invalidateAllMobileReadCaches();
+  return notification;
 };
 
 export const dispatchNotificationToUsers = async (input: {
@@ -122,11 +159,17 @@ export const dispatchNotificationToUsers = async (input: {
 
   if (targetUsers.length === 0) return null;
 
-  return Notification.create({
+  const notification = await Notification.create({
     type: input.type,
     preferenceKey: input.preferenceKey,
     body: input.body,
     info: input.info,
     targetUsers,
   });
+  emitRealtimeNotification({
+    notification,
+    targetUserIds: targetUsers.map((id) => String(id)),
+  });
+  await invalidateAllMobileReadCaches();
+  return notification;
 };

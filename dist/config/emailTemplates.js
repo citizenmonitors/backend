@@ -1695,7 +1695,11 @@ export const newsLetterTemplateCitizensGetUp = () => baseTemplate({
       </table>
       `,
 });
-export const newsletterFooterTemplate = (unsubscribeLink = "https://www.citizenmonitors.com/portal/settings/notifications") => `
+export const newsletterFooterTemplate = (unsubscribeLink) => {
+    const link = unsubscribeLink?.trim() ||
+        process.env.NEWSLETTER_UNSUBSCRIBE_URL?.trim() ||
+        "https://www.citizenmonitors.com/portal/settings/notifications";
+    return `
   <p style="margin-top: 25px;"><strong>With Regards;</strong><br>
   <strong>Citizen Monitors.</strong><br>
   <em>Guardians of Truth.</em></p>
@@ -1718,10 +1722,11 @@ export const newsletterFooterTemplate = (unsubscribeLink = "https://www.citizenm
 
   <p style="margin-top: 14px; font-size: 12px; line-height: 1.6; color: #777777;">
     You are receiving this email because you subscribed to Citizen Monitors updates.
-    <a href="${unsubscribeLink}" style="color: #06BBAF; text-decoration: underline;">Unsubscribe from newsletters</a>
+    <a href="${link}" style="color: #06BBAF; text-decoration: underline;">Unsubscribe from newsletters</a>
     or reply to this email with <strong>UNSUBSCRIBE</strong>.
   </p>
 `;
+};
 export const newsLetterTemplateAmendedElectoralAct = () => baseTemplate({
     title: "Will Nigerians unite for credible 2027 elections?",
     message: `

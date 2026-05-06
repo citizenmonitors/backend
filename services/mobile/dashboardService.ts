@@ -7,6 +7,7 @@ import CollationReportComment from "../../models/Election/CollationReportComment
 import PulsePost from "../../models/Pulse/PulsePost.ts";
 import PulseComment from "../../models/Pulse/PulseComment.ts";
 import { getMobileLiveElectionsCarousel } from "./electionService.ts";
+import { getOrSetCache } from "../../utils/cache.ts";
 
 const roleVisibilityFilter = (userId: string, role: string) => ({
   $and: [
@@ -83,7 +84,18 @@ const resolveAuthorName = (
       ? `@${author.anonymousUsername}`
       : "Member";
 
-export const getMobileDashboard = async (user: AuthenticatedUser) => {
+const DASHBOARD_CACHE_TTL_SECONDS = 45;
+
+const buildDashboardCacheKey = (user: AuthenticatedUser): string => {
+  const userId = String(user._id ?? "");
+  const role = String(user.role ?? "");
+  const state = normalizeLocationKey((user as { state?: string | null }).state);
+  const lga = normalizeLocationKey((user as { lga?: string | null }).lga);
+  const ward = normalizeLocationKey((user as { ward?: string | null }).ward);
+  return `mobile:dashboard:${userId}:${role}:${state}:${lga}:${ward}`;
+};
+
+const buildMobileDashboard = async (user: AuthenticatedUser) => {
   const userId = String(user._id ?? "");
   if (!userId) throw new Error("Authentication required");
   const role = String(user.role ?? "");
@@ -243,4 +255,11 @@ export const getMobileDashboard = async (user: AuthenticatedUser) => {
       publishedAt: i.createdAt,
     })),
   };
+};
+
+export const getMobileDashboard = async (user: AuthenticatedUser) => {
+  const cacheKey = buildDashboardCacheKey(user);
+  return getOrSetCache(cacheKey, DASHBOARD_CACHE_TTL_SECONDS, () =>
+    buildMobileDashboard(user)
+  );
 };

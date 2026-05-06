@@ -9,6 +9,7 @@ if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
 }
 import path from "path";
 import { fileURLToPath } from "url";
+import http from "http";
 import express from "express";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
@@ -33,6 +34,8 @@ import mobileNotificationRoutes from "./routes/mobile/notificationRoutes.js";
 import mobileDashboardRoutes from "./routes/mobile/dashboardRoutes.js";
 import mobilePulseRoutes from "./routes/mobile/pulseRoutes.js";
 import { inhouseApiAccessMiddleware } from "./middleware/inhouseApiAccessMiddleware.js";
+import { initSocketServer } from "./services/realtime/socketServer.js";
+import { setSocketServer } from "./services/realtime/socketBus.js";
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -150,5 +153,8 @@ app.use((err, _req, res, _next) => {
     });
 });
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+const httpServer = http.createServer(app);
+const io = initSocketServer(httpServer);
+setSocketServer(io);
+httpServer.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 //# sourceMappingURL=server.js.map

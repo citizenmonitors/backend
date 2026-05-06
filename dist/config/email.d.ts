@@ -4,6 +4,13 @@ export interface SendEmailOptions {
     htmlbody: string;
     textbody?: string;
     fromName?: string;
+    /**
+     * Adds RFC 2369 List-Unsubscribe and disables Zepto click/open tracking for this send.
+     * Recommended for newsletters and bulk-style mail (helps some providers, e.g. Yahoo).
+     */
+    listUnsubscribeUrl?: string;
+    trackClicks?: boolean;
+    trackOpens?: boolean;
 }
-export declare const sendEmail: ({ to, subject, htmlbody, textbody, fromName, }: SendEmailOptions) => Promise<unknown>;
+export declare const sendEmail: ({ to, subject, htmlbody, textbody, fromName, listUnsubscribeUrl, trackClicks, trackOpens, }: SendEmailOptions) => Promise<unknown>;
 //# sourceMappingURL=email.d.ts.map

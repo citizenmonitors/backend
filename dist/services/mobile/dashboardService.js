@@ -6,6 +6,7 @@ import CollationReportComment from "../../models/Election/CollationReportComment
 import PulsePost from "../../models/Pulse/PulsePost.js";
 import PulseComment from "../../models/Pulse/PulseComment.js";
 import { getMobileLiveElectionsCarousel } from "./electionService.js";
+import { getOrSetCache } from "../../utils/cache.js";
 const roleVisibilityFilter = (userId, role) => ({
     $and: [
         {
@@ -71,7 +72,16 @@ const resolveAuthorName = (author) => author?.firstName
     : author?.anonymousUsername
         ? `@${author.anonymousUsername}`
         : "Member";
-export const getMobileDashboard = async (user) => {
+const DASHBOARD_CACHE_TTL_SECONDS = 45;
+const buildDashboardCacheKey = (user) => {
+    const userId = String(user._id ?? "");
+    const role = String(user.role ?? "");
+    const state = normalizeLocationKey(user.state);
+    const lga = normalizeLocationKey(user.lga);
+    const ward = normalizeLocationKey(user.ward);
+    return `mobile:dashboard:${userId}:${role}:${state}:${lga}:${ward}`;
+};
+const buildMobileDashboard = async (user) => {
     const userId = String(user._id ?? "");
     if (!userId)
         throw new Error("Authentication required");
@@ -207,5 +217,9 @@ export const getMobileDashboard = async (user) => {
             publishedAt: i.createdAt,
         })),
     };
+};
+export const getMobileDashboard = async (user) => {
+    const cacheKey = buildDashboardCacheKey(user);
+    return getOrSetCache(cacheKey, DASHBOARD_CACHE_TTL_SECONDS, () => buildMobileDashboard(user));
 };
 //# sourceMappingURL=dashboardService.js.map

@@ -1,5 +1,7 @@
 import ActiveElection from "../../models/Election/ActiveElection.js";
 import { getElectionById } from "../Election/electionService.js";
+import { getOrSetCache } from "../../utils/cache.js";
+const MOBILE_ELECTIONS_CACHE_TTL_SECONDS = 30;
 const standardizeName = (name) => String(name ?? "")
     .toLowerCase()
     .replace(/[-\s]/g, "_")
@@ -11,6 +13,13 @@ const normalizeLgaKey = (raw) => {
     s = s.replace(/^\d+[-_\s]+/, "");
     s = s.replace(/[/\s,-]+/g, "_").replace(/_+/g, "_").replace(/^_|_$/g, "");
     return s;
+};
+const buildElectionCacheKey = (input) => {
+    const userId = String(input.user._id ?? "");
+    const role = String(input.user.role ?? "");
+    const state = standardizeName(input.user.state);
+    const lga = normalizeLgaKey(input.user.lga);
+    return `mobile:elections:${userId}:${role}:${state}:${lga}:${input.status}:${input.scope}`;
 };
 const electionMatchesPollingScope = (electionTypeRaw, electionLocationRaw, user) => {
     const electionType = String(electionTypeRaw ?? "").toLowerCase().trim();
@@ -37,7 +46,7 @@ const electionMatchesPollingScope = (electionTypeRaw, electionLocationRaw, user)
     }
     return false;
 };
-export const getMobileActiveElections = async (input) => {
+const getMobileActiveElectionsUncached = async (input) => {
     const now = new Date();
     const docs = await ActiveElection.find()
         .populate("election", "electionType electionName")
@@ -70,6 +79,10 @@ export const getMobileActiveElections = async (input) => {
     if (input.status === "all")
         return withStatus;
     return withStatus.filter((election) => election.status === input.status);
+};
+export const getMobileActiveElections = async (input) => {
+    const cacheKey = buildElectionCacheKey(input);
+    return getOrSetCache(cacheKey, MOBILE_ELECTIONS_CACHE_TTL_SECONDS, () => getMobileActiveElectionsUncached(input));
 };
 // Mobile carousel needs all live elections in scope (not web-prioritized single item).
 export const getMobileLiveElectionsCarousel = async (user) => {

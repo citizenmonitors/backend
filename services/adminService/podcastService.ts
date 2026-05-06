@@ -1,5 +1,5 @@
 import { sendEmail } from "../../config/email.ts";
-import { newsLetterTemplateInecForensicAudit, podcastNotificationTemplate } from "../../config/emailTemplates.ts";
+import { newsLetterTemplatePoliceBrutalityLeadershipOrInstitutional, podcastNotificationTemplate } from "../../config/emailTemplates.ts";
 import schedule from "node-schedule";
 import { utcToZonedTime } from "date-fns-tz";
 import { format } from "date-fns";
@@ -8,6 +8,7 @@ import type { Types } from "mongoose";
 import AdminLog from "../../models/admin/AdminLog.ts";
 import Podcast from "../../models/admin/Podcast.ts";
 import CompletedUser from "../../models/CompletedUser.ts";
+import { invalidateAllMobileReadCaches } from "../../utils/cache.ts";
 
 type Id = string | Types.ObjectId;
 type RecipientRole = "all" | "super-admin" | "admin" | "observer" | "volunteer";
@@ -109,6 +110,8 @@ export const sendPodcastService = async ({
     timestamp: new Date(),
   });
 
+  await invalidateAllMobileReadCaches();
+
   return podcast;
 };
 
@@ -150,6 +153,8 @@ export const editPodcastService = async ({
     timestamp: new Date(),
   });
 
+  await invalidateAllMobileReadCaches();
+
   return podcast;
 };
 
@@ -190,6 +195,7 @@ export const deletePodcastService = async (id: Id, adminId: Id | undefined) => {
     },
     timestamp: new Date(),
   });
+  await invalidateAllMobileReadCaches();
   return { message: "Podcast deleted successfully" };
 };
 
@@ -268,7 +274,7 @@ export const sendNewsletterService = async ({
       userEmails.push(...completedUsers.map((user) => user.email));
     }
 
-  
+
 
 
     // For testing, override userEmails with your email
@@ -280,14 +286,19 @@ export const sendNewsletterService = async ({
     ];
 
 
-    const htmlContent = newsLetterTemplateInecForensicAudit();
+    const htmlContent = newsLetterTemplatePoliceBrutalityLeadershipOrInstitutional();
+
+    const listUnsubscribeUrl =
+      process.env.NEWSLETTER_UNSUBSCRIBE_URL?.trim() ||
+      "https://www.citizenmonitors.com/portal/settings/notifications";
 
     // Send emails to all targeted users
     const emailPromises = userEmails.map((email) =>
       sendEmail({
         to: email,
-        subject: `INEC Forensic Audit; Real or Imagined?`,
+        subject: `Police Brutality in Nigeria; Leadership or Institutional Failure?`,
         htmlbody: htmlContent,
+        listUnsubscribeUrl,
       }).catch((err) => {
         console.error(`Failed to send email to ${email}:`, err);
       })

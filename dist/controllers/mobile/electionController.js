@@ -1,6 +1,7 @@
 import { getMobileActiveElections, getMobileElectionSubmissionByActiveElection, getMobileLiveElectionsCarousel, } from "../../services/mobile/electionService.js";
 import { deleteElectionResultDataService, deleteIncidentReportDataService, updateIncidentReportDataService, updateResultDataService, uploadIncidentReportDataService, uploadResultDataService, } from "../../services/Election/electionService.js";
 import { isValidObjectId } from "../../utils/validators.js";
+import { invalidateCacheByPrefixes } from "../../utils/cache.js";
 const getErrorMessage = (error) => error instanceof Error ? error.message : String(error);
 const asParam = (value) => Array.isArray(value) ? String(value[0] ?? "") : String(value ?? "");
 const requireUserId = (req) => {
@@ -9,6 +10,12 @@ const requireUserId = (req) => {
         throw new Error("Authentication required");
     }
     return String(userId);
+};
+const invalidateMobileReadCaches = async (req) => {
+    const userId = String(req.user?._id ?? "");
+    if (!userId)
+        return;
+    await invalidateCacheByPrefixes([`mobile:elections:${userId}:`, `mobile:dashboard:${userId}:`]);
 };
 export const getActiveElectionsMobile = async (req, res) => {
     try {
@@ -80,6 +87,7 @@ export const submitElectionResultMobile = async (req, res) => {
             return res.status(400).json({ message: "Invalid election ID" });
         }
         const result = await uploadResultDataService(electionId, requireUserId(r), r.body, r.files);
+        await invalidateMobileReadCaches(r);
         return res.status(201).json(result);
     }
     catch (error) {
@@ -97,6 +105,7 @@ export const updateElectionResultMobile = async (req, res) => {
             return res.status(400).json({ message: "Invalid election ID" });
         }
         const result = await updateResultDataService(electionId, requireUserId(r), r.body, r.files);
+        await invalidateMobileReadCaches(r);
         return res.status(200).json(result);
     }
     catch (error) {
@@ -114,6 +123,7 @@ export const deleteElectionResultMobile = async (req, res) => {
             return res.status(400).json({ message: "Invalid election ID" });
         }
         const response = await deleteElectionResultDataService(electionId, requireUserId(r));
+        await invalidateMobileReadCaches(r);
         return res.status(200).json(response);
     }
     catch (error) {
@@ -131,6 +141,7 @@ export const submitIncidentReportMobile = async (req, res) => {
             return res.status(400).json({ message: "Invalid election ID" });
         }
         const report = await uploadIncidentReportDataService(electionId, requireUserId(r), r.body, r.files);
+        await invalidateMobileReadCaches(r);
         return res.status(201).json(report);
     }
     catch (error) {
@@ -148,6 +159,7 @@ export const updateIncidentReportMobile = async (req, res) => {
             return res.status(400).json({ message: "Invalid election ID" });
         }
         const report = await updateIncidentReportDataService(electionId, requireUserId(r), r.body, r.files);
+        await invalidateMobileReadCaches(r);
         return res.status(200).json(report);
     }
     catch (error) {
@@ -165,6 +177,7 @@ export const deleteIncidentReportMobile = async (req, res) => {
             return res.status(400).json({ message: "Invalid election ID" });
         }
         const response = await deleteIncidentReportDataService(electionId, requireUserId(r));
+        await invalidateMobileReadCaches(r);
         return res.status(200).json(response);
     }
     catch (error) {

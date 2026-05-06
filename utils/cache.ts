@@ -63,3 +63,32 @@ export const getOrSetCache = async <T>(
   return value;
 };
 
+export const invalidateCacheByPrefix = async (prefix: string): Promise<void> => {
+  for (const key of memoryCache.keys()) {
+    if (key.startsWith(prefix)) {
+      memoryCache.delete(key);
+    }
+  }
+
+  if (!redisClient.isOpen) return;
+
+  try {
+    for await (const key of redisClient.scanIterator({
+      MATCH: `${prefix}*`,
+      COUNT: 100,
+    })) {
+      await redisClient.del(String(key));
+    }
+  } catch {
+    // Best-effort invalidation; request flow should not fail if cache cleanup fails.
+  }
+};
+
+export const invalidateCacheByPrefixes = async (prefixes: string[]): Promise<void> => {
+  await Promise.all(prefixes.map((prefix) => invalidateCacheByPrefix(prefix)));
+};
+
+export const invalidateAllMobileReadCaches = async (): Promise<void> => {
+  await invalidateCacheByPrefixes(["mobile:elections:", "mobile:dashboard:"]);
+};
+

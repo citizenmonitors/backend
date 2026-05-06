@@ -1,9 +1,11 @@
 import ActiveElection from "../../models/Election/ActiveElection.ts";
 import type { AuthenticatedUser } from "../../types/authenticatedRequest.ts";
 import { getElectionById } from "../Election/electionService.ts";
+import { getOrSetCache } from "../../utils/cache.ts";
 
 type ElectionStatus = "all" | "live" | "upcoming" | "concluded";
 type ElectionScope = "all" | "polling-unit";
+const MOBILE_ELECTIONS_CACHE_TTL_SECONDS = 30;
 
 const standardizeName = (name: unknown): string =>
   String(name ?? "")
@@ -17,6 +19,18 @@ const normalizeLgaKey = (raw: unknown): string => {
   s = s.replace(/^\d+[-_\s]+/, "");
   s = s.replace(/[/\s,-]+/g, "_").replace(/_+/g, "_").replace(/^_|_$/g, "");
   return s;
+};
+
+const buildElectionCacheKey = (input: {
+  status: ElectionStatus;
+  scope: ElectionScope;
+  user: AuthenticatedUser;
+}): string => {
+  const userId = String(input.user._id ?? "");
+  const role = String(input.user.role ?? "");
+  const state = standardizeName((input.user as { state?: unknown }).state);
+  const lga = normalizeLgaKey((input.user as { lga?: unknown }).lga);
+  return `mobile:elections:${userId}:${role}:${state}:${lga}:${input.status}:${input.scope}`;
 };
 
 const electionMatchesPollingScope = (
@@ -57,7 +71,7 @@ const electionMatchesPollingScope = (
   return false;
 };
 
-export const getMobileActiveElections = async (input: {
+const getMobileActiveElectionsUncached = async (input: {
   status: ElectionStatus;
   scope: ElectionScope;
   user: AuthenticatedUser;
@@ -104,6 +118,17 @@ export const getMobileActiveElections = async (input: {
 
   if (input.status === "all") return withStatus;
   return withStatus.filter((election) => election.status === input.status);
+};
+
+export const getMobileActiveElections = async (input: {
+  status: ElectionStatus;
+  scope: ElectionScope;
+  user: AuthenticatedUser;
+}) => {
+  const cacheKey = buildElectionCacheKey(input);
+  return getOrSetCache(cacheKey, MOBILE_ELECTIONS_CACHE_TTL_SECONDS, () =>
+    getMobileActiveElectionsUncached(input)
+  );
 };
 
 // Mobile carousel needs all live elections in scope (not web-prioritized single item).

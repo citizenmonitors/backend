@@ -6,6 +6,7 @@ Base URL: `https://citizen-monitors.onrender.com/api/v1/mobile`
 
 - Protected endpoints require:
   - `Authorization: Bearer <JWT>`
+  - `X-Inhouse-Access-Token: <INHOUSE_API_ACCESS_TOKEN>` (required when in-house gate is enabled on server)
 - Content type:
   - `application/json` for most endpoints
   - `multipart/form-data` for file upload endpoints
@@ -132,9 +133,56 @@ Fields:
 ### `POST /auth/observer-role` (`multipart/form-data`)
 Fields:
 - `email` (required)
-- `phoneNumber` (required)
-- `bankName`, `bankAccountNumber`, `bankAccountName` (optional)
-- `observerId[]` (files, max 2)
+- `observerId[]` (PVC files, optional, max 2)
+
+---
+
+## Realtime Notifications (WebSocket)
+
+Use Socket.IO to receive notifications instantly while the app is open.
+
+- Socket base URL: `https://citizen-monitors.onrender.com`
+- Transport: Socket.IO client
+- Auth token options (one is enough):
+  - `auth.token = "<JWT>"`
+  - `Authorization: Bearer <JWT>` header
+  - `?token=<JWT>` query
+
+### Connection Event
+
+Server emits on successful connection:
+
+```json
+{
+  "event": "realtime:connected",
+  "data": {
+    "userId": "664f2d...",
+    "connectedAt": "2026-05-05T13:33:01.896Z"
+  }
+}
+```
+
+### New Notification Event
+
+Server emits when a new notification targets the connected user:
+
+```json
+{
+  "event": "notification:new",
+  "data": {
+    "id": "6650a1...",
+    "type": "result-aggregated",
+    "preferenceKey": "resultAggregated",
+    "body": "New collation update in your polling area.",
+    "info": "Polling Unit 004",
+    "createdAt": "2026-05-05T13:40:00.000Z"
+  }
+}
+```
+
+Notes:
+- Persisted notifications are still available from `GET /notifications`.
+- If user is offline, app should fall back to polling and/or push notification.
 
 ---
 

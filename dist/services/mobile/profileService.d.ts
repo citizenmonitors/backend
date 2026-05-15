@@ -35,6 +35,8 @@ type MobileNotificationSettings = {
     reportFlagged?: boolean;
     securityAlerts?: boolean;
     newsletter?: boolean;
+    newsAndInsights?: boolean;
+    pressCoverage?: boolean;
 };
 type PollingUnitDetail = {
     id?: string;
@@ -52,6 +54,8 @@ export declare const getMobileProfile: (userId: Id) => Promise<{
             reportFlagged: boolean;
             securityAlerts: boolean;
             newsletter: boolean;
+            newsAndInsights: boolean;
+            pressCoverage: boolean;
         };
     };
 }>;
@@ -152,6 +156,8 @@ export declare const upgradeVolunteerToObserver: ({ email, details, files, }: Ob
             reportConfirmed: boolean;
             reportFlagged: boolean;
             securityAlerts: boolean;
+            newsAndInsights: boolean;
+            pressCoverage: boolean;
         } | null | undefined;
     } | null | undefined;
     _id: Types.ObjectId;
@@ -196,11 +202,39 @@ export declare const getElectionVault: (userId: Id) => Promise<{
         }>;
         actions: Types.DocumentArray<{
             action: "agree" | "flag";
+            flagImage?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
+            flagVideo?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
             userId?: Types.ObjectId | null | undefined;
             flagReason?: string | null | undefined;
             evidenceId?: Types.ObjectId | null | undefined;
         } | {
             action: "agree" | "flag";
+            flagImage?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
+            flagVideo?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
             userId?: string | null | undefined;
             flagReason?: string | null | undefined;
             evidenceId?: string | null | undefined;
@@ -208,11 +242,39 @@ export declare const getElectionVault: (userId: Id) => Promise<{
             __v: number;
         }, Types.Subdocument<string | Types.ObjectId, any, {
             action: "agree" | "flag";
+            flagImage?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
+            flagVideo?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
             userId?: Types.ObjectId | null | undefined;
             flagReason?: string | null | undefined;
             evidenceId?: Types.ObjectId | null | undefined;
         } | {
             action: "agree" | "flag";
+            flagImage?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
+            flagVideo?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
             userId?: string | null | undefined;
             flagReason?: string | null | undefined;
             evidenceId?: string | null | undefined;
@@ -220,11 +282,39 @@ export declare const getElectionVault: (userId: Id) => Promise<{
             __v: number;
         }> & ({
             action: "agree" | "flag";
+            flagImage?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
+            flagVideo?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
             userId?: Types.ObjectId | null | undefined;
             flagReason?: string | null | undefined;
             evidenceId?: Types.ObjectId | null | undefined;
         } | {
             action: "agree" | "flag";
+            flagImage?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
+            flagVideo?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
             userId?: string | null | undefined;
             flagReason?: string | null | undefined;
             evidenceId?: string | null | undefined;
@@ -282,11 +372,39 @@ export declare const getElectionVault: (userId: Id) => Promise<{
         userRole: string;
         actions: Types.DocumentArray<{
             action: "agree" | "flag";
+            flagImage?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
+            flagVideo?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
             userId?: Types.ObjectId | null | undefined;
             flagReason?: string | null | undefined;
             evidenceId?: Types.ObjectId | null | undefined;
         } | {
             action: "agree" | "flag";
+            flagImage?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
+            flagVideo?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
             userId?: string | null | undefined;
             flagReason?: string | null | undefined;
             evidenceId?: string | null | undefined;
@@ -294,11 +412,39 @@ export declare const getElectionVault: (userId: Id) => Promise<{
             __v: number;
         }, Types.Subdocument<string | Types.ObjectId, any, {
             action: "agree" | "flag";
+            flagImage?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
+            flagVideo?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
             userId?: Types.ObjectId | null | undefined;
             flagReason?: string | null | undefined;
             evidenceId?: Types.ObjectId | null | undefined;
         } | {
             action: "agree" | "flag";
+            flagImage?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
+            flagVideo?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
             userId?: string | null | undefined;
             flagReason?: string | null | undefined;
             evidenceId?: string | null | undefined;
@@ -306,11 +452,39 @@ export declare const getElectionVault: (userId: Id) => Promise<{
             __v: number;
         }> & ({
             action: "agree" | "flag";
+            flagImage?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
+            flagVideo?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
             userId?: Types.ObjectId | null | undefined;
             flagReason?: string | null | undefined;
             evidenceId?: Types.ObjectId | null | undefined;
         } | {
             action: "agree" | "flag";
+            flagImage?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
+            flagVideo?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
             userId?: string | null | undefined;
             flagReason?: string | null | undefined;
             evidenceId?: string | null | undefined;
@@ -382,6 +556,8 @@ export declare const updateMobileNotifications: (userId: Id, updates: MobileNoti
     reportFlagged: boolean;
     securityAlerts: boolean;
     newsletter: boolean;
+    newsAndInsights: boolean;
+    pressCoverage: boolean;
 }>;
 export declare const getMobileNotifications: (userId: Id) => Promise<{
     pollingUnitActivity: boolean;
@@ -392,6 +568,8 @@ export declare const getMobileNotifications: (userId: Id) => Promise<{
     reportFlagged: boolean;
     securityAlerts: boolean;
     newsletter: boolean;
+    newsAndInsights: boolean;
+    pressCoverage: boolean;
 }>;
 export declare const locatePollingUnit: (input: {
     state: string;

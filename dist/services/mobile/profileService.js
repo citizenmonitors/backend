@@ -58,6 +58,8 @@ const withNotificationDefaults = (role, current) => ({
     reportFlagged: current?.reportFlagged ?? role === "observer",
     securityAlerts: current?.securityAlerts ?? false,
     newsletter: current?.newsletter ?? true,
+    newsAndInsights: current?.newsAndInsights ?? true,
+    pressCoverage: current?.pressCoverage ?? true,
 });
 export const getMobileProfile = async (userId) => {
     const user = await getUserOrThrow(userId);

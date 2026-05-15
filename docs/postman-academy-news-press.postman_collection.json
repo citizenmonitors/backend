@@ -1,0 +1,354 @@
+{
+  "info": {
+    "name": "Citizen Monitors — Academy, News & Insight, Press Coverage",
+    "description": "Sample requests for Citizen Academy (public), News & Insight, and Press Coverage (mobile + admin + likes/comments). Set collection variables first. Use your real JWT for {{token}} and {{adminToken}}. If INHOUSE_API_ACCESS_TOKEN is set on the server, add header X-Inhouse-Access-Token on all /api/* calls.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "apiBase", "value": "http://localhost:4000/api" },
+    { "key": "mobileBase", "value": "{{apiBase}}/v1/mobile" },
+    { "key": "token", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "inhouseToken", "value": "" },
+    { "key": "academySlug", "value": "pvc-registration-guide" },
+    { "key": "newsArticleId", "value": "REPLACE_WITH_MONGO_ID_FROM_LIST_OR_ADMIN" },
+    { "key": "pressArticleId", "value": "REPLACE_WITH_MONGO_ID_FROM_LIST_OR_ADMIN" },
+    { "key": "newsSlug", "value": "your-news-slug-from-admin-create" },
+    { "key": "pressSlug", "value": "your-press-slug-from-admin-create" },
+    { "key": "newsCommentId", "value": "REPLACE_AFTER_POST_COMMENT" },
+    { "key": "pressCommentId", "value": "REPLACE_AFTER_POST_COMMENT" }
+  ],
+  "item": [
+    {
+      "name": "Citizen Academy (no Bearer required)",
+      "item": [
+        {
+          "name": "GET Academy list",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Inhouse-Access-Token",
+                "value": "{{inhouseToken}}",
+                "disabled": true
+              }
+            ],
+            "url": "{{mobileBase}}/academy"
+          }
+        },
+        {
+          "name": "GET Academy article by slug",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Inhouse-Access-Token",
+                "value": "{{inhouseToken}}",
+                "disabled": true
+              }
+            ],
+            "url": "{{mobileBase}}/academy/{{academySlug}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "News & Insight — Mobile",
+      "item": [
+        {
+          "name": "GET News list (optional Bearer for isLikedByCurrentUser)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Inhouse-Access-Token",
+                "value": "{{inhouseToken}}",
+                "disabled": true
+              }
+            ],
+            "url": "{{mobileBase}}/news-insights?page=1&limit=20"
+          }
+        },
+        {
+          "name": "GET News list (anonymous — disable Bearer)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{mobileBase}}/news-insights?page=1&limit=20"
+          }
+        },
+        {
+          "name": "POST Create article (admin — form-data, image files)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{adminToken}}", "type": "string" }] },
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "Kano by-election: APC sweeps assembly seats", "type": "text" },
+                { "key": "content", "value": "<p>First paragraph.</p><p>Second paragraph.</p>", "type": "text" },
+                { "key": "excerpt", "value": "APC wins majority in by-elections.", "type": "text" },
+                { "key": "slug", "value": "kano-by-election-apc-sweeps-sample", "type": "text" },
+                { "key": "publishedAt", "value": "2026-02-02T10:00:00.000Z", "type": "text" },
+                { "key": "isPublished", "value": "true", "type": "text" },
+                { "key": "notifySubscribers", "value": "true", "type": "text" },
+                { "key": "thumbnail", "description": "Required — pick a local image file", "type": "file" },
+                { "key": "heroImage", "description": "Optional — pick a local image file", "type": "file" }
+              ]
+            },
+            "url": "{{mobileBase}}/news-insights"
+          }
+        },
+        {
+          "name": "GET News article by slug",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": "{{mobileBase}}/news-insights/{{newsSlug}}"
+          }
+        },
+        {
+          "name": "POST Toggle like on article",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "" },
+            "url": "{{mobileBase}}/news-insights/articles/{{newsArticleId}}/like"
+          }
+        },
+        {
+          "name": "GET Comments on article",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": "{{mobileBase}}/news-insights/articles/{{newsArticleId}}/comments"
+          }
+        },
+        {
+          "name": "POST Comment on article",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"body\": \"This is a test comment on the article.\",\n  \"useAnonymousDisplay\": false\n}"
+            },
+            "url": "{{mobileBase}}/news-insights/articles/{{newsArticleId}}/comments"
+          }
+        },
+        {
+          "name": "POST Toggle like on comment",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "" },
+            "url": "{{mobileBase}}/news-insights/articles/{{newsArticleId}}/comments/{{newsCommentId}}/like"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Press Coverage — Mobile",
+      "item": [
+        {
+          "name": "GET Press list",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": "{{mobileBase}}/press-coverage?page=1&limit=20"
+          }
+        },
+        {
+          "name": "POST Create press article (admin — form-data, image files)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{adminToken}}", "type": "string" }] },
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "Citizen Monitors Queries Budget for 2027 Elections", "type": "text" },
+                { "key": "dateline", "value": "Lagos, Nigeria", "type": "text" },
+                { "key": "content", "value": "<p>Lagos, Nigeria — Opening paragraph.</p><p>Second paragraph.</p>", "type": "text" },
+                { "key": "excerpt", "value": "Organisation calls for transparency.", "type": "text" },
+                { "key": "slug", "value": "budget-2027-elections-sample", "type": "text" },
+                { "key": "publishedAt", "value": "2026-02-02T12:00:00.000Z", "type": "text" },
+                { "key": "isPublished", "value": "true", "type": "text" },
+                { "key": "notifySubscribers", "value": "true", "type": "text" },
+                { "key": "thumbnail", "description": "Required — pick a local image file in Postman", "type": "file" },
+                { "key": "heroImage", "description": "Optional — pick a local image file", "type": "file" }
+              ]
+            },
+            "url": "{{mobileBase}}/press-coverage"
+          }
+        },
+        {
+          "name": "GET Press article by slug",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": "{{mobileBase}}/press-coverage/{{pressSlug}}"
+          }
+        },
+        {
+          "name": "POST Toggle like on press article",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "POST",
+            "url": "{{mobileBase}}/press-coverage/articles/{{pressArticleId}}/like"
+          }
+        },
+        {
+          "name": "GET Press comments",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": "{{mobileBase}}/press-coverage/articles/{{pressArticleId}}/comments"
+          }
+        },
+        {
+          "name": "POST Press comment",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"body\": \"Test comment on press release.\",\n  \"useAnonymousDisplay\": false\n}"
+            },
+            "url": "{{mobileBase}}/press-coverage/articles/{{pressArticleId}}/comments"
+          }
+        },
+        {
+          "name": "POST Toggle like on press comment",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "POST",
+            "url": "{{mobileBase}}/press-coverage/articles/{{pressArticleId}}/comments/{{pressCommentId}}/like"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin — News & Insight (admin JWT)",
+      "item": [
+        {
+          "name": "POST Create news article (form-data)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{adminToken}}", "type": "string" }] },
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "Kano by-election: APC sweeps assembly seats", "type": "text" },
+                { "key": "content", "value": "<p>First paragraph.</p>", "type": "text" },
+                { "key": "thumbnail", "type": "file" },
+                { "key": "heroImage", "type": "file" }
+              ]
+            },
+            "url": "{{apiBase}}/admin/news-insights"
+          }
+        },
+        {
+          "name": "GET List news (admin)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{adminToken}}", "type": "string" }] },
+            "method": "GET",
+            "url": "{{apiBase}}/admin/news-insights?page=1&limit=30"
+          }
+        },
+        {
+          "name": "GET Single news by Mongo id",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{adminToken}}", "type": "string" }] },
+            "method": "GET",
+            "url": "{{apiBase}}/admin/news-insights/{{newsArticleId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin — Press Coverage (admin JWT)",
+      "item": [
+        {
+          "name": "POST Create press article (form-data)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{adminToken}}", "type": "string" }] },
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "Citizen Monitors Queries Budget for 2027 Elections", "type": "text" },
+                { "key": "dateline", "value": "Lagos, Nigeria", "type": "text" },
+                { "key": "content", "value": "<p>Opening paragraph.</p>", "type": "text" },
+                { "key": "thumbnail", "type": "file" },
+                { "key": "heroImage", "type": "file" }
+              ]
+            },
+            "url": "{{apiBase}}/admin/press-coverage"
+          }
+        },
+        {
+          "name": "GET List press (admin)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{adminToken}}", "type": "string" }] },
+            "method": "GET",
+            "url": "{{apiBase}}/admin/press-coverage?page=1&limit=30"
+          }
+        },
+        {
+          "name": "GET Single press by Mongo id",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{adminToken}}", "type": "string" }] },
+            "method": "GET",
+            "url": "{{apiBase}}/admin/press-coverage/{{pressArticleId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile — notification toggles (mobile JWT)",
+      "item": [
+        {
+          "name": "GET Mobile notification settings",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": "{{mobileBase}}/profile/notifications"
+          }
+        },
+        {
+          "name": "PUT Mobile notification settings (sample)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newsAndInsights\": true,\n  \"pressCoverage\": true,\n  \"pollingUnitActivity\": true,\n  \"electionDayAlert\": false,\n  \"discussionReplies\": false,\n  \"resultAggregated\": false,\n  \"reportConfirmed\": false,\n  \"reportFlagged\": true,\n  \"securityAlerts\": false,\n  \"newsletter\": true\n}"
+            },
+            "url": "{{mobileBase}}/profile/notifications"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard (includes news + press cards)",
+      "item": [
+        {
+          "name": "GET Dashboard",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": "{{mobileBase}}/dashboard"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -30,6 +30,82 @@ type MulterMemoryFile = {
   size: number;
 };
 
+export type FlagMediaFiles = {
+  flagImage?: MulterMemoryFile[];
+  flagVideo?: MulterMemoryFile[];
+};
+
+type EmbeddedFlagFile = {
+  location?: string;
+  name?: string;
+  type?: string;
+  size?: number;
+  url?: string;
+};
+
+const embedFlagEvidenceFiles = async (
+  files?: FlagMediaFiles
+): Promise<{ flagImage?: EmbeddedFlagFile; flagVideo?: EmbeddedFlagFile }> => {
+  const out: { flagImage?: EmbeddedFlagFile; flagVideo?: EmbeddedFlagFile } = {};
+  if (files?.flagImage?.[0]) {
+    const file = files.flagImage[0];
+    const { publicUrl, filePath, token } = await uploadFileToFirebase(
+      file,
+      "flag_evidence_pictures"
+    );
+    const doc = await File.create({
+      location: filePath,
+      name: file.originalname,
+      type: file.mimetype,
+      size: file.size,
+      url: publicUrl,
+      token,
+    });
+    out.flagImage = {
+      location: doc.location ?? "",
+      name: doc.name ?? "",
+      type: doc.type ?? "",
+      size: typeof doc.size === "number" ? doc.size : 0,
+      url: doc.url ?? "",
+    };
+  }
+  if (files?.flagVideo?.[0]) {
+    const file = files.flagVideo[0];
+    const { publicUrl, filePath, token } = await uploadFileToFirebase(
+      file,
+      "flag_evidence_videos"
+    );
+    const doc = await File.create({
+      location: filePath,
+      name: file.originalname,
+      type: file.mimetype,
+      size: file.size,
+      url: publicUrl,
+      token,
+    });
+    out.flagVideo = {
+      location: doc.location ?? "",
+      name: doc.name ?? "",
+      type: doc.type ?? "",
+      size: typeof doc.size === "number" ? doc.size : 0,
+      url: doc.url ?? "",
+    };
+  }
+  return out;
+};
+
+const formatFlagNotificationInfo = (
+  reason: string | undefined,
+  media: { flagImage?: EmbeddedFlagFile; flagVideo?: EmbeddedFlagFile }
+): string => {
+  const parts: string[] = [];
+  const trimmed = reason?.trim();
+  if (trimmed) parts.push(`Reason: ${trimmed}`);
+  if (media.flagImage?.url) parts.push(`Image: ${media.flagImage.url}`);
+  if (media.flagVideo?.url) parts.push(`Video: ${media.flagVideo.url}`);
+  return parts.length > 0 ? parts.join(" | ") : "Flagged for review.";
+};
+
 type ElectionResultUploadFiles = {
   resultPicture?: MulterMemoryFile[];
   resultVideo?: MulterMemoryFile[];
@@ -119,6 +195,7 @@ type PollingUnitActionPayload = {
   dataType: "election" | "incident";
   electionId: Id;
   action: "agree" | "flag" | "unagree";
+  /** Required when `action` is `flag` (trimmed non-empty). */
   flagReason?: string;
   evidenceId?: string;
 };
@@ -1924,7 +2001,8 @@ const formattedIncidentReports = (incidentReports as UserResultOrIncident[]).map
 
 export const getResultsAndPerformAction = async (
   userId: Id,
-  actionData: PollingUnitActionPayload | null | undefined
+  actionData: PollingUnitActionPayload | null | undefined,
+  flagMediaFiles?: FlagMediaFiles
 ) => {
   try {
     // Fetch user to get polling unit
@@ -1952,6 +2030,8 @@ export const getResultsAndPerformAction = async (
       action?: string;
       flagReason?: string;
       evidenceId?: Types.ObjectId | string;
+      flagImage?: EmbeddedFlagFile;
+      flagVideo?: EmbeddedFlagFile;
     };
 
     type FlaggableDoc = {
@@ -1994,6 +2074,17 @@ export const getResultsAndPerformAction = async (
       evidenceId = submissionCheck.evidenceId as Id;
     }
 
+    let flagMediaEmbedded: {
+      flagImage?: EmbeddedFlagFile;
+      flagVideo?: EmbeddedFlagFile;
+    } = {};
+    if (actionData.action === "flag") {
+      if (!actionData.flagReason?.trim()) {
+        throw new Error("Flag reason is required when flagging.");
+      }
+      flagMediaEmbedded = await embedFlagEvidenceFiles(flagMediaFiles);
+    }
+
     // Locate the user's existing action
     const existingActionIndex = data.actions.findIndex(
       (a) =>
@@ -2020,17 +2111,20 @@ export const getResultsAndPerformAction = async (
           throw new Error("You cannot agree after flagging the result.");
         }
       } else if (actionData.action === "flag") {
-        if (!actionData.flagReason) {
-          throw new Error("Flag reason is required when flagging.");
-        }
         existingAction.action = "flag";
-        existingAction.flagReason = actionData.flagReason;
+        existingAction.flagReason = actionData.flagReason!.trim();
+        if (flagMediaEmbedded.flagImage) {
+          existingAction.flagImage = flagMediaEmbedded.flagImage;
+        }
+        if (flagMediaEmbedded.flagVideo) {
+          existingAction.flagVideo = flagMediaEmbedded.flagVideo;
+        }
         existingAction.evidenceId = evidenceId;
         await dispatchNotificationToUsers({
           type: "report-flagged",
           preferenceKey: "reportFlagged",
           body: "Your report/result was flagged for review.",
-          info: `Reason: ${actionData.flagReason}`,
+          info: formatFlagNotificationInfo(actionData.flagReason, flagMediaEmbedded),
           userIds: [String(data.user)],
         });
       } else if (actionData.action === "unagree") {
@@ -2050,15 +2144,18 @@ export const getResultsAndPerformAction = async (
         newAction.evidenceId = evidenceId;
       }
       if (actionData.action === "flag") {
-        if (!actionData.flagReason) {
-          throw new Error("Flag reason is required when flagging.");
+        newAction.flagReason = actionData.flagReason!.trim();
+        if (flagMediaEmbedded.flagImage) {
+          newAction.flagImage = flagMediaEmbedded.flagImage;
         }
-        newAction.flagReason = actionData.flagReason;
+        if (flagMediaEmbedded.flagVideo) {
+          newAction.flagVideo = flagMediaEmbedded.flagVideo;
+        }
         await dispatchNotificationToUsers({
           type: "report-flagged",
           preferenceKey: "reportFlagged",
           body: "Your report/result was flagged for review.",
-          info: `Reason: ${actionData.flagReason}`,
+          info: formatFlagNotificationInfo(actionData.flagReason, flagMediaEmbedded),
           userIds: [String(data.user)],
         });
       } else if (actionData.action === "agree") {

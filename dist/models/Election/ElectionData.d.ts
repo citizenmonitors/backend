@@ -23,16 +23,58 @@ declare const _default: mongoose.Model<{
     }>;
     actions: mongoose.Types.DocumentArray<{
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: mongoose.Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: mongoose.Types.ObjectId | null | undefined;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: mongoose.Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: mongoose.Types.ObjectId | null | undefined;
     }> & {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: mongoose.Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: mongoose.Types.ObjectId | null | undefined;
@@ -93,16 +135,58 @@ declare const _default: mongoose.Model<{
     }>;
     actions: mongoose.Types.DocumentArray<{
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: mongoose.Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: mongoose.Types.ObjectId | null | undefined;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: mongoose.Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: mongoose.Types.ObjectId | null | undefined;
     }> & {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: mongoose.Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: mongoose.Types.ObjectId | null | undefined;
@@ -163,16 +247,58 @@ declare const _default: mongoose.Model<{
     }>;
     actions: mongoose.Types.DocumentArray<{
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: mongoose.Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: mongoose.Types.ObjectId | null | undefined;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: mongoose.Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: mongoose.Types.ObjectId | null | undefined;
     }> & {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: mongoose.Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: mongoose.Types.ObjectId | null | undefined;
@@ -239,16 +365,58 @@ declare const _default: mongoose.Model<{
     }>;
     actions: mongoose.Types.DocumentArray<{
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: mongoose.Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: mongoose.Types.ObjectId | null | undefined;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: mongoose.Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: mongoose.Types.ObjectId | null | undefined;
     }> & {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: mongoose.Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: mongoose.Types.ObjectId | null | undefined;
@@ -309,16 +477,58 @@ declare const _default: mongoose.Model<{
     }>;
     actions: mongoose.Types.DocumentArray<{
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: mongoose.Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: mongoose.Types.ObjectId | null | undefined;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: mongoose.Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: mongoose.Types.ObjectId | null | undefined;
     }> & {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: mongoose.Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: mongoose.Types.ObjectId | null | undefined;
@@ -379,16 +589,58 @@ declare const _default: mongoose.Model<{
     }>;
     actions: mongoose.Types.DocumentArray<{
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: mongoose.Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: mongoose.Types.ObjectId | null | undefined;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: mongoose.Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: mongoose.Types.ObjectId | null | undefined;
     }> & {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: mongoose.Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: mongoose.Types.ObjectId | null | undefined;

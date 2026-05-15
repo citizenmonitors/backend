@@ -75,7 +75,10 @@ export const postMobileCollationUserAction = async (req, res) => {
         if (actionData && !isValidObjectId(actionData.electionId)) {
             return res.status(400).json({ message: "Invalid target id" });
         }
-        const results = await mobileCollationUserAction(activeElectionId, userId, actionData);
+        const flagMediaFiles = r.files?.flagImage?.length || r.files?.flagVideo?.length
+            ? { flagImage: r.files.flagImage, flagVideo: r.files.flagVideo }
+            : undefined;
+        const results = await mobileCollationUserAction(activeElectionId, userId, actionData, flagMediaFiles);
         return res.status(200).json({
             message: actionData
                 ? "Updated successfully"

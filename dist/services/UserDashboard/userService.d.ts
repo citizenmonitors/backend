@@ -122,6 +122,8 @@ export declare const volunteerToObserverService: ({ email, details, files, }: Vo
             reportConfirmed: boolean;
             reportFlagged: boolean;
             securityAlerts: boolean;
+            newsAndInsights: boolean;
+            pressCoverage: boolean;
         } | null | undefined;
     } | null | undefined;
     _id: Types.ObjectId;
@@ -234,6 +236,8 @@ export declare const deleteUserService: (userId: Id) => Promise<import("mongoose
             reportConfirmed: boolean;
             reportFlagged: boolean;
             securityAlerts: boolean;
+            newsAndInsights: boolean;
+            pressCoverage: boolean;
         } | null | undefined;
     } | null | undefined;
 }> & {
@@ -333,6 +337,8 @@ export declare const deleteUserService: (userId: Id) => Promise<import("mongoose
             reportConfirmed: boolean;
             reportFlagged: boolean;
             securityAlerts: boolean;
+            newsAndInsights: boolean;
+            pressCoverage: boolean;
         } | null | undefined;
     } | null | undefined;
 } & {

@@ -15,6 +15,8 @@ const notificationSchema = new mongoose.Schema({
       "report-flagged",
       "newsletter",
       "election-day-alert",
+      "news-insight",
+      "press-coverage",
     ],
   },
   preferenceKey: {
@@ -28,6 +30,8 @@ const notificationSchema = new mongoose.Schema({
       "reportFlagged",
       "securityAlerts",
       "newsletter",
+      "newsAndInsights",
+      "pressCoverage",
     ],
     default: undefined,
   },
@@ -69,4 +73,3 @@ const notificationSchema = new mongoose.Schema({
 const Notification = mongoose.model("Notification", notificationSchema);
 
 export default Notification;
-

@@ -150,9 +150,9 @@ export declare const getActivityBoardAndNotificationsService: () => Promise<{
         targetUsers: Types.ObjectId[];
         readBy: Types.ObjectId[];
         deletedBy: Types.ObjectId[];
-        type?: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | null | undefined;
+        type?: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | "news-insight" | "press-coverage" | null | undefined;
         info?: string | null | undefined;
-        preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | null | undefined;
+        preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | "newsAndInsights" | "pressCoverage" | null | undefined;
         body?: string | null | undefined;
         recipients?: string[] | null | undefined;
     }> & {

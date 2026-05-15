@@ -15,6 +15,59 @@ import { sendEmail } from "../../config/email.js";
 import { isActiveElectionRelevantForUser } from "../../utils/electionRelevanceForUser.js";
 import { dispatchMobileNotification, dispatchNotificationToUsers, } from "../mobile/notificationDispatchService.js";
 const BACKEND_URL = process.env.BACKEND_URL;
+const embedFlagEvidenceFiles = async (files) => {
+    const out = {};
+    if (files?.flagImage?.[0]) {
+        const file = files.flagImage[0];
+        const { publicUrl, filePath, token } = await uploadFileToFirebase(file, "flag_evidence_pictures");
+        const doc = await File.create({
+            location: filePath,
+            name: file.originalname,
+            type: file.mimetype,
+            size: file.size,
+            url: publicUrl,
+            token,
+        });
+        out.flagImage = {
+            location: doc.location ?? "",
+            name: doc.name ?? "",
+            type: doc.type ?? "",
+            size: typeof doc.size === "number" ? doc.size : 0,
+            url: doc.url ?? "",
+        };
+    }
+    if (files?.flagVideo?.[0]) {
+        const file = files.flagVideo[0];
+        const { publicUrl, filePath, token } = await uploadFileToFirebase(file, "flag_evidence_videos");
+        const doc = await File.create({
+            location: filePath,
+            name: file.originalname,
+            type: file.mimetype,
+            size: file.size,
+            url: publicUrl,
+            token,
+        });
+        out.flagVideo = {
+            location: doc.location ?? "",
+            name: doc.name ?? "",
+            type: doc.type ?? "",
+            size: typeof doc.size === "number" ? doc.size : 0,
+            url: doc.url ?? "",
+        };
+    }
+    return out;
+};
+const formatFlagNotificationInfo = (reason, media) => {
+    const parts = [];
+    const trimmed = reason?.trim();
+    if (trimmed)
+        parts.push(`Reason: ${trimmed}`);
+    if (media.flagImage?.url)
+        parts.push(`Image: ${media.flagImage.url}`);
+    if (media.flagVideo?.url)
+        parts.push(`Video: ${media.flagVideo.url}`);
+    return parts.length > 0 ? parts.join(" | ") : "Flagged for review.";
+};
 const parseUploadLocation = (raw) => {
     if (!raw)
         return undefined;
@@ -1292,7 +1345,7 @@ export const getUserElectionResultsAndReports = async (userId) => {
         throw new Error(`Failed to fetch election results and incident reports: ${error.message}`);
     }
 };
-export const getResultsAndPerformAction = async (userId, actionData) => {
+export const getResultsAndPerformAction = async (userId, actionData, flagMediaFiles) => {
     try {
         // Fetch user to get polling unit
         const user = await CompletedUser.findById(userId).lean();
@@ -1327,6 +1380,13 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
             }
             evidenceId = submissionCheck.evidenceId;
         }
+        let flagMediaEmbedded = {};
+        if (actionData.action === "flag") {
+            if (!actionData.flagReason?.trim()) {
+                throw new Error("Flag reason is required when flagging.");
+            }
+            flagMediaEmbedded = await embedFlagEvidenceFiles(flagMediaFiles);
+        }
         // Locate the user's existing action
         const existingActionIndex = data.actions.findIndex((a) => a.userId != null && String(a.userId) === String(userId));
         const existingAction = data.actions[existingActionIndex];
@@ -1352,17 +1412,20 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
                 }
             }
             else if (actionData.action === "flag") {
-                if (!actionData.flagReason) {
-                    throw new Error("Flag reason is required when flagging.");
-                }
                 existingAction.action = "flag";
-                existingAction.flagReason = actionData.flagReason;
+                existingAction.flagReason = actionData.flagReason.trim();
+                if (flagMediaEmbedded.flagImage) {
+                    existingAction.flagImage = flagMediaEmbedded.flagImage;
+                }
+                if (flagMediaEmbedded.flagVideo) {
+                    existingAction.flagVideo = flagMediaEmbedded.flagVideo;
+                }
                 existingAction.evidenceId = evidenceId;
                 await dispatchNotificationToUsers({
                     type: "report-flagged",
                     preferenceKey: "reportFlagged",
                     body: "Your report/result was flagged for review.",
-                    info: `Reason: ${actionData.flagReason}`,
+                    info: formatFlagNotificationInfo(actionData.flagReason, flagMediaEmbedded),
                     userIds: [String(data.user)],
                 });
             }
@@ -1385,15 +1448,18 @@ export const getResultsAndPerformAction = async (userId, actionData) => {
                 newAction.evidenceId = evidenceId;
             }
             if (actionData.action === "flag") {
-                if (!actionData.flagReason) {
-                    throw new Error("Flag reason is required when flagging.");
+                newAction.flagReason = actionData.flagReason.trim();
+                if (flagMediaEmbedded.flagImage) {
+                    newAction.flagImage = flagMediaEmbedded.flagImage;
                 }
-                newAction.flagReason = actionData.flagReason;
+                if (flagMediaEmbedded.flagVideo) {
+                    newAction.flagVideo = flagMediaEmbedded.flagVideo;
+                }
                 await dispatchNotificationToUsers({
                     type: "report-flagged",
                     preferenceKey: "reportFlagged",
                     body: "Your report/result was flagged for review.",
-                    info: `Reason: ${actionData.flagReason}`,
+                    info: formatFlagNotificationInfo(actionData.flagReason, flagMediaEmbedded),
                     userIds: [String(data.user)],
                 });
             }

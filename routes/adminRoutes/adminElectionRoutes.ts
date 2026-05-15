@@ -9,6 +9,9 @@ import {
 import { getDashboardController } from "../../controllers/adminController/adminDashboard.ts";
 import * as AdminController from "../../controllers/adminController/adminDashboard.ts";
 import * as PodcastController from "../../controllers/adminController/podcastController.ts";
+import * as NewsInsightAdminController from "../../controllers/adminController/newsInsightAdminController.ts";
+import * as PressCoverageAdminController from "../../controllers/adminController/pressCoverageAdminController.ts";
+import { parseNewsPressAdminMultipart } from "../../config/electionMulter.ts";
 import * as AdminSpeakerSlotsController from "../../controllers/speakerSlots/adminSpeakerSlotsController.ts";
 
 const router = express.Router();
@@ -148,6 +151,27 @@ router.post("/admin/newsletter", authMiddleware, isAdmin, PodcastController.send
 router.patch("/admin/podcast/:id", authMiddleware, isAdmin, PodcastController.editPodcast);
 router.get("/admin/podcast", authMiddleware, isAdmin, PodcastController.getAllPodcasts);
 router.delete("/admin/podcast/:id", authMiddleware, isAdmin, PodcastController.deletePodcast);
+
+router.post(
+  "/admin/news-insights",
+  authMiddleware,
+  isAdmin,
+  parseNewsPressAdminMultipart,
+  NewsInsightAdminController.createNewsInsightAdmin
+);
+router.get("/admin/news-insights", authMiddleware, isAdmin, NewsInsightAdminController.listNewsInsightsAdmin);
+router.get("/admin/news-insights/:id", authMiddleware, isAdmin, NewsInsightAdminController.getNewsInsightByIdAdmin);
+
+router.post(
+  "/admin/press-coverage",
+  authMiddleware,
+  isAdmin,
+  parseNewsPressAdminMultipart,
+  PressCoverageAdminController.createPressCoverageAdmin
+);
+router.get("/admin/press-coverage", authMiddleware, isAdmin, PressCoverageAdminController.listPressCoverageAdmin);
+router.get("/admin/press-coverage/:id", authMiddleware, isAdmin, PressCoverageAdminController.getPressCoverageByIdAdmin);
+
 router.get("/podcast/:id", authMiddleware, PodcastController.getSinglePodcast);
 router.get("/podcasts/inbox", authMiddleware, PodcastController.getUserInbox);
 router.patch("/podcast/mark-read/:podcastId", authMiddleware, PodcastController.markPodcastAsRead);

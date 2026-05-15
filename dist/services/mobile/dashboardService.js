@@ -1,5 +1,6 @@
 import Notification from "../../models/DailyTraffic/Notification.js";
-import Podcast from "../../models/admin/Podcast.js";
+import NewsInsight from "../../models/admin/NewsInsight.js";
+import PressCoverage from "../../models/admin/PressCoverage.js";
 import CollationDiscussionPost from "../../models/Election/CollationDiscussionPost.js";
 import CollationDiscussionComment from "../../models/Election/CollationDiscussionComment.js";
 import CollationReportComment from "../../models/Election/CollationReportComment.js";
@@ -7,6 +8,8 @@ import PulsePost from "../../models/Pulse/PulsePost.js";
 import PulseComment from "../../models/Pulse/PulseComment.js";
 import { getMobileLiveElectionsCarousel } from "./electionService.js";
 import { getOrSetCache } from "../../utils/cache.js";
+import { countCommentsForArticles } from "./newsInsightEngagementService.js";
+import { countCommentsForPressCoverageArticles } from "./pressCoverageService.js";
 const roleVisibilityFilter = (userId, role) => ({
     $and: [
         {
@@ -27,6 +30,12 @@ const roleVisibilityFilter = (userId, role) => ({
         { deletedBy: { $ne: userId } },
     ],
 });
+const textPreview = (html, max) => {
+    const plain = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    if (plain.length <= max)
+        return plain;
+    return `${plain.slice(0, max)}…`;
+};
 const relativeTime = (date) => {
     if (!date)
         return "";
@@ -89,7 +98,7 @@ const buildMobileDashboard = async (user) => {
     const liveElections = await getMobileLiveElectionsCarousel(user);
     const liveIds = liveElections.map((e) => e.id);
     const pulseVisibility = buildPulseVisibilityFilter(user);
-    const [electionNotifications, discussionPosts, pulsePosts, reportThreadComments, insights] = await Promise.all([
+    const [electionNotifications, discussionPosts, pulsePosts, reportThreadComments, insights, pressCoverageFeed] = await Promise.all([
         Notification.find({
             ...roleVisibilityFilter(userId, role),
             type: {
@@ -128,11 +137,19 @@ const buildMobileDashboard = async (user) => {
                 .limit(10)
                 .lean()
             : Promise.resolve([]),
-        Podcast.find({
-            recipients: { $in: ["all", role] },
+        NewsInsight.find({
+            isPublished: true,
         })
-            .sort({ createdAt: -1 })
+            .sort({ publishedAt: -1 })
             .limit(10)
+            .select("slug title thumbnailUrl excerpt content publishedAt likes")
+            .lean(),
+        PressCoverage.find({
+            isPublished: true,
+        })
+            .sort({ publishedAt: -1 })
+            .limit(10)
+            .select("slug title thumbnailUrl excerpt content publishedAt likes dateline")
             .lean(),
     ]);
     const [discussionCommentCounts, pulseCommentCounts] = await Promise.all([
@@ -151,6 +168,14 @@ const buildMobileDashboard = async (user) => {
     ]);
     const discussionCommentCountByPost = new Map(discussionCommentCounts.map((entry) => [String(entry._id), entry.count]));
     const pulseCommentCountByPost = new Map(pulseCommentCounts.map((entry) => [String(entry._id), entry.count]));
+    const insightIds = insights.map((i) => String(i._id));
+    const newsInsightCommentCountByArticle = insightIds.length
+        ? await countCommentsForArticles(insightIds)
+        : new Map();
+    const pressIds = pressCoverageFeed.map((p) => String(p._id));
+    const pressCoverageCommentCountByArticle = pressIds.length
+        ? await countCommentsForPressCoverageArticles(pressIds)
+        : new Map();
     return {
         liveElections,
         electionUpdates: electionNotifications
@@ -210,12 +235,37 @@ const buildMobileDashboard = async (user) => {
                 createdAt: c.createdAt,
             };
         }),
-        latestNewsAndInsights: insights.map((i) => ({
-            id: String(i._id),
-            title: i.title,
-            content: i.content,
-            publishedAt: i.createdAt,
-        })),
+        latestNewsAndInsights: insights.map((i) => {
+            const likes = Array.isArray(i.likes) ? i.likes : [];
+            return {
+                id: String(i._id),
+                slug: i.slug,
+                title: i.title,
+                thumbnailUrl: i.thumbnailUrl,
+                summary: (typeof i.excerpt === "string" ? i.excerpt.trim() : "") ||
+                    textPreview(String(i.content ?? ""), 240),
+                publishedAt: i.publishedAt,
+                likesCount: likes.length,
+                commentsCount: newsInsightCommentCountByArticle.get(String(i._id)) ?? 0,
+                isLikedByCurrentUser: likes.some((l) => l.user != null && String(l.user) === userId),
+            };
+        }),
+        pressCoverage: pressCoverageFeed.map((i) => {
+            const likes = Array.isArray(i.likes) ? i.likes : [];
+            return {
+                id: String(i._id),
+                slug: i.slug,
+                title: i.title,
+                thumbnailUrl: i.thumbnailUrl,
+                summary: (typeof i.excerpt === "string" ? i.excerpt.trim() : "") ||
+                    textPreview(String(i.content ?? ""), 240),
+                publishedAt: i.publishedAt,
+                dateline: typeof i.dateline === "string" ? i.dateline.trim() || undefined : undefined,
+                likesCount: likes.length,
+                commentsCount: pressCoverageCommentCountByArticle.get(String(i._id)) ?? 0,
+                isLikedByCurrentUser: likes.some((l) => l.user != null && String(l.user) === userId),
+            };
+        }),
     };
 };
 export const getMobileDashboard = async (user) => {

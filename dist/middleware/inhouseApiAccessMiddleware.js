@@ -16,13 +16,6 @@ const timingSafeMatch = (provided, expected) => {
         return false;
     return crypto.timingSafeEqual(a, b);
 };
-/**
- * When `INHOUSE_API_ACCESS_TOKEN` is set (single value or comma-separated),
- * every request under `/api` must send header `X-Inhouse-Access-Token` matching one of them.
- * This is separate from the user JWT (`Authorization: Bearer ...`).
- *
- * If the env var is unset, this middleware is a no-op (backward compatible for local dev).
- */
 export const inhouseApiAccessMiddleware = (req, res, next) => {
     const allowed = parseAllowedTokens();
     if (allowed.length === 0) {

@@ -1,6 +1,7 @@
 import type { AuthenticatedUser } from "../../types/authenticatedRequest.ts";
 import Notification from "../../models/DailyTraffic/Notification.ts";
-import Podcast from "../../models/admin/Podcast.ts";
+import NewsInsight from "../../models/admin/NewsInsight.ts";
+import PressCoverage from "../../models/admin/PressCoverage.ts";
 import CollationDiscussionPost from "../../models/Election/CollationDiscussionPost.ts";
 import CollationDiscussionComment from "../../models/Election/CollationDiscussionComment.ts";
 import CollationReportComment from "../../models/Election/CollationReportComment.ts";
@@ -8,6 +9,8 @@ import PulsePost from "../../models/Pulse/PulsePost.ts";
 import PulseComment from "../../models/Pulse/PulseComment.ts";
 import { getMobileLiveElectionsCarousel } from "./electionService.ts";
 import { getOrSetCache } from "../../utils/cache.ts";
+import { countCommentsForArticles } from "./newsInsightEngagementService.ts";
+import { countCommentsForPressCoverageArticles } from "./pressCoverageService.ts";
 
 const roleVisibilityFilter = (userId: string, role: string) => ({
   $and: [
@@ -29,6 +32,12 @@ const roleVisibilityFilter = (userId: string, role: string) => ({
     { deletedBy: { $ne: userId } },
   ],
 });
+
+const textPreview = (html: string, max: number): string => {
+  const plain = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  if (plain.length <= max) return plain;
+  return `${plain.slice(0, max)}…`;
+};
 
 const relativeTime = (date: Date | undefined): string => {
   if (!date) return "";
@@ -110,7 +119,7 @@ const buildMobileDashboard = async (user: AuthenticatedUser) => {
       ward?: string | null;
     }
   );
-  const [electionNotifications, discussionPosts, pulsePosts, reportThreadComments, insights] =
+  const [electionNotifications, discussionPosts, pulsePosts, reportThreadComments, insights, pressCoverageFeed] =
     await Promise.all([
       Notification.find({
         ...roleVisibilityFilter(userId, role),
@@ -150,11 +159,19 @@ const buildMobileDashboard = async (user: AuthenticatedUser) => {
             .limit(10)
             .lean()
         : Promise.resolve([]),
-      Podcast.find({
-        recipients: { $in: ["all", role] },
+      NewsInsight.find({
+        isPublished: true,
       })
-        .sort({ createdAt: -1 })
+        .sort({ publishedAt: -1 })
         .limit(10)
+        .select("slug title thumbnailUrl excerpt content publishedAt likes")
+        .lean(),
+      PressCoverage.find({
+        isPublished: true,
+      })
+        .sort({ publishedAt: -1 })
+        .limit(10)
+        .select("slug title thumbnailUrl excerpt content publishedAt likes dateline")
         .lean(),
     ]);
 
@@ -179,6 +196,16 @@ const buildMobileDashboard = async (user: AuthenticatedUser) => {
   const pulseCommentCountByPost = new Map(
     pulseCommentCounts.map((entry) => [String(entry._id), entry.count])
   );
+
+  const insightIds = insights.map((i) => String(i._id));
+  const newsInsightCommentCountByArticle = insightIds.length
+    ? await countCommentsForArticles(insightIds)
+    : new Map<string, number>();
+
+  const pressIds = pressCoverageFeed.map((p) => String(p._id));
+  const pressCoverageCommentCountByArticle = pressIds.length
+    ? await countCommentsForPressCoverageArticles(pressIds)
+    : new Map<string, number>();
 
   return {
     liveElections,
@@ -248,12 +275,43 @@ const buildMobileDashboard = async (user: AuthenticatedUser) => {
         createdAt: c.createdAt,
       };
     }),
-    latestNewsAndInsights: insights.map((i) => ({
-      id: String(i._id),
-      title: i.title,
-      content: i.content,
-      publishedAt: i.createdAt,
-    })),
+    latestNewsAndInsights: insights.map((i) => {
+      const likes = Array.isArray(i.likes) ? i.likes : [];
+      return {
+        id: String(i._id),
+        slug: i.slug,
+        title: i.title,
+        thumbnailUrl: i.thumbnailUrl,
+        summary:
+          (typeof i.excerpt === "string" ? i.excerpt.trim() : "") ||
+          textPreview(String(i.content ?? ""), 240),
+        publishedAt: i.publishedAt,
+        likesCount: likes.length,
+        commentsCount: newsInsightCommentCountByArticle.get(String(i._id)) ?? 0,
+        isLikedByCurrentUser: likes.some(
+          (l: { user?: unknown }) => l.user != null && String(l.user) === userId
+        ),
+      };
+    }),
+    pressCoverage: pressCoverageFeed.map((i) => {
+      const likes = Array.isArray(i.likes) ? i.likes : [];
+      return {
+        id: String(i._id),
+        slug: i.slug,
+        title: i.title,
+        thumbnailUrl: i.thumbnailUrl,
+        summary:
+          (typeof i.excerpt === "string" ? i.excerpt.trim() : "") ||
+          textPreview(String(i.content ?? ""), 240),
+        publishedAt: i.publishedAt,
+        dateline: typeof i.dateline === "string" ? i.dateline.trim() || undefined : undefined,
+        likesCount: likes.length,
+        commentsCount: pressCoverageCommentCountByArticle.get(String(i._id)) ?? 0,
+        isLikedByCurrentUser: likes.some(
+          (l: { user?: unknown }) => l.user != null && String(l.user) === userId
+        ),
+      };
+    }),
   };
 };
 

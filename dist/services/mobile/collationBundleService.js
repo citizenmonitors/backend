@@ -3,7 +3,7 @@ import ElectionData from "../../models/Election/ElectionData.js";
 import IncidentReport from "../../models/Election/IncidentReport.js";
 import CompletedUser from "../../models/CompletedUser.js";
 import { getLiveElectionService, buildObserverSubmissionLocationFilter, observerSubmissionDocMatchesLocationFilter, } from "../Election/electionLive.js";
-import { getResultsAndPerformAction } from "../Election/electionService.js";
+import { getResultsAndPerformAction, } from "../Election/electionService.js";
 import { isActiveElectionRelevantForUser } from "../../utils/electionRelevanceForUser.js";
 export const assertMobileCollationAccess = async (activeElectionId, userId) => {
     const user = await CompletedUser.findById(userId).lean();
@@ -97,7 +97,7 @@ export const getMobileCollationBundle = async (activeElectionId, userId) => {
         },
     };
 };
-export const mobileCollationUserAction = async (activeElectionId, userId, body) => {
+export const mobileCollationUserAction = async (activeElectionId, userId, body, flagMediaFiles) => {
     const { user, electionType } = await assertMobileCollationAccess(activeElectionId, userId);
     if (!body?.action) {
         return getResultsAndPerformAction(userId, null);
@@ -128,6 +128,6 @@ export const mobileCollationUserAction = async (activeElectionId, userId, body) 
         action: body.action,
         dataType: body.dataType,
         flagReason: body.flagReason,
-    });
+    }, flagMediaFiles);
 };
 //# sourceMappingURL=collationBundleService.js.map

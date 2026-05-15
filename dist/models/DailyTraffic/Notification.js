@@ -13,6 +13,8 @@ const notificationSchema = new mongoose.Schema({
             "report-flagged",
             "newsletter",
             "election-day-alert",
+            "news-insight",
+            "press-coverage",
         ],
     },
     preferenceKey: {
@@ -26,6 +28,8 @@ const notificationSchema = new mongoose.Schema({
             "reportFlagged",
             "securityAlerts",
             "newsletter",
+            "newsAndInsights",
+            "pressCoverage",
         ],
         default: undefined,
     },

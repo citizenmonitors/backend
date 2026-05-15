@@ -1,7 +1,7 @@
 import express from "express";
 import { authMiddleware } from "../../middleware/authMiddleware.js";
 import { getActiveElectionsMobile, getMyElectionSubmissionMobile, submitElectionResultMobile, updateElectionResultMobile, deleteElectionResultMobile, submitIncidentReportMobile, updateIncidentReportMobile, deleteIncidentReportMobile, getLiveElectionsCarouselMobile, } from "../../controllers/mobile/electionController.js";
-import { uploadCollationDiscussionFiles, uploadReportDataFiles, uploadResultDataFiles, } from "../../config/electionMulter.js";
+import { uploadCollationDiscussionFiles, uploadReportDataFiles, uploadResultDataFiles, uploadFlagEvidenceFiles, } from "../../config/electionMulter.js";
 import { getMobileCollation, postMobileCollationUserAction, getReportThreadCommentsMobile, postReportThreadCommentMobile, postReportCommentLikeMobile, getDiscussionPostsMobile, postDiscussionPostMobile, postDiscussionPostLikeMobile, getDiscussionPostCommentsMobile, postDiscussionPostCommentMobile, postDiscussionPostCommentLikeMobile, } from "../../controllers/mobile/collationController.js";
 const router = express.Router();
 // GET /api/v1/mobile/elections/active?status=live|upcoming|concluded&scope=all|polling-unit
@@ -61,7 +61,18 @@ router.put("/:activeElectionId/report", authMiddleware, (req, res, next) => {
 router.delete("/:activeElectionId/report", authMiddleware, deleteIncidentReportMobile);
 // Collation / election live (active election id = ActiveElection._id)
 router.get("/:activeElectionId/collation", authMiddleware, getMobileCollation);
-router.post("/:activeElectionId/collation/user-action", authMiddleware, postMobileCollationUserAction);
+router.post("/:activeElectionId/collation/user-action", authMiddleware, (req, res, next) => {
+    uploadFlagEvidenceFiles(req, res, (err) => {
+        if (err) {
+            const message = err instanceof Error ? err.message : String(err);
+            return res.status(400).json({
+                message: "Flag evidence upload Multer error",
+                error: message,
+            });
+        }
+        next();
+    });
+}, postMobileCollationUserAction);
 // Threaded comments on a specific result (election-result) or incident (incident-report)
 router.get("/:activeElectionId/report-thread/:targetType/:targetId/comments", authMiddleware, getReportThreadCommentsMobile);
 router.post("/:activeElectionId/report-thread/:targetType/:targetId/comments", authMiddleware, postReportThreadCommentMobile);

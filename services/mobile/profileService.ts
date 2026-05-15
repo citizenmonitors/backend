@@ -60,6 +60,8 @@ type MobileNotificationSettings = {
   reportFlagged?: boolean;
   securityAlerts?: boolean;
   newsletter?: boolean;
+  newsAndInsights?: boolean;
+  pressCoverage?: boolean;
 };
 
 type PollingUnitDetail = {
@@ -121,6 +123,8 @@ const withNotificationDefaults = (
   reportFlagged: current?.reportFlagged ?? role === "observer",
   securityAlerts: current?.securityAlerts ?? false,
   newsletter: current?.newsletter ?? true,
+  newsAndInsights: current?.newsAndInsights ?? true,
+  pressCoverage: current?.pressCoverage ?? true,
 });
 
 export const getMobileProfile = async (userId: Id) => {

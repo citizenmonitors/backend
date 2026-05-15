@@ -18,6 +18,20 @@ import {
 } from "../../services/mobile/collationDiscussionService.ts";
 import { invalidateCacheByPrefixes } from "../../utils/cache.ts";
 
+type CollationFlagUploadFile = {
+  buffer: Buffer;
+  mimetype: string;
+  originalname: string;
+  size: number;
+};
+
+type CollationUserActionRequest = AuthenticatedRequest & {
+  files?: {
+    flagImage?: CollationFlagUploadFile[];
+    flagVideo?: CollationFlagUploadFile[];
+  };
+};
+
 const errMsg = (e: unknown): string => (e instanceof Error ? e.message : String(e));
 
 const requireUserId = (req: AuthenticatedRequest): string => {
@@ -76,7 +90,7 @@ export const getMobileCollation = async (req: Request, res: Response) => {
 
 export const postMobileCollationUserAction = async (req: Request, res: Response) => {
   try {
-    const r = req as AuthenticatedRequest;
+    const r = req as CollationUserActionRequest;
     const activeElectionId = asParamString(req.params.activeElectionId);
     if (!isValidObjectId(activeElectionId)) {
       return res.status(400).json({ message: "Invalid election id" });
@@ -101,7 +115,17 @@ export const postMobileCollationUserAction = async (req: Request, res: Response)
       return res.status(400).json({ message: "Invalid target id" });
     }
 
-    const results = await mobileCollationUserAction(activeElectionId, userId, actionData);
+    const flagMediaFiles =
+      r.files?.flagImage?.length || r.files?.flagVideo?.length
+        ? { flagImage: r.files.flagImage, flagVideo: r.files.flagVideo }
+        : undefined;
+
+    const results = await mobileCollationUserAction(
+      activeElectionId,
+      userId,
+      actionData,
+      flagMediaFiles
+    );
 
     return res.status(200).json({
       message: actionData

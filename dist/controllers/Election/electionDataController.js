@@ -316,14 +316,18 @@ export const getUserElectionResultsAndReportsCon = async (req, res) => {
 export const getResultsAndPerformActionController = async (req, res) => {
     try {
         const userId = requireUserId(req);
-        const { electionId, action, dataType, flagReason } = req.body;
+        const r = req;
+        const { electionId, action, dataType, flagReason } = r.body;
         if (electionId && !isValidObjectId(electionId)) {
             return res.status(400).json({ message: "Invalid election ID" });
         }
         const actionData = action
             ? { electionId, action, dataType, flagReason }
             : null;
-        const results = await getResultsAndPerformAction(userId, actionData);
+        const flagMediaFiles = r.files?.flagImage?.length || r.files?.flagVideo?.length
+            ? { flagImage: r.files.flagImage, flagVideo: r.files.flagVideo }
+            : undefined;
+        const results = await getResultsAndPerformAction(userId, actionData, flagMediaFiles);
         return res.status(200).json({
             message: action
                 ? "Election results and incident reports updated successfully"

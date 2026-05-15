@@ -36,6 +36,9 @@ import mobileElectionRoutes from "./routes/mobile/electionRoutes.ts";
 import mobileNotificationRoutes from "./routes/mobile/notificationRoutes.ts";
 import mobileDashboardRoutes from "./routes/mobile/dashboardRoutes.ts";
 import mobilePulseRoutes from "./routes/mobile/pulseRoutes.ts";
+import mobileAcademyRoutes from "./routes/mobile/academyRoutes.ts";
+import mobileNewsInsightRoutes from "./routes/mobile/newsInsightRoutes.ts";
+import mobilePressCoverageRoutes from "./routes/mobile/pressCoverageRoutes.ts";
 import { inhouseApiAccessMiddleware } from "./middleware/inhouseApiAccessMiddleware.ts";
 import { initSocketServer } from "./services/realtime/socketServer.ts";
 import { setSocketServer } from "./services/realtime/socketBus.ts";
@@ -79,8 +82,6 @@ app.use("/api/auth", authLimiter);
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 
-// In-house API gate: when INHOUSE_API_ACCESS_TOKEN is set, require header
-// `X-Inhouse-Access-Token` on all `/api/*` routes (separate from user JWT).
 app.use((req: Request, res: Response, next: NextFunction) => {
   const path = req.path ?? "";
   if (!path.startsWith("/api")) {
@@ -154,6 +155,9 @@ app.use("/api/v1/mobile/elections", mobileElectionRoutes);
 app.use("/api/v1/mobile/notifications", mobileNotificationRoutes);
 app.use("/api/v1/mobile/dashboard", mobileDashboardRoutes);
 app.use("/api/v1/mobile/pulse", mobilePulseRoutes);
+app.use("/api/v1/mobile/academy", mobileAcademyRoutes);
+app.use("/api/v1/mobile/news-insights", mobileNewsInsightRoutes);
+app.use("/api/v1/mobile/press-coverage", mobilePressCoverageRoutes);
 
 app.use("/observerid", express.static(path.join(__dirname, "observerId")));
 app.use("/profileimage", express.static(path.join(__dirname, "profileImage")));

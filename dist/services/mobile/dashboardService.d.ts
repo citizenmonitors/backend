@@ -13,7 +13,7 @@ export declare const getMobileDashboard: (user: AuthenticatedUser) => Promise<{
     }[];
     electionUpdates: {
         id: string;
-        type: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | null | undefined;
+        type: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | "news-insight" | "press-coverage" | null | undefined;
         title: string;
         info: string;
         timeAgo: string;
@@ -55,9 +55,26 @@ export declare const getMobileDashboard: (user: AuthenticatedUser) => Promise<{
     }[];
     latestNewsAndInsights: {
         id: string;
+        slug: string;
         title: string;
-        content: string;
+        thumbnailUrl: string;
+        summary: string;
         publishedAt: NativeDate;
+        likesCount: number;
+        commentsCount: number;
+        isLikedByCurrentUser: boolean;
+    }[];
+    pressCoverage: {
+        id: string;
+        slug: string;
+        title: string;
+        thumbnailUrl: string;
+        summary: string;
+        publishedAt: NativeDate;
+        dateline: string | undefined;
+        likesCount: number;
+        commentsCount: number;
+        isLikedByCurrentUser: boolean;
     }[];
 }>;
 //# sourceMappingURL=dashboardService.d.ts.map

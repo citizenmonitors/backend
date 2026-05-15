@@ -6,6 +6,10 @@ type MulterMemoryFile = {
     originalname: string;
     size: number;
 };
+export type FlagMediaFiles = {
+    flagImage?: MulterMemoryFile[];
+    flagVideo?: MulterMemoryFile[];
+};
 type ElectionResultUploadFiles = {
     resultPicture?: MulterMemoryFile[];
     resultVideo?: MulterMemoryFile[];
@@ -60,6 +64,7 @@ type PollingUnitActionPayload = {
     dataType: "election" | "incident";
     electionId: Id;
     action: "agree" | "flag" | "unagree";
+    /** Required when `action` is `flag` (trimmed non-empty). */
     flagReason?: string;
     evidenceId?: string;
 };
@@ -310,11 +315,39 @@ export declare const getElectionResultById: (electionId: Id, userId: Id) => Prom
         }>;
         actions: Types.DocumentArray<{
             action: "agree" | "flag";
+            flagImage?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
+            flagVideo?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
             userId?: Types.ObjectId | null | undefined;
             flagReason?: string | null | undefined;
             evidenceId?: Types.ObjectId | null | undefined;
         } | {
             action: "agree" | "flag";
+            flagImage?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
+            flagVideo?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
             userId?: string | null | undefined;
             flagReason?: string | null | undefined;
             evidenceId?: string | null | undefined;
@@ -322,11 +355,39 @@ export declare const getElectionResultById: (electionId: Id, userId: Id) => Prom
             __v: number;
         }, Types.Subdocument<string | Types.ObjectId, any, {
             action: "agree" | "flag";
+            flagImage?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
+            flagVideo?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
             userId?: Types.ObjectId | null | undefined;
             flagReason?: string | null | undefined;
             evidenceId?: Types.ObjectId | null | undefined;
         } | {
             action: "agree" | "flag";
+            flagImage?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
+            flagVideo?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
             userId?: string | null | undefined;
             flagReason?: string | null | undefined;
             evidenceId?: string | null | undefined;
@@ -334,11 +395,39 @@ export declare const getElectionResultById: (electionId: Id, userId: Id) => Prom
             __v: number;
         }> & ({
             action: "agree" | "flag";
+            flagImage?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
+            flagVideo?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
             userId?: Types.ObjectId | null | undefined;
             flagReason?: string | null | undefined;
             evidenceId?: Types.ObjectId | null | undefined;
         } | {
             action: "agree" | "flag";
+            flagImage?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
+            flagVideo?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
             userId?: string | null | undefined;
             flagReason?: string | null | undefined;
             evidenceId?: string | null | undefined;
@@ -396,11 +485,39 @@ export declare const getElectionResultById: (electionId: Id, userId: Id) => Prom
         userRole: string;
         actions: Types.DocumentArray<{
             action: "agree" | "flag";
+            flagImage?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
+            flagVideo?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
             userId?: Types.ObjectId | null | undefined;
             flagReason?: string | null | undefined;
             evidenceId?: Types.ObjectId | null | undefined;
         } | {
             action: "agree" | "flag";
+            flagImage?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
+            flagVideo?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
             userId?: string | null | undefined;
             flagReason?: string | null | undefined;
             evidenceId?: string | null | undefined;
@@ -408,11 +525,39 @@ export declare const getElectionResultById: (electionId: Id, userId: Id) => Prom
             __v: number;
         }, Types.Subdocument<string | Types.ObjectId, any, {
             action: "agree" | "flag";
+            flagImage?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
+            flagVideo?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
             userId?: Types.ObjectId | null | undefined;
             flagReason?: string | null | undefined;
             evidenceId?: Types.ObjectId | null | undefined;
         } | {
             action: "agree" | "flag";
+            flagImage?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
+            flagVideo?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
             userId?: string | null | undefined;
             flagReason?: string | null | undefined;
             evidenceId?: string | null | undefined;
@@ -420,11 +565,39 @@ export declare const getElectionResultById: (electionId: Id, userId: Id) => Prom
             __v: number;
         }> & ({
             action: "agree" | "flag";
+            flagImage?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
+            flagVideo?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
             userId?: Types.ObjectId | null | undefined;
             flagReason?: string | null | undefined;
             evidenceId?: Types.ObjectId | null | undefined;
         } | {
             action: "agree" | "flag";
+            flagImage?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
+            flagVideo?: {
+                name?: string | null | undefined;
+                type?: string | null | undefined;
+                url?: string | null | undefined;
+                location?: string | null | undefined;
+                size?: number | null | undefined;
+            } | null | undefined;
             userId?: string | null | undefined;
             flagReason?: string | null | undefined;
             evidenceId?: string | null | undefined;
@@ -519,11 +692,39 @@ export declare const getElectionById: (electionId: Id, userId: Id) => Promise<{
             }>;
             actions: Types.DocumentArray<{
                 action: "agree" | "flag";
+                flagImage?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
+                flagVideo?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
                 userId?: Types.ObjectId | null | undefined;
                 flagReason?: string | null | undefined;
                 evidenceId?: Types.ObjectId | null | undefined;
             } | {
                 action: "agree" | "flag";
+                flagImage?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
+                flagVideo?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
                 userId?: string | null | undefined;
                 flagReason?: string | null | undefined;
                 evidenceId?: string | null | undefined;
@@ -531,11 +732,39 @@ export declare const getElectionById: (electionId: Id, userId: Id) => Promise<{
                 __v: number;
             }, Types.Subdocument<string | Types.ObjectId, any, {
                 action: "agree" | "flag";
+                flagImage?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
+                flagVideo?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
                 userId?: Types.ObjectId | null | undefined;
                 flagReason?: string | null | undefined;
                 evidenceId?: Types.ObjectId | null | undefined;
             } | {
                 action: "agree" | "flag";
+                flagImage?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
+                flagVideo?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
                 userId?: string | null | undefined;
                 flagReason?: string | null | undefined;
                 evidenceId?: string | null | undefined;
@@ -543,11 +772,39 @@ export declare const getElectionById: (electionId: Id, userId: Id) => Promise<{
                 __v: number;
             }> & ({
                 action: "agree" | "flag";
+                flagImage?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
+                flagVideo?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
                 userId?: Types.ObjectId | null | undefined;
                 flagReason?: string | null | undefined;
                 evidenceId?: Types.ObjectId | null | undefined;
             } | {
                 action: "agree" | "flag";
+                flagImage?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
+                flagVideo?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
                 userId?: string | null | undefined;
                 flagReason?: string | null | undefined;
                 evidenceId?: string | null | undefined;
@@ -605,11 +862,39 @@ export declare const getElectionById: (electionId: Id, userId: Id) => Promise<{
             userRole: string;
             actions: Types.DocumentArray<{
                 action: "agree" | "flag";
+                flagImage?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
+                flagVideo?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
                 userId?: Types.ObjectId | null | undefined;
                 flagReason?: string | null | undefined;
                 evidenceId?: Types.ObjectId | null | undefined;
             } | {
                 action: "agree" | "flag";
+                flagImage?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
+                flagVideo?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
                 userId?: string | null | undefined;
                 flagReason?: string | null | undefined;
                 evidenceId?: string | null | undefined;
@@ -617,11 +902,39 @@ export declare const getElectionById: (electionId: Id, userId: Id) => Promise<{
                 __v: number;
             }, Types.Subdocument<string | Types.ObjectId, any, {
                 action: "agree" | "flag";
+                flagImage?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
+                flagVideo?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
                 userId?: Types.ObjectId | null | undefined;
                 flagReason?: string | null | undefined;
                 evidenceId?: Types.ObjectId | null | undefined;
             } | {
                 action: "agree" | "flag";
+                flagImage?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
+                flagVideo?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
                 userId?: string | null | undefined;
                 flagReason?: string | null | undefined;
                 evidenceId?: string | null | undefined;
@@ -629,11 +942,39 @@ export declare const getElectionById: (electionId: Id, userId: Id) => Promise<{
                 __v: number;
             }> & ({
                 action: "agree" | "flag";
+                flagImage?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
+                flagVideo?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
                 userId?: Types.ObjectId | null | undefined;
                 flagReason?: string | null | undefined;
                 evidenceId?: Types.ObjectId | null | undefined;
             } | {
                 action: "agree" | "flag";
+                flagImage?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
+                flagVideo?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
                 userId?: string | null | undefined;
                 flagReason?: string | null | undefined;
                 evidenceId?: string | null | undefined;
@@ -768,16 +1109,58 @@ export declare const uploadResultDataService: (electionId: Id, userId: Id, data:
     }>;
     actions: Types.DocumentArray<{
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: Types.ObjectId | null | undefined;
     }, Types.Subdocument<Types.ObjectId, any, {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: Types.ObjectId | null | undefined;
     }> & {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: Types.ObjectId | null | undefined;
@@ -843,16 +1226,58 @@ export declare const updateResultDataService: (electionId: Id, userId: Id, data?
     }>;
     actions: Types.DocumentArray<{
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: Types.ObjectId | null | undefined;
     }, Types.Subdocument<Types.ObjectId, any, {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: Types.ObjectId | null | undefined;
     }> & {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: Types.ObjectId | null | undefined;
@@ -913,16 +1338,58 @@ export declare const updateResultDataService: (electionId: Id, userId: Id, data?
     }>;
     actions: Types.DocumentArray<{
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: Types.ObjectId | null | undefined;
     }, Types.Subdocument<Types.ObjectId, any, {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: Types.ObjectId | null | undefined;
     }> & {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: Types.ObjectId | null | undefined;
@@ -991,16 +1458,58 @@ export declare const getUserElectionData: (userId: Id) => Promise<(import("mongo
     }>;
     actions: Types.DocumentArray<{
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: Types.ObjectId | null | undefined;
     }, Types.Subdocument<Types.ObjectId, any, {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: Types.ObjectId | null | undefined;
     }> & {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: Types.ObjectId | null | undefined;
@@ -1061,16 +1570,58 @@ export declare const getUserElectionData: (userId: Id) => Promise<(import("mongo
     }>;
     actions: Types.DocumentArray<{
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: Types.ObjectId | null | undefined;
     }, Types.Subdocument<Types.ObjectId, any, {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: Types.ObjectId | null | undefined;
     }> & {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: Types.ObjectId | null | undefined;
@@ -1128,16 +1679,58 @@ export declare const uploadIncidentReportDataService: (electionId: Id, userId: I
     userRole: string;
     actions: Types.DocumentArray<{
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: Types.ObjectId | null | undefined;
     }, Types.Subdocument<Types.ObjectId, any, {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: Types.ObjectId | null | undefined;
     }> & {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: Types.ObjectId | null | undefined;
@@ -1207,16 +1800,58 @@ export declare const uploadIncidentReportDataService: (electionId: Id, userId: I
     userRole: string;
     actions: Types.DocumentArray<{
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: Types.ObjectId | null | undefined;
     }, Types.Subdocument<Types.ObjectId, any, {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: Types.ObjectId | null | undefined;
     }> & {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: Types.ObjectId | null | undefined;
@@ -1291,16 +1926,58 @@ export declare const updateIncidentReportDataService: (electionId: Id, userId: I
     userRole: string;
     actions: Types.DocumentArray<{
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: Types.ObjectId | null | undefined;
     }, Types.Subdocument<Types.ObjectId, any, {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: Types.ObjectId | null | undefined;
     }> & {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: Types.ObjectId | null | undefined;
@@ -1370,16 +2047,58 @@ export declare const updateIncidentReportDataService: (electionId: Id, userId: I
     userRole: string;
     actions: Types.DocumentArray<{
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: Types.ObjectId | null | undefined;
     }, Types.Subdocument<Types.ObjectId, any, {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: Types.ObjectId | null | undefined;
     }> & {
         action: "agree" | "flag";
+        flagImage?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
+        flagVideo?: {
+            name?: string | null | undefined;
+            type?: string | null | undefined;
+            url?: string | null | undefined;
+            location?: string | null | undefined;
+            size?: number | null | undefined;
+        } | null | undefined;
         userId?: Types.ObjectId | null | undefined;
         flagReason?: string | null | undefined;
         evidenceId?: Types.ObjectId | null | undefined;
@@ -1474,7 +2193,7 @@ export declare const getUserElectionResultsAndReports: (userId: Id) => Promise<{
         } | null)[];
     };
 }>;
-export declare const getResultsAndPerformAction: (userId: Id, actionData: PollingUnitActionPayload | null | undefined) => Promise<{
+export declare const getResultsAndPerformAction: (userId: Id, actionData: PollingUnitActionPayload | null | undefined, flagMediaFiles?: FlagMediaFiles) => Promise<{
     results: {
         electionTypeId: string | Types.ObjectId | undefined;
         electionId: string | Types.ObjectId;

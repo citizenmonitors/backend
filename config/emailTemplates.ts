@@ -2295,3 +2295,67 @@ export const newsLetterTemplatePoliceBrutalityLeadershipOrInstitutional = () =>
       `,
   });
 
+export const newsLetterTemplateNigerianVotersPartyOrPoliticianLoyalty = () =>
+  baseTemplate({
+    title: "Nigerian Voters; Loyal to Politicians or Political Parties?",
+    message: `
+      <table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
+        <tr>
+          <td>
+            <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 6px; overflow: hidden;">
+
+              <!-- Header -->
+              <tr>
+                <td style="background-color: #06BBAF; color: white; padding: 20px 30px; text-align: center;">
+                  <h3 style="color: #ffffff; margin: 0; font-size: 22px;">Nigerian Voters; Loyal to Politicians or Political Parties?</h3>
+                </td>
+              </tr>
+
+              <!-- Body -->
+              <tr>
+                <td style="padding: 30px; color: #000000; font-size: 18px; line-height: 1.7;">
+
+                  <p><strong>Dear Citizen Monitors,</strong></p>
+
+                  <p>As Nigeria gradually inches toward another electoral cycle, one question continues to shape the nation's political reality: are Nigerian voters truly loyal to political parties, or are they simply loyal to powerful politicians?</p>
+
+                  <p>In many established democracies, political parties are built on ideology, long-term policy direction, and institutional identity. Voters often align with parties because of shared beliefs on governance, economy, social values, or national priorities. But in Nigeria, the situation appears far more complicated.</p>
+
+                  <p>Over the years, Nigerian politics has increasingly revolved around personalities rather than party structures. Politicians move freely from one party to another, often carrying their supporters along with them. What was once described as "cross carpeting" has now become almost a routine political strategy. Strikingly, many voters who once fiercely defended a party suddenly switch allegiance the moment their preferred political figure defects elsewhere.</p>
+
+                  <h4 style="color: #06BBAF; margin-top: 20px;">Do Nigerians vote for manifestos, or for familiar names?</h4>
+
+                  <p>The evidence suggests that individuals often matter more than institutions. From local council elections to presidential contests, charismatic politicians with strong ethnic, regional, religious, or financial influence tend to overshadow party ideology. In many cases, voters are less concerned about what a political party represents and more interested in who is flying its flag.</p>
+
+                  <p>This reality weakens democratic development.</p>
+
+                  <p>When political parties become mere vehicles for personal ambition rather than institutions driven by ideas, accountability suffers. Ideology disappears. Internal democracy weakens. Long-term national planning becomes secondary to political survival. Elections then become popularity contests instead of serious debates about governance and policy.</p>
+
+                  <h4 style="color: #06BBAF; margin-top: 20px;">Yet, the blame cannot rest solely on politicians</h4>
+
+                  <p>Nigerian parties themselves have struggled to build strong ideological identities. Most parties campaign on similar promises: security, jobs, infrastructure, and anti-corruption. Very few clearly define how their approach fundamentally differs from others. As a result, voters often find it difficult to develop genuine party loyalty rooted in ideas or policy convictions.</p>
+
+                  <h4 style="color: #06BBAF; margin-top: 20px;">Still, there are signs of political evolution</h4>
+
+                  <p>The 2023 elections demonstrated that younger voters are beginning to pay closer attention to governance records, transparency, and competence. Social media conversations, civic engagement, and issue-based advocacy are slowly reshaping political participation. For many citizens, especially first-time voters, blind loyalty is gradually giving way to greater scrutiny.</p>
+
+                  <h4 style="color: #06BBAF; margin-top: 20px;">But the transition remains incomplete</h4>
+
+                  <p>Nigeria's democracy cannot mature fully until political parties become stronger than individual politicians. Institutions must outlive personalities. Voters must demand consistency, ideology, and accountability rather than emotional attachment to political figures.</p>
+
+                  <p>The future of Nigerian democracy may ultimately depend on whether citizens continue to follow politicians wherever they go, or begin to insist that parties stand for something beyond the ambitions of the men and women who lead them.</p>
+
+                  <p>As always, the conversation continues as the Citizen Monitors App launches June 1st, 2026. We will keep you informed.</p>
+
+                  ${newsletterFooterTemplate()}
+
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+      </table>
+      `,
+  });
+

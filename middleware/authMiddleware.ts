@@ -60,6 +60,38 @@ export const authMiddleware = async (
   }
 };
 
+/** If a valid Bearer token is present, attaches `user` (same shape as authMiddleware). Invalid or missing token continues without user. */
+export const optionalAuthMiddleware = async (
+  req: Request,
+  _res: Response,
+  next: NextFunction
+) => {
+  const token = extractBearerToken(req.header("Authorization"));
+  if (!token) return next();
+
+  try {
+    const email = verifyJwtEmail(token);
+    const user = await CompletedUser.findOne({ email })
+      .populate("adminPermissions")
+      .lean();
+    if (!user) return next();
+
+    const rawPerms = user.adminPermissions;
+    const permissions: Record<string, boolean> =
+      rawPerms &&
+      typeof rawPerms === "object" &&
+      !(rawPerms instanceof mongoose.Types.ObjectId)
+        ? (rawPerms as Record<string, boolean>)
+        : {};
+
+    const r = req as AuthenticatedRequest;
+    r.user = { ...user, permissions } as AuthenticatedUser;
+  } catch {
+    // ignore invalid/expired token for optional-auth routes
+  }
+  next();
+};
+
 //  Check if User is Admin
 export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
   const r = req as AuthenticatedRequest;

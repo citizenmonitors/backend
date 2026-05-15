@@ -28,6 +28,49 @@ const upload = multer({
     limits: { fileSize: 25 * 1024 * 1024 }, // 25 MB
     fileFilter,
 });
+const newsPressImageExtensions = [".png", ".jpg", ".jpeg", ".webp", ".svg"];
+const newsPressImageMimeTypes = [
+    "image/png",
+    "image/jpeg",
+    "image/webp",
+    "image/svg+xml",
+];
+const newsPressImageFilter = (_req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (newsPressImageExtensions.includes(ext) && newsPressImageMimeTypes.includes(file.mimetype)) {
+        cb(null, true);
+    }
+    else {
+        cb(new Error("Thumbnail and hero must be images: png, jpg, jpeg, webp, or svg"));
+    }
+};
+const uploadNewsPress = multer({
+    storage,
+    limits: { fileSize: 15 * 1024 * 1024 },
+    fileFilter: newsPressImageFilter,
+});
+/** Admin create News / Press — multipart file fields `thumbnail` (required), `heroImage` (optional). */
+export const uploadNewsPressAdminImages = uploadNewsPress.fields([
+    { name: "thumbnail", maxCount: 1 },
+    { name: "heroImage", maxCount: 1 },
+]);
+export const runNewsPressAdminUpload = (req, res, next) => {
+    uploadNewsPressAdminImages(req, res, (err) => {
+        if (err) {
+            const message = err instanceof Error ? err.message : String(err);
+            return res.status(400).json({ message: `Upload: ${message}` });
+        }
+        next();
+    });
+};
+/** Parses multipart form-data (text fields + image files `thumbnail` / `heroImage`). Skips for JSON bodies. */
+export const parseNewsPressAdminMultipart = (req, res, next) => {
+    const ct = String(req.headers["content-type"] ?? "").toLowerCase();
+    if (ct.includes("multipart/form-data")) {
+        return runNewsPressAdminUpload(req, res, next);
+    }
+    next();
+};
 export const uploadResultDataFiles = upload.fields([
     { name: "resultPicture", maxCount: 1 },
     { name: "resultVideo", maxCount: 1 },
@@ -42,5 +85,10 @@ export const uploadCollationDiscussionFiles = upload.fields([
 ]);
 export const uploadPulsePostFiles = upload.fields([
     { name: "image", maxCount: 1 },
+]);
+/** Optional evidence when flagging another user's result or incident (polling-unit verification). */
+export const uploadFlagEvidenceFiles = upload.fields([
+    { name: "flagImage", maxCount: 1 },
+    { name: "flagVideo", maxCount: 1 },
 ]);
 //# sourceMappingURL=electionMulter.js.map

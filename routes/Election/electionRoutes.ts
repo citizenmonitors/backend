@@ -33,6 +33,7 @@ import {
 import {
   uploadResultDataFiles,
   uploadReportDataFiles,
+  uploadFlagEvidenceFiles,
 } from "../../config/electionMulter.ts";
 import { getActivityBoardAndNotifications, getLiveElectionDetails, getOngoingElections } from "../../controllers/Election/electionLive.ts";
 
@@ -193,7 +194,17 @@ router.get(
 router.post(
   "/user-action",
   authMiddleware,
-  getResultsAndPerformActionController);
+  (req: Request, res: Response, next: NextFunction) => {
+    runMulter(
+      uploadFlagEvidenceFiles,
+      req,
+      res,
+      next,
+      "Flag evidence upload Multer error"
+    );
+  },
+  getResultsAndPerformActionController
+);
 router.post("/flag-action", authMiddleware, checkUserStatusForFlagController);
 router.get("/live-results/:electionId", authMiddleware, getLiveElectionDetails);
 router.get("/live-result", authMiddleware, getOngoingElections);

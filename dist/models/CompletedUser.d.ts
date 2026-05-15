@@ -96,6 +96,8 @@ declare const _default: mongoose.Model<{
             reportConfirmed: boolean;
             reportFlagged: boolean;
             securityAlerts: boolean;
+            newsAndInsights: boolean;
+            pressCoverage: boolean;
         } | null | undefined;
     } | null | undefined;
 }, {}, {}, {}, mongoose.Document<unknown, {}, {
@@ -195,6 +197,8 @@ declare const _default: mongoose.Model<{
             reportConfirmed: boolean;
             reportFlagged: boolean;
             securityAlerts: boolean;
+            newsAndInsights: boolean;
+            pressCoverage: boolean;
         } | null | undefined;
     } | null | undefined;
 }> & {
@@ -294,6 +298,8 @@ declare const _default: mongoose.Model<{
             reportConfirmed: boolean;
             reportFlagged: boolean;
             securityAlerts: boolean;
+            newsAndInsights: boolean;
+            pressCoverage: boolean;
         } | null | undefined;
     } | null | undefined;
 } & {
@@ -399,6 +405,8 @@ declare const _default: mongoose.Model<{
             reportConfirmed: boolean;
             reportFlagged: boolean;
             securityAlerts: boolean;
+            newsAndInsights: boolean;
+            pressCoverage: boolean;
         } | null | undefined;
     } | null | undefined;
 }, mongoose.Document<unknown, {}, mongoose.FlatRecord<{
@@ -498,6 +506,8 @@ declare const _default: mongoose.Model<{
             reportConfirmed: boolean;
             reportFlagged: boolean;
             securityAlerts: boolean;
+            newsAndInsights: boolean;
+            pressCoverage: boolean;
         } | null | undefined;
     } | null | undefined;
 }>> & mongoose.FlatRecord<{
@@ -597,6 +607,8 @@ declare const _default: mongoose.Model<{
             reportConfirmed: boolean;
             reportFlagged: boolean;
             securityAlerts: boolean;
+            newsAndInsights: boolean;
+            pressCoverage: boolean;
         } | null | undefined;
     } | null | undefined;
 }> & {

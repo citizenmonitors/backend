@@ -59,11 +59,39 @@ export declare const getMobileElectionSubmissionByActiveElection: (activeElectio
             }>;
             actions: import("mongoose").Types.DocumentArray<{
                 action: "agree" | "flag";
+                flagImage?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
+                flagVideo?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
                 userId?: import("mongoose").Types.ObjectId | null | undefined;
                 flagReason?: string | null | undefined;
                 evidenceId?: import("mongoose").Types.ObjectId | null | undefined;
             } | {
                 action: "agree" | "flag";
+                flagImage?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
+                flagVideo?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
                 userId?: string | null | undefined;
                 flagReason?: string | null | undefined;
                 evidenceId?: string | null | undefined;
@@ -71,11 +99,39 @@ export declare const getMobileElectionSubmissionByActiveElection: (activeElectio
                 __v: number;
             }, import("mongoose").Types.Subdocument<string | import("mongoose").Types.ObjectId, any, {
                 action: "agree" | "flag";
+                flagImage?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
+                flagVideo?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
                 userId?: import("mongoose").Types.ObjectId | null | undefined;
                 flagReason?: string | null | undefined;
                 evidenceId?: import("mongoose").Types.ObjectId | null | undefined;
             } | {
                 action: "agree" | "flag";
+                flagImage?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
+                flagVideo?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
                 userId?: string | null | undefined;
                 flagReason?: string | null | undefined;
                 evidenceId?: string | null | undefined;
@@ -83,11 +139,39 @@ export declare const getMobileElectionSubmissionByActiveElection: (activeElectio
                 __v: number;
             }> & ({
                 action: "agree" | "flag";
+                flagImage?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
+                flagVideo?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
                 userId?: import("mongoose").Types.ObjectId | null | undefined;
                 flagReason?: string | null | undefined;
                 evidenceId?: import("mongoose").Types.ObjectId | null | undefined;
             } | {
                 action: "agree" | "flag";
+                flagImage?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
+                flagVideo?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
                 userId?: string | null | undefined;
                 flagReason?: string | null | undefined;
                 evidenceId?: string | null | undefined;
@@ -145,11 +229,39 @@ export declare const getMobileElectionSubmissionByActiveElection: (activeElectio
             userRole: string;
             actions: import("mongoose").Types.DocumentArray<{
                 action: "agree" | "flag";
+                flagImage?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
+                flagVideo?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
                 userId?: import("mongoose").Types.ObjectId | null | undefined;
                 flagReason?: string | null | undefined;
                 evidenceId?: import("mongoose").Types.ObjectId | null | undefined;
             } | {
                 action: "agree" | "flag";
+                flagImage?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
+                flagVideo?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
                 userId?: string | null | undefined;
                 flagReason?: string | null | undefined;
                 evidenceId?: string | null | undefined;
@@ -157,11 +269,39 @@ export declare const getMobileElectionSubmissionByActiveElection: (activeElectio
                 __v: number;
             }, import("mongoose").Types.Subdocument<string | import("mongoose").Types.ObjectId, any, {
                 action: "agree" | "flag";
+                flagImage?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
+                flagVideo?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
                 userId?: import("mongoose").Types.ObjectId | null | undefined;
                 flagReason?: string | null | undefined;
                 evidenceId?: import("mongoose").Types.ObjectId | null | undefined;
             } | {
                 action: "agree" | "flag";
+                flagImage?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
+                flagVideo?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
                 userId?: string | null | undefined;
                 flagReason?: string | null | undefined;
                 evidenceId?: string | null | undefined;
@@ -169,11 +309,39 @@ export declare const getMobileElectionSubmissionByActiveElection: (activeElectio
                 __v: number;
             }> & ({
                 action: "agree" | "flag";
+                flagImage?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
+                flagVideo?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
                 userId?: import("mongoose").Types.ObjectId | null | undefined;
                 flagReason?: string | null | undefined;
                 evidenceId?: import("mongoose").Types.ObjectId | null | undefined;
             } | {
                 action: "agree" | "flag";
+                flagImage?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
+                flagVideo?: {
+                    name?: string | null | undefined;
+                    type?: string | null | undefined;
+                    url?: string | null | undefined;
+                    location?: string | null | undefined;
+                    size?: number | null | undefined;
+                } | null | undefined;
                 userId?: string | null | undefined;
                 flagReason?: string | null | undefined;
                 evidenceId?: string | null | undefined;

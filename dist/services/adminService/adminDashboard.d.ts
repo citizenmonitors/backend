@@ -122,6 +122,8 @@ export declare const getDashboardData: () => Promise<{
                 reportConfirmed: boolean;
                 reportFlagged: boolean;
                 securityAlerts: boolean;
+                newsAndInsights: boolean;
+                pressCoverage: boolean;
             } | null | undefined;
         } | null | undefined;
     }> & {
@@ -221,6 +223,8 @@ export declare const getDashboardData: () => Promise<{
                 reportConfirmed: boolean;
                 reportFlagged: boolean;
                 securityAlerts: boolean;
+                newsAndInsights: boolean;
+                pressCoverage: boolean;
             } | null | undefined;
         } | null | undefined;
     } & {
@@ -355,6 +359,8 @@ export declare const getAllUsersService: () => Promise<{
                 reportConfirmed: boolean;
                 reportFlagged: boolean;
                 securityAlerts: boolean;
+                newsAndInsights: boolean;
+                pressCoverage: boolean;
             } | null | undefined;
         } | null | undefined;
     }> & {
@@ -459,6 +465,8 @@ export declare const getUserByIdService: (id: Id) => Promise<import("mongoose").
             reportConfirmed: boolean;
             reportFlagged: boolean;
             securityAlerts: boolean;
+            newsAndInsights: boolean;
+            pressCoverage: boolean;
         } | null | undefined;
     } | null | undefined;
 }> & {
@@ -567,6 +575,8 @@ export declare const approveObserverService: (id: Id, adminId: Id) => Promise<{
                 reportConfirmed: boolean;
                 reportFlagged: boolean;
                 securityAlerts: boolean;
+                newsAndInsights: boolean;
+                pressCoverage: boolean;
             } | null | undefined;
         } | null | undefined;
     }> & {
@@ -673,6 +683,8 @@ export declare const getAllObsersverService: () => Promise<{
                 reportConfirmed: boolean;
                 reportFlagged: boolean;
                 securityAlerts: boolean;
+                newsAndInsights: boolean;
+                pressCoverage: boolean;
             } | null | undefined;
         } | null | undefined;
     }> & {
@@ -779,6 +791,8 @@ export declare const unapproveObserverService: (id: Id, adminId: Id) => Promise<
                 reportConfirmed: boolean;
                 reportFlagged: boolean;
                 securityAlerts: boolean;
+                newsAndInsights: boolean;
+                pressCoverage: boolean;
             } | null | undefined;
         } | null | undefined;
     }> & {
@@ -885,6 +899,8 @@ export declare const downgradeObserverService: (id: Id, adminReason: string, adm
                 reportConfirmed: boolean;
                 reportFlagged: boolean;
                 securityAlerts: boolean;
+                newsAndInsights: boolean;
+                pressCoverage: boolean;
             } | null | undefined;
         } | null | undefined;
     }> & {
@@ -1110,6 +1126,8 @@ export declare const createAdminService: (adminId: Id | undefined, { email, role
                 reportConfirmed: boolean;
                 reportFlagged: boolean;
                 securityAlerts: boolean;
+                newsAndInsights: boolean;
+                pressCoverage: boolean;
             } | null | undefined;
         } | null | undefined;
     }> & {
@@ -1209,6 +1227,8 @@ export declare const createAdminService: (adminId: Id | undefined, { email, role
                 reportConfirmed: boolean;
                 reportFlagged: boolean;
                 securityAlerts: boolean;
+                newsAndInsights: boolean;
+                pressCoverage: boolean;
             } | null | undefined;
         } | null | undefined;
     } & {
@@ -1374,6 +1394,8 @@ export declare const suspendAdminService: (adminId: Id, suspendedBy: Id) => Prom
                 reportConfirmed: boolean;
                 reportFlagged: boolean;
                 securityAlerts: boolean;
+                newsAndInsights: boolean;
+                pressCoverage: boolean;
             } | null | undefined;
         } | null | undefined;
     }> & {
@@ -1473,6 +1495,8 @@ export declare const suspendAdminService: (adminId: Id, suspendedBy: Id) => Prom
                 reportConfirmed: boolean;
                 reportFlagged: boolean;
                 securityAlerts: boolean;
+                newsAndInsights: boolean;
+                pressCoverage: boolean;
             } | null | undefined;
         } | null | undefined;
     } & {
@@ -1578,6 +1602,8 @@ export declare const getAllAdminsService: () => Promise<{
                 reportConfirmed: boolean;
                 reportFlagged: boolean;
                 securityAlerts: boolean;
+                newsAndInsights: boolean;
+                pressCoverage: boolean;
             } | null | undefined;
         } | null | undefined;
     }> & {

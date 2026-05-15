@@ -74,6 +74,8 @@ const ElectionDataSchema = new mongoose.Schema(
         flagReason: {
           type: String,
         },
+        flagImage: fileSchema,
+        flagVideo: fileSchema,
         evidenceId: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "ElectionData",

@@ -189,6 +189,8 @@ export declare const selectUserRole: (email: string, role: string) => Promise<{
                 reportConfirmed: boolean;
                 reportFlagged: boolean;
                 securityAlerts: boolean;
+                newsAndInsights: boolean;
+                pressCoverage: boolean;
             } | null | undefined;
         } | null | undefined;
         _id: import("mongoose").Types.ObjectId;
@@ -297,6 +299,8 @@ export declare const submitObserverDetails: ({ email, observerIdFiles: observerI
                 reportConfirmed: boolean;
                 reportFlagged: boolean;
                 securityAlerts: boolean;
+                newsAndInsights: boolean;
+                pressCoverage: boolean;
             } | null | undefined;
         } | null | undefined;
         _id: import("mongoose").Types.ObjectId;
@@ -400,6 +404,8 @@ export declare const authenticateUser: ({ email, password }: AuthCredentials) =>
                 reportConfirmed: boolean;
                 reportFlagged: boolean;
                 securityAlerts: boolean;
+                newsAndInsights: boolean;
+                pressCoverage: boolean;
             } | null | undefined;
         } | null | undefined;
         _id: import("mongoose").Types.ObjectId;
@@ -508,6 +514,8 @@ export declare const validateTokenService: (token: string) => Promise<{
                 reportConfirmed: boolean;
                 reportFlagged: boolean;
                 securityAlerts: boolean;
+                newsAndInsights: boolean;
+                pressCoverage: boolean;
             } | null | undefined;
         } | null | undefined;
         _id: import("mongoose").Types.ObjectId;

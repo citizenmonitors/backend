@@ -659,7 +659,24 @@ paths:
                 electionId: { type: string }
                 action: { type: string, enum: [agree, flag, unagree] }
                 dataType: { type: string, enum: [election, incident] }
+                flagReason: { type: string, description: Required when action is flag }
+          multipart/form-data:
+            schema:
+              type: object
+              required: [electionId, action, dataType]
+              properties:
+                electionId: { type: string }
+                action: { type: string, enum: [agree, flag, unagree] }
+                dataType: { type: string, enum: [election, incident] }
                 flagReason: { type: string }
+                flagImage:
+                  type: string
+                  format: binary
+                  description: Optional image when action is flag
+                flagVideo:
+                  type: string
+                  format: binary
+                  description: Optional video when action is flag
       responses: { "200": { description: Updated } }
   /elections/{activeElectionId}/report-thread/{targetType}/{targetId}/comments:
     get:

@@ -4,9 +4,9 @@ declare const Notification: mongoose.Model<{
     targetUsers: mongoose.Types.ObjectId[];
     readBy: mongoose.Types.ObjectId[];
     deletedBy: mongoose.Types.ObjectId[];
-    type?: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | null | undefined;
+    type?: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | "news-insight" | "press-coverage" | null | undefined;
     info?: string | null | undefined;
-    preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | null | undefined;
+    preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | "newsAndInsights" | "pressCoverage" | null | undefined;
     body?: string | null | undefined;
     recipients?: string[] | null | undefined;
 }, {}, {}, {}, mongoose.Document<unknown, {}, {
@@ -14,9 +14,9 @@ declare const Notification: mongoose.Model<{
     targetUsers: mongoose.Types.ObjectId[];
     readBy: mongoose.Types.ObjectId[];
     deletedBy: mongoose.Types.ObjectId[];
-    type?: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | null | undefined;
+    type?: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | "news-insight" | "press-coverage" | null | undefined;
     info?: string | null | undefined;
-    preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | null | undefined;
+    preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | "newsAndInsights" | "pressCoverage" | null | undefined;
     body?: string | null | undefined;
     recipients?: string[] | null | undefined;
 }> & {
@@ -24,9 +24,9 @@ declare const Notification: mongoose.Model<{
     targetUsers: mongoose.Types.ObjectId[];
     readBy: mongoose.Types.ObjectId[];
     deletedBy: mongoose.Types.ObjectId[];
-    type?: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | null | undefined;
+    type?: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | "news-insight" | "press-coverage" | null | undefined;
     info?: string | null | undefined;
-    preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | null | undefined;
+    preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | "newsAndInsights" | "pressCoverage" | null | undefined;
     body?: string | null | undefined;
     recipients?: string[] | null | undefined;
 } & {
@@ -38,9 +38,9 @@ declare const Notification: mongoose.Model<{
     targetUsers: mongoose.Types.ObjectId[];
     readBy: mongoose.Types.ObjectId[];
     deletedBy: mongoose.Types.ObjectId[];
-    type?: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | null | undefined;
+    type?: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | "news-insight" | "press-coverage" | null | undefined;
     info?: string | null | undefined;
-    preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | null | undefined;
+    preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | "newsAndInsights" | "pressCoverage" | null | undefined;
     body?: string | null | undefined;
     recipients?: string[] | null | undefined;
 }, mongoose.Document<unknown, {}, mongoose.FlatRecord<{
@@ -48,9 +48,9 @@ declare const Notification: mongoose.Model<{
     targetUsers: mongoose.Types.ObjectId[];
     readBy: mongoose.Types.ObjectId[];
     deletedBy: mongoose.Types.ObjectId[];
-    type?: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | null | undefined;
+    type?: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | "news-insight" | "press-coverage" | null | undefined;
     info?: string | null | undefined;
-    preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | null | undefined;
+    preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | "newsAndInsights" | "pressCoverage" | null | undefined;
     body?: string | null | undefined;
     recipients?: string[] | null | undefined;
 }>> & mongoose.FlatRecord<{
@@ -58,9 +58,9 @@ declare const Notification: mongoose.Model<{
     targetUsers: mongoose.Types.ObjectId[];
     readBy: mongoose.Types.ObjectId[];
     deletedBy: mongoose.Types.ObjectId[];
-    type?: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | null | undefined;
+    type?: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | "news-insight" | "press-coverage" | null | undefined;
     info?: string | null | undefined;
-    preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | null | undefined;
+    preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | "newsAndInsights" | "pressCoverage" | null | undefined;
     body?: string | null | undefined;
     recipients?: string[] | null | undefined;
 }> & {

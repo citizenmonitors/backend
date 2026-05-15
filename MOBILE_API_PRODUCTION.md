@@ -286,7 +286,9 @@ Body (all optional booleans):
   "reportConfirmed": true,
   "reportFlagged": true,
   "securityAlerts": true,
-  "newsletter": true
+  "newsletter": true,
+  "newsAndInsights": true,
+  "pressCoverage": true
 }
 ```
 
@@ -348,13 +350,25 @@ Get collation bundle for active election.
 ### `POST /elections/:activeElectionId/collation/user-action`
 Actions: `agree`, `flag`, `unagree`
 
-Body:
+Send as `multipart/form-data` when attaching optional flag evidence; `application/json` is still OK when you are not uploading files.
+
+Body fields:
+- `electionId` (required): target `ElectionData` or `IncidentReport` document id
+- `dataType` (required): `election` | `incident`
+- `action` (required): `agree` | `flag` | `unagree`
+- `flagReason` (**required** when `action` is `flag`): short explanation
+- `flagImage` (optional file): extra evidence
+- `flagVideo` (optional file): extra evidence
+
+When `action` is `flag`, you must always send **`flagReason`**. Image and video are optional extras.
+
+Example (JSON-only, no media):
 ```json
 {
   "electionId": "target-result-or-incident-id",
   "dataType": "election",
-  "action": "agree",
-  "flagReason": "optional-required-for-flag"
+  "action": "flag",
+  "flagReason": "Numbers do not match the polling unit summary."
 }
 ```
 
@@ -427,6 +441,54 @@ Body:
 ### `POST /pulse/posts/:postId/comments/:commentId/like`
 Toggle like/unlike for comment.
 
+### Citizen Academy (educational articles)
+
+Base (mobile): `/academy` → full paths `GET /api/v1/mobile/academy` and `GET /api/v1/mobile/academy/:slug`. **No Bearer token required.** If the server has `INHOUSE_API_ACCESS_TOKEN` set, clients must still send matching `X-Inhouse-Access-Token` on `/api/*` routes (same as other public API paths).
+
+- **`GET /academy`** — `{ title, subtitle, articles[] }` where each article has `slug`, `title`, `category`, `readMinutes`, `summary`.
+- **`GET /academy/:slug`** — full article: `slug`, `title`, `category`, `readMinutes`, `summary`, `sections[]` (`heading`, `paragraphs[]`). `400` if slug format is invalid; `404` if unknown slug.
+
+Known slugs: `pvc-registration-guide`, `know-voters-right`, `incident-reporting`, `electoral-act-2022`, `voters-handbook-2027`.
+
+### News & Insight (articles)
+
+Base (mobile): `/news-insights`. **Optional Bearer** on `GET /` and `GET /:slug`: when a valid token is sent, responses include `isLikedByCurrentUser` for the current user. Other engagement routes **require** Bearer. In-house header rule matches Academy when configured.
+
+- **`GET /news-insights`** — `{ title, subtitle, total, page, limit, items[] }`. Each item: `id`, `slug`, `title`, `thumbnailUrl`, `summary`, `publishedAt`, `likesCount`, `commentsCount`, `isLikedByCurrentUser` (false if anonymous).
+- **`GET /news-insights/:slug`** — article detail plus `likesCount`, `commentsCount`, `isLikedByCurrentUser`.
+
+**Engagement (Bearer required):** use article **`id`** from list/detail (MongoDB ObjectId).
+
+- **`POST /news-insights/articles/:articleId/like`** — toggle like on the article. Response: `{ id, likesCount, isLikedByCurrentUser }`.
+- **`GET /news-insights/articles/:articleId/comments`** — `{ comments[] }` (newest first). Each comment: `id`, `body`, `createdAt`, `updatedAt`, `author`, `likesCount`, `isLikedByCurrentUser`.
+- **`POST /news-insights/articles/:articleId/comments`** — body: `{ "body": "...", "useAnonymousDisplay": false }` (anonymous requires an anonymous username on profile, same as Pulse).
+- **`POST /news-insights/articles/:articleId/comments/:commentId/like`** — toggle like on a comment. Response: `{ comment }` shape (serialized comment object).
+
+**Admin (Bearer + admin role):**
+
+- `POST /api/admin/news-insights` — create article. **multipart/form-data:** text fields `title`, `content` (HTML), optional `excerpt`, `slug`, `publishedAt`, `isPublished`, `notifySubscribers`; **File** fields `thumbnail` (required image), `heroImage` (optional image). Files upload to Firebase; responses include `thumbnailUrl` / `heroImageUrl` as stored URLs. **Alias:** `POST /api/v1/mobile/news-insights` (same). On publish + `notifySubscribers`, users with `newsAndInsights: true` get a push (`type: news-insight`).
+- `GET /api/admin/news-insights?page=1&limit=30` — list all articles (including unpublished).
+- `GET /api/admin/news-insights/:id` — single article by MongoDB id.
+
+**User toggle:** `PUT /profile/notifications` with `newsAndInsights` (boolean) controls whether the user receives these pushes (default `true` for new accounts).
+
+### Press Coverage (articles)
+
+Base (mobile): `/press-coverage`. Same patterns as News & Insight: optional Bearer on list/detail for `isLikedByCurrentUser`; engagement routes require Bearer.
+
+- **`GET /press-coverage`** — `{ title, subtitle, total, page, limit, items[] }`. Items include `dateline` (optional), plus `likesCount`, `commentsCount`, `isLikedByCurrentUser`.
+- **`GET /press-coverage/:slug`** — detail includes `dateline`, HTML `content`, hero image, counts, `isLikedByCurrentUser`.
+
+**Engagement:** `POST/GET /press-coverage/articles/:articleId/like|comments` and comment like — same shapes as News & Insight.
+
+**Admin:**
+
+- `POST /api/admin/press-coverage` — create. **multipart/form-data:** text fields `title`, `content`, optional `excerpt`, `dateline`, `slug`, `publishedAt`, `isPublished`, `notifySubscribers`; **File** fields `thumbnail` (required image), `heroImage` (optional image). **Alias:** `POST /api/v1/mobile/press-coverage`. Pushes use `type: press-coverage` / preference `pressCoverage`.
+- `GET /api/admin/press-coverage?page=1&limit=30`
+- `GET /api/admin/press-coverage/:id`
+
+**User toggle:** `PUT /profile/notifications` with `pressCoverage` (boolean) for these notifications (default `true`).
+
 ---
 
 ## 8) Mobile Notifications API (Protected)
@@ -457,7 +519,8 @@ Returns:
 - `electionUpdates`
 - `collationUpdates`
 - `pulseAndDiscourse`
-- `latestNewsAndInsights`
+- `latestNewsAndInsights` — published news cards: `id`, `slug`, `title`, `thumbnailUrl`, `summary`, `publishedAt`, `likesCount`, `commentsCount`, `isLikedByCurrentUser` (from **News & Insight**; see `GET /news-insights`).
+- `pressCoverage` — same card shape for **Press Coverage**, plus optional `dateline` (see `GET /press-coverage`).
 
 ---
 

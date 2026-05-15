@@ -12,7 +12,9 @@ export type MobileNotificationPreferenceKey =
   | "reportConfirmed"
   | "reportFlagged"
   | "securityAlerts"
-  | "newsletter";
+  | "newsletter"
+  | "newsAndInsights"
+  | "pressCoverage";
 
 type RecipientRole =
   | "all"
@@ -33,6 +35,8 @@ const withDefaults = (role: string | undefined, current: MobilePrefState): Requi
   reportFlagged: current.reportFlagged ?? role === "observer",
   securityAlerts: current.securityAlerts ?? false,
   newsletter: current.newsletter ?? true,
+  newsAndInsights: current.newsAndInsights ?? true,
+  pressCoverage: current.pressCoverage ?? true,
 });
 
 const roleFilter = (recipients: RecipientRole[]) => {
@@ -83,7 +87,9 @@ export const dispatchMobileNotification = async (input: {
     | "report-confirmed"
     | "report-flagged"
     | "newsletter"
-    | "election-day-alert";
+    | "election-day-alert"
+    | "news-insight"
+    | "press-coverage";
   preferenceKey: MobileNotificationPreferenceKey;
   body: string;
   info?: string;
@@ -135,7 +141,9 @@ export const dispatchNotificationToUsers = async (input: {
     | "report-confirmed"
     | "report-flagged"
     | "newsletter"
-    | "election-day-alert";
+    | "election-day-alert"
+    | "news-insight"
+    | "press-coverage";
   preferenceKey: MobileNotificationPreferenceKey;
   body: string;
   info?: string;

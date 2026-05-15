@@ -371,19 +371,40 @@ export const getUserElectionResultsAndReportsCon = async (req: AuthenticatedRequ
   }
 };
 
+type WebFlagUploadFile = {
+  buffer: Buffer;
+  mimetype: string;
+  originalname: string;
+  size: number;
+};
+
+type UserActionRequest = AuthenticatedRequest & {
+  files?: {
+    flagImage?: WebFlagUploadFile[];
+    flagVideo?: WebFlagUploadFile[];
+  };
+};
+
 export const getResultsAndPerformActionController = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = requireUserId(req);
-    const { electionId, action, dataType, flagReason } = req.body;
+    const r = req as UserActionRequest;
+    const { electionId, action, dataType, flagReason } = r.body;
     if (electionId && !isValidObjectId(electionId)) {
       return res.status(400).json({ message: "Invalid election ID" });
     }
 
+    
     const actionData = action
       ? { electionId, action, dataType, flagReason }
       : null;
 
-    const results = await getResultsAndPerformAction(userId, actionData);
+    const flagMediaFiles =
+      r.files?.flagImage?.length || r.files?.flagVideo?.length
+        ? { flagImage: r.files.flagImage, flagVideo: r.files.flagVideo }
+        : undefined;
+
+    const results = await getResultsAndPerformAction(userId, actionData, flagMediaFiles);
 
     return res.status(200).json({
       message: action

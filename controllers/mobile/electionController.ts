@@ -248,3 +248,9 @@ export const deleteIncidentReportMobile = async (req: Request, res: Response) =>
     });
   }
 };
+
+
+
+
+
+

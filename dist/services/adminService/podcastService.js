@@ -1,5 +1,5 @@
 import { sendEmail } from "../../config/email.js";
-import { newsLetterTemplatePoliceBrutalityLeadershipOrInstitutional, podcastNotificationTemplate } from "../../config/emailTemplates.js";
+import { newsLetterTemplateNigerianVotersPartyOrPoliticianLoyalty, podcastNotificationTemplate } from "../../config/emailTemplates.js";
 import schedule from "node-schedule";
 import { utcToZonedTime } from "date-fns-tz";
 import { format } from "date-fns";
@@ -183,16 +183,16 @@ export const sendNewsletterService = async ({ recipients, scheduleTime, }) => {
         userEmails = [
             "yunusmustapha2@gmail.com",
             "citizenmonitors@yahoo.com",
-            "oluwaloninyo@yahoo.com",
+            // "oluwaloninyo@yahoo.com",
             "yunusmustapha01@yahoo.com",
         ];
-        const htmlContent = newsLetterTemplatePoliceBrutalityLeadershipOrInstitutional();
+        const htmlContent = newsLetterTemplateNigerianVotersPartyOrPoliticianLoyalty();
         const listUnsubscribeUrl = process.env.NEWSLETTER_UNSUBSCRIBE_URL?.trim() ||
             "https://www.citizenmonitors.com/portal/settings/notifications";
         // Send emails to all targeted users
         const emailPromises = userEmails.map((email) => sendEmail({
             to: email,
-            subject: `Police Brutality in Nigeria; Leadership or Institutional Failure?`,
+            subject: `Nigerian Voters; Loyal to Politicians or Political Parties?`,
             htmlbody: htmlContent,
             listUnsubscribeUrl,
         }).catch((err) => {

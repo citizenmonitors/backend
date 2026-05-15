@@ -94,5 +94,6 @@ export declare const newsLetterTemplateInecIndependence: () => string;
 export declare const newsLetterTemplateInecChairmanAmupitanResign: () => string;
 export declare const newsLetterTemplateInecForensicAudit: () => string;
 export declare const newsLetterTemplatePoliceBrutalityLeadershipOrInstitutional: () => string;
+export declare const newsLetterTemplateNigerianVotersPartyOrPoliticianLoyalty: () => string;
 export {};
 //# sourceMappingURL=emailTemplates.d.ts.map

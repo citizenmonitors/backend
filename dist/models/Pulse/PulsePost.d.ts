@@ -4,8 +4,6 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     body: string;
-    author: mongoose.Types.ObjectId;
-    useAnonymousDisplay: boolean;
     likes: mongoose.Types.DocumentArray<{
         user: mongoose.Types.ObjectId;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
@@ -13,6 +11,8 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
+    author: mongoose.Types.ObjectId;
+    useAnonymousDisplay: boolean;
     visibilityScope: "lga" | "ward";
     audienceState: string;
     audienceLga: string;
@@ -23,8 +23,6 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     body: string;
-    author: mongoose.Types.ObjectId;
-    useAnonymousDisplay: boolean;
     likes: mongoose.Types.DocumentArray<{
         user: mongoose.Types.ObjectId;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
@@ -32,6 +30,8 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
+    author: mongoose.Types.ObjectId;
+    useAnonymousDisplay: boolean;
     visibilityScope: "lga" | "ward";
     audienceState: string;
     audienceLga: string;
@@ -42,8 +42,6 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     body: string;
-    author: mongoose.Types.ObjectId;
-    useAnonymousDisplay: boolean;
     likes: mongoose.Types.DocumentArray<{
         user: mongoose.Types.ObjectId;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
@@ -51,6 +49,8 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
+    author: mongoose.Types.ObjectId;
+    useAnonymousDisplay: boolean;
     visibilityScope: "lga" | "ward";
     audienceState: string;
     audienceLga: string;
@@ -67,8 +67,6 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     body: string;
-    author: mongoose.Types.ObjectId;
-    useAnonymousDisplay: boolean;
     likes: mongoose.Types.DocumentArray<{
         user: mongoose.Types.ObjectId;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
@@ -76,6 +74,8 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
+    author: mongoose.Types.ObjectId;
+    useAnonymousDisplay: boolean;
     visibilityScope: "lga" | "ward";
     audienceState: string;
     audienceLga: string;
@@ -86,8 +86,6 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     body: string;
-    author: mongoose.Types.ObjectId;
-    useAnonymousDisplay: boolean;
     likes: mongoose.Types.DocumentArray<{
         user: mongoose.Types.ObjectId;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
@@ -95,6 +93,8 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
+    author: mongoose.Types.ObjectId;
+    useAnonymousDisplay: boolean;
     visibilityScope: "lga" | "ward";
     audienceState: string;
     audienceLga: string;
@@ -105,8 +105,6 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     body: string;
-    author: mongoose.Types.ObjectId;
-    useAnonymousDisplay: boolean;
     likes: mongoose.Types.DocumentArray<{
         user: mongoose.Types.ObjectId;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
@@ -114,6 +112,8 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
+    author: mongoose.Types.ObjectId;
+    useAnonymousDisplay: boolean;
     visibilityScope: "lga" | "ward";
     audienceState: string;
     audienceLga: string;

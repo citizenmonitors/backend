@@ -149,6 +149,8 @@ export declare const getAllAdminService: () => Promise<(mongoose.Document<unknow
             reportConfirmed: boolean;
             reportFlagged: boolean;
             securityAlerts: boolean;
+            newsAndInsights: boolean;
+            pressCoverage: boolean;
         } | null | undefined;
     } | null | undefined;
 }> & {
@@ -248,6 +250,8 @@ export declare const getAllAdminService: () => Promise<(mongoose.Document<unknow
             reportConfirmed: boolean;
             reportFlagged: boolean;
             securityAlerts: boolean;
+            newsAndInsights: boolean;
+            pressCoverage: boolean;
         } | null | undefined;
     } | null | undefined;
 } & {
@@ -1016,9 +1020,9 @@ export declare const adminNotificationService: (userId: Id) => Promise<{
     createdAt: NativeDate;
     targetUsers: Types.ObjectId[];
     deletedBy: Types.ObjectId[];
-    type?: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | null | undefined;
+    type?: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | "news-insight" | "press-coverage" | null | undefined;
     info?: string | null | undefined;
-    preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | null | undefined;
+    preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | "newsAndInsights" | "pressCoverage" | null | undefined;
     body?: string | null | undefined;
     recipients?: string[] | null | undefined;
     _id: Types.ObjectId;

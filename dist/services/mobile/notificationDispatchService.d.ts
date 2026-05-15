@@ -1,7 +1,7 @@
-export type MobileNotificationPreferenceKey = "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | "newsletter";
+export type MobileNotificationPreferenceKey = "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | "newsletter" | "newsAndInsights" | "pressCoverage";
 type RecipientRole = "all" | "observer" | "volunteer" | "public-viewer" | "admin" | "super-admin";
 export declare const dispatchMobileNotification: (input: {
-    type: "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "newsletter" | "election-day-alert";
+    type: "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "newsletter" | "election-day-alert" | "news-insight" | "press-coverage";
     preferenceKey: MobileNotificationPreferenceKey;
     body: string;
     info?: string;
@@ -12,9 +12,9 @@ export declare const dispatchMobileNotification: (input: {
     targetUsers: import("mongoose").Types.ObjectId[];
     readBy: import("mongoose").Types.ObjectId[];
     deletedBy: import("mongoose").Types.ObjectId[];
-    type?: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | null | undefined;
+    type?: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | "news-insight" | "press-coverage" | null | undefined;
     info?: string | null | undefined;
-    preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | null | undefined;
+    preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | "newsAndInsights" | "pressCoverage" | null | undefined;
     body?: string | null | undefined;
     recipients?: string[] | null | undefined;
 }> & {
@@ -22,9 +22,9 @@ export declare const dispatchMobileNotification: (input: {
     targetUsers: import("mongoose").Types.ObjectId[];
     readBy: import("mongoose").Types.ObjectId[];
     deletedBy: import("mongoose").Types.ObjectId[];
-    type?: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | null | undefined;
+    type?: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | "news-insight" | "press-coverage" | null | undefined;
     info?: string | null | undefined;
-    preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | null | undefined;
+    preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | "newsAndInsights" | "pressCoverage" | null | undefined;
     body?: string | null | undefined;
     recipients?: string[] | null | undefined;
 } & {
@@ -33,7 +33,7 @@ export declare const dispatchMobileNotification: (input: {
     __v: number;
 }) | null>;
 export declare const dispatchNotificationToUsers: (input: {
-    type: "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "newsletter" | "election-day-alert";
+    type: "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "newsletter" | "election-day-alert" | "news-insight" | "press-coverage";
     preferenceKey: MobileNotificationPreferenceKey;
     body: string;
     info?: string;
@@ -43,9 +43,9 @@ export declare const dispatchNotificationToUsers: (input: {
     targetUsers: import("mongoose").Types.ObjectId[];
     readBy: import("mongoose").Types.ObjectId[];
     deletedBy: import("mongoose").Types.ObjectId[];
-    type?: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | null | undefined;
+    type?: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | "news-insight" | "press-coverage" | null | undefined;
     info?: string | null | undefined;
-    preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | null | undefined;
+    preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | "newsAndInsights" | "pressCoverage" | null | undefined;
     body?: string | null | undefined;
     recipients?: string[] | null | undefined;
 }> & {
@@ -53,9 +53,9 @@ export declare const dispatchNotificationToUsers: (input: {
     targetUsers: import("mongoose").Types.ObjectId[];
     readBy: import("mongoose").Types.ObjectId[];
     deletedBy: import("mongoose").Types.ObjectId[];
-    type?: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | null | undefined;
+    type?: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | "news-insight" | "press-coverage" | null | undefined;
     info?: string | null | undefined;
-    preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | null | undefined;
+    preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | "newsAndInsights" | "pressCoverage" | null | undefined;
     body?: string | null | undefined;
     recipients?: string[] | null | undefined;
 } & {

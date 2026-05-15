@@ -111,6 +111,14 @@ const completedUserSchema = new mongoose.Schema({
                 type: Boolean,
                 default: true,
             },
+            newsAndInsights: {
+                type: Boolean,
+                default: true,
+            },
+            pressCoverage: {
+                type: Boolean,
+                default: true,
+            },
         },
     },
 }, {

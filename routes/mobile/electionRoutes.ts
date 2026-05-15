@@ -15,6 +15,7 @@ import {
   uploadCollationDiscussionFiles,
   uploadReportDataFiles,
   uploadResultDataFiles,
+  uploadFlagEvidenceFiles,
 } from "../../config/electionMulter.ts";
 import {
   getMobileCollation,
@@ -129,6 +130,18 @@ router.get("/:activeElectionId/collation", authMiddleware, getMobileCollation);
 router.post(
   "/:activeElectionId/collation/user-action",
   authMiddleware,
+  (req, res, next) => {
+    uploadFlagEvidenceFiles(req, res, (err?: unknown) => {
+      if (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        return res.status(400).json({
+          message: "Flag evidence upload Multer error",
+          error: message,
+        });
+      }
+      next();
+    });
+  },
   postMobileCollationUserAction
 );
 

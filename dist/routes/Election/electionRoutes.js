@@ -1,7 +1,7 @@
 import express from "express";
 import { getUserElectionDataController, deleteElectionResultData, createElection, updateElection, getAllElectionResultsController, getElectionResultByIdCont, getElectionByIdCont, updateResultData, uploadIncidentReportData, uploadResultData, getAllActiveElections, updateIncidentReportData, deleteIncidentReportData, getLiveElectionByIdCont, getUserElectionResultsAndReportsCon, getResultsAndPerformActionController, checkUserStatusForFlagController, createActiveElectionsCon, updateActiveElectionCon, getAllElectionTypes, deleteElection, deleteActiveElection, } from "../../controllers/Election/electionDataController.js";
 import { authMiddleware, isAuthorized, } from "../../middleware/authMiddleware.js";
-import { uploadResultDataFiles, uploadReportDataFiles, } from "../../config/electionMulter.js";
+import { uploadResultDataFiles, uploadReportDataFiles, uploadFlagEvidenceFiles, } from "../../config/electionMulter.js";
 import { getActivityBoardAndNotifications, getLiveElectionDetails, getOngoingElections } from "../../controllers/Election/electionLive.js";
 const router = express.Router();
 const runMulter = (middleware, req, res, next, uploadErrorMessage) => {
@@ -46,7 +46,9 @@ router.put("/election/:electionId/results", authMiddleware, (req, res, next) => 
     runMulter(uploadResultDataFiles, req, res, next, "Update result data  error");
 }, updateResultData);
 router.get("/user-election-data", authMiddleware, getUserElectionResultsAndReportsCon);
-router.post("/user-action", authMiddleware, getResultsAndPerformActionController);
+router.post("/user-action", authMiddleware, (req, res, next) => {
+    runMulter(uploadFlagEvidenceFiles, req, res, next, "Flag evidence upload Multer error");
+}, getResultsAndPerformActionController);
 router.post("/flag-action", authMiddleware, checkUserStatusForFlagController);
 router.get("/live-results/:electionId", authMiddleware, getLiveElectionDetails);
 router.get("/live-result", authMiddleware, getOngoingElections);

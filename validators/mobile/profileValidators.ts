@@ -22,6 +22,8 @@ export const mobileNotificationUpdateValidation = [
   body("reportFlagged").optional().isBoolean(),
   body("securityAlerts").optional().isBoolean(),
   body("newsletter").optional().isBoolean(),
+  body("newsAndInsights").optional().isBoolean(),
+  body("pressCoverage").optional().isBoolean(),
 ];
 
 export const mobilePollingUnitLookupValidation = [

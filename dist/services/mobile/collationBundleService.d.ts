@@ -1,4 +1,5 @@
 import type { Types } from "mongoose";
+import { type FlagMediaFiles } from "../Election/electionService.ts";
 type Id = Types.ObjectId | string;
 export declare const assertMobileCollationAccess: (activeElectionId: string, userId: Id) => Promise<{
     user: import("mongoose").FlattenMaps<{
@@ -97,6 +98,8 @@ export declare const assertMobileCollationAccess: (activeElectionId: string, use
                 reportConfirmed: boolean;
                 reportFlagged: boolean;
                 securityAlerts: boolean;
+                newsAndInsights: boolean;
+                pressCoverage: boolean;
             } | null | undefined;
         } | null | undefined;
     }> & {
@@ -225,7 +228,7 @@ export declare const mobileCollationUserAction: (activeElectionId: string, userI
     action: "agree" | "flag" | "unagree";
     dataType: "election" | "incident";
     flagReason?: string;
-} | null) => Promise<{
+} | null, flagMediaFiles?: FlagMediaFiles) => Promise<{
     results: {
         electionTypeId: string | Types.ObjectId | undefined;
         electionId: string | Types.ObjectId;

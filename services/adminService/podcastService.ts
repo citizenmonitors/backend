@@ -1,5 +1,5 @@
 import { sendEmail } from "../../config/email.ts";
-import { newsLetterTemplatePoliceBrutalityLeadershipOrInstitutional, podcastNotificationTemplate } from "../../config/emailTemplates.ts";
+import { newsLetterTemplateNigerianVotersPartyOrPoliticianLoyalty, podcastNotificationTemplate } from "../../config/emailTemplates.ts";
 import schedule from "node-schedule";
 import { utcToZonedTime } from "date-fns-tz";
 import { format } from "date-fns";
@@ -276,17 +276,16 @@ export const sendNewsletterService = async ({
 
 
 
-
     // For testing, override userEmails with your email
     userEmails = [
       "yunusmustapha2@gmail.com",
       "citizenmonitors@yahoo.com",
-      "oluwaloninyo@yahoo.com",
+      // "oluwaloninyo@yahoo.com",
       "yunusmustapha01@yahoo.com",
     ];
 
 
-    const htmlContent = newsLetterTemplatePoliceBrutalityLeadershipOrInstitutional();
+    const htmlContent = newsLetterTemplateNigerianVotersPartyOrPoliticianLoyalty();
 
     const listUnsubscribeUrl =
       process.env.NEWSLETTER_UNSUBSCRIBE_URL?.trim() ||
@@ -296,7 +295,7 @@ export const sendNewsletterService = async ({
     const emailPromises = userEmails.map((email) =>
       sendEmail({
         to: email,
-        subject: `Police Brutality in Nigeria; Leadership or Institutional Failure?`,
+        subject: `Nigerian Voters; Loyal to Politicians or Political Parties?`,
         htmlbody: htmlContent,
         listUnsubscribeUrl,
       }).catch((err) => {

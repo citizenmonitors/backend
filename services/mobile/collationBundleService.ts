@@ -8,7 +8,10 @@ import {
   buildObserverSubmissionLocationFilter,
   observerSubmissionDocMatchesLocationFilter,
 } from "../Election/electionLive.ts";
-import { getResultsAndPerformAction } from "../Election/electionService.ts";
+import {
+  getResultsAndPerformAction,
+  type FlagMediaFiles,
+} from "../Election/electionService.ts";
 import { isActiveElectionRelevantForUser } from "../../utils/electionRelevanceForUser.ts";
 
 type Id = Types.ObjectId | string;
@@ -137,7 +140,8 @@ export const mobileCollationUserAction = async (
     action: "agree" | "flag" | "unagree";
     dataType: "election" | "incident";
     flagReason?: string;
-  } | null
+  } | null,
+  flagMediaFiles?: FlagMediaFiles
 ) => {
   const { user, electionType } = await assertMobileCollationAccess(activeElectionId, userId);
 
@@ -177,10 +181,14 @@ export const mobileCollationUserAction = async (
     throw new Error("Invalid data type");
   }
 
-  return getResultsAndPerformAction(userId, {
-    electionId: body.electionId,
-    action: body.action,
-    dataType: body.dataType,
-    flagReason: body.flagReason,
-  });
+  return getResultsAndPerformAction(
+    userId,
+    {
+      electionId: body.electionId,
+      action: body.action,
+      dataType: body.dataType,
+      flagReason: body.flagReason,
+    },
+    flagMediaFiles
+  );
 };

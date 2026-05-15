@@ -19,8 +19,8 @@ const pressCoverageSchema = new mongoose.Schema(
     /** Optional dateline e.g. "Lagos, Nigeria" shown before article body */
     dateline: { type: String, trim: true },
     content: { type: String, required: true },
-    thumbnailUrl: { type: String, required: true, trim: true },
-    heroImageUrl: { type: String, trim: true },
+    thumbnail: { type: String, required: true, trim: true },
+    heroImage: { type: String, trim: true },
     publishedAt: { type: Date, required: true, index: true },
     isPublished: { type: Boolean, default: true, index: true },
     createdBy: {

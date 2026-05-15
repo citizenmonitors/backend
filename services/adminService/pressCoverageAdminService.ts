@@ -48,8 +48,8 @@ export type CreatePressCoverageInput = {
   adminId: Id | undefined;
   title: string;
   content: string;
-  thumbnailUrl: string;
-  heroImageUrl?: string;
+  thumbnail: string;
+  heroImage?: string;
   excerpt?: string;
   dateline?: string;
   slug?: string;
@@ -62,10 +62,10 @@ export const createPressCoverageArticle = async (input: CreatePressCoverageInput
   const adminId = requireId(input.adminId, "adminId");
   const title = String(input.title ?? "").trim();
   const content = String(input.content ?? "").trim();
-  const thumbnailUrl = String(input.thumbnailUrl ?? "").trim();
+  const thumbnail = String(input.thumbnail ?? "").trim();
   if (!title) throw new Error("title is required");
   if (!content) throw new Error("content is required");
-  if (!thumbnailUrl) throw new Error("thumbnail image is required");
+  if (!thumbnail) throw new Error("thumbnail image is required");
 
   const isPublished = toBoolean(input.isPublished, true);
   const notifySubscribers = toBoolean(input.notifySubscribers, isPublished);
@@ -90,8 +90,8 @@ export const createPressCoverageArticle = async (input: CreatePressCoverageInput
 
   const excerpt = input.excerpt !== undefined ? String(input.excerpt).trim() : "";
   const dateline = input.dateline !== undefined ? String(input.dateline).trim() : "";
-  const heroImageUrl =
-    input.heroImageUrl !== undefined ? String(input.heroImageUrl).trim() : "";
+  const heroImage =
+    input.heroImage !== undefined ? String(input.heroImage).trim() : "";
 
   const article = await PressCoverage.create({
     title,
@@ -99,8 +99,8 @@ export const createPressCoverageArticle = async (input: CreatePressCoverageInput
     excerpt,
     dateline: dateline || undefined,
     content,
-    thumbnailUrl,
-    heroImageUrl: heroImageUrl || undefined,
+    thumbnail,
+    heroImage: heroImage || undefined,
     publishedAt,
     isPublished,
     createdBy: adminId instanceof mongoose.Types.ObjectId ? adminId : new mongoose.Types.ObjectId(adminId),

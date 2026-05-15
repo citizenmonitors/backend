@@ -68,7 +68,7 @@ export declare const getMobileDashboard: (user: AuthenticatedUser) => Promise<{
         id: string;
         slug: string;
         title: string;
-        thumbnailUrl: string;
+        thumbnail: string;
         summary: string;
         publishedAt: NativeDate;
         dateline: string | undefined;

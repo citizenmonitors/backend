@@ -40,7 +40,7 @@ export const listPublishedPressCoverageMobile = async (input?: {
       .sort({ publishedAt: -1 })
       .skip(skip)
       .limit(limit)
-      .select("slug title thumbnailUrl publishedAt excerpt content likes dateline")
+      .select("slug title thumbnail publishedAt excerpt content likes dateline")
       .lean(),
     PressCoverage.countDocuments(filter),
   ]);
@@ -58,7 +58,7 @@ export const listPublishedPressCoverageMobile = async (input?: {
         id: String(row._id),
         slug: row.slug,
         title: row.title,
-        thumbnailUrl: row.thumbnailUrl,
+        thumbnail: row.thumbnail,
         summary: row.excerpt?.trim() || textPreview(String(row.content ?? ""), 220),
         publishedAt: row.publishedAt,
         dateline: row.dateline?.trim() || undefined,
@@ -82,12 +82,12 @@ export const getPublishedPressCoverageBySlugMobile = async (
     isPublished: true,
   })
     .select(
-      "slug title excerpt dateline content thumbnailUrl heroImageUrl publishedAt createdAt likes"
+      "slug title excerpt dateline content thumbnail heroImage publishedAt createdAt likes"
     )
     .lean();
   if (!row) return null;
 
-  const hero = row.heroImageUrl?.trim() || row.thumbnailUrl;
+  const hero = row.heroImage?.trim() || row.thumbnail;
   const likes = likesArray(row);
   const commentsCount = await PressCoverageComment.countDocuments({ article: row._id });
 
@@ -98,8 +98,8 @@ export const getPublishedPressCoverageBySlugMobile = async (
     excerpt: row.excerpt?.trim() || textPreview(String(row.content ?? ""), 280),
     dateline: row.dateline?.trim() || undefined,
     content: row.content,
-    thumbnailUrl: row.thumbnailUrl,
-    heroImageUrl: hero,
+    thumbnail: row.thumbnail,
+    heroImage: hero,
     publishedAt: row.publishedAt,
     createdAt: row.createdAt,
     likesCount: likes.length,

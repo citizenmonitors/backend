@@ -149,7 +149,7 @@ const buildMobileDashboard = async (user) => {
         })
             .sort({ publishedAt: -1 })
             .limit(10)
-            .select("slug title thumbnailUrl excerpt content publishedAt likes dateline")
+            .select("slug title thumbnail excerpt content publishedAt likes dateline")
             .lean(),
     ]);
     const [discussionCommentCounts, pulseCommentCounts] = await Promise.all([
@@ -256,7 +256,7 @@ const buildMobileDashboard = async (user) => {
                 id: String(i._id),
                 slug: i.slug,
                 title: i.title,
-                thumbnailUrl: i.thumbnailUrl,
+                thumbnail: i.thumbnail,
                 summary: (typeof i.excerpt === "string" ? i.excerpt.trim() : "") ||
                     textPreview(String(i.content ?? ""), 240),
                 publishedAt: i.publishedAt,

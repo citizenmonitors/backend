@@ -23,7 +23,7 @@ export const resolveArticleImageUrls = async (input) => {
         thumbnailUrl = (await uploadFileToFirebase(thumbFile, input.firebaseFolder)).publicUrl;
     }
     else {
-        const fromBody = String(input.body.thumbnailUrl ?? "").trim();
+        const fromBody = String(input.body.thumbnailUrl ?? input.body.thumbnail ?? "").trim();
         if (fromBody && isHttpUrl(fromBody))
             thumbnailUrl = fromBody;
     }
@@ -35,7 +35,7 @@ export const resolveArticleImageUrls = async (input) => {
         heroImageUrl = (await uploadFileToFirebase(heroFile, input.firebaseFolder)).publicUrl;
     }
     else {
-        const fromBody = String(input.body.heroImageUrl ?? "").trim();
+        const fromBody = String(input.body.heroImageUrl ?? input.body.heroImage ?? "").trim();
         if (fromBody && isHttpUrl(fromBody))
             heroImageUrl = fromBody;
     }

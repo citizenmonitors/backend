@@ -4,9 +4,9 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     slug: string;
+    thumbnail: string;
     title: string;
     content: string;
-    thumbnailUrl: string;
     publishedAt: NativeDate;
     isPublished: boolean;
     createdBy: mongoose.Types.ObjectId;
@@ -17,7 +17,7 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
-    heroImageUrl?: string | null | undefined;
+    heroImage?: string | null | undefined;
     excerpt?: string | null | undefined;
     dateline?: string | null | undefined;
 }, {}, {}, {}, mongoose.Document<unknown, {}, {
@@ -25,9 +25,9 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     slug: string;
+    thumbnail: string;
     title: string;
     content: string;
-    thumbnailUrl: string;
     publishedAt: NativeDate;
     isPublished: boolean;
     createdBy: mongoose.Types.ObjectId;
@@ -38,7 +38,7 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
-    heroImageUrl?: string | null | undefined;
+    heroImage?: string | null | undefined;
     excerpt?: string | null | undefined;
     dateline?: string | null | undefined;
 }> & {
@@ -46,9 +46,9 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     slug: string;
+    thumbnail: string;
     title: string;
     content: string;
-    thumbnailUrl: string;
     publishedAt: NativeDate;
     isPublished: boolean;
     createdBy: mongoose.Types.ObjectId;
@@ -59,7 +59,7 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
-    heroImageUrl?: string | null | undefined;
+    heroImage?: string | null | undefined;
     excerpt?: string | null | undefined;
     dateline?: string | null | undefined;
 } & {
@@ -73,9 +73,9 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     slug: string;
+    thumbnail: string;
     title: string;
     content: string;
-    thumbnailUrl: string;
     publishedAt: NativeDate;
     isPublished: boolean;
     createdBy: mongoose.Types.ObjectId;
@@ -86,7 +86,7 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
-    heroImageUrl?: string | null | undefined;
+    heroImage?: string | null | undefined;
     excerpt?: string | null | undefined;
     dateline?: string | null | undefined;
 }, mongoose.Document<unknown, {}, mongoose.FlatRecord<{
@@ -94,9 +94,9 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     slug: string;
+    thumbnail: string;
     title: string;
     content: string;
-    thumbnailUrl: string;
     publishedAt: NativeDate;
     isPublished: boolean;
     createdBy: mongoose.Types.ObjectId;
@@ -107,7 +107,7 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
-    heroImageUrl?: string | null | undefined;
+    heroImage?: string | null | undefined;
     excerpt?: string | null | undefined;
     dateline?: string | null | undefined;
 }>> & mongoose.FlatRecord<{
@@ -115,9 +115,9 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     slug: string;
+    thumbnail: string;
     title: string;
     content: string;
-    thumbnailUrl: string;
     publishedAt: NativeDate;
     isPublished: boolean;
     createdBy: mongoose.Types.ObjectId;
@@ -128,7 +128,7 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
-    heroImageUrl?: string | null | undefined;
+    heroImage?: string | null | undefined;
     excerpt?: string | null | undefined;
     dateline?: string | null | undefined;
 }> & {

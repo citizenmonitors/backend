@@ -5,8 +5,8 @@ export type CreatePressCoverageInput = {
     adminId: Id | undefined;
     title: string;
     content: string;
-    thumbnailUrl: string;
-    heroImageUrl?: string;
+    thumbnail: string;
+    heroImage?: string;
     excerpt?: string;
     dateline?: string;
     slug?: string;
@@ -19,9 +19,9 @@ export declare const createPressCoverageArticle: (input: CreatePressCoverageInpu
     updatedAt: NativeDate;
 } & {
     slug: string;
+    thumbnail: string;
     title: string;
     content: string;
-    thumbnailUrl: string;
     publishedAt: NativeDate;
     isPublished: boolean;
     createdBy: Types.ObjectId;
@@ -32,7 +32,7 @@ export declare const createPressCoverageArticle: (input: CreatePressCoverageInpu
     }> & {
         user: Types.ObjectId;
     }>;
-    heroImageUrl?: string | null | undefined;
+    heroImage?: string | null | undefined;
     excerpt?: string | null | undefined;
     dateline?: string | null | undefined;
 } & {
@@ -51,9 +51,9 @@ export declare const listPressCoverageForAdmin: (input?: {
         createdAt: NativeDate;
         updatedAt: NativeDate;
         slug: string;
+        thumbnail: string;
         title: string;
         content: string;
-        thumbnailUrl: string;
         publishedAt: NativeDate;
         isPublished: boolean;
         createdBy: Types.ObjectId;
@@ -76,7 +76,7 @@ export declare const listPressCoverageForAdmin: (input?: {
             _id: string;
             __v: number;
         })>;
-        heroImageUrl?: string | null | undefined;
+        heroImage?: string | null | undefined;
         excerpt?: string | null | undefined;
         dateline?: string | null | undefined;
     }> & {
@@ -89,9 +89,9 @@ export declare const getPressCoverageByIdForAdmin: (articleId: string) => Promis
     createdAt: NativeDate;
     updatedAt: NativeDate;
     slug: string;
+    thumbnail: string;
     title: string;
     content: string;
-    thumbnailUrl: string;
     publishedAt: NativeDate;
     isPublished: boolean;
     createdBy: Types.ObjectId;
@@ -114,7 +114,7 @@ export declare const getPressCoverageByIdForAdmin: (articleId: string) => Promis
         _id: string;
         __v: number;
     })>;
-    heroImageUrl?: string | null | undefined;
+    heroImage?: string | null | undefined;
     excerpt?: string | null | undefined;
     dateline?: string | null | undefined;
 }> & {

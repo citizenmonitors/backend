@@ -11,7 +11,7 @@ export declare const listPublishedPressCoverageMobile: (input?: {
         id: string;
         slug: string;
         title: string;
-        thumbnailUrl: string;
+        thumbnail: string;
         summary: string;
         publishedAt: NativeDate;
         dateline: string | undefined;
@@ -27,8 +27,8 @@ export declare const getPublishedPressCoverageBySlugMobile: (slug: string, viewe
     excerpt: string;
     dateline: string | undefined;
     content: string;
-    thumbnailUrl: string;
-    heroImageUrl: string;
+    thumbnail: string;
+    heroImage: string;
     publishedAt: NativeDate;
     createdAt: NativeDate;
     likesCount: number;

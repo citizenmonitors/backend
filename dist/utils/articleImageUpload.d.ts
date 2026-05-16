@@ -5,16 +5,16 @@ type MulterMemoryFile = {
 };
 type FilesMap = Record<string, MulterMemoryFile[] | undefined>;
 /**
- * Resolves thumbnail + hero for News / Press admin create.
- * Multipart files: `thumbnail` (required) and optional hero (`heroImage` or `heroImageURL`).
- * JSON body fallbacks: `thumbnailUrl` / `thumbnail` and `heroImageURL` / `heroImage` / `heroImageUrl` as HTTPS URLs.
+ * Resolves thumbnailURL + hero for News / Press admin create.
+ * Multipart files: thumbnail (`thumbnail`, `thumbnailUrl`, or `thumbnailURL`) and optional hero.
+ * JSON body fallbacks: same names as HTTPS URLs when not uploading files.
  */
 export declare const resolveArticleImageUrls: (input: {
     body: Record<string, unknown>;
     files?: FilesMap;
     firebaseFolder: string;
 }) => Promise<{
-    thumbnailUrl: string;
+    thumbnailURLUrl: string;
     heroImageURL?: string;
 }>;
 export {};

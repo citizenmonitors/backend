@@ -8,7 +8,12 @@ type MulterMemoryFile = {
 
 type FilesMap = Record<string, MulterMemoryFile[] | undefined>;
 
-const THUMB_FILE_FIELDS = ["thumbnail", "thumbnailUrl"] as const;
+const THUMB_FILE_FIELDS = [
+  "thumbnail",
+  "thumbnailUrl",
+  "thumbnailURL",
+  "thumbnailURLUrl",
+] as const;
 const HERO_FILE_FIELDS = ["heroImage", "heroImageURL", "heroImageUrl"] as const;
 
 const firstFile = (files: FilesMap | undefined, names: readonly string[]): MulterMemoryFile | undefined => {
@@ -23,31 +28,35 @@ const firstFile = (files: FilesMap | undefined, names: readonly string[]): Multe
 const isHttpUrl = (value: string): boolean => /^https?:\/\//i.test(value.trim());
 
 /**
- * Resolves thumbnail + hero for News / Press admin create.
- * Multipart files: `thumbnail` (required) and optional hero (`heroImage` or `heroImageURL`).
- * JSON body fallbacks: `thumbnailUrl` / `thumbnail` and `heroImageURL` / `heroImage` / `heroImageUrl` as HTTPS URLs.
+ * Resolves thumbnailURL + hero for News / Press admin create.
+ * Multipart files: thumbnail (`thumbnail`, `thumbnailUrl`, or `thumbnailURL`) and optional hero.
+ * JSON body fallbacks: same names as HTTPS URLs when not uploading files.
  */
 export const resolveArticleImageUrls = async (input: {
   body: Record<string, unknown>;
   files?: FilesMap;
   firebaseFolder: string;
-}): Promise<{ thumbnailUrl: string; heroImageURL?: string }> => {
+}): Promise<{ thumbnailURLUrl: string; heroImageURL?: string }> => {
   const thumbFile = firstFile(input.files, THUMB_FILE_FIELDS);
   const heroFile = firstFile(input.files, HERO_FILE_FIELDS);
 
-  let thumbnailUrl = "";
+  let thumbnailURLUrl = "";
   if (thumbFile) {
-    thumbnailUrl = (await uploadFileToFirebase(thumbFile, input.firebaseFolder)).publicUrl;
+    thumbnailURLUrl = (await uploadFileToFirebase(thumbFile, input.firebaseFolder)).publicUrl;
   } else {
     const fromBody = String(
-      input.body.thumbnailUrl ?? input.body.thumbnail ?? ""
+      input.body.thumbnailURLUrl ??
+        input.body.thumbnailURL ??
+        input.body.thumbnailUrl ??
+        input.body.thumbnail ??
+        ""
     ).trim();
-    if (fromBody && isHttpUrl(fromBody)) thumbnailUrl = fromBody;
+    if (fromBody && isHttpUrl(fromBody)) thumbnailURLUrl = fromBody;
   }
 
-  if (!thumbnailUrl) {
+  if (!thumbnailURLUrl) {
     throw new Error(
-      'thumbnail is required — upload an image file (form-data field "thumbnail", type File)'
+      'thumbnail is required — upload an image file (form-data field "thumbnail" or "thumbnailURL", type File)'
     );
   }
 
@@ -65,5 +74,5 @@ export const resolveArticleImageUrls = async (input: {
     if (fromBody && isHttpUrl(fromBody)) heroImageURL = fromBody;
   }
 
-  return { thumbnailUrl, heroImageURL };
+  return { thumbnailURLUrl, heroImageURL };
 };

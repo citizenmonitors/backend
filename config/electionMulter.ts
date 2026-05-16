@@ -55,26 +55,41 @@ const newsPressImageFilter = (_req: Request, file: MulterLikeFile, cb: FileFilte
   if (newsPressImageExtensions.includes(ext) && newsPressImageMimeTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error("Thumbnail and hero must be images: png, jpg, jpeg, webp, or svg"));
+    cb(new Error("thumbnailURL and hero must be images: png, jpg, jpeg, webp, or svg"));
   }
 };
 
 const uploadNewsPress = multer({
   storage,
-  limits: { fileSize: 15 * 1024 * 1024 },
+  limits: { fileSize: 15 * 1024 * 1024, files: 2 },
   fileFilter: newsPressImageFilter,
 });
 
-type MulterFields = (fields: { name: string; maxCount: number }[]) => import("express").RequestHandler;
+type MulterAny = () => import("express").RequestHandler;
 
-/** Admin create News / Press — file fields: `thumbnail` (+ optional hero under any accepted alias). */
-export const uploadNewsPressAdminImages = (uploadNewsPress as unknown as { fields: MulterFields }).fields([
-  { name: "thumbnail", maxCount: 1 },
-  { name: "thumbnailUrl", maxCount: 1 },
-  { name: "heroImage", maxCount: 1 },
-  { name: "heroImageURL", maxCount: 1 },
-  { name: "heroImageUrl", maxCount: 1 },
-]);
+type MulterMemoryFile = {
+  fieldname: string;
+  buffer: Buffer;
+  mimetype: string;
+  originalname: string;
+};
+
+/** Accept up to 2 image files under any field name; resolved in articleImageUpload by known keys. */
+const uploadNewsPressAdminImages = (uploadNewsPress as unknown as { any: MulterAny }).any();
+
+const normalizeMulterFilesToMap = (files: unknown): Record<string, MulterMemoryFile[]> | undefined => {
+  if (!files) return undefined;
+  if (Array.isArray(files)) {
+    const map: Record<string, MulterMemoryFile[]> = {};
+    for (const file of files as MulterMemoryFile[]) {
+      const list = map[file.fieldname] ?? [];
+      list.push(file);
+      map[file.fieldname] = list;
+    }
+    return map;
+  }
+  return files as Record<string, MulterMemoryFile[]>;
+};
 
 export const runNewsPressAdminUpload = (req: Request, res: Response, next: NextFunction) => {
   uploadNewsPressAdminImages(req, res, (err: unknown) => {
@@ -83,11 +98,19 @@ export const runNewsPressAdminUpload = (req: Request, res: Response, next: NextF
       if (message.includes("Unexpected field")) {
         return res.status(400).json({
           message:
-            'Upload: unexpected file field. Use form-data files named "thumbnail" (required) and optionally "heroImage" or "heroImageURL".',
+            'Upload: too many files. Send at most 2 images: thumbnail (field "thumbnail" or "thumbnailURL") and optional hero ("heroImage" or "heroImageURL").',
+        });
+      }
+      if (message.includes("LIMIT_FILE_COUNT") || message.toLowerCase().includes("too many files")) {
+        return res.status(400).json({
+          message:
+            'Upload: at most 2 image files allowed (thumbnail + optional hero).',
         });
       }
       return res.status(400).json({ message: `Upload: ${message}` });
     }
+    const r = req as Request & { files?: unknown };
+    r.files = normalizeMulterFilesToMap(r.files);
     next();
   });
 };

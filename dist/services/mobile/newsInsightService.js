@@ -6,7 +6,7 @@ const resolveHeroImageURL = (row) => {
     const hero = row.heroImageURL?.trim() ||
         row.heroImageURLUrl?.trim() ||
         "";
-    return hero || row.thumbnailUrl;
+    return hero || row.thumbnailURLUrl;
 };
 const toNewsInsightMobileArticle = (row, input) => {
     const likes = likesArray(row);
@@ -17,7 +17,7 @@ const toNewsInsightMobileArticle = (row, input) => {
         title: row.title,
         excerpt: row.excerpt?.trim() || undefined,
         content: row.content,
-        thumbnailUrl: row.thumbnailUrl,
+        thumbnailURLUrl: row.thumbnailURLUrl,
         heroImageURL,
         publishedAt: row.publishedAt,
         isPublished: row.isPublished ?? true,

@@ -17,7 +17,7 @@ const newsInsightSchema = new mongoose.Schema(
     slug: { type: String, required: true, unique: true, index: true, trim: true },
     excerpt: { type: String, trim: true },
     content: { type: String, required: true },
-    thumbnailUrl: { type: String, required: true, trim: true },
+    thumbnailURLUrl: { type: String, required: true, trim: true },
     heroImageURL: { type: String, trim: true },
     publishedAt: { type: Date, required: true, index: true },
     isPublished: { type: Boolean, default: true, index: true },

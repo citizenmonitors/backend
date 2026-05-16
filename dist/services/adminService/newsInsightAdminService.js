@@ -45,13 +45,13 @@ export const createNewsInsightArticle = async (input) => {
     const adminId = requireId(input.adminId, "adminId");
     const title = String(input.title ?? "").trim();
     const content = String(input.content ?? "").trim();
-    const thumbnailUrl = String(input.thumbnailUrl ?? "").trim();
+    const thumbnailURLUrl = String(input.thumbnailURLUrl ?? "").trim();
     if (!title)
         throw new Error("title is required");
     if (!content)
         throw new Error("content is required");
-    if (!thumbnailUrl)
-        throw new Error("thumbnail image is required");
+    if (!thumbnailURLUrl)
+        throw new Error("thumbnailURL image is required");
     const isPublished = toBoolean(input.isPublished, true);
     const notifySubscribers = toBoolean(input.notifySubscribers, isPublished);
     const rawInput = String(input.slug ?? "").trim().toLowerCase();
@@ -81,7 +81,7 @@ export const createNewsInsightArticle = async (input) => {
         slug,
         excerpt,
         content,
-        thumbnailUrl,
+        thumbnailURLUrl,
         heroImageURL: heroImageURL || undefined,
         publishedAt,
         isPublished,

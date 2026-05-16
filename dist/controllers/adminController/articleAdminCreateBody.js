@@ -2,7 +2,7 @@ import { resolveArticleImageUrls } from "../../utils/articleImageUpload.js";
 export const buildNewsInsightCreatePayload = async (req) => {
     const r = req;
     const body = req.body;
-    const { thumbnailUrl, heroImageURL } = await resolveArticleImageUrls({
+    const { thumbnailURLUrl, heroImageURL } = await resolveArticleImageUrls({
         body,
         files: r.files,
         firebaseFolder: "news-insights",
@@ -11,7 +11,7 @@ export const buildNewsInsightCreatePayload = async (req) => {
         adminId: r.user?._id,
         title: String(body.title ?? ""),
         content: String(body.content ?? ""),
-        thumbnailUrl,
+        thumbnailURLUrl,
         heroImageURL,
         excerpt: body.excerpt !== undefined ? String(body.excerpt) : undefined,
         slug: body.slug !== undefined ? String(body.slug) : undefined,
@@ -23,7 +23,7 @@ export const buildNewsInsightCreatePayload = async (req) => {
 export const buildPressCoverageCreatePayload = async (req) => {
     const r = req;
     const body = req.body;
-    const { thumbnailUrl, heroImageURL } = await resolveArticleImageUrls({
+    const { thumbnailURLUrl, heroImageURL } = await resolveArticleImageUrls({
         body,
         files: r.files,
         firebaseFolder: "press-coverage",
@@ -32,7 +32,7 @@ export const buildPressCoverageCreatePayload = async (req) => {
         adminId: r.user?._id,
         title: String(body.title ?? ""),
         content: String(body.content ?? ""),
-        thumbnail: thumbnailUrl,
+        thumbnailURL: thumbnailURLUrl,
         heroImageURL,
         excerpt: body.excerpt !== undefined ? String(body.excerpt) : undefined,
         dateline: body.dateline !== undefined ? String(body.dateline) : undefined,

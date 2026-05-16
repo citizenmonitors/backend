@@ -5,7 +5,7 @@ export type CreatePressCoverageInput = {
     adminId: Id | undefined;
     title: string;
     content: string;
-    thumbnail: string;
+    thumbnailURL: string;
     heroImageURL?: string;
     excerpt?: string;
     dateline?: string;
@@ -19,9 +19,9 @@ export declare const createPressCoverageArticle: (input: CreatePressCoverageInpu
     updatedAt: NativeDate;
 } & {
     slug: string;
-    thumbnail: string;
     title: string;
     content: string;
+    thumbnailURL: string;
     publishedAt: NativeDate;
     isPublished: boolean;
     createdBy: Types.ObjectId;
@@ -51,9 +51,9 @@ export declare const listPressCoverageForAdmin: (input?: {
         createdAt: NativeDate;
         updatedAt: NativeDate;
         slug: string;
-        thumbnail: string;
         title: string;
         content: string;
+        thumbnailURL: string;
         publishedAt: NativeDate;
         isPublished: boolean;
         createdBy: Types.ObjectId;
@@ -89,9 +89,9 @@ export declare const getPressCoverageByIdForAdmin: (articleId: string) => Promis
     createdAt: NativeDate;
     updatedAt: NativeDate;
     slug: string;
-    thumbnail: string;
     title: string;
     content: string;
+    thumbnailURL: string;
     publishedAt: NativeDate;
     isPublished: boolean;
     createdBy: Types.ObjectId;

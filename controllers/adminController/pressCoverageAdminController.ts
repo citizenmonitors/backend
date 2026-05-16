@@ -26,7 +26,7 @@ export const createPressCoverageAdmin = async (req: Request, res: Response) => {
     if (
       msg.includes("required") ||
       msg.includes("Invalid") ||
-      msg.includes("thumbnail") ||
+      msg.includes("thumbnailURL") ||
       msg.includes("upload")
     ) {
       return res.status(400).json({ message: msg });

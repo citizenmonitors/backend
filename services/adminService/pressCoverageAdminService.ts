@@ -48,7 +48,7 @@ export type CreatePressCoverageInput = {
   adminId: Id | undefined;
   title: string;
   content: string;
-  thumbnail: string;
+  thumbnailURL: string;
   heroImageURL?: string;
   excerpt?: string;
   dateline?: string;
@@ -62,10 +62,10 @@ export const createPressCoverageArticle = async (input: CreatePressCoverageInput
   const adminId = requireId(input.adminId, "adminId");
   const title = String(input.title ?? "").trim();
   const content = String(input.content ?? "").trim();
-  const thumbnail = String(input.thumbnail ?? "").trim();
+  const thumbnailURL = String(input.thumbnailURL ?? "").trim();
   if (!title) throw new Error("title is required");
   if (!content) throw new Error("content is required");
-  if (!thumbnail) throw new Error("thumbnail image is required");
+  if (!thumbnailURL) throw new Error("thumbnailURL image is required");
 
   const isPublished = toBoolean(input.isPublished, true);
   const notifySubscribers = toBoolean(input.notifySubscribers, isPublished);
@@ -99,7 +99,7 @@ export const createPressCoverageArticle = async (input: CreatePressCoverageInput
     excerpt,
     dateline: dateline || undefined,
     content,
-    thumbnail,
+    thumbnailURL,
     heroImageURL: heroImageURL || undefined,
     publishedAt,
     isPublished,

@@ -4,9 +4,9 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     slug: string;
-    thumbnailUrl: string;
     title: string;
     content: string;
+    thumbnailURLUrl: string;
     publishedAt: NativeDate;
     isPublished: boolean;
     createdBy: mongoose.Types.ObjectId;
@@ -24,9 +24,9 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     slug: string;
-    thumbnailUrl: string;
     title: string;
     content: string;
+    thumbnailURLUrl: string;
     publishedAt: NativeDate;
     isPublished: boolean;
     createdBy: mongoose.Types.ObjectId;
@@ -44,9 +44,9 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     slug: string;
-    thumbnailUrl: string;
     title: string;
     content: string;
+    thumbnailURLUrl: string;
     publishedAt: NativeDate;
     isPublished: boolean;
     createdBy: mongoose.Types.ObjectId;
@@ -70,9 +70,9 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     slug: string;
-    thumbnailUrl: string;
     title: string;
     content: string;
+    thumbnailURLUrl: string;
     publishedAt: NativeDate;
     isPublished: boolean;
     createdBy: mongoose.Types.ObjectId;
@@ -90,9 +90,9 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     slug: string;
-    thumbnailUrl: string;
     title: string;
     content: string;
+    thumbnailURLUrl: string;
     publishedAt: NativeDate;
     isPublished: boolean;
     createdBy: mongoose.Types.ObjectId;
@@ -110,9 +110,9 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     slug: string;
-    thumbnailUrl: string;
     title: string;
     content: string;
+    thumbnailURLUrl: string;
     publishedAt: NativeDate;
     isPublished: boolean;
     createdBy: mongoose.Types.ObjectId;

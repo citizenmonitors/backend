@@ -14,7 +14,7 @@ export declare const listPublishedPressCoverageMobile: (input?: {
         excerpt: string | undefined;
         dateline: string | undefined;
         content: string;
-        thumbnail: string;
+        thumbnailURL: string;
         heroImageURL: string;
         publishedAt: Date;
         isPublished: boolean;
@@ -32,7 +32,7 @@ export declare const getPublishedPressCoverageBySlugMobile: (slug: string, viewe
     excerpt: string | undefined;
     dateline: string | undefined;
     content: string;
-    thumbnail: string;
+    thumbnailURL: string;
     heroImageURL: string;
     publishedAt: Date;
     isPublished: boolean;

@@ -41,33 +41,48 @@ const newsPressImageFilter = (_req, file, cb) => {
         cb(null, true);
     }
     else {
-        cb(new Error("Thumbnail and hero must be images: png, jpg, jpeg, webp, or svg"));
+        cb(new Error("thumbnailURL and hero must be images: png, jpg, jpeg, webp, or svg"));
     }
 };
 const uploadNewsPress = multer({
     storage,
-    limits: { fileSize: 15 * 1024 * 1024 },
+    limits: { fileSize: 15 * 1024 * 1024, files: 2 },
     fileFilter: newsPressImageFilter,
 });
-/** Admin create News / Press — file fields: `thumbnail` (+ optional hero under any accepted alias). */
-export const uploadNewsPressAdminImages = uploadNewsPress.fields([
-    { name: "thumbnail", maxCount: 1 },
-    { name: "thumbnailUrl", maxCount: 1 },
-    { name: "heroImage", maxCount: 1 },
-    { name: "heroImageURL", maxCount: 1 },
-    { name: "heroImageUrl", maxCount: 1 },
-]);
+/** Accept up to 2 image files under any field name; resolved in articleImageUpload by known keys. */
+const uploadNewsPressAdminImages = uploadNewsPress.any();
+const normalizeMulterFilesToMap = (files) => {
+    if (!files)
+        return undefined;
+    if (Array.isArray(files)) {
+        const map = {};
+        for (const file of files) {
+            const list = map[file.fieldname] ?? [];
+            list.push(file);
+            map[file.fieldname] = list;
+        }
+        return map;
+    }
+    return files;
+};
 export const runNewsPressAdminUpload = (req, res, next) => {
     uploadNewsPressAdminImages(req, res, (err) => {
         if (err) {
             const message = err instanceof Error ? err.message : String(err);
             if (message.includes("Unexpected field")) {
                 return res.status(400).json({
-                    message: 'Upload: unexpected file field. Use form-data files named "thumbnail" (required) and optionally "heroImage" or "heroImageURL".',
+                    message: 'Upload: too many files. Send at most 2 images: thumbnail (field "thumbnail" or "thumbnailURL") and optional hero ("heroImage" or "heroImageURL").',
+                });
+            }
+            if (message.includes("LIMIT_FILE_COUNT") || message.toLowerCase().includes("too many files")) {
+                return res.status(400).json({
+                    message: 'Upload: at most 2 image files allowed (thumbnail + optional hero).',
                 });
             }
             return res.status(400).json({ message: `Upload: ${message}` });
         }
+        const r = req;
+        r.files = normalizeMulterFilesToMap(r.files);
         next();
     });
 };

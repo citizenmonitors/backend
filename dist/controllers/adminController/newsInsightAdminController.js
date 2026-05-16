@@ -17,7 +17,7 @@ export const createNewsInsightAdmin = async (req, res) => {
         const msg = getErrorMessage(error);
         if (msg.includes("required") ||
             msg.includes("Invalid") ||
-            msg.includes("thumbnail") ||
+            msg.includes("thumbnailURL") ||
             msg.includes("upload")) {
             return res.status(400).json({ message: msg });
         }

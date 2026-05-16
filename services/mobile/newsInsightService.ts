@@ -12,7 +12,7 @@ type NewsInsightLean = {
   title: string;
   excerpt?: string | null;
   content: string;
-  thumbnailUrl: string;
+  thumbnailURLUrl: string;
   heroImageURL?: string | null;
   /** @deprecated legacy DB key */
   heroImageURLUrl?: string | null;
@@ -28,7 +28,7 @@ const resolveHeroImageURL = (row: NewsInsightLean): string => {
     row.heroImageURL?.trim() ||
     row.heroImageURLUrl?.trim() ||
     "";
-  return hero || row.thumbnailUrl;
+  return hero || row.thumbnailURLUrl;
 };
 
 const toNewsInsightMobileArticle = (
@@ -44,7 +44,7 @@ const toNewsInsightMobileArticle = (
     title: row.title,
     excerpt: row.excerpt?.trim() || undefined,
     content: row.content,
-    thumbnailUrl: row.thumbnailUrl,
+    thumbnailURLUrl: row.thumbnailURLUrl,
     heroImageURL,
     publishedAt: row.publishedAt,
     isPublished: row.isPublished ?? true,

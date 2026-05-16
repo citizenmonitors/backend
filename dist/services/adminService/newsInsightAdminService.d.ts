@@ -5,7 +5,7 @@ export type CreateNewsInsightInput = {
     adminId: Id | undefined;
     title: string;
     content: string;
-    thumbnailUrl: string;
+    thumbnailURLUrl: string;
     heroImageURL?: string;
     excerpt?: string;
     slug?: string;
@@ -18,9 +18,9 @@ export declare const createNewsInsightArticle: (input: CreateNewsInsightInput) =
     updatedAt: NativeDate;
 } & {
     slug: string;
-    thumbnailUrl: string;
     title: string;
     content: string;
+    thumbnailURLUrl: string;
     publishedAt: NativeDate;
     isPublished: boolean;
     createdBy: Types.ObjectId;
@@ -49,9 +49,9 @@ export declare const listNewsInsightsForAdmin: (input?: {
         createdAt: NativeDate;
         updatedAt: NativeDate;
         slug: string;
-        thumbnailUrl: string;
         title: string;
         content: string;
+        thumbnailURLUrl: string;
         publishedAt: NativeDate;
         isPublished: boolean;
         createdBy: Types.ObjectId;
@@ -86,9 +86,9 @@ export declare const getNewsInsightByIdForAdmin: (articleId: string) => Promise<
     createdAt: NativeDate;
     updatedAt: NativeDate;
     slug: string;
-    thumbnailUrl: string;
     title: string;
     content: string;
+    thumbnailURLUrl: string;
     publishedAt: NativeDate;
     isPublished: boolean;
     createdBy: Types.ObjectId;

@@ -164,14 +164,14 @@ const buildMobileDashboard = async (user: AuthenticatedUser) => {
       })
         .sort({ publishedAt: -1 })
         .limit(10)
-        .select("slug title thumbnailUrl excerpt content publishedAt likes")
+        .select("slug title thumbnailURLUrl excerpt content publishedAt likes")
         .lean(),
       PressCoverage.find({
         isPublished: true,
       })
         .sort({ publishedAt: -1 })
         .limit(10)
-        .select("slug title thumbnail excerpt content publishedAt likes dateline")
+        .select("slug title thumbnailURL excerpt content publishedAt likes dateline")
         .lean(),
     ]);
 
@@ -281,7 +281,7 @@ const buildMobileDashboard = async (user: AuthenticatedUser) => {
         id: String(i._id),
         slug: i.slug,
         title: i.title,
-        thumbnailUrl: i.thumbnailUrl,
+        thumbnailURLUrl: i.thumbnailURLUrl,
         summary:
           (typeof i.excerpt === "string" ? i.excerpt.trim() : "") ||
           textPreview(String(i.content ?? ""), 240),
@@ -299,7 +299,7 @@ const buildMobileDashboard = async (user: AuthenticatedUser) => {
         id: String(i._id),
         slug: i.slug,
         title: i.title,
-        thumbnail: i.thumbnail,
+        thumbnailURL: i.thumbnailURL,
         summary:
           (typeof i.excerpt === "string" ? i.excerpt.trim() : "") ||
           textPreview(String(i.content ?? ""), 240),

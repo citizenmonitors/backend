@@ -13,7 +13,7 @@ const pressCoverageSchema = new mongoose.Schema({
     /** Optional dateline e.g. "Lagos, Nigeria" shown before article body */
     dateline: { type: String, trim: true },
     content: { type: String, required: true },
-    thumbnail: { type: String, required: true, trim: true },
+    thumbnailURL: { type: String, required: true, trim: true },
     heroImageURL: { type: String, trim: true },
     publishedAt: { type: Date, required: true, index: true },
     isPublished: { type: Boolean, default: true, index: true },

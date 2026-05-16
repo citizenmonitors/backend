@@ -13,7 +13,7 @@ type PressCoverageLean = {
   excerpt?: string | null;
   dateline?: string | null;
   content: string;
-  thumbnail: string;
+  thumbnailURL: string;
   heroImageURL?: string | null;
   publishedAt: Date;
   isPublished?: boolean;
@@ -27,7 +27,7 @@ const toPressCoverageMobileArticle = (
   input: { viewerUserId?: string; commentsCount: number }
 ) => {
   const likes = likesArray(row);
-  const heroImageURL = row.heroImageURL?.trim() || row.thumbnail;
+  const heroImageURL = row.heroImageURL?.trim() || row.thumbnailURL;
 
   return {
     id: String(row._id),
@@ -36,7 +36,7 @@ const toPressCoverageMobileArticle = (
     excerpt: row.excerpt?.trim() || undefined,
     dateline: row.dateline?.trim() || undefined,
     content: row.content,
-    thumbnail: row.thumbnail,
+    thumbnailURL: row.thumbnailURL,
     heroImageURL,
     publishedAt: row.publishedAt,
     isPublished: row.isPublished ?? true,

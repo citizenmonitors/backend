@@ -95,7 +95,7 @@
                 { "key": "publishedAt", "value": "2026-02-02T10:00:00.000Z", "type": "text" },
                 { "key": "isPublished", "value": "true", "type": "text" },
                 { "key": "notifySubscribers", "value": "true", "type": "text" },
-                { "key": "thumbnail", "description": "Required — pick a local image file", "type": "file" },
+                { "key": "thumbnailURL", "description": "Required — pick a local image file", "type": "file" },
                 { "key": "heroImageURL", "description": "Optional — pick a local image file", "type": "file" }
               ]
             },
@@ -180,7 +180,7 @@
                 { "key": "publishedAt", "value": "2026-02-02T12:00:00.000Z", "type": "text" },
                 { "key": "isPublished", "value": "true", "type": "text" },
                 { "key": "notifySubscribers", "value": "true", "type": "text" },
-                { "key": "thumbnail", "description": "Required — pick a local image file in Postman", "type": "file" },
+                { "key": "thumbnailURL", "description": "Required — pick a local image file in Postman", "type": "file" },
                 { "key": "heroImageURL", "description": "Optional — pick a local image file", "type": "file" }
               ]
             },
@@ -247,7 +247,7 @@
               "formdata": [
                 { "key": "title", "value": "Kano by-election: APC sweeps assembly seats", "type": "text" },
                 { "key": "content", "value": "<p>First paragraph.</p>", "type": "text" },
-                { "key": "thumbnail", "type": "file" },
+                { "key": "thumbnailURL", "type": "file" },
                 { "key": "heroImageURL", "type": "file" }
               ]
             },
@@ -286,7 +286,7 @@
                 { "key": "title", "value": "Citizen Monitors Queries Budget for 2027 Elections", "type": "text" },
                 { "key": "dateline", "value": "Lagos, Nigeria", "type": "text" },
                 { "key": "content", "value": "<p>Opening paragraph.</p>", "type": "text" },
-                { "key": "thumbnail", "type": "file" },
+                { "key": "thumbnailURL", "type": "file" },
                 { "key": "heroImageURL", "type": "file" }
               ]
             },

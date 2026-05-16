@@ -4,7 +4,7 @@ import PressCoverageComment from "../../models/admin/PressCoverageComment.js";
 const likesArray = (row) => Array.isArray(row.likes) ? row.likes : [];
 const toPressCoverageMobileArticle = (row, input) => {
     const likes = likesArray(row);
-    const heroImageURL = row.heroImageURL?.trim() || row.thumbnail;
+    const heroImageURL = row.heroImageURL?.trim() || row.thumbnailURL;
     return {
         id: String(row._id),
         slug: row.slug,
@@ -12,7 +12,7 @@ const toPressCoverageMobileArticle = (row, input) => {
         excerpt: row.excerpt?.trim() || undefined,
         dateline: row.dateline?.trim() || undefined,
         content: row.content,
-        thumbnail: row.thumbnail,
+        thumbnailURL: row.thumbnailURL,
         heroImageURL,
         publishedAt: row.publishedAt,
         isPublished: row.isPublished ?? true,

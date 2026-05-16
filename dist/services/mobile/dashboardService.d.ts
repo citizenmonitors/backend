@@ -57,7 +57,7 @@ export declare const getMobileDashboard: (user: AuthenticatedUser) => Promise<{
         id: string;
         slug: string;
         title: string;
-        thumbnailUrl: string;
+        thumbnailURLUrl: string;
         summary: string;
         publishedAt: NativeDate;
         likesCount: number;
@@ -68,7 +68,7 @@ export declare const getMobileDashboard: (user: AuthenticatedUser) => Promise<{
         id: string;
         slug: string;
         title: string;
-        thumbnail: string;
+        thumbnailURL: string;
         summary: string;
         publishedAt: NativeDate;
         dateline: string | undefined;

@@ -1,5 +1,10 @@
 import { uploadFileToFirebase } from "../config/firebaseUploader.js";
-const THUMB_FILE_FIELDS = ["thumbnail", "thumbnailUrl"];
+const THUMB_FILE_FIELDS = [
+    "thumbnail",
+    "thumbnailUrl",
+    "thumbnailURL",
+    "thumbnailURLUrl",
+];
 const HERO_FILE_FIELDS = ["heroImage", "heroImageURL", "heroImageUrl"];
 const firstFile = (files, names) => {
     if (!files)
@@ -13,24 +18,28 @@ const firstFile = (files, names) => {
 };
 const isHttpUrl = (value) => /^https?:\/\//i.test(value.trim());
 /**
- * Resolves thumbnail + hero for News / Press admin create.
- * Multipart files: `thumbnail` (required) and optional hero (`heroImage` or `heroImageURL`).
- * JSON body fallbacks: `thumbnailUrl` / `thumbnail` and `heroImageURL` / `heroImage` / `heroImageUrl` as HTTPS URLs.
+ * Resolves thumbnailURL + hero for News / Press admin create.
+ * Multipart files: thumbnail (`thumbnail`, `thumbnailUrl`, or `thumbnailURL`) and optional hero.
+ * JSON body fallbacks: same names as HTTPS URLs when not uploading files.
  */
 export const resolveArticleImageUrls = async (input) => {
     const thumbFile = firstFile(input.files, THUMB_FILE_FIELDS);
     const heroFile = firstFile(input.files, HERO_FILE_FIELDS);
-    let thumbnailUrl = "";
+    let thumbnailURLUrl = "";
     if (thumbFile) {
-        thumbnailUrl = (await uploadFileToFirebase(thumbFile, input.firebaseFolder)).publicUrl;
+        thumbnailURLUrl = (await uploadFileToFirebase(thumbFile, input.firebaseFolder)).publicUrl;
     }
     else {
-        const fromBody = String(input.body.thumbnailUrl ?? input.body.thumbnail ?? "").trim();
+        const fromBody = String(input.body.thumbnailURLUrl ??
+            input.body.thumbnailURL ??
+            input.body.thumbnailUrl ??
+            input.body.thumbnail ??
+            "").trim();
         if (fromBody && isHttpUrl(fromBody))
-            thumbnailUrl = fromBody;
+            thumbnailURLUrl = fromBody;
     }
-    if (!thumbnailUrl) {
-        throw new Error('thumbnail is required — upload an image file (form-data field "thumbnail", type File)');
+    if (!thumbnailURLUrl) {
+        throw new Error('thumbnail is required — upload an image file (form-data field "thumbnail" or "thumbnailURL", type File)');
     }
     let heroImageURL;
     if (heroFile) {
@@ -45,6 +54,6 @@ export const resolveArticleImageUrls = async (input) => {
         if (fromBody && isHttpUrl(fromBody))
             heroImageURL = fromBody;
     }
-    return { thumbnailUrl, heroImageURL };
+    return { thumbnailURLUrl, heroImageURL };
 };
 //# sourceMappingURL=articleImageUpload.js.map

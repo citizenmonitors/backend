@@ -12,7 +12,7 @@ export declare const listPublishedNewsInsightsMobile: (input?: {
         title: string;
         excerpt: string | undefined;
         content: string;
-        thumbnailUrl: string;
+        thumbnailURLUrl: string;
         heroImageURL: string;
         publishedAt: Date;
         isPublished: boolean;
@@ -29,7 +29,7 @@ export declare const getPublishedNewsInsightBySlugMobile: (slug: string, viewerU
     title: string;
     excerpt: string | undefined;
     content: string;
-    thumbnailUrl: string;
+    thumbnailURLUrl: string;
     heroImageURL: string;
     publishedAt: Date;
     isPublished: boolean;

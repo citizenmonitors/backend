@@ -6,7 +6,7 @@ export type CreateNewsInsightInput = {
     title: string;
     content: string;
     thumbnailUrl: string;
-    heroImageUrl?: string;
+    heroImageURL?: string;
     excerpt?: string;
     slug?: string;
     publishedAt?: Date | string;
@@ -18,9 +18,9 @@ export declare const createNewsInsightArticle: (input: CreateNewsInsightInput) =
     updatedAt: NativeDate;
 } & {
     slug: string;
+    thumbnailUrl: string;
     title: string;
     content: string;
-    thumbnailUrl: string;
     publishedAt: NativeDate;
     isPublished: boolean;
     createdBy: Types.ObjectId;
@@ -31,7 +31,7 @@ export declare const createNewsInsightArticle: (input: CreateNewsInsightInput) =
     }> & {
         user: Types.ObjectId;
     }>;
-    heroImageUrl?: string | null | undefined;
+    heroImageURL?: string | null | undefined;
     excerpt?: string | null | undefined;
 } & {
     _id: Types.ObjectId;
@@ -49,9 +49,9 @@ export declare const listNewsInsightsForAdmin: (input?: {
         createdAt: NativeDate;
         updatedAt: NativeDate;
         slug: string;
+        thumbnailUrl: string;
         title: string;
         content: string;
-        thumbnailUrl: string;
         publishedAt: NativeDate;
         isPublished: boolean;
         createdBy: Types.ObjectId;
@@ -74,7 +74,7 @@ export declare const listNewsInsightsForAdmin: (input?: {
             _id: string;
             __v: number;
         })>;
-        heroImageUrl?: string | null | undefined;
+        heroImageURL?: string | null | undefined;
         excerpt?: string | null | undefined;
     }> & {
         _id: Types.ObjectId;
@@ -86,9 +86,9 @@ export declare const getNewsInsightByIdForAdmin: (articleId: string) => Promise<
     createdAt: NativeDate;
     updatedAt: NativeDate;
     slug: string;
+    thumbnailUrl: string;
     title: string;
     content: string;
-    thumbnailUrl: string;
     publishedAt: NativeDate;
     isPublished: boolean;
     createdBy: Types.ObjectId;
@@ -111,7 +111,7 @@ export declare const getNewsInsightByIdForAdmin: (articleId: string) => Promise<
         _id: string;
         __v: number;
     })>;
-    heroImageUrl?: string | null | undefined;
+    heroImageURL?: string | null | undefined;
     excerpt?: string | null | undefined;
 }> & {
     _id: Types.ObjectId;

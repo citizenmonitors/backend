@@ -75,14 +75,14 @@ export const createNewsInsightArticle = async (input) => {
         publishedAt = new Date();
     }
     const excerpt = input.excerpt !== undefined ? String(input.excerpt).trim() : "";
-    const heroImageUrl = input.heroImageUrl !== undefined ? String(input.heroImageUrl).trim() : "";
+    const heroImageURL = input.heroImageURL !== undefined ? String(input.heroImageURL).trim() : "";
     const article = await NewsInsight.create({
         title,
         slug,
         excerpt,
         content,
         thumbnailUrl,
-        heroImageUrl: heroImageUrl || undefined,
+        heroImageURL: heroImageURL || undefined,
         publishedAt,
         isPublished,
         createdBy: adminId instanceof mongoose.Types.ObjectId ? adminId : new mongoose.Types.ObjectId(adminId),

@@ -49,7 +49,7 @@ export type CreateNewsInsightInput = {
   title: string;
   content: string;
   thumbnailUrl: string;
-  heroImageUrl?: string;
+  heroImageURL?: string;
   excerpt?: string;
   slug?: string;
   publishedAt?: Date | string;
@@ -88,8 +88,8 @@ export const createNewsInsightArticle = async (input: CreateNewsInsightInput) =>
   }
 
   const excerpt = input.excerpt !== undefined ? String(input.excerpt).trim() : "";
-  const heroImageUrl =
-    input.heroImageUrl !== undefined ? String(input.heroImageUrl).trim() : "";
+  const heroImageURL =
+    input.heroImageURL !== undefined ? String(input.heroImageURL).trim() : "";
 
   const article = await NewsInsight.create({
     title,
@@ -97,7 +97,7 @@ export const createNewsInsightArticle = async (input: CreateNewsInsightInput) =>
     excerpt,
     content,
     thumbnailUrl,
-    heroImageUrl: heroImageUrl || undefined,
+    heroImageURL: heroImageURL || undefined,
     publishedAt,
     isPublished,
     createdBy: adminId instanceof mongoose.Types.ObjectId ? adminId : new mongoose.Types.ObjectId(adminId),

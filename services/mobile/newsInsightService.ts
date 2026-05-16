@@ -1,15 +1,62 @@
+import type { Types } from "mongoose";
 import NewsInsight from "../../models/admin/NewsInsight.ts";
 import NewsInsightComment from "../../models/admin/NewsInsightComment.ts";
 import { countCommentsForArticles } from "./newsInsightEngagementService.ts";
 
-const textPreview = (html: string, max: number): string => {
-  const plain = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-  if (plain.length <= max) return plain;
-  return `${plain.slice(0, max)}…`;
-};
-
 const likesArray = (row: { likes?: { user?: unknown }[] }): { user?: unknown }[] =>
   Array.isArray(row.likes) ? row.likes : [];
+
+type NewsInsightLean = {
+  _id: Types.ObjectId;
+  slug: string;
+  title: string;
+  excerpt?: string | null;
+  content: string;
+  thumbnailUrl: string;
+  heroImageURL?: string | null;
+  /** @deprecated legacy DB key */
+  heroImageURLUrl?: string | null;
+  publishedAt: Date;
+  isPublished?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+  likes?: { user?: unknown }[];
+};
+
+const resolveHeroImageURL = (row: NewsInsightLean): string => {
+  const hero =
+    row.heroImageURL?.trim() ||
+    row.heroImageURLUrl?.trim() ||
+    "";
+  return hero || row.thumbnailUrl;
+};
+
+const toNewsInsightMobileArticle = (
+  row: NewsInsightLean,
+  input: { viewerUserId?: string; commentsCount: number }
+) => {
+  const likes = likesArray(row);
+  const heroImageURL = resolveHeroImageURL(row);
+
+  return {
+    id: String(row._id),
+    slug: row.slug,
+    title: row.title,
+    excerpt: row.excerpt?.trim() || undefined,
+    content: row.content,
+    thumbnailUrl: row.thumbnailUrl,
+    heroImageURL,
+    publishedAt: row.publishedAt,
+    isPublished: row.isPublished ?? true,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+    likesCount: likes.length,
+    commentsCount: input.commentsCount,
+    isLikedByCurrentUser: input.viewerUserId
+      ? likes.some((l) => l.user != null && String(l.user) === input.viewerUserId)
+      : false,
+  };
+};
 
 export const listPublishedNewsInsightsMobile = async (input?: {
   page?: number;
@@ -23,12 +70,7 @@ export const listPublishedNewsInsightsMobile = async (input?: {
 
   const filter = { isPublished: true };
   const [rows, total] = await Promise.all([
-    NewsInsight.find(filter)
-      .sort({ publishedAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .select("slug title thumbnailUrl publishedAt excerpt content likes")
-      .lean(),
+    NewsInsight.find(filter).sort({ publishedAt: -1 }).skip(skip).limit(limit).lean(),
     NewsInsight.countDocuments(filter),
   ]);
 
@@ -39,22 +81,12 @@ export const listPublishedNewsInsightsMobile = async (input?: {
     total,
     page,
     limit,
-    items: rows.map((row) => {
-      const likes = likesArray(row);
-      return {
-        id: String(row._id),
-        slug: row.slug,
-        title: row.title,
-        thumbnailUrl: row.thumbnailUrl,
-        summary: row.excerpt?.trim() || textPreview(String(row.content ?? ""), 220),
-        publishedAt: row.publishedAt,
-        likesCount: likes.length,
+    items: rows.map((row) =>
+      toNewsInsightMobileArticle(row as NewsInsightLean, {
+        viewerUserId: viewerId,
         commentsCount: commentCountByArticle.get(String(row._id)) ?? 0,
-        isLikedByCurrentUser: viewerId
-          ? likes.some((l) => l.user != null && String(l.user) === viewerId)
-          : false,
-      };
-    }),
+      })
+    ),
   };
 };
 
@@ -66,29 +98,13 @@ export const getPublishedNewsInsightBySlugMobile = async (
   const row = await NewsInsight.findOne({
     slug: normalized,
     isPublished: true,
-  })
-    .select("slug title excerpt content thumbnailUrl heroImageUrl publishedAt createdAt likes")
-    .lean();
+  }).lean();
   if (!row) return null;
 
-  const hero = row.heroImageUrl?.trim() || row.thumbnailUrl;
-  const likes = likesArray(row);
   const commentsCount = await NewsInsightComment.countDocuments({ article: row._id });
 
-  return {
-    id: String(row._id),
-    slug: row.slug,
-    title: row.title,
-    excerpt: row.excerpt?.trim() || textPreview(String(row.content ?? ""), 280),
-    content: row.content,
-    thumbnailUrl: row.thumbnailUrl,
-    heroImageUrl: hero,
-    publishedAt: row.publishedAt,
-    createdAt: row.createdAt,
-    likesCount: likes.length,
+  return toNewsInsightMobileArticle(row as NewsInsightLean, {
+    viewerUserId,
     commentsCount,
-    isLikedByCurrentUser: viewerUserId
-      ? likes.some((l) => l.user != null && String(l.user) === viewerUserId)
-      : false,
-  };
+  });
 };

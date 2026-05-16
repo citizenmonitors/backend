@@ -6,7 +6,7 @@ export type CreatePressCoverageInput = {
     title: string;
     content: string;
     thumbnail: string;
-    heroImage?: string;
+    heroImageURL?: string;
     excerpt?: string;
     dateline?: string;
     slug?: string;
@@ -32,7 +32,7 @@ export declare const createPressCoverageArticle: (input: CreatePressCoverageInpu
     }> & {
         user: Types.ObjectId;
     }>;
-    heroImage?: string | null | undefined;
+    heroImageURL?: string | null | undefined;
     excerpt?: string | null | undefined;
     dateline?: string | null | undefined;
 } & {
@@ -76,7 +76,7 @@ export declare const listPressCoverageForAdmin: (input?: {
             _id: string;
             __v: number;
         })>;
-        heroImage?: string | null | undefined;
+        heroImageURL?: string | null | undefined;
         excerpt?: string | null | undefined;
         dateline?: string | null | undefined;
     }> & {
@@ -114,7 +114,7 @@ export declare const getPressCoverageByIdForAdmin: (articleId: string) => Promis
         _id: string;
         __v: number;
     })>;
-    heroImage?: string | null | undefined;
+    heroImageURL?: string | null | undefined;
     excerpt?: string | null | undefined;
     dateline?: string | null | undefined;
 }> & {

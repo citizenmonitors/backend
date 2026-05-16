@@ -1,5 +1,7 @@
 import { uploadFileToFirebase } from "../config/firebaseUploader.js";
-const firstFile = (files, ...names) => {
+const THUMB_FILE_FIELDS = ["thumbnail", "thumbnailUrl"];
+const HERO_FILE_FIELDS = ["heroImage", "heroImageURL", "heroImageUrl"];
+const firstFile = (files, names) => {
     if (!files)
         return undefined;
     for (const name of names) {
@@ -12,12 +14,12 @@ const firstFile = (files, ...names) => {
 const isHttpUrl = (value) => /^https?:\/\//i.test(value.trim());
 /**
  * Resolves thumbnail + hero for News / Press admin create.
- * Multipart: image **files** `thumbnail` (required) and optional `heroImage` → uploaded to Firebase.
- * JSON-only: optional `thumbnailUrl` / `heroImageUrl` body fields if already HTTPS URLs.
+ * Multipart files: `thumbnail` (required) and optional hero (`heroImage` or `heroImageURL`).
+ * JSON body fallbacks: `thumbnailUrl` / `thumbnail` and `heroImageURL` / `heroImage` / `heroImageUrl` as HTTPS URLs.
  */
 export const resolveArticleImageUrls = async (input) => {
-    const thumbFile = firstFile(input.files, "thumbnail");
-    const heroFile = firstFile(input.files, "heroImage");
+    const thumbFile = firstFile(input.files, THUMB_FILE_FIELDS);
+    const heroFile = firstFile(input.files, HERO_FILE_FIELDS);
     let thumbnailUrl = "";
     if (thumbFile) {
         thumbnailUrl = (await uploadFileToFirebase(thumbFile, input.firebaseFolder)).publicUrl;
@@ -28,17 +30,21 @@ export const resolveArticleImageUrls = async (input) => {
             thumbnailUrl = fromBody;
     }
     if (!thumbnailUrl) {
-        throw new Error("thumbnail is required — upload an image file (form-data field \"thumbnail\", type File)");
+        throw new Error('thumbnail is required — upload an image file (form-data field "thumbnail", type File)');
     }
-    let heroImageUrl;
+    let heroImageURL;
     if (heroFile) {
-        heroImageUrl = (await uploadFileToFirebase(heroFile, input.firebaseFolder)).publicUrl;
+        heroImageURL = (await uploadFileToFirebase(heroFile, input.firebaseFolder)).publicUrl;
     }
     else {
-        const fromBody = String(input.body.heroImageUrl ?? input.body.heroImage ?? "").trim();
+        const fromBody = String(input.body.heroImageURL ??
+            input.body.heroImageUrl ??
+            input.body.heroImageURLUrl ??
+            input.body.heroImage ??
+            "").trim();
         if (fromBody && isHttpUrl(fromBody))
-            heroImageUrl = fromBody;
+            heroImageURL = fromBody;
     }
-    return { thumbnailUrl, heroImageUrl };
+    return { thumbnailUrl, heroImageURL };
 };
 //# sourceMappingURL=articleImageUpload.js.map

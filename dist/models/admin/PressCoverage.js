@@ -14,7 +14,7 @@ const pressCoverageSchema = new mongoose.Schema({
     dateline: { type: String, trim: true },
     content: { type: String, required: true },
     thumbnail: { type: String, required: true, trim: true },
-    heroImage: { type: String, trim: true },
+    heroImageURL: { type: String, trim: true },
     publishedAt: { type: Date, required: true, index: true },
     isPublished: { type: Boolean, default: true, index: true },
     createdBy: {

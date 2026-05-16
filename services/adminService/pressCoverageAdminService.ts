@@ -49,7 +49,7 @@ export type CreatePressCoverageInput = {
   title: string;
   content: string;
   thumbnail: string;
-  heroImage?: string;
+  heroImageURL?: string;
   excerpt?: string;
   dateline?: string;
   slug?: string;
@@ -90,8 +90,8 @@ export const createPressCoverageArticle = async (input: CreatePressCoverageInput
 
   const excerpt = input.excerpt !== undefined ? String(input.excerpt).trim() : "";
   const dateline = input.dateline !== undefined ? String(input.dateline).trim() : "";
-  const heroImage =
-    input.heroImage !== undefined ? String(input.heroImage).trim() : "";
+  const heroImageURL =
+    input.heroImageURL !== undefined ? String(input.heroImageURL).trim() : "";
 
   const article = await PressCoverage.create({
     title,
@@ -100,7 +100,7 @@ export const createPressCoverageArticle = async (input: CreatePressCoverageInput
     dateline: dateline || undefined,
     content,
     thumbnail,
-    heroImage: heroImage || undefined,
+    heroImageURL: heroImageURL || undefined,
     publishedAt,
     isPublished,
     createdBy: adminId instanceof mongoose.Types.ObjectId ? adminId : new mongoose.Types.ObjectId(adminId),

@@ -67,23 +67,32 @@ const uploadNewsPress = multer({
 
 type MulterFields = (fields: { name: string; maxCount: number }[]) => import("express").RequestHandler;
 
-/** Admin create News / Press — multipart file fields `thumbnail` (required), `heroImage` (optional). */
+/** Admin create News / Press — file fields: `thumbnail` (+ optional hero under any accepted alias). */
 export const uploadNewsPressAdminImages = (uploadNewsPress as unknown as { fields: MulterFields }).fields([
   { name: "thumbnail", maxCount: 1 },
+  { name: "thumbnailUrl", maxCount: 1 },
   { name: "heroImage", maxCount: 1 },
+  { name: "heroImageURL", maxCount: 1 },
+  { name: "heroImageUrl", maxCount: 1 },
 ]);
 
 export const runNewsPressAdminUpload = (req: Request, res: Response, next: NextFunction) => {
   uploadNewsPressAdminImages(req, res, (err: unknown) => {
     if (err) {
       const message = err instanceof Error ? err.message : String(err);
+      if (message.includes("Unexpected field")) {
+        return res.status(400).json({
+          message:
+            'Upload: unexpected file field. Use form-data files named "thumbnail" (required) and optionally "heroImage" or "heroImageURL".',
+        });
+      }
       return res.status(400).json({ message: `Upload: ${message}` });
     }
     next();
   });
 };
 
-/** Parses multipart form-data (text fields + image files `thumbnail` / `heroImage`). Skips for JSON bodies. */
+/** Parses multipart form-data (text fields + image files). Skips for JSON bodies. */
 export const parseNewsPressAdminMultipart = (req: Request, res: Response, next: NextFunction) => {
   const ct = String(req.headers["content-type"] ?? "").toLowerCase();
   if (ct.includes("multipart/form-data")) {

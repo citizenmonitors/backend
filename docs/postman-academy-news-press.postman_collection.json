@@ -96,7 +96,7 @@
                 { "key": "isPublished", "value": "true", "type": "text" },
                 { "key": "notifySubscribers", "value": "true", "type": "text" },
                 { "key": "thumbnail", "description": "Required — pick a local image file", "type": "file" },
-                { "key": "heroImage", "description": "Optional — pick a local image file", "type": "file" }
+                { "key": "heroImageURL", "description": "Optional — pick a local image file", "type": "file" }
               ]
             },
             "url": "{{mobileBase}}/news-insights"
@@ -181,7 +181,7 @@
                 { "key": "isPublished", "value": "true", "type": "text" },
                 { "key": "notifySubscribers", "value": "true", "type": "text" },
                 { "key": "thumbnail", "description": "Required — pick a local image file in Postman", "type": "file" },
-                { "key": "heroImage", "description": "Optional — pick a local image file", "type": "file" }
+                { "key": "heroImageURL", "description": "Optional — pick a local image file", "type": "file" }
               ]
             },
             "url": "{{mobileBase}}/press-coverage"
@@ -248,7 +248,7 @@
                 { "key": "title", "value": "Kano by-election: APC sweeps assembly seats", "type": "text" },
                 { "key": "content", "value": "<p>First paragraph.</p>", "type": "text" },
                 { "key": "thumbnail", "type": "file" },
-                { "key": "heroImage", "type": "file" }
+                { "key": "heroImageURL", "type": "file" }
               ]
             },
             "url": "{{apiBase}}/admin/news-insights"
@@ -287,7 +287,7 @@
                 { "key": "dateline", "value": "Lagos, Nigeria", "type": "text" },
                 { "key": "content", "value": "<p>Opening paragraph.</p>", "type": "text" },
                 { "key": "thumbnail", "type": "file" },
-                { "key": "heroImage", "type": "file" }
+                { "key": "heroImageURL", "type": "file" }
               ]
             },
             "url": "{{apiBase}}/admin/press-coverage"

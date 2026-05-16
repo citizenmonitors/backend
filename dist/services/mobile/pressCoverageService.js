@@ -1,13 +1,30 @@
 import mongoose from "mongoose";
 import PressCoverage from "../../models/admin/PressCoverage.js";
 import PressCoverageComment from "../../models/admin/PressCoverageComment.js";
-const textPreview = (html, max) => {
-    const plain = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-    if (plain.length <= max)
-        return plain;
-    return `${plain.slice(0, max)}…`;
-};
 const likesArray = (row) => Array.isArray(row.likes) ? row.likes : [];
+const toPressCoverageMobileArticle = (row, input) => {
+    const likes = likesArray(row);
+    const heroImageURL = row.heroImageURL?.trim() || row.thumbnail;
+    return {
+        id: String(row._id),
+        slug: row.slug,
+        title: row.title,
+        excerpt: row.excerpt?.trim() || undefined,
+        dateline: row.dateline?.trim() || undefined,
+        content: row.content,
+        thumbnail: row.thumbnail,
+        heroImageURL,
+        publishedAt: row.publishedAt,
+        isPublished: row.isPublished ?? true,
+        createdAt: row.createdAt,
+        updatedAt: row.updatedAt,
+        likesCount: likes.length,
+        commentsCount: input.commentsCount,
+        isLikedByCurrentUser: input.viewerUserId
+            ? likes.some((l) => l.user != null && String(l.user) === input.viewerUserId)
+            : false,
+    };
+};
 export const countCommentsForPressCoverageArticles = async (articleIds) => {
     if (articleIds.length === 0)
         return new Map();
@@ -25,12 +42,7 @@ export const listPublishedPressCoverageMobile = async (input) => {
     const viewerId = input?.viewerUserId;
     const filter = { isPublished: true };
     const [rows, total] = await Promise.all([
-        PressCoverage.find(filter)
-            .sort({ publishedAt: -1 })
-            .skip(skip)
-            .limit(limit)
-            .select("slug title thumbnail publishedAt excerpt content likes dateline")
-            .lean(),
+        PressCoverage.find(filter).sort({ publishedAt: -1 }).skip(skip).limit(limit).lean(),
         PressCoverage.countDocuments(filter),
     ]);
     const ids = rows.map((row) => String(row._id));
@@ -39,23 +51,10 @@ export const listPublishedPressCoverageMobile = async (input) => {
         total,
         page,
         limit,
-        items: rows.map((row) => {
-            const likes = likesArray(row);
-            return {
-                id: String(row._id),
-                slug: row.slug,
-                title: row.title,
-                thumbnail: row.thumbnail,
-                summary: row.excerpt?.trim() || textPreview(String(row.content ?? ""), 220),
-                publishedAt: row.publishedAt,
-                dateline: row.dateline?.trim() || undefined,
-                likesCount: likes.length,
-                commentsCount: commentCountByArticle.get(String(row._id)) ?? 0,
-                isLikedByCurrentUser: viewerId
-                    ? likes.some((l) => l.user != null && String(l.user) === viewerId)
-                    : false,
-            };
-        }),
+        items: rows.map((row) => toPressCoverageMobileArticle(row, {
+            viewerUserId: viewerId,
+            commentsCount: commentCountByArticle.get(String(row._id)) ?? 0,
+        })),
     };
 };
 export const getPublishedPressCoverageBySlugMobile = async (slug, viewerUserId) => {
@@ -63,30 +62,13 @@ export const getPublishedPressCoverageBySlugMobile = async (slug, viewerUserId) 
     const row = await PressCoverage.findOne({
         slug: normalized,
         isPublished: true,
-    })
-        .select("slug title excerpt dateline content thumbnail heroImage publishedAt createdAt likes")
-        .lean();
+    }).lean();
     if (!row)
         return null;
-    const hero = row.heroImage?.trim() || row.thumbnail;
-    const likes = likesArray(row);
     const commentsCount = await PressCoverageComment.countDocuments({ article: row._id });
-    return {
-        id: String(row._id),
-        slug: row.slug,
-        title: row.title,
-        excerpt: row.excerpt?.trim() || textPreview(String(row.content ?? ""), 280),
-        dateline: row.dateline?.trim() || undefined,
-        content: row.content,
-        thumbnail: row.thumbnail,
-        heroImage: hero,
-        publishedAt: row.publishedAt,
-        createdAt: row.createdAt,
-        likesCount: likes.length,
+    return toPressCoverageMobileArticle(row, {
+        viewerUserId,
         commentsCount,
-        isLikedByCurrentUser: viewerUserId
-            ? likes.some((l) => l.user != null && String(l.user) === viewerUserId)
-            : false,
-    };
+    });
 };
 //# sourceMappingURL=pressCoverageService.js.map

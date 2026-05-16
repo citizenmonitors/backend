@@ -466,7 +466,7 @@ Base (mobile): `/news-insights`. **Optional Bearer** on `GET /` and `GET /:slug`
 
 **Admin (Bearer + admin role):**
 
-- `POST /api/admin/news-insights` — create article. **multipart/form-data:** text fields `title`, `content` (HTML), optional `excerpt`, `slug`, `publishedAt`, `isPublished`, `notifySubscribers`; **File** fields `thumbnail` (required image), `heroImage` (optional image). Files upload to Firebase; responses include `thumbnailUrl` / `heroImageUrl` as stored URLs. **Alias:** `POST /api/v1/mobile/news-insights` (same). On publish + `notifySubscribers`, users with `newsAndInsights: true` get a push (`type: news-insight`).
+- `POST /api/admin/news-insights` — create article. **multipart/form-data:** text fields `title`, `content` (HTML), optional `excerpt`, `slug`, `publishedAt`, `isPublished`, `notifySubscribers`; **File** fields `thumbnail` (required image), `heroImageURL` (optional image). Files upload to Firebase; responses include `thumbnailUrl` / `heroImageURLUrl` as stored URLs. **Alias:** `POST /api/v1/mobile/news-insights` (same). On publish + `notifySubscribers`, users with `newsAndInsights: true` get a push (`type: news-insight`).
 - `GET /api/admin/news-insights?page=1&limit=30` — list all articles (including unpublished).
 - `GET /api/admin/news-insights/:id` — single article by MongoDB id.
 
@@ -483,7 +483,7 @@ Base (mobile): `/press-coverage`. Same patterns as News & Insight: optional Bear
 
 **Admin:**
 
-- `POST /api/admin/press-coverage` — create. **multipart/form-data:** text fields `title`, `content`, optional `excerpt`, `dateline`, `slug`, `publishedAt`, `isPublished`, `notifySubscribers`; **File** fields `thumbnail` (required image), `heroImage` (optional image). **Alias:** `POST /api/v1/mobile/press-coverage`. Pushes use `type: press-coverage` / preference `pressCoverage`.
+- `POST /api/admin/press-coverage` — create. **multipart/form-data:** text fields `title`, `content`, optional `excerpt`, `dateline`, `slug`, `publishedAt`, `isPublished`, `notifySubscribers`; **File** fields `thumbnail` (required image), `heroImageURL` (optional image). **Alias:** `POST /api/v1/mobile/press-coverage`. Pushes use `type: press-coverage` / preference `pressCoverage`.
 - `GET /api/admin/press-coverage?page=1&limit=30`
 - `GET /api/admin/press-coverage/:id`
 

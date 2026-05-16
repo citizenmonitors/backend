@@ -4,7 +4,7 @@ export declare const buildNewsInsightCreatePayload: (req: Request) => Promise<{
     title: string;
     content: string;
     thumbnailUrl: string;
-    heroImageUrl: string | undefined;
+    heroImageURL: string | undefined;
     excerpt: string | undefined;
     slug: string | undefined;
     publishedAt: string | Date | undefined;
@@ -16,7 +16,7 @@ export declare const buildPressCoverageCreatePayload: (req: Request) => Promise<
     title: string;
     content: string;
     thumbnail: string;
-    heroImage: string | undefined;
+    heroImageURL: string | undefined;
     excerpt: string | undefined;
     dateline: string | undefined;
     slug: string | undefined;

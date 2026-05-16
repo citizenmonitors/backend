@@ -12,7 +12,7 @@ type RequestWithFiles = AuthenticatedRequest & { files?: MulterFiles };
 export const buildNewsInsightCreatePayload = async (req: Request) => {
   const r = req as RequestWithFiles;
   const body = req.body as Record<string, unknown>;
-  const { thumbnailUrl, heroImageUrl } = await resolveArticleImageUrls({
+  const { thumbnailUrl, heroImageURL } = await resolveArticleImageUrls({
     body,
     files: r.files,
     firebaseFolder: "news-insights",
@@ -23,7 +23,7 @@ export const buildNewsInsightCreatePayload = async (req: Request) => {
     title: String(body.title ?? ""),
     content: String(body.content ?? ""),
     thumbnailUrl,
-    heroImageUrl,
+    heroImageURL,
     excerpt: body.excerpt !== undefined ? String(body.excerpt) : undefined,
     slug: body.slug !== undefined ? String(body.slug) : undefined,
     publishedAt: body.publishedAt as string | Date | undefined,
@@ -35,7 +35,7 @@ export const buildNewsInsightCreatePayload = async (req: Request) => {
 export const buildPressCoverageCreatePayload = async (req: Request) => {
   const r = req as RequestWithFiles;
   const body = req.body as Record<string, unknown>;
-  const { thumbnailUrl, heroImageUrl } = await resolveArticleImageUrls({
+  const { thumbnailUrl, heroImageURL } = await resolveArticleImageUrls({
     body,
     files: r.files,
     firebaseFolder: "press-coverage",
@@ -46,7 +46,7 @@ export const buildPressCoverageCreatePayload = async (req: Request) => {
     title: String(body.title ?? ""),
     content: String(body.content ?? ""),
     thumbnail: thumbnailUrl,
-    heroImage: heroImageUrl,
+    heroImageURL,
     excerpt: body.excerpt !== undefined ? String(body.excerpt) : undefined,
     dateline: body.dateline !== undefined ? String(body.dateline) : undefined,
     slug: body.slug !== undefined ? String(body.slug) : undefined,

@@ -3,7 +3,6 @@ import NewsInsight from "../../models/admin/NewsInsight.js";
 import PressCoverage from "../../models/admin/PressCoverage.js";
 import CollationDiscussionPost from "../../models/Election/CollationDiscussionPost.js";
 import CollationDiscussionComment from "../../models/Election/CollationDiscussionComment.js";
-import CollationReportComment from "../../models/Election/CollationReportComment.js";
 import PulsePost from "../../models/Pulse/PulsePost.js";
 import PulseComment from "../../models/Pulse/PulseComment.js";
 import { getMobileLiveElectionsCarousel } from "./electionService.js";
@@ -98,7 +97,7 @@ const buildMobileDashboard = async (user) => {
     const liveElections = await getMobileLiveElectionsCarousel(user);
     const liveIds = liveElections.map((e) => e.id);
     const pulseVisibility = buildPulseVisibilityFilter(user);
-    const [electionNotifications, discussionPosts, pulsePosts, reportThreadComments, insights, pressCoverageFeed] = await Promise.all([
+    const [electionNotifications, discussionPosts, pulsePosts, insights, pressCoverageFeed] = await Promise.all([
         Notification.find({
             ...roleVisibilityFilter(userId, role),
             type: {
@@ -125,13 +124,6 @@ const buildMobileDashboard = async (user) => {
             : Promise.resolve([]),
         pulseVisibility
             ? PulsePost.find(pulseVisibility)
-                .populate("author", "firstName lastName anonymousUsername")
-                .sort({ createdAt: -1 })
-                .limit(10)
-                .lean()
-            : Promise.resolve([]),
-        liveIds.length
-            ? CollationReportComment.find({ activeElection: { $in: liveIds } })
                 .populate("author", "firstName lastName anonymousUsername")
                 .sort({ createdAt: -1 })
                 .limit(10)
@@ -221,20 +213,6 @@ const buildMobileDashboard = async (user) => {
         ]
             .sort((a, b) => new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime())
             .slice(0, 10),
-        reportThreadUpdates: reportThreadComments.map((c) => {
-            const author = c.author;
-            return {
-                id: String(c._id),
-                targetType: c.targetType,
-                targetId: String(c.targetId),
-                activeElectionId: String(c.activeElection),
-                body: c.body,
-                likesCount: Array.isArray(c.likes) ? c.likes.length : 0,
-                authorName: resolveAuthorName(author),
-                timeAgo: relativeTime(c.createdAt),
-                createdAt: c.createdAt,
-            };
-        }),
         latestNewsAndInsights: insights.map((i) => {
             const likes = Array.isArray(i.likes) ? i.likes : [];
             return {

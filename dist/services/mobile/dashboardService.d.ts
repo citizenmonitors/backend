@@ -42,17 +42,6 @@ export declare const getMobileDashboard: (user: AuthenticatedUser) => Promise<{
         timeAgo: string;
         createdAt: NativeDate;
     }[];
-    reportThreadUpdates: {
-        id: string;
-        targetType: "election_result" | "incident_report";
-        targetId: string;
-        activeElectionId: string;
-        body: string;
-        likesCount: number;
-        authorName: string;
-        timeAgo: string;
-        createdAt: NativeDate;
-    }[];
     latestNewsAndInsights: {
         id: string;
         slug: string;

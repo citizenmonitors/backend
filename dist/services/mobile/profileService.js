@@ -11,6 +11,7 @@ import { slugifyForLocationMatch } from "../../utils/locationNormalize.js";
 import { sendEmail } from "../../config/email.js";
 import { uploadFileToFirebase } from "../../config/firebaseUploader.js";
 import { mobileFeedbackTemplate } from "../../config/emailTemplates.js";
+import { dispatchMobileNotification } from "./notificationDispatchService.js";
 const ANON_ADJECTIVES = [
     "Iron",
     "Silent",
@@ -51,12 +52,12 @@ const sanitizeUser = (doc) => {
 };
 const withNotificationDefaults = (role, current) => ({
     pollingUnitActivity: current?.pollingUnitActivity ?? true,
-    electionDayAlert: current?.electionDayAlert ?? false,
-    discussionReplies: current?.discussionReplies ?? false,
-    resultAggregated: current?.resultAggregated ?? false,
-    reportConfirmed: current?.reportConfirmed ?? false,
+    electionDayAlert: current?.electionDayAlert ?? true,
+    discussionReplies: current?.discussionReplies ?? true,
+    resultAggregated: current?.resultAggregated ?? true,
+    reportConfirmed: current?.reportConfirmed ?? true,
     reportFlagged: current?.reportFlagged ?? role === "observer",
-    securityAlerts: current?.securityAlerts ?? false,
+    securityAlerts: current?.securityAlerts ?? true,
     newsletter: current?.newsletter ?? true,
     newsAndInsights: current?.newsAndInsights ?? true,
     pressCoverage: current?.pressCoverage ?? true,
@@ -137,6 +138,15 @@ export const upsertObserverProfileData = async (input) => {
     }
     user.pendingObserverVerification = true;
     await user.save();
+    const applicantName = [user.firstName, user.lastName].filter(Boolean).join(" ").trim();
+    await dispatchMobileNotification({
+        type: "pending-approval",
+        preferenceKey: "securityAlerts",
+        body: "Observer application pending review",
+        info: [applicantName, user.pollingUnit].filter(Boolean).join(" • "),
+        recipients: ["admin", "super-admin"],
+        respectPreferences: false,
+    });
     return sanitizeUser(user);
 };
 export const getElectionVault = async (userId) => {

@@ -15,6 +15,7 @@ import { emailChangeNotificationTemplate, emailVerificationCodeTemplate, resendV
 import { uploadFileToFirebase } from "../../config/firebaseUploader.js";
 import bucket from "../../config/firebaseConfig.js";
 import crypto from "crypto";
+import { dispatchMobileNotification } from "../mobile/notificationDispatchService.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const BACKEND_URL = process.env.BACKEND_URL;
@@ -145,6 +146,15 @@ export const volunteerToObserverService = async ({ email, details, files, }) => 
     user.role = "observer";
     // Save the updated user to the database
     await user.save();
+    const applicantName = [user.firstName, user.lastName].filter(Boolean).join(" ").trim();
+    await dispatchMobileNotification({
+        type: "pending-approval",
+        preferenceKey: "securityAlerts",
+        body: "Observer application pending review",
+        info: [applicantName, user.pollingUnit].filter(Boolean).join(" • "),
+        recipients: ["admin", "super-admin"],
+        respectPreferences: false,
+    });
     // Exclude the password from the response
     const { password, ...userDetails } = user.toObject();
     return userDetails;

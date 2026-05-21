@@ -3,6 +3,7 @@ import Notification from "../../models/DailyTraffic/Notification.ts";
 import { invalidateAllMobileReadCaches } from "../../utils/cache.ts";
 import { getSocketServer } from "../realtime/socketBus.ts";
 import { userRoomName } from "../realtime/socketServer.ts";
+import { sendPushForMobileNotification } from "./pushNotificationService.ts";
 
 export type MobileNotificationPreferenceKey =
   | "pollingUnitActivity"
@@ -28,9 +29,9 @@ type MobilePrefState = Partial<Record<MobileNotificationPreferenceKey, boolean>>
 
 const withDefaults = (role: string | undefined, current: MobilePrefState): Required<MobilePrefState> => ({
   pollingUnitActivity: current.pollingUnitActivity ?? true,
-  electionDayAlert: current.electionDayAlert ?? false,
-  discussionReplies: current.discussionReplies ?? false,
-  resultAggregated: current.resultAggregated ?? false,
+  electionDayAlert: current.electionDayAlert ?? true,
+  discussionReplies: current.discussionReplies ?? true,
+  resultAggregated: current.resultAggregated ?? true,
   reportConfirmed: current.reportConfirmed ?? false,
   reportFlagged: current.reportFlagged ?? role === "observer",
   securityAlerts: current.securityAlerts ?? false,
@@ -76,6 +77,43 @@ const emitRealtimeNotification = (input: {
   }
 };
 
+const deliverNotification = async (
+  notification: {
+    _id: unknown;
+    type?: string | null;
+    preferenceKey?: string | null;
+    body?: string | null;
+    info?: string | null;
+    createdAt?: Date | string;
+  },
+  targetUserIds: string[]
+): Promise<void> => {
+  const userIds = targetUserIds.map(String);
+  emitRealtimeNotification({ notification, targetUserIds: userIds });
+  await sendPushForMobileNotification({ notification, userIds }).catch((error) => {
+    console.error("Mobile push delivery failed:", error);
+  });
+  await invalidateAllMobileReadCaches();
+};
+
+const filterUsersByPreference = (
+  users: Array<{ _id: unknown; role?: string | null; notifications?: unknown }>,
+  preferenceKey: MobileNotificationPreferenceKey,
+  respectPreferences: boolean
+) => {
+  if (!respectPreferences) {
+    return users.map((user) => user._id);
+  }
+  return users
+    .filter((user) => {
+      const mobilePrefs = ((user.notifications as { mobile?: MobilePrefState } | undefined)?.mobile ??
+        {}) as MobilePrefState;
+      const resolved = withDefaults(user.role ?? undefined, mobilePrefs);
+      return Boolean(resolved[preferenceKey]);
+    })
+    .map((user) => user._id);
+};
+
 export const dispatchMobileNotification = async (input: {
   type:
     | "result-upload"
@@ -95,20 +133,16 @@ export const dispatchMobileNotification = async (input: {
   info?: string;
   recipients: RecipientRole[];
   audienceQuery?: Record<string, unknown>;
+  /** When false, delivers to all matched users regardless of notification prefs (transactional). */
+  respectPreferences?: boolean;
 }) => {
+  const respectPreferences = input.respectPreferences ?? true;
   const users = await CompletedUser.find(
     { ...roleFilter(input.recipients), ...(input.audienceQuery ?? {}) },
     "_id role notifications.mobile"
   ).lean();
 
-  const targetUsers = users
-    .filter((user) => {
-      const mobilePrefs = ((user.notifications as { mobile?: MobilePrefState } | undefined)?.mobile ??
-        {}) as MobilePrefState;
-      const resolved = withDefaults(user.role ?? undefined, mobilePrefs);
-      return Boolean(resolved[input.preferenceKey]);
-    })
-    .map((user) => user._id);
+  const targetUsers = filterUsersByPreference(users, input.preferenceKey, respectPreferences);
 
   if (targetUsers.length === 0) {
     return null;
@@ -122,11 +156,7 @@ export const dispatchMobileNotification = async (input: {
     recipients: input.recipients,
     targetUsers,
   });
-  emitRealtimeNotification({
-    notification,
-    targetUserIds: targetUsers.map((id) => String(id)),
-  });
-  await invalidateAllMobileReadCaches();
+  await deliverNotification(notification, targetUsers.map((id) => String(id)));
   return notification;
 };
 
@@ -148,22 +178,17 @@ export const dispatchNotificationToUsers = async (input: {
   body: string;
   info?: string;
   userIds: Array<string>;
+  respectPreferences?: boolean;
 }) => {
   const ids = Array.from(new Set(input.userIds.filter(Boolean)));
   if (ids.length === 0) return null;
 
+  const respectPreferences = input.respectPreferences ?? true;
   const users = await CompletedUser.find(
     { _id: { $in: ids } },
     "_id role notifications.mobile"
   ).lean();
-  const targetUsers = users
-    .filter((user) => {
-      const mobilePrefs = ((user.notifications as { mobile?: MobilePrefState } | undefined)?.mobile ??
-        {}) as MobilePrefState;
-      const resolved = withDefaults(user.role ?? undefined, mobilePrefs);
-      return Boolean(resolved[input.preferenceKey]);
-    })
-    .map((user) => user._id);
+  const targetUsers = filterUsersByPreference(users, input.preferenceKey, respectPreferences);
 
   if (targetUsers.length === 0) return null;
 
@@ -174,10 +199,6 @@ export const dispatchNotificationToUsers = async (input: {
     info: input.info,
     targetUsers,
   });
-  emitRealtimeNotification({
-    notification,
-    targetUserIds: targetUsers.map((id) => String(id)),
-  });
-  await invalidateAllMobileReadCaches();
+  await deliverNotification(notification, targetUsers.map((id) => String(id)));
   return notification;
 };

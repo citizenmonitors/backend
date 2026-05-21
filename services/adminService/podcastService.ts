@@ -1,5 +1,5 @@
 import { sendEmail } from "../../config/email.ts";
-import { newsLetterTemplateNigerianVotersPartyOrPoliticianLoyalty, podcastNotificationTemplate } from "../../config/emailTemplates.ts";
+import { newsLetterTemplate2027CanNigeriaBeSaved, podcastNotificationTemplate } from "../../config/emailTemplates.ts";
 import schedule from "node-schedule";
 import { utcToZonedTime } from "date-fns-tz";
 import { format } from "date-fns";
@@ -9,9 +9,41 @@ import AdminLog from "../../models/admin/AdminLog.ts";
 import Podcast from "../../models/admin/Podcast.ts";
 import CompletedUser from "../../models/CompletedUser.ts";
 import { invalidateAllMobileReadCaches } from "../../utils/cache.ts";
+import { dispatchMobileNotification } from "../mobile/notificationDispatchService.ts";
 
 type Id = string | Types.ObjectId;
 type RecipientRole = "all" | "super-admin" | "admin" | "observer" | "volunteer";
+type MobileDispatchRole =
+  | "all"
+  | "super-admin"
+  | "admin"
+  | "observer"
+  | "volunteer"
+  | "public-viewer";
+
+const toMobileDispatchRecipients = (
+  recipients: RecipientRole[]
+): MobileDispatchRole[] => {
+  if (recipients.includes("all")) return ["all"];
+  return recipients as MobileDispatchRole[];
+};
+
+const dispatchNewsletterMobileInbox = async (input: {
+  recipients: RecipientRole[];
+  title: string;
+  info?: string;
+}) => {
+  const mobileRecipients = toMobileDispatchRecipients(input.recipients);
+  if (mobileRecipients.length === 0) return;
+
+  await dispatchMobileNotification({
+    type: "newsletter",
+    preferenceKey: "newsletter",
+    body: input.title,
+    info: input.info ?? "",
+    recipients: mobileRecipients,
+  });
+};
 type UserEmailOnly = { email: string };
 type PodcastReadByShape = { readBy?: Types.ObjectId[] };
 
@@ -97,6 +129,12 @@ export const sendPodcastService = async ({
   );
 
   await Promise.all(emailPromises);
+
+  await dispatchNewsletterMobileInbox({
+    recipients: normalizedRecipients,
+    title: `New podcast: ${title}`,
+    info: content.slice(0, 200),
+  });
 
   await AdminLog.create({
     admin: senderId,
@@ -285,7 +323,7 @@ export const sendNewsletterService = async ({
     ];
 
 
-    const htmlContent = newsLetterTemplateNigerianVotersPartyOrPoliticianLoyalty();
+    const htmlContent = newsLetterTemplate2027CanNigeriaBeSaved();
 
     const listUnsubscribeUrl =
       process.env.NEWSLETTER_UNSUBSCRIBE_URL?.trim() ||
@@ -295,7 +333,7 @@ export const sendNewsletterService = async ({
     const emailPromises = userEmails.map((email) =>
       sendEmail({
         to: email,
-        subject: `Nigerian Voters; Loyal to Politicians or Political Parties?`,
+        subject: `2027 Elections, can this Nigeria be Saved?`,
         htmlbody: htmlContent,
         listUnsubscribeUrl,
       }).catch((err) => {
@@ -303,7 +341,14 @@ export const sendNewsletterService = async ({
       })
     );
 
+    
     await Promise.all(emailPromises);
+
+    await dispatchNewsletterMobileInbox({
+      recipients: normalizedRecipients,
+      title: "2027 Elections, can this Nigeria be Saved?",
+      info: "New newsletter from Citizen Monitors",
+    });
 
     console.log(`Newsletter sent successfully to ${userEmails.length} recipients.`);
     return { totalRecipients: userEmails.length };

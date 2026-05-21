@@ -1,5 +1,5 @@
 import { sendEmail } from "../../config/email.js";
-import { newsLetterTemplateNigerianVotersPartyOrPoliticianLoyalty, podcastNotificationTemplate } from "../../config/emailTemplates.js";
+import { newsLetterTemplate2027CanNigeriaBeSaved, podcastNotificationTemplate } from "../../config/emailTemplates.js";
 import schedule from "node-schedule";
 import { utcToZonedTime } from "date-fns-tz";
 import { format } from "date-fns";
@@ -8,6 +8,24 @@ import AdminLog from "../../models/admin/AdminLog.js";
 import Podcast from "../../models/admin/Podcast.js";
 import CompletedUser from "../../models/CompletedUser.js";
 import { invalidateAllMobileReadCaches } from "../../utils/cache.js";
+import { dispatchMobileNotification } from "../mobile/notificationDispatchService.js";
+const toMobileDispatchRecipients = (recipients) => {
+    if (recipients.includes("all"))
+        return ["all"];
+    return recipients;
+};
+const dispatchNewsletterMobileInbox = async (input) => {
+    const mobileRecipients = toMobileDispatchRecipients(input.recipients);
+    if (mobileRecipients.length === 0)
+        return;
+    await dispatchMobileNotification({
+        type: "newsletter",
+        preferenceKey: "newsletter",
+        body: input.title,
+        info: input.info ?? "",
+        recipients: mobileRecipients,
+    });
+};
 const toObjectId = (id) => id instanceof mongoose.Types.ObjectId ? id : new mongoose.Types.ObjectId(id);
 const requireId = (id, field) => {
     if (!id)
@@ -50,6 +68,11 @@ export const sendPodcastService = async ({ title, content, recipients, adminId, 
         console.error(`Failed to send email to ${email}:`, err);
     }));
     await Promise.all(emailPromises);
+    await dispatchNewsletterMobileInbox({
+        recipients: normalizedRecipients,
+        title: `New podcast: ${title}`,
+        info: content.slice(0, 200),
+    });
     await AdminLog.create({
         admin: senderId,
         action: "Sent Podcast",
@@ -186,19 +209,24 @@ export const sendNewsletterService = async ({ recipients, scheduleTime, }) => {
             // "oluwaloninyo@yahoo.com",
             "yunusmustapha01@yahoo.com",
         ];
-        const htmlContent = newsLetterTemplateNigerianVotersPartyOrPoliticianLoyalty();
+        const htmlContent = newsLetterTemplate2027CanNigeriaBeSaved();
         const listUnsubscribeUrl = process.env.NEWSLETTER_UNSUBSCRIBE_URL?.trim() ||
             "https://www.citizenmonitors.com/portal/settings/notifications";
         // Send emails to all targeted users
         const emailPromises = userEmails.map((email) => sendEmail({
             to: email,
-            subject: `Nigerian Voters; Loyal to Politicians or Political Parties?`,
+            subject: `2027 Elections, can this Nigeria be Saved?`,
             htmlbody: htmlContent,
             listUnsubscribeUrl,
         }).catch((err) => {
             console.error(`Failed to send email to ${email}:`, err);
         }));
         await Promise.all(emailPromises);
+        await dispatchNewsletterMobileInbox({
+            recipients: normalizedRecipients,
+            title: "2027 Elections, can this Nigeria be Saved?",
+            info: "New newsletter from Citizen Monitors",
+        });
         console.log(`Newsletter sent successfully to ${userEmails.length} recipients.`);
         return { totalRecipients: userEmails.length };
     };

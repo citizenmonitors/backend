@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { OAuth2Client } from "google-auth-library";
 import CompletedUser from "../../models/CompletedUser.js";
 import User from "../../models/User.js";
 import { authenticateUser, registerUser, resendTokenService, selectUserRole, submitObserverDetails, submitRoleFormDetails, validateTokenService, verifyUserEmail, } from "../authService.js";
@@ -7,10 +8,12 @@ import { passwordResetOtpTemplate } from "../../config/emailTemplates.js";
 import { generateToken } from "../../utils/generateToken.js";
 import { hashPassword } from "../../utils/hashPassword.js";
 import { verifyJwtEmail } from "../../utils/authToken.js";
+const googleOAuthClient = new OAuth2Client();
 const getAllowedGoogleClientIds = () => {
     const candidates = [
         process.env.GOOGLE_ANDROID_CLIENT_ID,
         process.env.GOOGLE_IOS_CLIENT_ID,
+        process.env.GOOGLE_WEB_CLIENT_ID,
         ...(process.env.GOOGLE_CLIENT_IDS?.split(",") ?? []),
         process.env.GOOGLE_CLIENT_ID, // backward compatibility
     ];
@@ -24,19 +27,26 @@ const mobileMetaPatch = (mobileMeta) => ({
     "mobileMeta.lastLoginAt": new Date(),
 });
 async function verifyGoogleIdToken(idToken) {
-    const response = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(idToken)}`);
-    if (!response.ok) {
+    const normalizedToken = idToken.trim().replace(/^Bearer\s+/i, "");
+    const allowedAudiences = getAllowedGoogleClientIds();
+    let ticket;
+    try {
+        ticket = await googleOAuthClient.verifyIdToken({
+            idToken: normalizedToken,
+            ...(allowedAudiences.length > 0 ? { audience: allowedAudiences } : {}),
+        });
+    }
+    catch {
         throw new Error("Invalid Google token");
     }
-    const data = (await response.json());
-    if (!data.email || data.email_verified !== "true") {
+    const payload = ticket.getPayload();
+    if (!payload?.sub || !payload.email) {
+        throw new Error("Invalid Google token");
+    }
+    if (!payload.email_verified) {
         throw new Error("Google account email is not verified");
     }
-    const allowedAudiences = getAllowedGoogleClientIds();
-    if (allowedAudiences.length > 0 && !allowedAudiences.includes(data.aud)) {
-        throw new Error("Google token audience mismatch");
-    }
-    return data;
+    return { sub: payload.sub, email: payload.email };
 }
 export const mobileRegister = async (payload, mobileMeta) => {
     await registerUser(payload);
@@ -49,7 +59,7 @@ export const mobileResendToken = async (email) => {
     return resendTokenService(email);
 };
 export const mobileContinueWithGoogle = async (idToken, mobileMeta) => {
-    const googleInfo = await verifyGoogleIdToken(idToken);
+    const googleInfo = await verifyGoogleIdToken(idToken.trim());
     const email = googleInfo.email.toLowerCase();
     const providerPatch = {
         ...mobileMetaPatch(mobileMeta),
@@ -200,9 +210,17 @@ export const mobileSubmitObserverDetails = async (input) => {
     });
 };
 export const mobileSignIn = async (payload, mobileMeta) => {
-    const existingUser = await CompletedUser.findOne({ email: payload.email }).lean();
-    if (existingUser && existingUser.hasSetPassword === false) {
-        throw new Error("The email or password you entered is incorrect");
+    const email = payload.email.toLowerCase();
+    const googleOnlySignInMessage = "Continue with Google to sign in, or set a password first.";
+    const completedUser = await CompletedUser.findOne({ email }).lean();
+    if (completedUser?.hasSetPassword === false &&
+        completedUser.authProviders?.google?.googleId) {
+        throw new Error(googleOnlySignInMessage);
+    }
+    const onboardingUser = await User.findOne({ email }).lean();
+    if (onboardingUser?.hasSetPassword === false &&
+        onboardingUser.authProviders?.google?.googleId) {
+        throw new Error(googleOnlySignInMessage);
     }
     const { token, user } = await authenticateUser(payload);
     await CompletedUser.findOneAndUpdate({ email: payload.email }, { $set: mobileMetaPatch(mobileMeta) });

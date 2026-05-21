@@ -74,6 +74,7 @@ type MulterMemoryFile = {
   originalname: string;
 };
 
+
 /** Accept up to 2 image files under any field name; resolved in articleImageUpload by known keys. */
 const uploadNewsPressAdminImages = (uploadNewsPress as unknown as { any: MulterAny }).any();
 

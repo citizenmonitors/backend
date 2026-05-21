@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { OAuth2Client } from "google-auth-library";
 import CompletedUser from "../../models/CompletedUser.ts";
 import User from "../../models/User.ts";
 import {
@@ -24,17 +25,18 @@ type MobileMetaInput = {
   pushToken?: string;
 };
 
-type GoogleTokenInfo = {
+type GoogleIdTokenPayload = {
   sub: string;
   email: string;
-  email_verified: string;
-  aud: string;
 };
+
+const googleOAuthClient = new OAuth2Client();
 
 const getAllowedGoogleClientIds = (): string[] => {
   const candidates = [
     process.env.GOOGLE_ANDROID_CLIENT_ID,
     process.env.GOOGLE_IOS_CLIENT_ID,
+    process.env.GOOGLE_WEB_CLIENT_ID,
     ...(process.env.GOOGLE_CLIENT_IDS?.split(",") ?? []),
     process.env.GOOGLE_CLIENT_ID, // backward compatibility
   ];
@@ -57,25 +59,29 @@ const mobileMetaPatch = (mobileMeta?: MobileMetaInput) => ({
   "mobileMeta.lastLoginAt": new Date(),
 });
 
-async function verifyGoogleIdToken(idToken: string): Promise<GoogleTokenInfo> {
-  const response = await fetch(
-    `https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(idToken)}`
-  );
-  if (!response.ok) {
+async function verifyGoogleIdToken(idToken: string): Promise<GoogleIdTokenPayload> {
+  const normalizedToken = idToken.trim().replace(/^Bearer\s+/i, "");
+  const allowedAudiences = getAllowedGoogleClientIds();
+
+  let ticket;
+  try {
+    ticket = await googleOAuthClient.verifyIdToken({
+      idToken: normalizedToken,
+      ...(allowedAudiences.length > 0 ? { audience: allowedAudiences } : {}),
+    });
+  } catch {
     throw new Error("Invalid Google token");
   }
 
-  const data = (await response.json()) as GoogleTokenInfo;
-  if (!data.email || data.email_verified !== "true") {
+  const payload = ticket.getPayload();
+  if (!payload?.sub || !payload.email) {
+    throw new Error("Invalid Google token");
+  }
+  if (!payload.email_verified) {
     throw new Error("Google account email is not verified");
   }
 
-  const allowedAudiences = getAllowedGoogleClientIds();
-  if (allowedAudiences.length > 0 && !allowedAudiences.includes(data.aud)) {
-    throw new Error("Google token audience mismatch");
-  }
-
-  return data;
+  return { sub: payload.sub, email: payload.email };
 }
 
 export const mobileRegister = async (
@@ -101,7 +107,7 @@ export const mobileContinueWithGoogle = async (
   idToken: string,
   mobileMeta?: MobileMetaInput
 ) => {
-  const googleInfo = await verifyGoogleIdToken(idToken);
+  const googleInfo = await verifyGoogleIdToken(idToken.trim());
   const email = googleInfo.email.toLowerCase();
   const providerPatch = {
     ...mobileMetaPatch(mobileMeta),
@@ -286,9 +292,25 @@ export const mobileSignIn = async (
   payload: { email: string; password: string },
   mobileMeta?: MobileMetaInput
 ) => {
-  const existingUser = await CompletedUser.findOne({ email: payload.email }).lean();
-  if (existingUser && existingUser.hasSetPassword === false) {
-    throw new Error("The email or password you entered is incorrect");
+  const email = payload.email.toLowerCase();
+
+  const googleOnlySignInMessage =
+    "Continue with Google to sign in, or set a password first.";
+
+  const completedUser = await CompletedUser.findOne({ email }).lean();
+  if (
+    completedUser?.hasSetPassword === false &&
+    completedUser.authProviders?.google?.googleId
+  ) {
+    throw new Error(googleOnlySignInMessage);
+  }
+
+  const onboardingUser = await User.findOne({ email }).lean();
+  if (
+    onboardingUser?.hasSetPassword === false &&
+    onboardingUser.authProviders?.google?.googleId
+  ) {
+    throw new Error(googleOnlySignInMessage);
   }
 
   const { token, user } = await authenticateUser(payload);

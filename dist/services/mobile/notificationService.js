@@ -103,4 +103,19 @@ export const markAllMobileNotificationsRead = async (input) => {
     await Notification.updateMany(visibility, { $addToSet: { readBy: userId } });
     return { message: "All notifications marked as read" };
 };
+export const dismissMobileNotification = async (input) => {
+    const userId = String(input.user._id ?? "");
+    if (!userId)
+        throw new Error("Authentication required");
+    const role = String(input.user.role ?? "");
+    const visibility = baseVisibilityFilter(userId, role);
+    const notification = await Notification.findOne({
+        _id: input.notificationId,
+        ...visibility,
+    });
+    if (!notification)
+        throw new Error("Notification not found");
+    await Notification.updateOne({ _id: input.notificationId }, { $addToSet: { deletedBy: userId, readBy: userId } });
+    return { message: "Notification removed from inbox" };
+};
 //# sourceMappingURL=notificationService.js.map

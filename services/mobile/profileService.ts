@@ -19,6 +19,7 @@ import { slugifyForLocationMatch } from "../../utils/locationNormalize.ts";
 import { sendEmail } from "../../config/email.ts";
 import { uploadFileToFirebase } from "../../config/firebaseUploader.ts";
 import { mobileFeedbackTemplate } from "../../config/emailTemplates.ts";
+import { dispatchMobileNotification } from "./notificationDispatchService.ts";
 
 type Id = Types.ObjectId | string;
 
@@ -116,12 +117,12 @@ const withNotificationDefaults = (
   current: MobileNotificationSettings | undefined
 ) => ({
   pollingUnitActivity: current?.pollingUnitActivity ?? true,
-  electionDayAlert: current?.electionDayAlert ?? false,
-  discussionReplies: current?.discussionReplies ?? false,
-  resultAggregated: current?.resultAggregated ?? false,
-  reportConfirmed: current?.reportConfirmed ?? false,
+  electionDayAlert: current?.electionDayAlert ?? true,
+  discussionReplies: current?.discussionReplies ?? true,
+  resultAggregated: current?.resultAggregated ?? true,
+  reportConfirmed: current?.reportConfirmed ?? true,
   reportFlagged: current?.reportFlagged ?? role === "observer",
-  securityAlerts: current?.securityAlerts ?? false,
+  securityAlerts: current?.securityAlerts ?? true,
   newsletter: current?.newsletter ?? true,
   newsAndInsights: current?.newsAndInsights ?? true,
   pressCoverage: current?.pressCoverage ?? true,
@@ -251,6 +252,17 @@ export const upsertObserverProfileData = async (input: {
 
   user.pendingObserverVerification = true;
   await user.save();
+
+  const applicantName = [user.firstName, user.lastName].filter(Boolean).join(" ").trim();
+  await dispatchMobileNotification({
+    type: "pending-approval",
+    preferenceKey: "securityAlerts",
+    body: "Observer application pending review",
+    info: [applicantName, user.pollingUnit].filter(Boolean).join(" • "),
+    recipients: ["admin", "super-admin"],
+    respectPreferences: false,
+  });
+
   return sanitizeUser(user);
 };
 

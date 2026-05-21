@@ -85,27 +85,27 @@ const completedUserSchema = new mongoose.Schema({
             },
             electionDayAlert: {
                 type: Boolean,
-                default: false,
+                default: true,
             },
             discussionReplies: {
                 type: Boolean,
-                default: false,
+                default: true,
             },
             resultAggregated: {
                 type: Boolean,
-                default: false,
+                default: true,
             },
             reportConfirmed: {
                 type: Boolean,
-                default: false,
+                default: true,
             },
             reportFlagged: {
                 type: Boolean,
-                default: false,
+                default: true,
             },
             securityAlerts: {
                 type: Boolean,
-                default: false,
+                default: true,
             },
             newsletter: {
                 type: Boolean,

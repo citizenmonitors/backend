@@ -41,4 +41,10 @@ export declare const markAllMobileNotificationsRead: (input: {
 }) => Promise<{
     message: string;
 }>;
+export declare const dismissMobileNotification: (input: {
+    user: AuthenticatedUser;
+    notificationId: string;
+}) => Promise<{
+    message: string;
+}>;
 //# sourceMappingURL=notificationService.d.ts.map

@@ -2359,3 +2359,63 @@ export const newsLetterTemplateNigerianVotersPartyOrPoliticianLoyalty = () =>
       `,
   });
 
+export const newsLetterTemplate2027CanNigeriaBeSaved = () =>
+  baseTemplate({
+    title: "2027 Elections, can this Nigeria be Saved?",
+    message: `
+      <table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
+        <tr>
+          <td>
+            <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 6px; overflow: hidden;">
+
+              <!-- Header -->
+              <tr>
+                <td style="background-color: #06BBAF; color: white; padding: 20px 30px; text-align: center;">
+                  <h3 style="color: #ffffff; margin: 0; font-size: 22px;">2027 Elections, can this Nigeria be Saved?</h3>
+                </td>
+              </tr>
+
+              <!-- Body -->
+              <tr>
+                <td style="padding: 30px; color: #000000; font-size: 18px; line-height: 1.7;">
+
+                  <p><strong>Dear Citizen Monitors,</strong></p>
+
+                  <p>As Nigeria slowly marches toward the 2027 elections, one uncomfortable question hangs heavily in the air: Can this Nigeria still be saved?</p>
+
+                  <p>Across the country, frustration is no longer hidden. From rising food prices to worsening insecurity, from youth unemployment to collapsing public trust in institutions, millions of Nigerians are asking whether elections still represent hope, or simply another cycle of disappointment.</p>
+
+                  <p>For many citizens, the problem is no longer just about politicians. It is about a political culture that rewards loyalty over competence, propaganda over performance, and power over service. Every election season comes with promises of reform, yet ordinary Nigerians continue to battle the same hardships year after year.</p>
+
+                  <p>The deeper concern is that citizens are gradually losing faith in the democratic process itself. When people no longer believe their votes matter, democracy becomes dangerously hollow.</p>
+
+                  <p>But despite the anger and fatigue, Nigeria still stands at a crossroad, rather than a dead end.</p>
+
+                  <p>The 2027 elections could become another recycling exercise of familiar faces and failed ideas. Or they could mark the beginning of a civic awakening driven by informed voters, stronger institutions, and issue-based politics.</p>
+
+                  <p>The real battle may not be between political parties. It may be between apathy and participation.</p>
+
+                  <h4 style="color: #06BBAF; margin-top: 20px;">Can Nigeria be saved?</h4>
+
+                  <p>Yes, but not by slogans. Not by ethnicity. Not by online outrage.</p>
+
+                  <p>Nigeria can only be saved when citizens begin to demand accountability with consistency, reward competence over sentiment, and understand that democracy is not an event every four years, but a continuous responsibility.</p>
+
+                  <p>The future of Nigeria may ultimately depend on whether Nigerians themselves still believe the country is worth fighting for.</p>
+
+                  <p>As 2027 approaches, one thing is clear; the elections will not only determine who governs Nigeria. They may determine whether Nigerians still have faith in the idea of Nigeria itself.</p>
+
+                  <p>Thank you for being a part of our community. Together, let's strive for a better Nigeria, as we draw closer to our 72-hour X space from 29th-31st of May, 2026; discussing "Credible 2027 Elections in Nigeria"; as a prelude to the launch of the Citizen Monitors App.</p>
+
+                  ${newsletterFooterTemplate()}
+
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+      </table>
+      `,
+  });
+

@@ -16,6 +16,7 @@ import { uploadFileToFirebase } from "../../config/firebaseUploader.ts";
 import bucket from "../../config/firebaseConfig.ts";
 import type { Types } from "mongoose";
 import crypto from "crypto";
+import { dispatchMobileNotification } from "../mobile/notificationDispatchService.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -216,6 +217,16 @@ export const volunteerToObserverService = async ({
 
   // Save the updated user to the database
   await user.save();
+
+  const applicantName = [user.firstName, user.lastName].filter(Boolean).join(" ").trim();
+  await dispatchMobileNotification({
+    type: "pending-approval",
+    preferenceKey: "securityAlerts",
+    body: "Observer application pending review",
+    info: [applicantName, user.pollingUnit].filter(Boolean).join(" • "),
+    recipients: ["admin", "super-admin"],
+    respectPreferences: false,
+  });
 
   // Exclude the password from the response
   const { password, ...userDetails } = user.toObject();

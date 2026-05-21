@@ -11,6 +11,10 @@ import AdminPermissions from "../../models/admin/AdminPermissions.ts";
 import AdminLog from "../../models/admin/AdminLog.ts";
 import { adminRoleInvitationTemplate, adminSuspensionTemplate, approveObserverTemplate, observerDowngradeTemplate, observerRoleAvailableTemplate, observerNotApprovedInvalidPvcTemplate, observerRoleUpdateTemplate } from "../../config/emailTemplates.ts";
 import { getPopulatedElectionLabels } from "./adminElectionService.ts";
+import {
+  dispatchMobileNotification,
+  dispatchNotificationToUsers,
+} from "../mobile/notificationDispatchService.ts";
 
 type Id = string | Types.ObjectId;
 
@@ -393,6 +397,15 @@ export const approveObserverService = async (id: Id, adminId: Id) => {
       htmlbody: htmlContent,
     });
 
+    await dispatchNotificationToUsers({
+      type: "pending-approval",
+      preferenceKey: "pollingUnitActivity",
+      body: "Your observer account has been approved",
+      info: user.pollingUnit ? `Polling unit: ${user.pollingUnit}` : "",
+      userIds: [String(user._id)],
+      respectPreferences: false,
+    });
+
     // Find all users in the same polling unit
     const usersInPollingUnit = await CompletedUser.find({
       pollingUnit: user.pollingUnit,
@@ -419,6 +432,17 @@ export const approveObserverService = async (id: Id, adminId: Id) => {
           to: otherUser.email,
           subject: "Observer Role Update - Citizen Monitors",
           htmlbody: htmlContent,
+        });
+
+        await dispatchNotificationToUsers({
+          type: "pending-approval",
+          preferenceKey: "pollingUnitActivity",
+          body: "Observer role update in your polling unit",
+          info: user.pollingUnit
+            ? `A new observer was approved for ${user.pollingUnit}`
+            : "A new observer was approved in your polling unit",
+          userIds: [String(otherUser._id)],
+          respectPreferences: false,
         });
       }
 
@@ -503,6 +527,15 @@ export const unapproveObserverService = async (id: Id, adminId: Id) => {
       to: user.email,
       subject: "Observer Application Not Approved - Citizen Monitors",
       htmlbody: htmlContent,
+    });
+
+    await dispatchNotificationToUsers({
+      type: "pending-approval",
+      preferenceKey: "pollingUnitActivity",
+      body: "Your observer application was not approved",
+      info: "Please review your PVC details or contact support.",
+      userIds: [String(user._id)],
+      respectPreferences: false,
     });
 
     await AdminLog.create({

@@ -7,6 +7,8 @@ export declare const dispatchMobileNotification: (input: {
     info?: string;
     recipients: RecipientRole[];
     audienceQuery?: Record<string, unknown>;
+    /** When false, delivers to all matched users regardless of notification prefs (transactional). */
+    respectPreferences?: boolean;
 }) => Promise<(import("mongoose").Document<unknown, {}, {
     createdAt: NativeDate;
     targetUsers: import("mongoose").Types.ObjectId[];
@@ -38,6 +40,7 @@ export declare const dispatchNotificationToUsers: (input: {
     body: string;
     info?: string;
     userIds: Array<string>;
+    respectPreferences?: boolean;
 }) => Promise<(import("mongoose").Document<unknown, {}, {
     createdAt: NativeDate;
     targetUsers: import("mongoose").Types.ObjectId[];

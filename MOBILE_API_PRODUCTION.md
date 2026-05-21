@@ -29,9 +29,11 @@ Body:
   "platform": "android",
   "deviceId": "device-123",
   "appVersion": "1.0.0",
-  "pushToken": "expo-push-token"
+  "pushToken": "ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]"
 }
 ```
+
+**Expo push token (device):** obtain in the app with `expo-notifications`, then send the string on **register**, **signin**, and **google/continue** (re-send when the token changes). Stored as `mobileMeta.pushToken`. Format must start with `ExponentPushToken[` or `ExpoPushToken[`.
 
 ### `POST /auth/verify-email`
 Body:
@@ -59,11 +61,15 @@ Body:
   "platform": "android",
   "deviceId": "device-123",
   "appVersion": "1.0.0",
-  "pushToken": "expo-push-token"
+  "pushToken": "ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]"
 }
 ```
 
 ### `POST /auth/google/continue`
+Use for first-time Google sign-up **and** returning users who signed up with Google. ID tokens are verified with `google-auth-library` (signature + audience).
+
+Returning Google users who have not set a password yet must use this endpoint again (not email/password sign-in). After they call `POST /auth/set-password`, they may sign in with email and password.
+
 Body:
 ```json
 {
@@ -71,7 +77,7 @@ Body:
   "platform": "ios",
   "deviceId": "ios-device-1",
   "appVersion": "1.0.0",
-  "pushToken": "apns-token"
+  "pushToken": "ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]"
 }
 ```
 
@@ -182,7 +188,41 @@ Server emits when a new notification targets the connected user:
 
 Notes:
 - Persisted notifications are still available from `GET /notifications`.
-- If user is offline, app should fall back to polling and/or push notification.
+- When the app is backgrounded or closed, the server sends push to `mobileMeta.pushToken` (if registered at login):
+  - **Expo** tokens (`ExponentPushToken[...]`) → Expo Push API
+  - **FCM** native tokens → Firebase Cloud Messaging (same Firebase project as storage)
+- Set `EXPO_ACCESS_TOKEN` on the server for authenticated Expo delivery (see `.env.example`).
+- Invalid/expired tokens are cleared from the user record automatically.
+- Enabled in production by default; set `PUSH_NOTIFICATIONS_ENABLED=true` in dev to test.
+- Push payload `data` includes `notificationId`, `type`, `preferenceKey`, and `info` for deep linking.
+- Admin **newsletter** and **podcast** sends also create mobile inbox items (`type: newsletter`) for users with `notifications.mobile.newsletter` enabled.
+
+### Backend: `EXPO_ACCESS_TOKEN` (server only)
+
+1. Log in at [expo.dev](https://expo.dev) → **Account settings** → **Access tokens** → **Create**.
+2. Copy the token into Render env: `EXPO_ACCESS_TOKEN=...` (never put this in the mobile app).
+3. Redeploy the API. Optional in dev; recommended in production.
+
+### Mobile app: register device token (example)
+
+```ts
+import * as Notifications from "expo-notifications";
+
+const { status } = await Notifications.requestPermissionsAsync();
+if (status !== "granted") return;
+
+const expoPushToken = (await Notifications.getExpoPushTokenAsync()).data;
+// e.g. ExponentPushToken[abc...]
+
+await api.post("/auth/signin", {
+  email,
+  password,
+  platform: Platform.OS === "ios" ? "ios" : "android",
+  pushToken: expoPushToken,
+});
+```
+
+Re-call signin (or register) when Expo issues a new token so the backend stays in sync.
 
 ---
 
@@ -506,6 +546,36 @@ Mark one notification as read.
 
 ### `POST /notifications/read-all`
 Mark all visible notifications as read.
+
+### `DELETE /notifications/:notificationId`
+Remove a notification from the current user's inbox (soft delete). Also marks it read.
+
+### `POST /notifications/test` (dev / staging only)
+Sends a test notification to the **logged-in user** (inbox + Socket.IO + push if enabled).
+
+Disabled in production unless `ALLOW_NOTIFICATION_TEST=true` on the server.
+
+Body (optional):
+```json
+{
+  "body": "Test title",
+  "info": "Test subtitle"
+}
+```
+
+Example:
+```bash
+curl -X POST "http://localhost:4000/api/v1/mobile/notifications/test" \
+  -H "Authorization: Bearer YOUR_JWT" \
+  -H "X-Inhouse-Access-Token: YOUR_INHOUSE_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"body":"Hello","info":"Push + inbox test"}'
+```
+
+**Observer approval (`pending-approval` type):**
+- User submits observer PVC → admins receive inbox + push (`respectPreferences: false`).
+- Admin approves → user receives approval inbox + push; volunteers in same PU may get role-update notice.
+- Admin unapproves pending observer → user receives rejection inbox + push.
 
 ---
 

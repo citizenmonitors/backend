@@ -8,7 +8,7 @@ router.post("/register", mobileRegisterValidation, handleValidationErrors, regis
 router.post("/verify-email", mobileVerifyEmailValidation, handleValidationErrors, verifyEmailMobile);
 router.post("/resend-token", mobileResendTokenValidation, handleValidationErrors, resendTokenMobile);
 router.post("/signin", mobileSignInValidation, handleValidationErrors, signInMobile);
-router.post("/google/continue", mobileGoogleContinueValidation, handleValidationErrors, continueWithGoogleMobile);
+router.post("/google", mobileGoogleContinueValidation, handleValidationErrors, continueWithGoogleMobile);
 router.post("/set-password", mobileSetPasswordValidation, handleValidationErrors, setPasswordMobile);
 router.post("/validate", validateSessionMobile);
 router.post("/forgot-password", mobileResendTokenValidation, handleValidationErrors, forgotPasswordMobile);

@@ -2359,6 +2359,7 @@ export const newsLetterTemplateNigerianVotersPartyOrPoliticianLoyalty = () =>
       `,
   });
 
+  
 export const newsLetterTemplate2027CanNigeriaBeSaved = () =>
   baseTemplate({
     title: "2027 Elections, can this Nigeria be Saved?",
@@ -2406,6 +2407,121 @@ export const newsLetterTemplate2027CanNigeriaBeSaved = () =>
                   <p>As 2027 approaches, one thing is clear; the elections will not only determine who governs Nigeria. They may determine whether Nigerians still have faith in the idea of Nigeria itself.</p>
 
                   <p>Thank you for being a part of our community. Together, let's strive for a better Nigeria, as we draw closer to our 72-hour X space from 29th-31st of May, 2026; discussing "Credible 2027 Elections in Nigeria"; as a prelude to the launch of the Citizen Monitors App.</p>
+
+                  ${newsletterFooterTemplate()}
+
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+      </table>
+      `,
+  });
+
+export const newsLetterTemplatePartyPrimariesAndInsecurity = () =>
+  baseTemplate({
+    title: "The Politics of Party Primaries and Insecurity.",
+    message: `
+      <table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
+        <tr>
+          <td>
+            <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 6px; overflow: hidden;">
+
+              <!-- Header -->
+              <tr>
+                <td style="background-color: #06BBAF; color: white; padding: 20px 30px; text-align: center;">
+                  <h3 style="color: #ffffff; margin: 0; font-size: 22px;">The Politics of Party Primaries and Insecurity.</h3>
+                </td>
+              </tr>
+
+              <!-- Body -->
+              <tr>
+                <td style="padding: 30px; color: #000000; font-size: 18px; line-height: 1.7;">
+
+                  <p><strong>Dear Citizen Monitors,</strong></p>
+
+                  <p>Nigeria's political conversations are once again shifting toward party primaries, alliances, defections, endorsements, and power negotiations. Across the country, politicians are calculating their next moves, while citizens are left wondering whether governance itself has become secondary to electoral ambitions.</p>
+
+                  <p>Amid the noise of political manoeuvring, what happens to national security when politics becomes the priority?</p>
+
+                  <p>Insecurity is no longer a distant headline affecting "other people." It has become part of daily Nigerian life. Kidnappings, communal clashes, armed robberies, terrorism, cult violence, and attacks on communities continue to spread fear across both rural and urban areas. Citizens increasingly feel abandoned, while trust in institutions continues to weaken.</p>
+
+                  <p>Yet, rather than presenting clear policy alternatives, many political actors appear more focused on controlling party structures than addressing the nation's security crisis. Internal party battles now dominate headlines more than solutions to insecurity. Regional calculations often overshadow national interest. And in some cases, insecurity itself becomes a political tool; exploited to mobilize fear, suppress participation, or discredit opponents.</p>
+
+                  <p>Party primaries are supposed to strengthen democracy by allowing parties to present their best candidates. Instead, they often expose the weaknesses within our political system. Imposition of candidates, vote-buying and godfather politics continue to shape outcomes. When leadership selection lacks credibility, governance itself suffers.</p>
+
+                  <p>The consequences are serious. Leaders who emerge from flawed political processes may feel more accountable to political sponsors than to ordinary Nigerians. Security appointments become political settlements. Law enforcement agencies are dragged into political disputes. Communities begin to interpret insecurity through ethnic or partisan lenses. Gradually, national unity weakens while distrust grows.</p>
+
+                  <p>The danger is that Nigerians may become desensitized, accepting insecurity as normal while politicians continue campaigning as though the country is stable. But democracy cannot survive where citizens live in fear.</p>
+
+                  <p>No election slogan can replace effective governance. No party convention can substitute for public safety. And no political coalition can succeed in the long term, if Nigerians continue to feel unsafe in their homes, schools, highways, and communities.</p>
+
+                  <h4 style="color: #06BBAF; margin-top: 20px;">As voters prepare for another round of political promises, we must demand more than speeches and propaganda. Nigerians must begin to ask tougher questions:</h4>
+                  <ul style="padding-left: 20px; line-height: 1.8;">
+                    <li>What are the candidates' security strategies?</li>
+                    <li>How will communities regain trust in government?</li>
+                    <li>And most importantly, can politicians place national stability above political ambition?</li>
+                  </ul>
+
+                  <p>The politics of party primaries may determine who gets power, but insecurity will determine whether that power has meaning. Nigeria needs more responsible leadership.</p>
+
+                  ${newsletterFooterTemplate()}
+
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+      </table>
+      `,
+  });
+
+export const newsLetterTemplateCitizenMonitors72Hours = () =>
+  baseTemplate({
+    title: "Citizen Monitors 72 Hours; A Weekend of Civic Engagement and National Conversation.",
+    message: `
+      <table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
+        <tr>
+          <td>
+            <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 6px; overflow: hidden;">
+
+              <!-- Header -->
+              <tr>
+                <td style="background-color: #06BBAF; color: white; padding: 20px 30px; text-align: center;">
+                  <h3 style="color: #ffffff; margin: 0; font-size: 22px;">Citizen Monitors 72 Hours; A Weekend of Civic Engagement and National Conversation.</h3>
+                </td>
+              </tr>
+
+              <!-- Body -->
+              <tr>
+                <td style="padding: 30px; color: #000000; font-size: 18px; line-height: 1.7;">
+
+                  <p><strong>Dear Citizen Monitors,</strong></p>
+
+                  <p>From Friday, May 29 to Sunday, May 31, 2026, the Citizen Monitors 72 Hours X Space demonstrated the power of citizens coming together to discuss the issues shaping Nigeria's future.</p>
+
+                  <p>For seventy-two consecutive hours, participants from across Nigeria and the diaspora engaged in robust conversations on governance, elections, accountability, security, economic challenges, and citizen participation. What began as a digital conversation evolved into a vibrant civic forum where diverse voices exchanged ideas, challenged assumptions, and explored solutions to some of the country's most pressing concerns.</p>
+
+                  <p>The success of the weekend was not measured merely by the number of speakers, listeners, or hours spent online. Its true achievement lay in the quality of engagement. Citizens, professionals, activists, public servants, political stakeholders, and ordinary Nigerians shared perspectives in an atmosphere that encouraged dialogue rather than division.</p>
+
+                  <p>At a time when many citizens feel disconnected from political processes, Citizen Monitors 72 Hours conversation provided a platform where Nigerians all over the world, asked difficult questions, demanding accountability, and contributed meaningfully to discussions about the nation's future. The conversations reinforced a simple but powerful truth: democracy functions best when citizens remain informed, engaged, and willing to participate.</p>
+
+                  <p>Under one theme, "Credible 2027 Elections," several topics emerged throughout the weekend. Participants highlighted the importance of strengthening democratic institutions ahead of the 2027 elections, improving transparency in governance, enhancing public trust in electoral processes, and promoting issue-based political engagement. There was also widespread agreement that citizens must move beyond periodic voting and embrace continuous civic participation.</p>
+
+                  <p>The discussions further underscored the growing role of digital platforms in fostering civic education and public accountability. In an era where misinformation and political polarization often dominate public discourse, the Citizen Monitors 72 Hours X Space offered an opportunity for constructive engagement rooted in facts, experience, and shared national aspirations.</p>
+
+                  <p>As the curtains closed at midnight Sunday, 31st of May, 2026, one message resonated clearly: the future of Nigeria cannot be left solely to politicians, institutions, or government agencies. It requires active citizens who are willing to stay informed, ask questions, monitor public affairs, and contribute to nation-building.</p>
+
+                  <p>We extend our appreciation to every moderator, speaker, listener, partner, and supporter who made the May 29–31 edition a success. Your commitment demonstrates that civic engagement remains alive and that Nigerians continue to seek meaningful conversations about the future of their country.</p>
+
+                  <p>The conversations may have ended for now, but the work of building a better Nigeria continues. The Citizen Monitors app drops today. Please download from Google Play store and App Store.</p>
+
+                  <p style="margin-top: 20px; font-style: italic; color: #555555;">
+                    Informing Citizens. Strengthening Democracy. Inspiring Accountability.
+                  </p>
 
                   ${newsletterFooterTemplate()}
 

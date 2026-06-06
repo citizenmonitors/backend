@@ -1,5 +1,5 @@
 import { sendEmail } from "../../config/email.ts";
-import { newsLetterTemplate2027CanNigeriaBeSaved, podcastNotificationTemplate } from "../../config/emailTemplates.ts";
+import { newsLetterTemplateCitizenMonitors72Hours, podcastNotificationTemplate } from "../../config/emailTemplates.ts";
 import schedule from "node-schedule";
 import { utcToZonedTime } from "date-fns-tz";
 import { format } from "date-fns";
@@ -318,12 +318,13 @@ export const sendNewsletterService = async ({
     userEmails = [
       "yunusmustapha2@gmail.com",
       "citizenmonitors@yahoo.com",
-      // "oluwaloninyo@yahoo.com",
+      "oluwaloninyo@yahoo.com",
       "yunusmustapha01@yahoo.com",
     ];
 
+  
 
-    const htmlContent = newsLetterTemplate2027CanNigeriaBeSaved();
+    const htmlContent = newsLetterTemplateCitizenMonitors72Hours();
 
     const listUnsubscribeUrl =
       process.env.NEWSLETTER_UNSUBSCRIBE_URL?.trim() ||
@@ -333,7 +334,7 @@ export const sendNewsletterService = async ({
     const emailPromises = userEmails.map((email) =>
       sendEmail({
         to: email,
-        subject: `2027 Elections, can this Nigeria be Saved?`,
+        subject: `Citizen Monitors 72 Hours; A Weekend of Civic Engagement and National Conversation.`,
         htmlbody: htmlContent,
         listUnsubscribeUrl,
       }).catch((err) => {
@@ -341,12 +342,13 @@ export const sendNewsletterService = async ({
       })
     );
 
+
     
     await Promise.all(emailPromises);
 
     await dispatchNewsletterMobileInbox({
       recipients: normalizedRecipients,
-      title: "2027 Elections, can this Nigeria be Saved?",
+      title: "Citizen Monitors 72 Hours; A Weekend of Civic Engagement and National Conversation.",
       info: "New newsletter from Citizen Monitors",
     });
 

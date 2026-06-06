@@ -96,5 +96,7 @@ export declare const newsLetterTemplateInecForensicAudit: () => string;
 export declare const newsLetterTemplatePoliceBrutalityLeadershipOrInstitutional: () => string;
 export declare const newsLetterTemplateNigerianVotersPartyOrPoliticianLoyalty: () => string;
 export declare const newsLetterTemplate2027CanNigeriaBeSaved: () => string;
+export declare const newsLetterTemplatePartyPrimariesAndInsecurity: () => string;
+export declare const newsLetterTemplateCitizenMonitors72Hours: () => string;
 export {};
 //# sourceMappingURL=emailTemplates.d.ts.map

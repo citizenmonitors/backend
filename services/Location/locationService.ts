@@ -68,53 +68,92 @@ const buildWards = (
   return wards;
 };
 
-// Function to build the polling units data
-const buildPollingUnits = (lgaDir: string, wardParts: string[]): string[] => {
-  const pollingUnits: string[] = [];
+/** Resolve ward path segments under `.../wards` to an absolute ward folder. */
+const resolveWardDirectory = (
+  lgaDir: string,
+  wardParts: string[]
+): string | null => {
   let currentDir = path.join(lgaDir, "wards");
-
-  // Navigate through the ward parts to get to the correct directory
   for (const part of wardParts) {
     const subDirName = findDirectoryWithPrefix(currentDir, part);
     if (!subDirName) {
       console.warn(`Subdirectory not found for: ${part}`);
-      return pollingUnits;
+      return null;
     }
     currentDir = path.join(currentDir, subDirName);
   }
+  return currentDir;
+};
 
-  const pollingUnitsDir = path.join(currentDir, "units", "index.json");
-  console.log(`Looking for polling units in directory: ${pollingUnitsDir}`);
-  const pollingUnitDetails = readJsonFile<NameItem>(pollingUnitsDir);
-  if (pollingUnitDetails && Array.isArray(pollingUnitDetails)) {
-    pollingUnitDetails.forEach((unit) =>
-      pollingUnits.push(unit.name)
-    ); // Only include polling unit names
-  } else {
-    console.warn(
-      `Polling units directory not found or not an array: ${pollingUnitsDir}`
+/**
+ * Collect polling units from a ward folder. Supports flat `units/index.json`
+ * and nested sub-areas (e.g. `5869-shasha/akowonjo/units/index.json`).
+ */
+const collectPollingUnitNamesFromWardDir = (wardDir: string): string[] => {
+  const directPath = path.join(wardDir, "units", "index.json");
+  if (fs.existsSync(directPath)) {
+    const rows = readJsonFile<NameItem>(directPath);
+    return Array.isArray(rows) ? rows.map((row) => row.name) : [];
+  }
+
+  let dirents: Dirent[];
+  try {
+    dirents = fs.readdirSync(wardDir, { withFileTypes: true }) as Dirent[];
+  } catch {
+    return [];
+  }
+
+  const names: string[] = [];
+  for (const entry of dirents) {
+    if (!entry.isDirectory() || entry.name === "units") continue;
+    names.push(
+      ...collectPollingUnitNamesFromWardDir(path.join(wardDir, entry.name))
     );
   }
-  return pollingUnits;
+  return names;
+};
+
+const collectPollingUnitDetailsFromWardDir = (
+  wardDir: string
+): PollingUnitDetail[] => {
+  const directPath = path.join(wardDir, "units", "index.json");
+  if (fs.existsSync(directPath)) {
+    const rows = readJsonFile<PollingUnitDetail>(directPath);
+    return Array.isArray(rows) ? rows : [];
+  }
+
+  let dirents: Dirent[];
+  try {
+    dirents = fs.readdirSync(wardDir, { withFileTypes: true }) as Dirent[];
+  } catch {
+    return [];
+  }
+
+  const details: PollingUnitDetail[] = [];
+  for (const entry of dirents) {
+    if (!entry.isDirectory() || entry.name === "units") continue;
+    details.push(
+      ...collectPollingUnitDetailsFromWardDir(path.join(wardDir, entry.name))
+    );
+  }
+  return details;
+};
+
+// Function to build the polling units data
+const buildPollingUnits = (lgaDir: string, wardParts: string[]): string[] => {
+  const wardDir = resolveWardDirectory(lgaDir, wardParts);
+  if (!wardDir) return [];
+  console.log(`Looking for polling units under ward directory: ${wardDir}`);
+  return collectPollingUnitNamesFromWardDir(wardDir);
 };
 
 const buildPollingUnitDetails = (
   lgaDir: string,
   wardParts: string[]
 ): PollingUnitDetail[] => {
-  let currentDir = path.join(lgaDir, "wards");
-
-  for (const part of wardParts) {
-    const subDirName = findDirectoryWithPrefix(currentDir, part);
-    if (!subDirName) {
-      return [];
-    }
-    currentDir = path.join(currentDir, subDirName);
-  }
-
-  const pollingUnitsDir = path.join(currentDir, "units", "index.json");
-  const pollingUnitDetails = readJsonFile<PollingUnitDetail>(pollingUnitsDir);
-  return Array.isArray(pollingUnitDetails) ? pollingUnitDetails : [];
+  const wardDir = resolveWardDirectory(lgaDir, wardParts);
+  if (!wardDir) return [];
+  return collectPollingUnitDetailsFromWardDir(wardDir);
 };
 
 // Function to build the states data

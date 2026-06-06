@@ -29,7 +29,7 @@ export const mobileNotificationUpdateValidation = [
 export const mobilePollingUnitLookupValidation = [
   body("state").notEmpty().isString().withMessage("state is required"),
   body("lga").notEmpty().isString().withMessage("lga is required"),
-  body("ward").notEmpty().isString().withMessage("ward is required"),
+  body("ward").optional().isString(),
   body("pollingUnit").optional().isString(),
 ];
 

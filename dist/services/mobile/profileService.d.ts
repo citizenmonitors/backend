@@ -574,11 +574,20 @@ export declare const getMobileNotifications: (userId: Id) => Promise<{
 export declare const locatePollingUnit: (input: {
     state: string;
     lga: string;
-    ward: string;
+    ward?: string;
     pollingUnit?: string;
 }) => Promise<{
     count: number;
+    wards: {
+        name: string;
+        count: number;
+        pollingUnits: PollingUnitDetail[];
+    }[];
+    pollingUnits?: undefined;
+} | {
+    count: number;
     pollingUnits: PollingUnitDetail[];
+    wards?: undefined;
 }>;
 export declare const submitMobileFeedback: (input: {
     userId: Id;

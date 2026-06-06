@@ -6,7 +6,7 @@ import IncidentReport from "../../models/Election/IncidentReport.js";
 import MobileFeedback from "../../models/Feedback/mobileFeedback.js";
 import observerIdModel from "../../models/observerIds/observerIdModel.js";
 import { updateUserService, volunteerToObserverService, } from "../UserDashboard/userService.js";
-import { buildPollingUnitDetails, findDirectoryWithPrefix, resolveNestedDirectories, } from "../Location/locationService.js";
+import { buildPollingUnitDetails, buildWards, findDirectoryWithPrefix, resolveNestedDirectories, } from "../Location/locationService.js";
 import { slugifyForLocationMatch } from "../../utils/locationNormalize.js";
 import { sendEmail } from "../../config/email.js";
 import { uploadFileToFirebase } from "../../config/firebaseUploader.js";
@@ -200,7 +200,8 @@ export const getMobileNotifications = async (userId) => {
 export const locatePollingUnit = async (input) => {
     const state = slugifyForLocationMatch(input.state);
     const lga = slugifyForLocationMatch(input.lga);
-    const ward = slugifyForLocationMatch(input.ward);
+    const wardRaw = String(input.ward ?? "").trim();
+    const ward = wardRaw ? slugifyForLocationMatch(wardRaw) : undefined;
     const pollingUnitQuery = input.pollingUnit
         ? slugifyForLocationMatch(input.pollingUnit)
         : undefined;
@@ -210,6 +211,15 @@ export const locatePollingUnit = async (input) => {
     const lgaDir = resolveNestedDirectories(path.join(locationsBaseDir, stateDirName, "lgas"), [lga]);
     if (!lgaDir)
         throw new Error("LGA directory not found");
+    if (!ward) {
+        const wardNames = buildWards(lgaDir);
+        const wards = wardNames.map((name) => {
+            const pollingUnits = buildPollingUnitDetails(lgaDir, [name]);
+            return { name, count: pollingUnits.length, pollingUnits };
+        });
+        const count = wards.reduce((sum, row) => sum + row.pollingUnits.length, 0);
+        return { count, wards };
+    }
     const units = buildPollingUnitDetails(lgaDir, [ward]);
     if (!pollingUnitQuery) {
         return { count: units.length, pollingUnits: units };

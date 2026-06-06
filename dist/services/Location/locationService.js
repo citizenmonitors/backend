@@ -51,42 +51,78 @@ const buildWards = (lgaDir, subPathParts = []) => {
     }
     return wards;
 };
-// Function to build the polling units data
-const buildPollingUnits = (lgaDir, wardParts) => {
-    const pollingUnits = [];
+/** Resolve ward path segments under `.../wards` to an absolute ward folder. */
+const resolveWardDirectory = (lgaDir, wardParts) => {
     let currentDir = path.join(lgaDir, "wards");
-    // Navigate through the ward parts to get to the correct directory
     for (const part of wardParts) {
         const subDirName = findDirectoryWithPrefix(currentDir, part);
         if (!subDirName) {
             console.warn(`Subdirectory not found for: ${part}`);
-            return pollingUnits;
+            return null;
         }
         currentDir = path.join(currentDir, subDirName);
     }
-    const pollingUnitsDir = path.join(currentDir, "units", "index.json");
-    console.log(`Looking for polling units in directory: ${pollingUnitsDir}`);
-    const pollingUnitDetails = readJsonFile(pollingUnitsDir);
-    if (pollingUnitDetails && Array.isArray(pollingUnitDetails)) {
-        pollingUnitDetails.forEach((unit) => pollingUnits.push(unit.name)); // Only include polling unit names
+    return currentDir;
+};
+/**
+ * Collect polling units from a ward folder. Supports flat `units/index.json`
+ * and nested sub-areas (e.g. `5869-shasha/akowonjo/units/index.json`).
+ */
+const collectPollingUnitNamesFromWardDir = (wardDir) => {
+    const directPath = path.join(wardDir, "units", "index.json");
+    if (fs.existsSync(directPath)) {
+        const rows = readJsonFile(directPath);
+        return Array.isArray(rows) ? rows.map((row) => row.name) : [];
     }
-    else {
-        console.warn(`Polling units directory not found or not an array: ${pollingUnitsDir}`);
+    let dirents;
+    try {
+        dirents = fs.readdirSync(wardDir, { withFileTypes: true });
     }
-    return pollingUnits;
+    catch {
+        return [];
+    }
+    const names = [];
+    for (const entry of dirents) {
+        if (!entry.isDirectory() || entry.name === "units")
+            continue;
+        names.push(...collectPollingUnitNamesFromWardDir(path.join(wardDir, entry.name)));
+    }
+    return names;
+};
+const collectPollingUnitDetailsFromWardDir = (wardDir) => {
+    const directPath = path.join(wardDir, "units", "index.json");
+    if (fs.existsSync(directPath)) {
+        const rows = readJsonFile(directPath);
+        return Array.isArray(rows) ? rows : [];
+    }
+    let dirents;
+    try {
+        dirents = fs.readdirSync(wardDir, { withFileTypes: true });
+    }
+    catch {
+        return [];
+    }
+    const details = [];
+    for (const entry of dirents) {
+        if (!entry.isDirectory() || entry.name === "units")
+            continue;
+        details.push(...collectPollingUnitDetailsFromWardDir(path.join(wardDir, entry.name)));
+    }
+    return details;
+};
+// Function to build the polling units data
+const buildPollingUnits = (lgaDir, wardParts) => {
+    const wardDir = resolveWardDirectory(lgaDir, wardParts);
+    if (!wardDir)
+        return [];
+    console.log(`Looking for polling units under ward directory: ${wardDir}`);
+    return collectPollingUnitNamesFromWardDir(wardDir);
 };
 const buildPollingUnitDetails = (lgaDir, wardParts) => {
-    let currentDir = path.join(lgaDir, "wards");
-    for (const part of wardParts) {
-        const subDirName = findDirectoryWithPrefix(currentDir, part);
-        if (!subDirName) {
-            return [];
-        }
-        currentDir = path.join(currentDir, subDirName);
-    }
-    const pollingUnitsDir = path.join(currentDir, "units", "index.json");
-    const pollingUnitDetails = readJsonFile(pollingUnitsDir);
-    return Array.isArray(pollingUnitDetails) ? pollingUnitDetails : [];
+    const wardDir = resolveWardDirectory(lgaDir, wardParts);
+    if (!wardDir)
+        return [];
+    return collectPollingUnitDetailsFromWardDir(wardDir);
 };
 // Function to build the states data
 const buildStates = (statesDir) => {

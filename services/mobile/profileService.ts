@@ -12,6 +12,7 @@ import {
 } from "../UserDashboard/userService.ts";
 import {
   buildPollingUnitDetails,
+  buildWards,
   findDirectoryWithPrefix,
   resolveNestedDirectories,
 } from "../Location/locationService.ts";
@@ -111,6 +112,7 @@ const sanitizeUser = (doc: { toObject: () => Record<string, unknown> }) => {
   delete payload.resetPasswordOTPExpires;
   return payload;
 };
+
 
 const withNotificationDefaults = (
   role: string | undefined,
@@ -336,12 +338,13 @@ export const getMobileNotifications = async (userId: Id) => {
 export const locatePollingUnit = async (input: {
   state: string;
   lga: string;
-  ward: string;
+  ward?: string;
   pollingUnit?: string;
 }) => {
   const state = slugifyForLocationMatch(input.state);
   const lga = slugifyForLocationMatch(input.lga);
-  const ward = slugifyForLocationMatch(input.ward);
+  const wardRaw = String(input.ward ?? "").trim();
+  const ward = wardRaw ? slugifyForLocationMatch(wardRaw) : undefined;
   const pollingUnitQuery = input.pollingUnit
     ? slugifyForLocationMatch(input.pollingUnit)
     : undefined;
@@ -354,6 +357,16 @@ export const locatePollingUnit = async (input: {
     [lga]
   );
   if (!lgaDir) throw new Error("LGA directory not found");
+
+  if (!ward) {
+    const wardNames = buildWards(lgaDir);
+    const wards = wardNames.map((name) => {
+      const pollingUnits = buildPollingUnitDetails(lgaDir, [name]) as PollingUnitDetail[];
+      return { name, count: pollingUnits.length, pollingUnits };
+    });
+    const count = wards.reduce((sum, row) => sum + row.pollingUnits.length, 0);
+    return { count, wards };
+  }
 
   const units = buildPollingUnitDetails(lgaDir, [ward]) as PollingUnitDetail[];
   if (!pollingUnitQuery) {

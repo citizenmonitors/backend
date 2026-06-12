@@ -1,5 +1,9 @@
 import { sendEmail } from "../../config/email.ts";
-import { newsLetterTemplateCitizenMonitors72Hours, podcastNotificationTemplate } from "../../config/emailTemplates.ts";
+import {
+  getNewsletterUnsubscribeUrl,
+  newsLetterTemplate72HoursDemocracyWhatNext,
+  podcastNotificationTemplate,
+} from "../../config/emailTemplates.ts";
 import schedule from "node-schedule";
 import { utcToZonedTime } from "date-fns-tz";
 import { format } from "date-fns";
@@ -314,29 +318,29 @@ export const sendNewsletterService = async ({
 
 
 
+
     // For testing, override userEmails with your email
     userEmails = [
       "yunusmustapha2@gmail.com",
       "citizenmonitors@yahoo.com",
-      "oluwaloninyo@yahoo.com",
+      // "oluwaloninyo@yahoo.com",
       "yunusmustapha01@yahoo.com",
     ];
-
   
 
-    const htmlContent = newsLetterTemplateCitizenMonitors72Hours();
+    const htmlContent = newsLetterTemplate72HoursDemocracyWhatNext();
 
-    const listUnsubscribeUrl =
-      process.env.NEWSLETTER_UNSUBSCRIBE_URL?.trim() ||
-      "https://www.citizenmonitors.com/portal/settings/notifications";
+    const listUnsubscribeUrl = getNewsletterUnsubscribeUrl();
 
     // Send emails to all targeted users
     const emailPromises = userEmails.map((email) =>
       sendEmail({
         to: email,
-        subject: `Citizen Monitors 72 Hours; A Weekend of Civic Engagement and National Conversation.`,
+        subject: `72 Hours of Democracy, What Next?`,
         htmlbody: htmlContent,
         listUnsubscribeUrl,
+        trackClicks: false,
+        trackOpens: false,
       }).catch((err) => {
         console.error(`Failed to send email to ${email}:`, err);
       })
@@ -348,7 +352,7 @@ export const sendNewsletterService = async ({
 
     await dispatchNewsletterMobileInbox({
       recipients: normalizedRecipients,
-      title: "Citizen Monitors 72 Hours; A Weekend of Civic Engagement and National Conversation.",
+      title: "72 Hours of Democracy, What Next?",
       info: "New newsletter from Citizen Monitors",
     });
 

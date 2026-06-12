@@ -1,5 +1,5 @@
 import { sendEmail } from "../../config/email.js";
-import { newsLetterTemplateCitizenMonitors72Hours, podcastNotificationTemplate } from "../../config/emailTemplates.js";
+import { getNewsletterUnsubscribeUrl, newsLetterTemplate72HoursDemocracyWhatNext, podcastNotificationTemplate, } from "../../config/emailTemplates.js";
 import schedule from "node-schedule";
 import { utcToZonedTime } from "date-fns-tz";
 import { format } from "date-fns";
@@ -206,25 +206,26 @@ export const sendNewsletterService = async ({ recipients, scheduleTime, }) => {
         userEmails = [
             "yunusmustapha2@gmail.com",
             "citizenmonitors@yahoo.com",
-            "oluwaloninyo@yahoo.com",
+            // "oluwaloninyo@yahoo.com",
             "yunusmustapha01@yahoo.com",
         ];
-        const htmlContent = newsLetterTemplateCitizenMonitors72Hours();
-        const listUnsubscribeUrl = process.env.NEWSLETTER_UNSUBSCRIBE_URL?.trim() ||
-            "https://www.citizenmonitors.com/portal/settings/notifications";
+        const htmlContent = newsLetterTemplate72HoursDemocracyWhatNext();
+        const listUnsubscribeUrl = getNewsletterUnsubscribeUrl();
         // Send emails to all targeted users
         const emailPromises = userEmails.map((email) => sendEmail({
             to: email,
-            subject: `Citizen Monitors 72 Hours; A Weekend of Civic Engagement and National Conversation.`,
+            subject: `72 Hours of Democracy, What Next?`,
             htmlbody: htmlContent,
             listUnsubscribeUrl,
+            trackClicks: false,
+            trackOpens: false,
         }).catch((err) => {
             console.error(`Failed to send email to ${email}:`, err);
         }));
         await Promise.all(emailPromises);
         await dispatchNewsletterMobileInbox({
             recipients: normalizedRecipients,
-            title: "Citizen Monitors 72 Hours; A Weekend of Civic Engagement and National Conversation.",
+            title: "72 Hours of Democracy, What Next?",
             info: "New newsletter from Citizen Monitors",
         });
         console.log(`Newsletter sent successfully to ${userEmails.length} recipients.`);

@@ -7,6 +7,10 @@ const client = new SendMailClient({ url, token: token ?? "" });
 const htmlToPlainText = (html) => html
     .replace(/<style[\s\S]*?<\/style>/gi, " ")
     .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<a\s+[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi, (_, url, label) => {
+    const text = label.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    return text ? `${text} (${url})` : url;
+})
     .replace(/<br\s*\/?>/gi, "\n")
     .replace(/<\/p>/gi, "\n\n")
     .replace(/<\/(div|li|ul|ol|h1|h2|h3|h4|h5|h6|tr)>/gi, "\n")
@@ -56,17 +60,21 @@ export const sendEmail = async ({ to, subject, htmlbody, textbody, fromName = "C
             payload.reply_to = replyTo;
         }
         if (listUnsubscribeUrl?.trim()) {
+            const unsubscribeUrl = listUnsubscribeUrl.trim();
+            const unsubscribeMailto = process.env.NEWSLETTER_UNSUBSCRIBE_MAILTO?.trim() ||
+                (replyToAddress ? `mailto:${replyToAddress}?subject=UNSUBSCRIBE` : "");
             payload.mime_headers = {
-                "List-Unsubscribe": `<${listUnsubscribeUrl.trim()}>`,
+                "List-Unsubscribe": unsubscribeMailto
+                    ? `<${unsubscribeUrl}>, <${unsubscribeMailto}>`
+                    : `<${unsubscribeUrl}>`,
             };
             payload.track_clicks = false;
             payload.track_opens = false;
         }
         else {
-            if (trackClicks !== undefined)
-                payload.track_clicks = trackClicks;
-            if (trackOpens !== undefined)
-                payload.track_opens = trackOpens;
+            // Zepto click-tracking rewrites hrefs; that often hurts deliverability and can break links in strict clients.
+            payload.track_clicks = trackClicks ?? false;
+            payload.track_opens = trackOpens ?? false;
         }
         const response = await client.sendMail(payload);
         console.log("ZeptoMail connection verified successfully:");

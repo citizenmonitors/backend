@@ -28,6 +28,7 @@ import userRoutes from "./routes/userDashboard/userRoutes.ts";
 import adminRoutes from "./routes/adminRoutes/adminElectionRoutes.ts";
 import resourcesRoutes from "./routes/Resources/supportRoute.ts";
 import speakerSlotsRoutes from "./routes/speakerSlots.ts";
+import pvcIssuesRoutes from "./routes/pvcIssuesRoutes.ts";
 import mobileAuthRoutes from "./routes/mobile/authRoutes.ts";
 import mobileLocationRoutes from "./routes/mobile/locationRoutes.ts";
 import mobileBankRoutes from "./routes/mobile/bankRoutes.ts";
@@ -138,6 +139,7 @@ app.use("/api/dashboard", mobileDashboardRoutes);
 app.use("/api", adminRoutes);
 app.use("/api", resourcesRoutes);
 app.use("/api/speaker-slots", speakerSlotsRoutes);
+app.use("/api/pvc-issues", pvcIssuesRoutes);
 
 // Versioned API aliases for safer incremental evolution (mobile/web clients)
 app.use("/api/v1/auth", authRoutes);
@@ -151,6 +153,7 @@ app.use("/api/v1/dashboard", mobileDashboardRoutes);
 app.use("/api/v1", adminRoutes);
 app.use("/api/v1", resourcesRoutes);
 app.use("/api/v1/speaker-slots", speakerSlotsRoutes);
+app.use("/api/v1/pvc-issues", pvcIssuesRoutes);
 app.use("/api/v1/mobile/auth", mobileAuthRoutes);
 app.use("/api/v1/mobile/locations", mobileLocationRoutes);
 app.use("/api/v1/mobile/banks", mobileBankRoutes);

@@ -44,7 +44,7 @@ const baseTemplate = ({ message, buttonText, buttonLink, verifyCode }) => `
         <tr>
           <td style="font-size:13px;color:#888888;border-top:1px solid #e0e0e0;padding-top:20px;text-align:center;">
             © 2026 Citizen Monitors | 
-            <a href="https://citizenmonitors.com" style="color:#1d72b8;text-decoration:none;" target="_blank">citizenmonitors.com</a>
+            <a href="https://www.citizenmonitors.com" style="color:#1d72b8;text-decoration:underline;" target="_blank">citizenmonitors.com</a>
           </td>
         </tr>
 
@@ -207,6 +207,32 @@ export const supportRequestTemplate = (firstName, lastName, email, phoneNumber, 
                                               <p><strong>Message:</strong> ${message}</p>
 
                                             `,
+});
+export const pvcIssueAcknowledgementTemplate = ({ fullName, reportId, }) => baseTemplate({
+    title: "PVC Issue Report Received – Citizen Monitors",
+    message: `
+      <p>Dear ${fullName},</p>
+      <p>Thank you for submitting your PVC issue report. Your case has been received.</p>
+      <p><strong>Reference:</strong> ${reportId}</p>
+      <p>Warm regards,<br>Citizen Monitors</p>
+    `,
+});
+export const pvcIssueInternalNotificationTemplate = ({ reportId, fullName, phoneNumber, email, state, lga, pollingUnit, issueType, otherIssueDetail, description, evidenceCount, }) => baseTemplate({
+    title: "New PVC Issue Report – Citizen Monitors",
+    message: `
+      <p>A new PVC issue report has been submitted.</p>
+      <p><strong>Report ID:</strong> ${reportId}</p>
+      <p><strong>Full Name:</strong> ${fullName}</p>
+      <p><strong>Phone:</strong> ${phoneNumber}</p>
+      <p><strong>Email:</strong> ${email || "Not provided"}</p>
+      <p><strong>State:</strong> ${state}</p>
+      <p><strong>LGA:</strong> ${lga}</p>
+      <p><strong>Polling Unit:</strong> ${pollingUnit}</p>
+      <p><strong>Issue Type:</strong> ${issueType}</p>
+      ${otherIssueDetail ? `<p><strong>Other Detail:</strong> ${otherIssueDetail}</p>` : ""}
+      <p><strong>Description:</strong> ${description}</p>
+      <p><strong>Evidence files:</strong> ${evidenceCount}</p>
+    `,
 });
 // Speaker slot booking – confirmation to speaker (72-Hour X Space)
 export const speakerSlotConfirmationTemplate = ({ firstName, date, timeWAT, theme, sessionType }) => baseTemplate({
@@ -1695,34 +1721,59 @@ export const newsLetterTemplateCitizensGetUp = () => baseTemplate({
       </table>
       `,
 });
+const NEWSLETTER_SOCIAL_LINKS = {
+    x: "https://x.com/citizenmonitors",
+    instagram: "https://www.instagram.com/citizenmonitors",
+    facebook: "https://www.facebook.com/citizenmonitors",
+    youtube: "https://www.youtube.com/@citizenmonitors",
+};
+const DEFAULT_NEWSLETTER_UNSUBSCRIBE_URL = "https://www.citizenmonitors.com/portal/settings/notifications";
+const newsletterAnchorStyle = "color: #0066cc; text-decoration: underline; font-weight: 600;";
+export const getNewsletterUnsubscribeUrl = (unsubscribeLink) => unsubscribeLink?.trim() ||
+    process.env.NEWSLETTER_UNSUBSCRIBE_URL?.trim() ||
+    DEFAULT_NEWSLETTER_UNSUBSCRIBE_URL;
+export const newsletterPlainTextFooter = (unsubscribeLink) => {
+    const link = getNewsletterUnsubscribeUrl(unsubscribeLink);
+    const { x, instagram, facebook, youtube } = NEWSLETTER_SOCIAL_LINKS;
+    return `
+With Regards;
+Citizen Monitors.
+Guardians of Truth.
+
+Follow @CitizenMonitors:
+X: ${x}
+Instagram: ${instagram}
+Facebook: ${facebook}
+YouTube: ${youtube}
+
+You are receiving this email because you subscribed to Citizen Monitors updates.
+Unsubscribe: ${link}
+Or reply to this email with UNSUBSCRIBE.
+`.trim();
+};
 export const newsletterFooterTemplate = (unsubscribeLink) => {
-    const link = unsubscribeLink?.trim() ||
-        process.env.NEWSLETTER_UNSUBSCRIBE_URL?.trim() ||
-        "https://www.citizenmonitors.com/portal/settings/notifications";
+    const link = getNewsletterUnsubscribeUrl(unsubscribeLink);
+    const { x, instagram, facebook, youtube } = NEWSLETTER_SOCIAL_LINKS;
     return `
   <p style="margin-top: 25px;"><strong>With Regards;</strong><br>
   <strong>Citizen Monitors.</strong><br>
   <em>Guardians of Truth.</em></p>
 
-  <p style="margin-top: 15px; color: #06BBAF;">
-    📱 @CitizenMonitors —
-    <a href="https://x.com/citizenmonitors" style="color: #06BBAF; text-decoration: none;">
-      X
-    </a> |
-    <a href="https://www.instagram.com/citizenmonitors" style="color: #06BBAF; text-decoration: none;">
-      Instagram
-    </a> |
-    <a href="https://facebook.com/citizenmonitors" style="color: #06BBAF; text-decoration: none;">
-      Facebook
-    </a> |
-    <a href="https://www.youtube.com/@citizenmonitors" style="color: #06BBAF; text-decoration: none;">
-      YouTube
-    </a>
-  </p>
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top: 16px;">
+    <tr>
+      <td style="font-size: 15px; line-height: 1.9; color: #333333; font-family: Arial, sans-serif;">
+        <strong style="color: #06BBAF;">Follow @CitizenMonitors</strong> —
+        <a href="${x}" target="_blank" rel="noopener noreferrer" style="${newsletterAnchorStyle}">X</a> |
+        <a href="${instagram}" target="_blank" rel="noopener noreferrer" style="${newsletterAnchorStyle}">Instagram</a> |
+        <a href="${facebook}" target="_blank" rel="noopener noreferrer" style="${newsletterAnchorStyle}">Facebook</a> |
+        <a href="${youtube}" target="_blank" rel="noopener noreferrer" style="${newsletterAnchorStyle}">YouTube</a>
+      </td>
+    </tr>
+  </table>
 
-  <p style="margin-top: 14px; font-size: 12px; line-height: 1.6; color: #777777;">
-    You are receiving this email because you subscribed to Citizen Monitors updates.
-    <a href="${link}" style="color: #06BBAF; text-decoration: underline;">Unsubscribe from newsletters</a>
+  <p style="margin-top: 16px; font-size: 12px; line-height: 1.7; color: #666666; font-family: Arial, sans-serif;">
+    You are receiving this email because you subscribed to Citizen Monitors updates.<br>
+    <a href="${link}" target="_blank" rel="noopener noreferrer" style="${newsletterAnchorStyle}">Unsubscribe from newsletters</a>
     or reply to this email with <strong>UNSUBSCRIBE</strong>.
   </p>
 `;
@@ -2342,6 +2393,69 @@ export const newsLetterTemplateCitizenMonitors72Hours = () => baseTemplate({
                   <p>We extend our appreciation to every moderator, speaker, listener, partner, and supporter who made the May 29–31 edition a success. Your commitment demonstrates that civic engagement remains alive and that Nigerians continue to seek meaningful conversations about the future of their country.</p>
 
                   <p>The conversations may have ended for now, but the work of building a better Nigeria continues. The Citizen Monitors app drops today. Please download from Google Play store and App Store.</p>
+
+                  <p style="margin-top: 20px; font-style: italic; color: #555555;">
+                    Informing Citizens. Strengthening Democracy. Inspiring Accountability.
+                  </p>
+
+                  ${newsletterFooterTemplate()}
+
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+      </table>
+      `,
+});
+export const newsLetterTemplate72HoursDemocracyWhatNext = () => baseTemplate({
+    title: "72 Hours of Democracy, What Next?",
+    message: `
+      <table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
+        <tr>
+          <td>
+            <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 6px; overflow: hidden;">
+
+              <!-- Header -->
+              <tr>
+                <td style="background-color: #06BBAF; color: white; padding: 20px 30px; text-align: center;">
+                  <h3 style="color: #ffffff; margin: 0; font-size: 22px;">72 Hours of Democracy, What Next?</h3>
+                </td>
+              </tr>
+
+              <!-- Body -->
+              <tr>
+                <td style="padding: 30px; color: #000000; font-size: 18px; line-height: 1.7;">
+
+                  <p><strong>Dear Citizen Monitors,</strong></p>
+
+                  <p><strong>What happens after the microphones are switched off?</strong></p>
+
+                  <p>Democracy does not improve merely because conversations take place. It improves when conversations translate into action. The value of the Citizen Monitors' seventy-two-hour engagement will ultimately be measured not by the number of speakers, listeners, or trending moments; but by the impact it creates on public consciousness and civic participation.</p>
+
+                  <p>Citizens have expressed concerns about the credibility of future elections, inability of citizens to register for permanent voters cards (PVC), the growing disconnect between political leaders and the people, worsening economic realities, insecurity, and the weakening of public trust in institutions. Yet there's also a recurring message of hope; that citizens still possess the power to influence outcomes when they organise, engage, and hold leaders accountable.</p>
+
+                  <p>The challenge before Nigerians is to move from spectators to stakeholders. Democracy cannot be outsourced to politicians, electoral bodies, or civil society organisations alone. Every citizen has a role to play; whether by voting, demanding transparency, participating in community affairs, engaging elected representatives, or supporting reforms that strengthen institutions.</p>
+
+                  <p>Citizen Monitors is committed to the beginning of a larger movement. The platform has demonstrated that there is an appetite for serious, issue-based political engagement. The next phase must focus on sustaining these conversations, translating recommendations into advocacy, monitoring government performance, and building a community of informed citizens committed to democratic accountability.</p>
+
+                  <p>As Nigeria moves steadily towards the 2027 elections, the stakes could not be higher. The decisions made today will shape the quality of leadership, governance, and national development for years to come. The real test of democracy is not whether citizens can talk. It is whether they can remain engaged for months that follow.</p>
+
+                  <p>The conversation has ended, but the work has just begun.</p>
+
+                  <p>As we reflect on the successes and challenges faced during this initiative, we invite you to consider: <strong>What comes next?</strong></p>
+
+                  <h4 style="color: #06BBAF; margin-top: 20px;">Here are a few key insights:</h4>
+                  <ol style="padding-left: 20px; line-height: 1.8;">
+                    <li><strong>Sustaining Engagement:</strong> The momentum gained must not fade. We encourage all participants to stay involved in local governance and civic activities.</li>
+                    <li><strong>Feedback Mechanisms:</strong> We are establishing channels for Citizen Monitors to share their experiences and suggestions for improvement. Your voices are crucial in shaping future initiatives that may include litigations.</li>
+                    <li><strong>Upcoming Events:</strong> Stay tuned for workshops and forums designed to empower citizens with the tools needed to effect change in our communities as the Citizen Monitors App is launched.</li>
+                  </ol>
+
+                  <p>We look forward to your continued participation and insights as we strive to strengthen our democracy together.</p>
+
+                  <p>Thank you for being an essential part of this journey!</p>
 
                   <p style="margin-top: 20px; font-style: italic; color: #555555;">
                     Informing Citizens. Strengthening Democracy. Inspiring Accountability.

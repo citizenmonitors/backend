@@ -8,6 +8,7 @@ import * as NewsInsightAdminController from "../../controllers/adminController/n
 import * as PressCoverageAdminController from "../../controllers/adminController/pressCoverageAdminController.js";
 import { parseNewsPressAdminMultipart } from "../../config/electionMulter.js";
 import * as AdminSpeakerSlotsController from "../../controllers/speakerSlots/adminSpeakerSlotsController.js";
+import * as AdminPvcIssuesController from "../../controllers/pvcIssues/adminPvcIssuesController.js";
 const router = express.Router();
 router.get("/admin/", authMiddleware, isAdmin, AdminCont.getDashboardDataController);
 router.get("/admin/admins", authMiddleware, isAuthorized("getAdmins"), AdminCont.getAllAdminController);
@@ -70,5 +71,7 @@ router.get("/admin/speaker-slots/events/:eventId/slots", authMiddleware, isAdmin
 router.delete("/admin/speaker-slots/slots/:slotId", authMiddleware, isAdmin, AdminSpeakerSlotsController.deleteSlot);
 router.post("/admin/speaker-slots/events/:eventId/invites", authMiddleware, isAdmin, AdminSpeakerSlotsController.createInvites);
 router.post("/admin/speaker-slots/reminders/send", authMiddleware, isAdmin, AdminSpeakerSlotsController.sendReminders);
+router.get("/admin/pvc-issues", authMiddleware, isAdmin, AdminPvcIssuesController.listReports);
+router.get("/admin/pvc-issues/:id", authMiddleware, isAdmin, AdminPvcIssuesController.getReportById);
 export default router;
 //# sourceMappingURL=adminElectionRoutes.js.map

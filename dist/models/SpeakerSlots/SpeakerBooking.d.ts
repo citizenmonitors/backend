@@ -4,11 +4,11 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     email: string;
+    fullName: string;
     xHandle: string;
     topicAngle: string;
     slotId: mongoose.Types.ObjectId;
     inviteId: mongoose.Types.ObjectId;
-    fullName: string;
     bioLink: string;
     phone: string;
     status: "confirmed" | "cancelled" | "pending";
@@ -22,11 +22,11 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     email: string;
+    fullName: string;
     xHandle: string;
     topicAngle: string;
     slotId: mongoose.Types.ObjectId;
     inviteId: mongoose.Types.ObjectId;
-    fullName: string;
     bioLink: string;
     phone: string;
     status: "confirmed" | "cancelled" | "pending";
@@ -40,11 +40,11 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     email: string;
+    fullName: string;
     xHandle: string;
     topicAngle: string;
     slotId: mongoose.Types.ObjectId;
     inviteId: mongoose.Types.ObjectId;
-    fullName: string;
     bioLink: string;
     phone: string;
     status: "confirmed" | "cancelled" | "pending";
@@ -64,11 +64,11 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     email: string;
+    fullName: string;
     xHandle: string;
     topicAngle: string;
     slotId: mongoose.Types.ObjectId;
     inviteId: mongoose.Types.ObjectId;
-    fullName: string;
     bioLink: string;
     phone: string;
     status: "confirmed" | "cancelled" | "pending";
@@ -82,11 +82,11 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     email: string;
+    fullName: string;
     xHandle: string;
     topicAngle: string;
     slotId: mongoose.Types.ObjectId;
     inviteId: mongoose.Types.ObjectId;
-    fullName: string;
     bioLink: string;
     phone: string;
     status: "confirmed" | "cancelled" | "pending";
@@ -100,11 +100,11 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     email: string;
+    fullName: string;
     xHandle: string;
     topicAngle: string;
     slotId: mongoose.Types.ObjectId;
     inviteId: mongoose.Types.ObjectId;
-    fullName: string;
     bioLink: string;
     phone: string;
     status: "confirmed" | "cancelled" | "pending";

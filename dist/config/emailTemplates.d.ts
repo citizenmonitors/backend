@@ -61,6 +61,25 @@ export declare const emailChangeNotificationTemplate: (newEmail: string) => stri
 export declare const emailVerificationCodeTemplate: (verificationCode: string) => string;
 export declare const resendVerificationCodeTemplate: (verificationCode: string) => string;
 export declare const supportRequestTemplate: (firstName: string, lastName: string, email: string, phoneNumber: string, category: string, message: string) => string;
+type PvcIssueAcknowledgementInput = {
+    fullName: string;
+    reportId: string;
+};
+type PvcIssueInternalNotificationInput = {
+    reportId: string;
+    fullName: string;
+    phoneNumber: string;
+    email: string;
+    state: string;
+    lga: string;
+    pollingUnit: string;
+    issueType: string;
+    otherIssueDetail: string;
+    description: string;
+    evidenceCount: number;
+};
+export declare const pvcIssueAcknowledgementTemplate: ({ fullName, reportId, }: PvcIssueAcknowledgementInput) => string;
+export declare const pvcIssueInternalNotificationTemplate: ({ reportId, fullName, phoneNumber, email, state, lga, pollingUnit, issueType, otherIssueDetail, description, evidenceCount, }: PvcIssueInternalNotificationInput) => string;
 export declare const speakerSlotConfirmationTemplate: ({ firstName, date, timeWAT, theme, sessionType }: SpeakerSlotConfirmationInput) => string;
 export declare const speakerSlotInternalNotificationTemplate: ({ speakerName, xHandle, email, date, timeWAT, theme, topicAngle }: SpeakerSlotInternalNotificationInput) => string;
 export declare const speakerSlotReminder7DaysTemplate: ({ firstName, date, timeWAT, theme }: SpeakerSlotReminder7DaysInput) => string;
@@ -87,6 +106,8 @@ export declare const newsLetterTemplateAnambra2025Results: () => string;
 export declare const newsLetterTemplateUpcoming: () => string;
 export declare const newsLetterTemplateETransmission: () => string;
 export declare const newsLetterTemplateCitizensGetUp: () => string;
+export declare const getNewsletterUnsubscribeUrl: (unsubscribeLink?: string) => string;
+export declare const newsletterPlainTextFooter: (unsubscribeLink?: string) => string;
 export declare const newsletterFooterTemplate: (unsubscribeLink?: string) => string;
 export declare const newsLetterTemplateAmendedElectoralAct: () => string;
 export declare const newsLetterTemplateNigeriansOppositionSpearhead: () => string;
@@ -98,5 +119,6 @@ export declare const newsLetterTemplateNigerianVotersPartyOrPoliticianLoyalty: (
 export declare const newsLetterTemplate2027CanNigeriaBeSaved: () => string;
 export declare const newsLetterTemplatePartyPrimariesAndInsecurity: () => string;
 export declare const newsLetterTemplateCitizenMonitors72Hours: () => string;
+export declare const newsLetterTemplate72HoursDemocracyWhatNext: () => string;
 export {};
 //# sourceMappingURL=emailTemplates.d.ts.map

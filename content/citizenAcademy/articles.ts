@@ -105,7 +105,7 @@ export const CITIZEN_ACADEMY_ARTICLES: AcademyArticle[] = [
       {
         heading: "What counts as an incident",
         paragraphs: [
-          "Incidents can include violence or intimidation, ballot tampering, late opening, missing materials, underage voting, or misconduct by officials. Accurate reporting helps authorities respond and protects other voters.",
+          "Incidents can include violence or intimidation, ballot tampering, late opening, missing materials, underage voting, or misconduct by officials. Accurate reporting helps authorities respond and protects other voters. ",
         ],
       },
       {

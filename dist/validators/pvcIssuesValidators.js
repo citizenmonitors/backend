@@ -1,5 +1,5 @@
 import { body, validationResult } from "express-validator";
-import { PVC_ISSUE_TYPES } from "../models/PvcIssues/pvcIssuesReport.js";
+import { PVC_ISSUE_TYPE_OTHER, PVC_ISSUE_TYPES, } from "../models/PvcIssues/pvcIssuesReport.js";
 export const handleValidationErrors = (req, res, next) => {
     const errors = validationResult(req);
     if (errors.isEmpty())
@@ -94,7 +94,7 @@ export const submitPvcIssueValidation = [
         .isLength({ max: MAX_OTHER_DETAIL })
         .withMessage(`Other issue detail must be at most ${MAX_OTHER_DETAIL} characters`)
         .custom((value, { req }) => {
-        if (req.body.issueType === "Other" && !String(value ?? "").trim()) {
+        if (req.body.issueType === PVC_ISSUE_TYPE_OTHER && !String(value ?? "").trim()) {
             throw new Error("Please describe your issue when selecting Other");
         }
         return true;

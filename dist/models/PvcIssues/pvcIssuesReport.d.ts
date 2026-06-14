@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+/** When `issueType` is `"Other"`, submit `otherIssueDetail` (required, max 500 chars). */
+export declare const PVC_ISSUE_TYPE_OTHER = "Other";
 export declare const PVC_ISSUE_TYPES: readonly ["Marked as 'Unknown' in the voters roll despite valid registration", "PVC not available at collection centre", "PVC collection point inaccessible / unreasonably far", "Biometric data mismatch or capture failure", "Registration completed but PVC never issued", "PVC defaced or damaged", "Other"];
 export type PvcIssueType = (typeof PVC_ISSUE_TYPES)[number];
 declare const _default: mongoose.Model<{

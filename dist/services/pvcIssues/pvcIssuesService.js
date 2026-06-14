@@ -1,5 +1,5 @@
 import path from "path";
-import PvcIssuesReport from "../../models/PvcIssues/pvcIssuesReport.js";
+import PvcIssuesReport, { PVC_ISSUE_TYPE_OTHER, } from "../../models/PvcIssues/pvcIssuesReport.js";
 import { uploadFileToFirebase } from "../../config/firebaseUploader.js";
 import { sendEmail } from "../../config/email.js";
 import { pvcIssueAcknowledgementTemplate, pvcIssueInternalNotificationTemplate, } from "../../config/emailTemplates.js";
@@ -61,7 +61,9 @@ export const submitPvcIssueReport = async (data, files) => {
         lga: data.lga.trim(),
         pollingUnit: data.pollingUnit.trim(),
         issueType: data.issueType,
-        otherIssueDetail: data.issueType === "Other" ? (data.otherIssueDetail?.trim() ?? "") : "",
+        otherIssueDetail: data.issueType === PVC_ISSUE_TYPE_OTHER
+            ? (data.otherIssueDetail?.trim() ?? "")
+            : "",
         description: data.description.trim(),
         evidence,
         consentGiven: true,

@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import { fileSchema } from "../file.js";
+/** When `issueType` is `"Other"`, submit `otherIssueDetail` (required, max 500 chars). */
+export const PVC_ISSUE_TYPE_OTHER = "Other";
 export const PVC_ISSUE_TYPES = [
     "Marked as 'Unknown' in the voters roll despite valid registration",
     "PVC not available at collection centre",
@@ -7,7 +9,7 @@ export const PVC_ISSUE_TYPES = [
     "Biometric data mismatch or capture failure",
     "Registration completed but PVC never issued",
     "PVC defaced or damaged",
-    "Other",
+    PVC_ISSUE_TYPE_OTHER,
 ];
 const pvcIssuesReportSchema = new mongoose.Schema({
     fullName: { type: String, required: true, trim: true },
@@ -21,6 +23,7 @@ const pvcIssuesReportSchema = new mongoose.Schema({
         required: true,
         enum: PVC_ISSUE_TYPES,
     },
+    /** Required when issueType is "Other"; otherwise stored as empty string. */
     otherIssueDetail: { type: String, trim: true, default: "" },
     description: { type: String, required: true, trim: true },
     evidence: [fileSchema],

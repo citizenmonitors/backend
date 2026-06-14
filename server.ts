@@ -38,6 +38,7 @@ import mobileNotificationRoutes from "./routes/mobile/notificationRoutes.ts";
 import mobileDashboardRoutes from "./routes/mobile/dashboardRoutes.ts";
 import mobilePulseRoutes from "./routes/mobile/pulseRoutes.ts";
 import mobileAcademyRoutes from "./routes/mobile/academyRoutes.ts";
+import mobileFaqRoutes from "./routes/mobile/faqRoutes.ts";
 import mobileNewsInsightRoutes from "./routes/mobile/newsInsightRoutes.ts";
 import mobilePressCoverageRoutes from "./routes/mobile/pressCoverageRoutes.ts";
 import { inhouseApiAccessMiddleware } from "./middleware/inhouseApiAccessMiddleware.ts";
@@ -163,6 +164,7 @@ app.use("/api/v1/mobile/notifications", mobileNotificationRoutes);
 app.use("/api/v1/mobile/dashboard", mobileDashboardRoutes);
 app.use("/api/v1/mobile/pulse", mobilePulseRoutes);
 app.use("/api/v1/mobile/academy", mobileAcademyRoutes);
+app.use("/api/v1/mobile/faq", mobileFaqRoutes);
 app.use("/api/v1/mobile/news-insights", mobileNewsInsightRoutes);
 app.use("/api/v1/mobile/press-coverage", mobilePressCoverageRoutes);
 

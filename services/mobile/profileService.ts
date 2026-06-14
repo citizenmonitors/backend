@@ -1,5 +1,4 @@
 import path from "path";
-import { fileURLToPath } from "url";
 import type { Types } from "mongoose";
 import CompletedUser from "../../models/CompletedUser.ts";
 import ElectionData from "../../models/Election/ElectionData.ts";
@@ -17,6 +16,7 @@ import {
   resolveNestedDirectories,
 } from "../Location/locationService.ts";
 import { slugifyForLocationMatch } from "../../utils/locationNormalize.ts";
+import { projectPath } from "../../utils/projectRoot.ts";
 import { sendEmail } from "../../config/email.ts";
 import { uploadFileToFirebase } from "../../config/firebaseUploader.ts";
 import { mobileFeedbackTemplate } from "../../config/emailTemplates.ts";
@@ -93,9 +93,7 @@ const ANON_NOUNS = [
   "Sentinel",
 ];
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const locationsBaseDir = path.join(__dirname, "../../data/states");
+const locationsBaseDir = projectPath("data", "states");
 
 const getUserOrThrow = async (userId: Id) => {
   const user = await CompletedUser.findById(userId);

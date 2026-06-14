@@ -1,15 +1,12 @@
 import express from "express";
-import path from "path";
-import { fileURLToPath } from "url";
 import { readFileSync } from "fs";
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { projectPath } from "../utils/projectRoot.js";
 const router = express.Router();
 const asParamString = (value) => Array.isArray(value) ? value[0] ?? "" : value ?? "";
-const statesData = JSON.parse(readFileSync(path.join(__dirname, "../state-data/state.json"), "utf-8"));
-const statesLocalGovsData = JSON.parse(readFileSync(path.join(__dirname, "../state-data/lga.json"), "utf-8"));
-const statesLocalGovsWardsData = JSON.parse(readFileSync(path.join(__dirname, "../state-data/wards.json"), "utf-8"));
-const statesLocalGovsWardsPollingUnitsData = JSON.parse(readFileSync(path.join(__dirname, "../state-data/polling-units.json"), "utf-8"));
+const statesData = JSON.parse(readFileSync(projectPath("state-data", "state.json"), "utf-8"));
+const statesLocalGovsData = JSON.parse(readFileSync(projectPath("state-data", "lga.json"), "utf-8"));
+const statesLocalGovsWardsData = JSON.parse(readFileSync(projectPath("state-data", "wards.json"), "utf-8"));
+const statesLocalGovsWardsPollingUnitsData = JSON.parse(readFileSync(projectPath("state-data", "polling-units.json"), "utf-8"));
 const sortByString = (array, _field) => {
     return array.sort((a, b) => {
         const nameA = a ? String(a).toUpperCase() : "";

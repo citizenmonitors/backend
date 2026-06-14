@@ -8,9 +8,9 @@ import {
   findDirectoryWithPrefix,
   resolveNestedDirectories,
 } from "../../services/Location/locationService.ts";
-import { fileURLToPath } from "url";
 import { getOrSetCache } from "../../utils/cache.ts";
 import { slugifyForLocationMatch } from "../../utils/locationNormalize.ts";
+import { projectPath } from "../../utils/projectRoot.ts";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -22,9 +22,7 @@ const getErrorMessage = (error: unknown): string =>
 const asParamString = (value: string | string[] | undefined): string =>
   Array.isArray(value) ? value[0] ?? "" : value ?? "";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-global.baseDir = path.join(__dirname, "../../data/states");
+global.baseDir = projectPath("data", "states");
 
 
 /** Align URL/path segments with the same slug rules used under `data/states`. */

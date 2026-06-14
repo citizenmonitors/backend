@@ -1,11 +1,7 @@
 import express from "express";
 import type { Request, Response } from "express";
-import path from "path";
-import { fileURLToPath } from "url";
 import { readFileSync } from "fs";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { projectPath } from "../utils/projectRoot.ts";
 
 const router = express.Router();
 const asParamString = (value: string | string[] | undefined): string =>
@@ -22,19 +18,16 @@ type StateWithLgaWardsPollingUnits = {
 };
 
 const statesData = JSON.parse(
-  readFileSync(path.join(__dirname, "../state-data/state.json"), "utf-8")
+  readFileSync(projectPath("state-data", "state.json"), "utf-8")
 ) as StateOnly[];
 const statesLocalGovsData = JSON.parse(
-  readFileSync(path.join(__dirname, "../state-data/lga.json"), "utf-8")
+  readFileSync(projectPath("state-data", "lga.json"), "utf-8")
 ) as StateWithLgas[];
 const statesLocalGovsWardsData = JSON.parse(
-  readFileSync(path.join(__dirname, "../state-data/wards.json"), "utf-8")
+  readFileSync(projectPath("state-data", "wards.json"), "utf-8")
 ) as StateWithLgaWards[];
 const statesLocalGovsWardsPollingUnitsData = JSON.parse(
-  readFileSync(
-    path.join(__dirname, "../state-data/polling-units.json"),
-    "utf-8"
-  )
+  readFileSync(projectPath("state-data", "polling-units.json"), "utf-8")
 ) as StateWithLgaWardsPollingUnits[];
 
 

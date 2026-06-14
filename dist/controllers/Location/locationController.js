@@ -1,13 +1,11 @@
 import path from "path";
 import { getData, buildLocalGovernments, buildWards, buildPollingUnits, findDirectoryWithPrefix, resolveNestedDirectories, } from "../../services/Location/locationService.js";
-import { fileURLToPath } from "url";
 import { getOrSetCache } from "../../utils/cache.js";
 import { slugifyForLocationMatch } from "../../utils/locationNormalize.js";
+import { projectPath } from "../../utils/projectRoot.js";
 const getErrorMessage = (error) => error instanceof Error ? error.message : String(error);
 const asParamString = (value) => Array.isArray(value) ? value[0] ?? "" : value ?? "";
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-global.baseDir = path.join(__dirname, "../../data/states");
+global.baseDir = projectPath("data", "states");
 /** Align URL/path segments with the same slug rules used under `data/states`. */
 const normalizeName = (name) => slugifyForLocationMatch(name);
 // Helper function to transform response

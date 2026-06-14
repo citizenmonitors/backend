@@ -1,5 +1,4 @@
 import path from "path";
-import { fileURLToPath } from "url";
 import CompletedUser from "../../models/CompletedUser.js";
 import ElectionData from "../../models/Election/ElectionData.js";
 import IncidentReport from "../../models/Election/IncidentReport.js";
@@ -8,6 +7,7 @@ import observerIdModel from "../../models/observerIds/observerIdModel.js";
 import { updateUserService, volunteerToObserverService, } from "../UserDashboard/userService.js";
 import { buildPollingUnitDetails, buildWards, findDirectoryWithPrefix, resolveNestedDirectories, } from "../Location/locationService.js";
 import { slugifyForLocationMatch } from "../../utils/locationNormalize.js";
+import { projectPath } from "../../utils/projectRoot.js";
 import { sendEmail } from "../../config/email.js";
 import { uploadFileToFirebase } from "../../config/firebaseUploader.js";
 import { mobileFeedbackTemplate } from "../../config/emailTemplates.js";
@@ -32,9 +32,7 @@ const ANON_NOUNS = [
     "Voyager",
     "Sentinel",
 ];
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const locationsBaseDir = path.join(__dirname, "../../data/states");
+const locationsBaseDir = projectPath("data", "states");
 const getUserOrThrow = async (userId) => {
     const user = await CompletedUser.findById(userId);
     if (!user)

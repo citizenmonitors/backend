@@ -1,7 +1,7 @@
 import { sendEmail } from "../../config/email.ts";
 import {
   getNewsletterUnsubscribeUrl,
-  newsLetterTemplate72HoursDemocracyWhatNext,
+  newsLetterTemplateN210TrillionMissing,
   podcastNotificationTemplate,
 } from "../../config/emailTemplates.ts";
 import schedule from "node-schedule";
@@ -328,7 +328,7 @@ export const sendNewsletterService = async ({
     ];
   
 
-    const htmlContent = newsLetterTemplate72HoursDemocracyWhatNext();
+    const htmlContent = newsLetterTemplateN210TrillionMissing();
 
     const listUnsubscribeUrl = getNewsletterUnsubscribeUrl();
 
@@ -336,7 +336,7 @@ export const sendNewsletterService = async ({
     const emailPromises = userEmails.map((email) =>
       sendEmail({
         to: email,
-        subject: `72 Hours of Democracy, What Next?`,
+        subject: `Politics; Or Is N210 Trillion Really Missing?`,
         htmlbody: htmlContent,
         listUnsubscribeUrl,
         trackClicks: false,
@@ -352,7 +352,7 @@ export const sendNewsletterService = async ({
 
     await dispatchNewsletterMobileInbox({
       recipients: normalizedRecipients,
-      title: "72 Hours of Democracy, What Next?",
+      title: "Politics; Or Is N210 Trillion Really Missing?",
       info: "New newsletter from Citizen Monitors",
     });
 

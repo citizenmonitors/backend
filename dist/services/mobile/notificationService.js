@@ -1,4 +1,5 @@
 import Notification from "../../models/DailyTraffic/Notification.js";
+import { resolveNotificationDisplay } from "../../utils/notificationContent.js";
 const toStringId = (value) => String(value);
 const buildRoleRecipientFilter = (role) => ({
     $or: [
@@ -24,12 +25,15 @@ const baseVisibilityFilter = (userId, role) => ({
 const mapNotification = (row, userId) => {
     const readBy = Array.isArray(row.readBy) ? row.readBy.map(toStringId) : [];
     const isRead = readBy.includes(userId);
+    const { title, subtitle, link } = resolveNotificationDisplay(row);
     return {
         id: String(row._id),
         type: row.type ?? "general",
-        title: row.body ?? "",
-        message: row.body ?? "",
-        info: row.info ?? "",
+        title,
+        message: title,
+        info: subtitle,
+        articleSlug: link?.slug ?? null,
+        articleId: link?.articleId ?? null,
         createdAt: row.createdAt,
         isRead,
     };

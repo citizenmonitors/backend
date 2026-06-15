@@ -4,6 +4,7 @@ import AdminLog from "../../models/admin/AdminLog.ts";
 import PressCoverage from "../../models/admin/PressCoverage.ts";
 import { dispatchMobileNotification } from "../mobile/notificationDispatchService.ts";
 import { invalidateAllMobileReadCaches } from "../../utils/cache.ts";
+import { defaultNotificationSubtitle } from "../../utils/notificationContent.ts";
 
 type Id = string | Types.ObjectId;
 
@@ -124,7 +125,9 @@ export const createPressCoverageArticle = async (input: CreatePressCoverageInput
       type: "press-coverage",
       preferenceKey: "pressCoverage",
       body: title,
-      info: JSON.stringify({ slug: article.slug, articleId: String(article._id) }),
+      info: excerpt || defaultNotificationSubtitle("press-coverage"),
+      articleSlug: article.slug,
+      articleId: String(article._id),
       recipients: ["all"],
     });
   }

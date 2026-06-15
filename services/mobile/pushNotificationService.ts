@@ -1,6 +1,7 @@
 import admin from "firebase-admin";
 import "../../config/firebaseConfig.ts";
 import CompletedUser from "../../models/CompletedUser.ts";
+import { resolveNotificationDisplay } from "../../utils/notificationContent.ts";
 
 const EXPO_PUSH_URL = "https://exp.host/--/api/v2/push/send";
 const EXPO_CHUNK_SIZE = 100;
@@ -211,20 +212,25 @@ export const sendPushForMobileNotification = async (input: {
     preferenceKey?: string | null;
     body?: string | null;
     info?: string | null;
+    articleSlug?: string | null;
+    articleId?: string | null;
   };
 }): Promise<void> => {
-  const title = String(input.notification.body ?? "Citizen Monitors").trim() || "Citizen Monitors";
-  const body = String(input.notification.info ?? input.notification.body ?? "").trim() || title;
+  const { title, subtitle, link } = resolveNotificationDisplay(input.notification);
+
+  const data: Record<string, string> = {
+    notificationId: String(input.notification._id),
+    type: String(input.notification.type ?? ""),
+    preferenceKey: String(input.notification.preferenceKey ?? ""),
+  };
+
+  if (link?.slug) data.slug = link.slug;
+  if (link?.articleId) data.articleId = link.articleId;
 
   await sendPushToUserIds({
     userIds: input.userIds,
     title,
-    body,
-    data: {
-      notificationId: String(input.notification._id),
-      type: String(input.notification.type ?? ""),
-      preferenceKey: String(input.notification.preferenceKey ?? ""),
-      info: String(input.notification.info ?? ""),
-    },
+    body: subtitle,
+    data,
   });
 };

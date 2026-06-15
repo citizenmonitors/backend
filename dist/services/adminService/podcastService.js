@@ -1,5 +1,5 @@
 import { sendEmail } from "../../config/email.js";
-import { getNewsletterUnsubscribeUrl, newsLetterTemplate72HoursDemocracyWhatNext, podcastNotificationTemplate, } from "../../config/emailTemplates.js";
+import { getNewsletterUnsubscribeUrl, newsLetterTemplateN210TrillionMissing, podcastNotificationTemplate, } from "../../config/emailTemplates.js";
 import schedule from "node-schedule";
 import { utcToZonedTime } from "date-fns-tz";
 import { format } from "date-fns";
@@ -209,12 +209,12 @@ export const sendNewsletterService = async ({ recipients, scheduleTime, }) => {
             // "oluwaloninyo@yahoo.com",
             "yunusmustapha01@yahoo.com",
         ];
-        const htmlContent = newsLetterTemplate72HoursDemocracyWhatNext();
+        const htmlContent = newsLetterTemplateN210TrillionMissing();
         const listUnsubscribeUrl = getNewsletterUnsubscribeUrl();
         // Send emails to all targeted users
         const emailPromises = userEmails.map((email) => sendEmail({
             to: email,
-            subject: `72 Hours of Democracy, What Next?`,
+            subject: `Politics; Or Is N210 Trillion Really Missing?`,
             htmlbody: htmlContent,
             listUnsubscribeUrl,
             trackClicks: false,
@@ -225,7 +225,7 @@ export const sendNewsletterService = async ({ recipients, scheduleTime, }) => {
         await Promise.all(emailPromises);
         await dispatchNewsletterMobileInbox({
             recipients: normalizedRecipients,
-            title: "72 Hours of Democracy, What Next?",
+            title: "Politics; Or Is N210 Trillion Really Missing?",
             info: "New newsletter from Citizen Monitors",
         });
         console.log(`Newsletter sent successfully to ${userEmails.length} recipients.`);

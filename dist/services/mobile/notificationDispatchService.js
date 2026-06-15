@@ -73,6 +73,8 @@ export const dispatchMobileNotification = async (input) => {
         preferenceKey: input.preferenceKey,
         body: input.body,
         info: input.info,
+        articleSlug: input.articleSlug,
+        articleId: input.articleId,
         recipients: input.recipients,
         targetUsers,
     });
@@ -93,6 +95,8 @@ export const dispatchNotificationToUsers = async (input) => {
         preferenceKey: input.preferenceKey,
         body: input.body,
         info: input.info,
+        articleSlug: input.articleSlug,
+        articleId: input.articleId,
         targetUsers,
     });
     await deliverNotification(notification, targetUsers.map((id) => String(id)));

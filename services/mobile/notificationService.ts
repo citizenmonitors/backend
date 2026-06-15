@@ -1,5 +1,6 @@
 import Notification from "../../models/DailyTraffic/Notification.ts";
 import type { AuthenticatedUser } from "../../types/authenticatedRequest.ts";
+import { resolveNotificationDisplay } from "../../utils/notificationContent.ts";
 
 const toStringId = (value: unknown): string => String(value);
 
@@ -32,6 +33,8 @@ const mapNotification = (
     type?: string | null;
     body?: string | null;
     info?: string | null;
+    articleSlug?: string | null;
+    articleId?: string | null;
     createdAt?: Date;
     readBy?: unknown[];
   },
@@ -39,12 +42,15 @@ const mapNotification = (
 ) => {
   const readBy = Array.isArray(row.readBy) ? row.readBy.map(toStringId) : [];
   const isRead = readBy.includes(userId);
+  const { title, subtitle, link } = resolveNotificationDisplay(row);
   return {
     id: String(row._id),
     type: row.type ?? "general",
-    title: row.body ?? "",
-    message: row.body ?? "",
-    info: row.info ?? "",
+    title,
+    message: title,
+    info: subtitle,
+    articleSlug: link?.slug ?? null,
+    articleId: link?.articleId ?? null,
     createdAt: row.createdAt,
     isRead,
   };

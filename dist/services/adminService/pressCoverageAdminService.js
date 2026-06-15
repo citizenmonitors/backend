@@ -3,6 +3,7 @@ import AdminLog from "../../models/admin/AdminLog.js";
 import PressCoverage from "../../models/admin/PressCoverage.js";
 import { dispatchMobileNotification } from "../mobile/notificationDispatchService.js";
 import { invalidateAllMobileReadCaches } from "../../utils/cache.js";
+import { defaultNotificationSubtitle } from "../../utils/notificationContent.js";
 const requireId = (id, field) => {
     if (!id)
         throw new Error(`${field} is required`);
@@ -106,7 +107,9 @@ export const createPressCoverageArticle = async (input) => {
             type: "press-coverage",
             preferenceKey: "pressCoverage",
             body: title,
-            info: JSON.stringify({ slug: article.slug, articleId: String(article._id) }),
+            info: excerpt || defaultNotificationSubtitle("press-coverage"),
+            articleSlug: article.slug,
+            articleId: String(article._id),
             recipients: ["all"],
         });
     }

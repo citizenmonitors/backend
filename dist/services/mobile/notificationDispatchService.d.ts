@@ -5,6 +5,8 @@ export declare const dispatchMobileNotification: (input: {
     preferenceKey: MobileNotificationPreferenceKey;
     body: string;
     info?: string;
+    articleSlug?: string;
+    articleId?: string;
     recipients: RecipientRole[];
     audienceQuery?: Record<string, unknown>;
     /** When false, delivers to all matched users regardless of notification prefs (transactional). */
@@ -18,6 +20,8 @@ export declare const dispatchMobileNotification: (input: {
     info?: string | null | undefined;
     preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | "newsAndInsights" | "pressCoverage" | null | undefined;
     body?: string | null | undefined;
+    articleSlug?: string | null | undefined;
+    articleId?: string | null | undefined;
     recipients?: string[] | null | undefined;
 }> & {
     createdAt: NativeDate;
@@ -28,6 +32,8 @@ export declare const dispatchMobileNotification: (input: {
     info?: string | null | undefined;
     preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | "newsAndInsights" | "pressCoverage" | null | undefined;
     body?: string | null | undefined;
+    articleSlug?: string | null | undefined;
+    articleId?: string | null | undefined;
     recipients?: string[] | null | undefined;
 } & {
     _id: import("mongoose").Types.ObjectId;
@@ -39,6 +45,8 @@ export declare const dispatchNotificationToUsers: (input: {
     preferenceKey: MobileNotificationPreferenceKey;
     body: string;
     info?: string;
+    articleSlug?: string;
+    articleId?: string;
     userIds: Array<string>;
     respectPreferences?: boolean;
 }) => Promise<(import("mongoose").Document<unknown, {}, {
@@ -50,6 +58,8 @@ export declare const dispatchNotificationToUsers: (input: {
     info?: string | null | undefined;
     preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | "newsAndInsights" | "pressCoverage" | null | undefined;
     body?: string | null | undefined;
+    articleSlug?: string | null | undefined;
+    articleId?: string | null | undefined;
     recipients?: string[] | null | undefined;
 }> & {
     createdAt: NativeDate;
@@ -60,6 +70,8 @@ export declare const dispatchNotificationToUsers: (input: {
     info?: string | null | undefined;
     preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | "newsAndInsights" | "pressCoverage" | null | undefined;
     body?: string | null | undefined;
+    articleSlug?: string | null | undefined;
+    articleId?: string | null | undefined;
     recipients?: string[] | null | undefined;
 } & {
     _id: import("mongoose").Types.ObjectId;

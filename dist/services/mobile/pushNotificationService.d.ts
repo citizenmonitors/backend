@@ -17,6 +17,8 @@ export declare const sendPushForMobileNotification: (input: {
         preferenceKey?: string | null;
         body?: string | null;
         info?: string | null;
+        articleSlug?: string | null;
+        articleId?: string | null;
     };
 }) => Promise<void>;
 //# sourceMappingURL=pushNotificationService.d.ts.map

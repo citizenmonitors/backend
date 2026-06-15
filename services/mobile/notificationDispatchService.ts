@@ -131,6 +131,8 @@ export const dispatchMobileNotification = async (input: {
   preferenceKey: MobileNotificationPreferenceKey;
   body: string;
   info?: string;
+  articleSlug?: string;
+  articleId?: string;
   recipients: RecipientRole[];
   audienceQuery?: Record<string, unknown>;
   /** When false, delivers to all matched users regardless of notification prefs (transactional). */
@@ -153,6 +155,8 @@ export const dispatchMobileNotification = async (input: {
     preferenceKey: input.preferenceKey,
     body: input.body,
     info: input.info,
+    articleSlug: input.articleSlug,
+    articleId: input.articleId,
     recipients: input.recipients,
     targetUsers,
   });
@@ -177,6 +181,8 @@ export const dispatchNotificationToUsers = async (input: {
   preferenceKey: MobileNotificationPreferenceKey;
   body: string;
   info?: string;
+  articleSlug?: string;
+  articleId?: string;
   userIds: Array<string>;
   respectPreferences?: boolean;
 }) => {
@@ -197,6 +203,8 @@ export const dispatchNotificationToUsers = async (input: {
     preferenceKey: input.preferenceKey,
     body: input.body,
     info: input.info,
+    articleSlug: input.articleSlug,
+    articleId: input.articleId,
     targetUsers,
   });
   await deliverNotification(notification, targetUsers.map((id) => String(id)));

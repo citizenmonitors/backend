@@ -4,6 +4,7 @@ import AdminLog from "../../models/admin/AdminLog.ts";
 import NewsInsight from "../../models/admin/NewsInsight.ts";
 import { dispatchMobileNotification } from "../mobile/notificationDispatchService.ts";
 import { invalidateAllMobileReadCaches } from "../../utils/cache.ts";
+import { defaultNotificationSubtitle } from "../../utils/notificationContent.ts";
 
 type Id = string | Types.ObjectId;
 
@@ -121,7 +122,9 @@ export const createNewsInsightArticle = async (input: CreateNewsInsightInput) =>
       type: "news-insight",
       preferenceKey: "newsAndInsights",
       body: title,
-      info: JSON.stringify({ slug: article.slug, articleId: String(article._id) }),
+      info: excerpt || defaultNotificationSubtitle("news-insight"),
+      articleSlug: article.slug,
+      articleId: String(article._id),
       recipients: ["all"],
     });
   }

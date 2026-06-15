@@ -14,6 +14,8 @@ export declare const getMobileNotifications: (input: {
         title: string;
         message: string;
         info: string;
+        articleSlug: string | null;
+        articleId: string | null;
         createdAt: Date | undefined;
         isRead: boolean;
     }[];
@@ -27,6 +29,8 @@ export declare const getMobileNotificationDetail: (input: {
     title: string;
     message: string;
     info: string;
+    articleSlug: string | null;
+    articleId: string | null;
     createdAt: Date | undefined;
     isRead: boolean;
 }>;

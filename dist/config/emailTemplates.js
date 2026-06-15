@@ -2472,4 +2472,60 @@ export const newsLetterTemplate72HoursDemocracyWhatNext = () => baseTemplate({
       </table>
       `,
 });
+export const newsLetterTemplateN210TrillionMissing = () => baseTemplate({
+    title: "Politics; Or Is N210 Trillion Really Missing?",
+    message: `
+      <table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
+        <tr>
+          <td>
+            <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 6px; overflow: hidden;">
+
+              <!-- Header -->
+              <tr>
+                <td style="background-color: #06BBAF; color: white; padding: 20px 30px; text-align: center;">
+                  <h3 style="color: #ffffff; margin: 0; font-size: 22px;">Politics; Or Is N210 Trillion Really Missing?</h3>
+                </td>
+              </tr>
+
+              <!-- Body -->
+              <tr>
+                <td style="padding: 30px; color: #000000; font-size: 18px; line-height: 1.7;">
+
+                  <p><strong>Dear Citizen Monitors,</strong></p>
+
+                  <p>Nigeria never runs short of controversies. While citizens are grappling with inflation, insecurity, unemployment, and a cost-of-living crisis, the national conversation is about N210 trillion missing from NNPC.</p>
+
+                  <p>The number is staggering. It is larger than Nigeria's annual budget several times over. It is a figure that, if true, raises serious questions about public finance, governance, and accountability. Unsurprisingly, political actors have seized the moment. Accusations are flying, defences are being mounted, and social media has become a battleground of claims and counterclaims. Beyond the politics lies a more important question. What exactly is missing?</p>
+
+                  <p>Public debates in Nigeria often begin with sensational headlines and end without clarity. Figures are thrown around without sufficient explanation. Citizens are left confused, while politicians retreat into partisan camps. One side insists there has been monumental corruption; the other argues that accounting interpretations are being deliberately misrepresented for political gain. For ordinary Nigerians, however, the issue is not merely about who wins the political argument. The issue is trust.</p>
+
+                  <p>Why can't Nigerian citizens trust government institutions to provide transparent accounts of public resources? Can't oversight institutions effectively perform their duties without political interference? Can't allegations involving public funds be investigated thoroughly and independently? Most importantly, why can't Nigerians receive clear explanations that go beyond political talking points?</p>
+
+                  <p>Whether the disputed figure is N210 trillion, N21 trillion, or any other amount, citizens deserve facts, not propaganda. We deserve institutions that are strong enough to investigate allegations and transparent enough to communicate their findings. Democracy cannot function effectively when public confidence in government is constantly eroded.</p>
+
+                  <p>Unfortunately, our political culture encourages spectacle over substance. Complex financial and governance issues are reduced to partisan slogans. Supporters of political parties defend or attack, based on loyalty rather than evidence. In the process, the truth often becomes secondary.</p>
+
+                  <p>Nigeria's future depends not only on credible elections, but also on the strength of her institutions. A democracy where allegations of missing public funds cannot be independently verified or conclusively addressed, is a democracy vulnerable to cynicism and distrust.</p>
+
+                  <p>As citizens, we must resist the temptation to view every controversy through a partisan lens. Instead, we should demand transparency, accountability, and evidence. The question is not whether our preferred politicians are right or wrong, but if the institutions responsible for safeguarding public resources are working as they should.</p>
+
+                  <p>The debate over this N210 trillion will eventually fade from the headlines. Another controversy will replace it. The underlying challenge will remain: building a Nigeria where facts matter more than politics, and accountability matters more than loyalty.</p>
+
+                  <p><strong>Until then, is it politics, or is N210 Trillion really missing?</strong></p>
+
+                  <p style="margin-top: 20px; font-style: italic; color: #555555;">
+                    Informing Citizens. Strengthening Democracy. Inspiring Accountability.
+                  </p>
+
+                  ${newsletterFooterTemplate()}
+
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+      </table>
+      `,
+});
 //# sourceMappingURL=emailTemplates.js.map

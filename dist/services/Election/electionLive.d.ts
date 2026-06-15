@@ -154,6 +154,8 @@ export declare const getActivityBoardAndNotificationsService: () => Promise<{
         info?: string | null | undefined;
         preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | "newsAndInsights" | "pressCoverage" | null | undefined;
         body?: string | null | undefined;
+        articleSlug?: string | null | undefined;
+        articleId?: string | null | undefined;
         recipients?: string[] | null | undefined;
     }> & {
         _id: Types.ObjectId;

@@ -111,7 +111,6 @@ const sanitizeUser = (doc: { toObject: () => Record<string, unknown> }) => {
   return payload;
 };
 
-
 const withNotificationDefaults = (
   role: string | undefined,
   current: MobileNotificationSettings | undefined

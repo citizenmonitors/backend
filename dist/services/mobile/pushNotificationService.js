@@ -1,6 +1,7 @@
 import admin from "firebase-admin";
 import "../../config/firebaseConfig.js";
 import CompletedUser from "../../models/CompletedUser.js";
+import { resolveNotificationDisplay } from "../../utils/notificationContent.js";
 const EXPO_PUSH_URL = "https://exp.host/--/api/v2/push/send";
 const EXPO_CHUNK_SIZE = 100;
 const isTruthyEnv = (value) => value === "1" || value === "true" || value === "yes";
@@ -153,18 +154,21 @@ export const sendPushToUserIds = async (input) => {
     }
 };
 export const sendPushForMobileNotification = async (input) => {
-    const title = String(input.notification.body ?? "Citizen Monitors").trim() || "Citizen Monitors";
-    const body = String(input.notification.info ?? input.notification.body ?? "").trim() || title;
+    const { title, subtitle, link } = resolveNotificationDisplay(input.notification);
+    const data = {
+        notificationId: String(input.notification._id),
+        type: String(input.notification.type ?? ""),
+        preferenceKey: String(input.notification.preferenceKey ?? ""),
+    };
+    if (link?.slug)
+        data.slug = link.slug;
+    if (link?.articleId)
+        data.articleId = link.articleId;
     await sendPushToUserIds({
         userIds: input.userIds,
         title,
-        body,
-        data: {
-            notificationId: String(input.notification._id),
-            type: String(input.notification.type ?? ""),
-            preferenceKey: String(input.notification.preferenceKey ?? ""),
-            info: String(input.notification.info ?? ""),
-        },
+        body: subtitle,
+        data,
     });
 };
 //# sourceMappingURL=pushNotificationService.js.map

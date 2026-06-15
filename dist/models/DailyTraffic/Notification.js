@@ -39,6 +39,12 @@ const notificationSchema = new mongoose.Schema({
     info: {
         type: String,
     },
+    articleSlug: {
+        type: String,
+    },
+    articleId: {
+        type: String,
+    },
     recipients: {
         type: [String],
         enum: ["all", "super-admin", "admin", "observer", "volunteer", "public-viewer"],

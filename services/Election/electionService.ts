@@ -449,6 +449,7 @@ export const activeElections = async (
       preferenceKey: "electionDayAlert",
       body: `New election live: ${existingElection.electionName}`,
       info: `${String(startDate)} - ${String(endDate)}`,
+      activeElectionId: String(activeElection._id),
       recipients: ["observer", "volunteer", "public-viewer"],
       audienceQuery:
         ["gubernatorial", "house-of-assembly"].includes(electionType)
@@ -1070,6 +1071,7 @@ export const uploadResultDataService = async (
       preferenceKey: "pollingUnitActivity",
       body: uploadNotificationBody,
       info: uploadNotificationInfo,
+      activeElectionId: String(electionId),
       recipients: ["observer", "volunteer", "public-viewer"],
       audienceQuery: {
         state: user.state,
@@ -1084,6 +1086,7 @@ export const uploadResultDataService = async (
       preferenceKey: "resultAggregated",
       body: `${formattedElectionName} updates are being aggregated`,
       info: `${formattedStateName} • ${resultText}`,
+      activeElectionId: String(electionId),
       recipients: ["observer", "volunteer", "public-viewer"],
       audienceQuery: {
         state: user.state,
@@ -1643,6 +1646,7 @@ export const uploadIncidentReportDataService = async (
       preferenceKey: "pollingUnitActivity",
       body: `${user.role === "observer" ? "Observer" : "Volunteer"} reported an incident`,
       info: `${user.pollingUnit ?? "Polling Unit"} • ${selectIncident ?? "Incident"}`,
+      activeElectionId: String(electionId),
       recipients: ["observer", "volunteer", "public-viewer"],
       audienceQuery: {
         state: user.state,
@@ -2036,6 +2040,7 @@ export const getResultsAndPerformAction = async (
 
     type FlaggableDoc = {
       user: Types.ObjectId | string;
+      election?: Types.ObjectId | string;
       actions: ActionSubdoc[];
       flagged?: boolean;
       priorityLevel?: number;
@@ -2056,6 +2061,8 @@ export const getResultsAndPerformAction = async (
         } not found`
       );
     }
+
+    const activeElectionId = data.election ? String(data.election) : undefined;
 
     if (String(data.user) === String(userId)) {
       throw new Error("You cannot flag your own result or incident.");
@@ -2105,6 +2112,7 @@ export const getResultsAndPerformAction = async (
             preferenceKey: "reportConfirmed",
             body: "Your report/result received a confirmation.",
             info: "Another user agreed with your submission.",
+            activeElectionId,
             userIds: [String(data.user)],
           });
         } else {
@@ -2125,6 +2133,7 @@ export const getResultsAndPerformAction = async (
           preferenceKey: "reportFlagged",
           body: "Your report/result was flagged for review.",
           info: formatFlagNotificationInfo(actionData.flagReason, flagMediaEmbedded),
+          activeElectionId,
           userIds: [String(data.user)],
         });
       } else if (actionData.action === "unagree") {
@@ -2156,6 +2165,7 @@ export const getResultsAndPerformAction = async (
           preferenceKey: "reportFlagged",
           body: "Your report/result was flagged for review.",
           info: formatFlagNotificationInfo(actionData.flagReason, flagMediaEmbedded),
+          activeElectionId,
           userIds: [String(data.user)],
         });
       } else if (actionData.action === "agree") {
@@ -2164,6 +2174,7 @@ export const getResultsAndPerformAction = async (
           preferenceKey: "reportConfirmed",
           body: "Your report/result received a confirmation.",
           info: "Another user agreed with your submission.",
+          activeElectionId,
           userIds: [String(data.user)],
         });
       }
@@ -2184,15 +2195,15 @@ export const getResultsAndPerformAction = async (
     }
     if (priorityLevel >= 50) {
       data.hidden = true;
+      await dispatchMobileNotification({
+        type: "security-alert",
+        preferenceKey: "securityAlerts",
+        body: "Result flagged above 50% threshold.",
+        info: `Polling Unit: ${user.pollingUnit}, Priority Level: ${priorityLevel}%`,
+        activeElectionId,
+        recipients: ["admin", "super-admin"],
+      });
     }
-
-    await dispatchMobileNotification({
-      type: "security-alert",
-      preferenceKey: "securityAlerts",
-      body: "Result flagged above 50% threshold.",
-      info: `Polling Unit: ${user.pollingUnit}, Priority Level: ${priorityLevel}%`,
-      recipients: ["admin", "super-admin"],
-    });
 
     // Save the updated election result or incident report
     await data.save();

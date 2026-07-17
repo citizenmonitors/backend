@@ -1,5 +1,6 @@
 import CompletedUser from "../../models/CompletedUser.ts";
 import Notification from "../../models/DailyTraffic/Notification.ts";
+import { isActiveElectionConcludedById } from "../../utils/electionNotificationVisibility.ts";
 import { invalidateAllMobileReadCaches } from "../../utils/cache.ts";
 import { getSocketServer } from "../realtime/socketBus.ts";
 import { userRoomName } from "../realtime/socketServer.ts";
@@ -133,11 +134,19 @@ export const dispatchMobileNotification = async (input: {
   info?: string;
   articleSlug?: string;
   articleId?: string;
+  activeElectionId?: string;
   recipients: RecipientRole[];
   audienceQuery?: Record<string, unknown>;
   /** When false, delivers to all matched users regardless of notification prefs (transactional). */
   respectPreferences?: boolean;
 }) => {
+  if (
+    input.activeElectionId &&
+    (await isActiveElectionConcludedById(input.activeElectionId))
+  ) {
+    return null;
+  }
+
   const respectPreferences = input.respectPreferences ?? true;
   const users = await CompletedUser.find(
     { ...roleFilter(input.recipients), ...(input.audienceQuery ?? {}) },
@@ -157,6 +166,7 @@ export const dispatchMobileNotification = async (input: {
     info: input.info,
     articleSlug: input.articleSlug,
     articleId: input.articleId,
+    activeElectionId: input.activeElectionId,
     recipients: input.recipients,
     targetUsers,
   });
@@ -183,11 +193,19 @@ export const dispatchNotificationToUsers = async (input: {
   info?: string;
   articleSlug?: string;
   articleId?: string;
+  activeElectionId?: string;
   userIds: Array<string>;
   respectPreferences?: boolean;
 }) => {
   const ids = Array.from(new Set(input.userIds.filter(Boolean)));
   if (ids.length === 0) return null;
+
+  if (
+    input.activeElectionId &&
+    (await isActiveElectionConcludedById(input.activeElectionId))
+  ) {
+    return null;
+  }
 
   const respectPreferences = input.respectPreferences ?? true;
   const users = await CompletedUser.find(
@@ -205,6 +223,7 @@ export const dispatchNotificationToUsers = async (input: {
     info: input.info,
     articleSlug: input.articleSlug,
     articleId: input.articleId,
+    activeElectionId: input.activeElectionId,
     targetUsers,
   });
   await deliverNotification(notification, targetUsers.map((id) => String(id)));

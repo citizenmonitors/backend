@@ -1,9 +1,7 @@
 import type { Request, Response } from "express";
 import {
-  registerUser,
   verifyUserEmail,
   resendTokenService,
-  selectUserRole,
   submitRoleFormDetails,
   authenticateUser,
   generateResetToken,
@@ -11,7 +9,7 @@ import {
   validateTokenService,
   submitObserverDetails,
 } from "../services/authService.ts";
-import type { Types } from "mongoose";
+import { mobileRegister, mobileSelectRole } from "../services/mobile/authService.ts";
 type MulterLikeFile = {
   buffer: Buffer;
   mimetype: string;
@@ -23,19 +21,27 @@ type RequestWithUploads = Request & {
   file?: MulterLikeFile;
   files?: Record<string, MulterLikeFile[]>;
 };
-type AuthResponseUser = {
-  _id?: Types.ObjectId | string;
-  email?: string;
-  role?: string | null;
-  [key: string]: unknown;
-};
 
 const getErrorMessage = (error: unknown): string =>
   error instanceof Error ? error.message : String(error);
 
+const getClientMeta = (req: Request) => ({
+  platform: req.body.platform ?? "web",
+  deviceId: req.body.deviceId,
+  appVersion: req.body.appVersion,
+  pushToken: req.body.pushToken,
+});
+
 export const register = async (req: Request, res: Response) => {
   try {
-    await registerUser(req.body);
+    await mobileRegister(
+      {
+        email: req.body.email,
+        password: req.body.password,
+        confirmPassword: req.body.confirmPassword,
+      },
+      getClientMeta(req)
+    );
     res.status(201).json({
       message:
         "Registration successful! Please check your email for the verification code."
@@ -67,26 +73,8 @@ export const resendToken = async (req: Request, res: Response) => {
 export const pickRole = async (req: Request, res: Response) => {
   try {
     const { email, role } = req.body;
-
-    const result = await selectUserRole(email, role);
-
-    const respone: {
-      message: string;
-      token?: string;
-      user?: AuthResponseUser;
-    } = {
-      message: result.message,
-    };
-
-    if (result.token){
-      respone.token = result.token
-    }
-
-    if (result.user){
-      respone.user = result.user;
-    }
-
-    res.status(200).json(respone);
+    const result = await mobileSelectRole(email, role);
+    res.status(200).json(result);
   } catch (err) {
     return res.status(400).json({ message: getErrorMessage(err) });
   }

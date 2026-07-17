@@ -1,8 +1,9 @@
 import express from "express";
 import { authMiddleware } from "../../middleware/authMiddleware.js";
 import { getActiveElectionsMobile, getMyElectionSubmissionMobile, submitElectionResultMobile, updateElectionResultMobile, deleteElectionResultMobile, submitIncidentReportMobile, updateIncidentReportMobile, deleteIncidentReportMobile, getLiveElectionsCarouselMobile, } from "../../controllers/mobile/electionController.js";
-import { uploadCollationDiscussionFiles, uploadReportDataFiles, uploadResultDataFiles, uploadFlagEvidenceFiles, } from "../../config/electionMulter.js";
-import { getMobileCollation, postMobileCollationUserAction, getReportThreadCommentsMobile, postReportThreadCommentMobile, postReportCommentLikeMobile, getDiscussionPostsMobile, postDiscussionPostMobile, postDiscussionPostLikeMobile, getDiscussionPostCommentsMobile, postDiscussionPostCommentMobile, postDiscussionPostCommentLikeMobile, } from "../../controllers/mobile/collationController.js";
+import { uploadReportDataFiles, uploadResultDataFiles, uploadFlagEvidenceFiles, } from "../../config/electionMulter.js";
+import { getMobileCollation, postMobileCollationUserAction, } from "../../controllers/mobile/collationController.js";
+import collationDiscussionRoutes from "../collationDiscussionRoutes.js";
 const router = express.Router();
 // GET /api/v1/mobile/elections/active?status=live|upcoming|concluded&scope=all|polling-unit
 router.get("/active", authMiddleware, getActiveElectionsMobile);
@@ -73,27 +74,6 @@ router.post("/:activeElectionId/collation/user-action", authMiddleware, (req, re
         next();
     });
 }, postMobileCollationUserAction);
-// Threaded comments on a specific result (election-result) or incident (incident-report)
-router.get("/:activeElectionId/report-thread/:targetType/:targetId/comments", authMiddleware, getReportThreadCommentsMobile);
-router.post("/:activeElectionId/report-thread/:targetType/:targetId/comments", authMiddleware, postReportThreadCommentMobile);
-router.post("/:activeElectionId/report-thread/comments/:commentId/like", authMiddleware, postReportCommentLikeMobile);
-// Election-level discussion feed (Figma "Discussions" tab)
-router.get("/:activeElectionId/discussion/posts", authMiddleware, getDiscussionPostsMobile);
-router.post("/:activeElectionId/discussion/posts", authMiddleware, (req, res, next) => {
-    uploadCollationDiscussionFiles(req, res, (err) => {
-        if (err) {
-            const message = err instanceof Error ? err.message : String(err);
-            return res.status(400).json({
-                message: "Discussion media upload error",
-                error: message,
-            });
-        }
-        next();
-    });
-}, postDiscussionPostMobile);
-router.post("/:activeElectionId/discussion/posts/:postId/like", authMiddleware, postDiscussionPostLikeMobile);
-router.get("/:activeElectionId/discussion/posts/:postId/comments", authMiddleware, getDiscussionPostCommentsMobile);
-router.post("/:activeElectionId/discussion/posts/:postId/comments", authMiddleware, postDiscussionPostCommentMobile);
-router.post("/:activeElectionId/discussion/posts/:postId/comments/:commentId/like", authMiddleware, postDiscussionPostCommentLikeMobile);
+router.use(collationDiscussionRoutes);
 export default router;
 //# sourceMappingURL=electionRoutes.js.map

@@ -36,6 +36,12 @@ import {
   uploadFlagEvidenceFiles,
 } from "../../config/electionMulter.ts";
 import { getActivityBoardAndNotifications, getLiveElectionDetails, getOngoingElections } from "../../controllers/Election/electionLive.ts";
+import {
+  getMobileCollation,
+  postMobileCollationUserAction,
+} from "../../controllers/mobile/collationController.ts";
+import { getMyElectionSubmissionMobile } from "../../controllers/mobile/electionController.ts";
+import collationDiscussionRoutes from "../collationDiscussionRoutes.ts";
 
 const router = express.Router();
 const runMulter = (
@@ -209,5 +215,28 @@ router.post("/flag-action", authMiddleware, checkUserStatusForFlagController);
 router.get("/live-results/:electionId", authMiddleware, getLiveElectionDetails);
 router.get("/live-result", authMiddleware, getOngoingElections);
 router.get("/activity-board", authMiddleware, getActivityBoardAndNotifications);
+
+// Collation + discussion (activeElectionId = ActiveElection._id; same paths as mobile under /elections)
+router.get(
+  "/:activeElectionId/my-submission",
+  authMiddleware,
+  getMyElectionSubmissionMobile
+);
+router.get("/:activeElectionId/collation", authMiddleware, getMobileCollation);
+router.post(
+  "/:activeElectionId/collation/user-action",
+  authMiddleware,
+  (req: Request, res: Response, next: NextFunction) => {
+    runMulter(
+      uploadFlagEvidenceFiles,
+      req,
+      res,
+      next,
+      "Flag evidence upload Multer error"
+    );
+  },
+  postMobileCollationUserAction
+);
+router.use(collationDiscussionRoutes);
 
 export default router;

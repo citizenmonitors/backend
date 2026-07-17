@@ -5,4 +5,6 @@ export declare const mobilePollingUnitLookupValidation: import("express-validato
 export declare const mobileFeedbackValidation: import("express-validator").ValidationChain[];
 export declare const mobileObserverDataValidation: import("express-validator").ValidationChain[];
 export declare const mobileAnonymousIdentityToggleValidation: import("express-validator").ValidationChain[];
+export declare const profileEmailUpdateValidation: import("express-validator").ValidationChain[];
+export declare const profileVerifyEmailValidation: import("express-validator").ValidationChain[];
 //# sourceMappingURL=profileValidators.d.ts.map

@@ -1,5 +1,6 @@
 import CompletedUser from "../../models/CompletedUser.js";
 import Notification from "../../models/DailyTraffic/Notification.js";
+import { isActiveElectionConcludedById } from "../../utils/electionNotificationVisibility.js";
 import { invalidateAllMobileReadCaches } from "../../utils/cache.js";
 import { getSocketServer } from "../realtime/socketBus.js";
 import { userRoomName } from "../realtime/socketServer.js";
@@ -62,6 +63,10 @@ const filterUsersByPreference = (users, preferenceKey, respectPreferences) => {
         .map((user) => user._id);
 };
 export const dispatchMobileNotification = async (input) => {
+    if (input.activeElectionId &&
+        (await isActiveElectionConcludedById(input.activeElectionId))) {
+        return null;
+    }
     const respectPreferences = input.respectPreferences ?? true;
     const users = await CompletedUser.find({ ...roleFilter(input.recipients), ...(input.audienceQuery ?? {}) }, "_id role notifications.mobile").lean();
     const targetUsers = filterUsersByPreference(users, input.preferenceKey, respectPreferences);
@@ -75,6 +80,7 @@ export const dispatchMobileNotification = async (input) => {
         info: input.info,
         articleSlug: input.articleSlug,
         articleId: input.articleId,
+        activeElectionId: input.activeElectionId,
         recipients: input.recipients,
         targetUsers,
     });
@@ -85,6 +91,10 @@ export const dispatchNotificationToUsers = async (input) => {
     const ids = Array.from(new Set(input.userIds.filter(Boolean)));
     if (ids.length === 0)
         return null;
+    if (input.activeElectionId &&
+        (await isActiveElectionConcludedById(input.activeElectionId))) {
+        return null;
+    }
     const respectPreferences = input.respectPreferences ?? true;
     const users = await CompletedUser.find({ _id: { $in: ids } }, "_id role notifications.mobile").lean();
     const targetUsers = filterUsersByPreference(users, input.preferenceKey, respectPreferences);
@@ -97,6 +107,7 @@ export const dispatchNotificationToUsers = async (input) => {
         info: input.info,
         articleSlug: input.articleSlug,
         articleId: input.articleId,
+        activeElectionId: input.activeElectionId,
         targetUsers,
     });
     await deliverNotification(notification, targetUsers.map((id) => String(id)));

@@ -20,11 +20,6 @@ export declare const createPressCoverageArticle: (input: CreatePressCoverageInpu
 } & {
     slug: string;
     title: string;
-    content: string;
-    thumbnailURL: string;
-    publishedAt: NativeDate;
-    isPublished: boolean;
-    createdBy: Types.ObjectId;
     likes: Types.DocumentArray<{
         user: Types.ObjectId;
     }, Types.Subdocument<Types.ObjectId, any, {
@@ -32,8 +27,13 @@ export declare const createPressCoverageArticle: (input: CreatePressCoverageInpu
     }> & {
         user: Types.ObjectId;
     }>;
-    heroImageURL?: string | null | undefined;
+    content: string;
+    publishedAt: NativeDate;
+    isPublished: boolean;
+    createdBy: Types.ObjectId;
+    thumbnailURL: string;
     excerpt?: string | null | undefined;
+    heroImageURL?: string | null | undefined;
     dateline?: string | null | undefined;
 } & {
     _id: Types.ObjectId;
@@ -52,11 +52,6 @@ export declare const listPressCoverageForAdmin: (input?: {
         updatedAt: NativeDate;
         slug: string;
         title: string;
-        content: string;
-        thumbnailURL: string;
-        publishedAt: NativeDate;
-        isPublished: boolean;
-        createdBy: Types.ObjectId;
         likes: Types.DocumentArray<{
             user: Types.ObjectId;
         } | {
@@ -76,8 +71,13 @@ export declare const listPressCoverageForAdmin: (input?: {
             _id: string;
             __v: number;
         })>;
-        heroImageURL?: string | null | undefined;
+        content: string;
+        publishedAt: NativeDate;
+        isPublished: boolean;
+        createdBy: Types.ObjectId;
+        thumbnailURL: string;
         excerpt?: string | null | undefined;
+        heroImageURL?: string | null | undefined;
         dateline?: string | null | undefined;
     }> & {
         _id: Types.ObjectId;
@@ -90,11 +90,6 @@ export declare const getPressCoverageByIdForAdmin: (articleId: string) => Promis
     updatedAt: NativeDate;
     slug: string;
     title: string;
-    content: string;
-    thumbnailURL: string;
-    publishedAt: NativeDate;
-    isPublished: boolean;
-    createdBy: Types.ObjectId;
     likes: Types.DocumentArray<{
         user: Types.ObjectId;
     } | {
@@ -114,8 +109,13 @@ export declare const getPressCoverageByIdForAdmin: (articleId: string) => Promis
         _id: string;
         __v: number;
     })>;
-    heroImageURL?: string | null | undefined;
+    content: string;
+    publishedAt: NativeDate;
+    isPublished: boolean;
+    createdBy: Types.ObjectId;
+    thumbnailURL: string;
     excerpt?: string | null | undefined;
+    heroImageURL?: string | null | undefined;
     dateline?: string | null | undefined;
 }> & {
     _id: Types.ObjectId;

@@ -5,4 +5,3 @@ export const generateToken = (payload: Record<string, unknown>): string => {
     algorithm: "HS256",
   });
 };
-

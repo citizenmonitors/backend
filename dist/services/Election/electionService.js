@@ -237,6 +237,7 @@ export const activeElections = async (data, adminId) => {
             preferenceKey: "electionDayAlert",
             body: `New election live: ${existingElection.electionName}`,
             info: `${String(startDate)} - ${String(endDate)}`,
+            activeElectionId: String(activeElection._id),
             recipients: ["observer", "volunteer", "public-viewer"],
             audienceQuery: ["gubernatorial", "house-of-assembly"].includes(electionType)
                 ? { state: { $in: locations } }
@@ -677,6 +678,7 @@ export const uploadResultDataService = async (electionId, userId, data, files) =
             preferenceKey: "pollingUnitActivity",
             body: uploadNotificationBody,
             info: uploadNotificationInfo,
+            activeElectionId: String(electionId),
             recipients: ["observer", "volunteer", "public-viewer"],
             audienceQuery: {
                 state: user.state,
@@ -690,6 +692,7 @@ export const uploadResultDataService = async (electionId, userId, data, files) =
             preferenceKey: "resultAggregated",
             body: `${formattedElectionName} updates are being aggregated`,
             info: `${formattedStateName} • ${resultText}`,
+            activeElectionId: String(electionId),
             recipients: ["observer", "volunteer", "public-viewer"],
             audienceQuery: {
                 state: user.state,
@@ -1102,6 +1105,7 @@ export const uploadIncidentReportDataService = async (electionId, userId, data, 
             preferenceKey: "pollingUnitActivity",
             body: `${user.role === "observer" ? "Observer" : "Volunteer"} reported an incident`,
             info: `${user.pollingUnit ?? "Polling Unit"} • ${selectIncident ?? "Incident"}`,
+            activeElectionId: String(electionId),
             recipients: ["observer", "volunteer", "public-viewer"],
             audienceQuery: {
                 state: user.state,
@@ -1368,6 +1372,7 @@ export const getResultsAndPerformAction = async (userId, actionData, flagMediaFi
                 ? "Election result"
                 : "Incident report"} not found`);
         }
+        const activeElectionId = data.election ? String(data.election) : undefined;
         if (String(data.user) === String(userId)) {
             throw new Error("You cannot flag your own result or incident.");
         }
@@ -1404,6 +1409,7 @@ export const getResultsAndPerformAction = async (userId, actionData, flagMediaFi
                         preferenceKey: "reportConfirmed",
                         body: "Your report/result received a confirmation.",
                         info: "Another user agreed with your submission.",
+                        activeElectionId,
                         userIds: [String(data.user)],
                     });
                 }
@@ -1426,6 +1432,7 @@ export const getResultsAndPerformAction = async (userId, actionData, flagMediaFi
                     preferenceKey: "reportFlagged",
                     body: "Your report/result was flagged for review.",
                     info: formatFlagNotificationInfo(actionData.flagReason, flagMediaEmbedded),
+                    activeElectionId,
                     userIds: [String(data.user)],
                 });
             }
@@ -1460,6 +1467,7 @@ export const getResultsAndPerformAction = async (userId, actionData, flagMediaFi
                     preferenceKey: "reportFlagged",
                     body: "Your report/result was flagged for review.",
                     info: formatFlagNotificationInfo(actionData.flagReason, flagMediaEmbedded),
+                    activeElectionId,
                     userIds: [String(data.user)],
                 });
             }
@@ -1469,6 +1477,7 @@ export const getResultsAndPerformAction = async (userId, actionData, flagMediaFi
                     preferenceKey: "reportConfirmed",
                     body: "Your report/result received a confirmation.",
                     info: "Another user agreed with your submission.",
+                    activeElectionId,
                     userIds: [String(data.user)],
                 });
             }
@@ -1486,14 +1495,15 @@ export const getResultsAndPerformAction = async (userId, actionData, flagMediaFi
         }
         if (priorityLevel >= 50) {
             data.hidden = true;
+            await dispatchMobileNotification({
+                type: "security-alert",
+                preferenceKey: "securityAlerts",
+                body: "Result flagged above 50% threshold.",
+                info: `Polling Unit: ${user.pollingUnit}, Priority Level: ${priorityLevel}%`,
+                activeElectionId,
+                recipients: ["admin", "super-admin"],
+            });
         }
-        await dispatchMobileNotification({
-            type: "security-alert",
-            preferenceKey: "securityAlerts",
-            body: "Result flagged above 50% threshold.",
-            info: `Polling Unit: ${user.pollingUnit}, Priority Level: ${priorityLevel}%`,
-            recipients: ["admin", "super-admin"],
-        });
         // Save the updated election result or incident report
         await data.save();
         // Fetch and return the updated results and reports

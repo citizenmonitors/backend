@@ -10,3 +10,4 @@ electionsIncident
 config/firebaseServiceAccountKey.json
 *-service-account*.json
 *.pem
+backups/

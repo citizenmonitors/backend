@@ -7,6 +7,7 @@ import PulsePost from "../../models/Pulse/PulsePost.js";
 import PulseComment from "../../models/Pulse/PulseComment.js";
 import { getMobileLiveElectionsCarousel } from "./electionService.js";
 import { getOrSetCache } from "../../utils/cache.js";
+import { buildHideConcludedElectionNotificationsFilter } from "../../utils/electionNotificationVisibility.js";
 import { countCommentsForArticles } from "./newsInsightEngagementService.js";
 import { countCommentsForPressCoverageArticles } from "./pressCoverageService.js";
 const roleVisibilityFilter = (userId, role) => ({
@@ -97,20 +98,26 @@ const buildMobileDashboard = async (user) => {
     const liveElections = await getMobileLiveElectionsCarousel(user);
     const liveIds = liveElections.map((e) => e.id);
     const pulseVisibility = buildPulseVisibilityFilter(user);
+    const concludedElectionNotificationFilter = await buildHideConcludedElectionNotificationsFilter();
     const [electionNotifications, discussionPosts, pulsePosts, insights, pressCoverageFeed] = await Promise.all([
         Notification.find({
-            ...roleVisibilityFilter(userId, role),
-            type: {
-                $in: [
-                    "election-day-alert",
-                    "result-aggregated",
-                    "result-upload",
-                    "incident-upload",
-                    "report-confirmed",
-                    "report-flagged",
-                    "security-alert",
-                ],
-            },
+            $and: [
+                roleVisibilityFilter(userId, role),
+                concludedElectionNotificationFilter,
+                {
+                    type: {
+                        $in: [
+                            "election-day-alert",
+                            "result-aggregated",
+                            "result-upload",
+                            "incident-upload",
+                            "report-confirmed",
+                            "report-flagged",
+                            "security-alert",
+                        ],
+                    },
+                },
+            ],
         })
             .sort({ createdAt: -1 })
             .limit(20)

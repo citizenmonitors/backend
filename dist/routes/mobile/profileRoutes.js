@@ -1,12 +1,17 @@
 import express from "express";
 import { authMiddleware } from "../../middleware/authMiddleware.js";
 import { handleValidationErrors } from "../../validators/authValidators.js";
+import { deleteUser, resendToken, updateUserEmailCon, verifyEmail, } from "../../controllers/UserDashboard/userController.js";
 import { getElectionVaultMobile, generateAnonymousUsernameMobile, getMyProfileMobile, getNotificationSettingsMobile, locatePollingUnitMobile, publicViewerToVolunteerMobile, submitFeedbackMobile, setAnonymousIdentityToggleMobile, upsertObserverDataMobile, updateMyPasswordMobile, updateMyProfileMobile, updateNotificationSettingsMobile, volunteerToObserverMobile, } from "../../controllers/mobile/profileController.js";
-import { mobileFeedbackValidation, mobileAnonymousIdentityToggleValidation, mobileNotificationUpdateValidation, mobileObserverDataValidation, mobilePollingUnitLookupValidation, mobileUpdatePasswordValidation, } from "../../validators/mobile/profileValidators.js";
+import { mobileFeedbackValidation, mobileAnonymousIdentityToggleValidation, mobileNotificationUpdateValidation, mobileObserverDataValidation, mobilePollingUnitLookupValidation, mobileUpdatePasswordValidation, profileEmailUpdateValidation, profileVerifyEmailValidation, } from "../../validators/mobile/profileValidators.js";
 const router = express.Router();
 router.get("/me", authMiddleware, getMyProfileMobile);
 router.put("/me", authMiddleware, ...updateMyProfileMobile);
 router.put("/me/password", authMiddleware, mobileUpdatePasswordValidation, handleValidationErrors, updateMyPasswordMobile);
+router.put("/me/email", authMiddleware, profileEmailUpdateValidation, handleValidationErrors, updateUserEmailCon);
+router.post("/me/email/verify", authMiddleware, profileVerifyEmailValidation, handleValidationErrors, verifyEmail);
+router.post("/me/email/resend", authMiddleware, resendToken);
+router.delete("/me", authMiddleware, deleteUser);
 router.put("/upgrade/volunteer-to-observer", authMiddleware, ...volunteerToObserverMobile);
 router.put("/observer-data", authMiddleware, mobileObserverDataValidation, handleValidationErrors, ...upsertObserverDataMobile);
 router.put("/upgrade/public-viewer-to-volunteer", authMiddleware, publicViewerToVolunteerMobile);

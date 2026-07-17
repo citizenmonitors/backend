@@ -1,8 +1,19 @@
-import { registerUser, verifyUserEmail, resendTokenService, selectUserRole, submitRoleFormDetails, authenticateUser, generateResetToken, resetUserPassword, validateTokenService, submitObserverDetails, } from "../services/authService.js";
+import { verifyUserEmail, resendTokenService, submitRoleFormDetails, authenticateUser, generateResetToken, resetUserPassword, validateTokenService, submitObserverDetails, } from "../services/authService.js";
+import { mobileRegister, mobileSelectRole } from "../services/mobile/authService.js";
 const getErrorMessage = (error) => error instanceof Error ? error.message : String(error);
+const getClientMeta = (req) => ({
+    platform: req.body.platform ?? "web",
+    deviceId: req.body.deviceId,
+    appVersion: req.body.appVersion,
+    pushToken: req.body.pushToken,
+});
 export const register = async (req, res) => {
     try {
-        await registerUser(req.body);
+        await mobileRegister({
+            email: req.body.email,
+            password: req.body.password,
+            confirmPassword: req.body.confirmPassword,
+        }, getClientMeta(req));
         res.status(201).json({
             message: "Registration successful! Please check your email for the verification code."
         });
@@ -33,17 +44,8 @@ export const resendToken = async (req, res) => {
 export const pickRole = async (req, res) => {
     try {
         const { email, role } = req.body;
-        const result = await selectUserRole(email, role);
-        const respone = {
-            message: result.message,
-        };
-        if (result.token) {
-            respone.token = result.token;
-        }
-        if (result.user) {
-            respone.user = result.user;
-        }
-        res.status(200).json(respone);
+        const result = await mobileSelectRole(email, role);
+        res.status(200).json(result);
     }
     catch (err) {
         return res.status(400).json({ message: getErrorMessage(err) });

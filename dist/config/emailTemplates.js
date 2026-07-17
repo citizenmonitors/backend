@@ -78,6 +78,70 @@ export const passwordResetOtpTemplate = (otp) => baseTemplate({
     message: `You requested a password reset for your <b>Citizen Monitors</b> account. Enter this one-time code in the app. It expires in <b>5 minutes</b>.<br><br>`,
     verifyCode: otp,
 });
+export const newsLetterTemplatePvcReportChallenges = () => baseTemplate({
+    title: "PVC Registration Help: Report Your Challenges",
+    message: `
+      <table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
+        <tr>
+          <td>
+            <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 6px; overflow: hidden;">
+
+              <!-- Header -->
+              <tr>
+                <td style="background-color: #06BBAF; color: white; padding: 20px 30px; text-align: center;">
+                  <h3 style="color: #ffffff; margin: 0; font-size: 22px;">PVC Registration Help: Report Your Challenges</h3>
+                </td>
+              </tr>
+
+              <!-- Body -->
+              <tr>
+                <td style="padding: 30px; color: #000000; font-size: 18px; line-height: 1.7;">
+
+                  <p><strong>Dear Citizen Monitors,</strong></p>
+
+                  <p>As preparations for future elections continue, it is important that every eligible Nigerian is able to register for, and obtain a Permanent Voter’s Card (PVC) without unnecessary obstacles.</p>
+
+                  <p>If you are experiencing any challenges with PVC registration, transfer, replacement, collection, or any other voter registration-related issue; we encourage you to report your experience through the link below:</p>
+
+                  <p style="margin-top: 18px;">
+                    <a href="https://www.citizenmonitors.com/pvc-report" target="_blank" rel="noopener noreferrer" style="color: #06BBAF; text-decoration: underline; font-weight: 700;">
+                      https://www.citizenmonitors.com/pvc-report
+                    </a>
+                  </p>
+
+                  <p>When reporting your challenge, please provide as much detail as possible, including:</p>
+
+                  <ul style="padding-left: 22px; line-height: 1.9;">
+                    <li>Your state and local government area</li>
+                    <li>The registration centre involved</li>
+                    <li>The nature of the challenge encountered</li>
+                    <li>Date and time of the incident</li>
+                    <li>Any supporting evidence, where available</li>
+                  </ul>
+
+                  <p>Your reports will help Citizen Monitors document citizens’ experiences, identify recurring challenges, and possibly institute a class action, advocating for improvements in the voter registration process.</p>
+
+                  <p>Democracy works best when citizens participate. Your voice and your vote matter.</p>
+
+                  <p>Thank you for being part of the movement for transparent, inclusive, and credible elections in Nigeria.</p>
+
+                  <p style="margin-top: 18px;">
+                    <strong>Kind regards,</strong><br>
+                    <strong>Citizen Monitors.</strong><br>
+                    <em>Promoting Transparency, Accountability, Democratic Participation, and Informed Public Discourse.</em>
+                  </p>
+
+                  ${newsletterFooterTemplate()}
+
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+      </table>
+      `,
+});
 export const mobileFeedbackTemplate = (email, title, message) => baseTemplate({
     title: "New Mobile Feedback - Citizen Monitors",
     message: `
@@ -2515,6 +2579,247 @@ export const newsLetterTemplateN210TrillionMissing = () => baseTemplate({
 
                   <p style="margin-top: 20px; font-style: italic; color: #555555;">
                     Informing Citizens. Strengthening Democracy. Inspiring Accountability.
+                  </p>
+
+                  ${newsletterFooterTemplate()}
+
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+      </table>
+      `,
+});
+export const newsLetterTemplateNigerianJudiciaryComeOutside = () => baseTemplate({
+    title: "Nigerian Judiciary, Come Outside.",
+    message: `
+      <table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
+        <tr>
+          <td>
+            <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 6px; overflow: hidden;">
+
+              <!-- Header -->
+              <tr>
+                <td style="background-color: #06BBAF; color: white; padding: 20px 30px; text-align: center;">
+                  <h3 style="color: #ffffff; margin: 0; font-size: 22px;">Nigerian Judiciary, Come Outside.</h3>
+                </td>
+              </tr>
+
+              <!-- Body -->
+              <tr>
+                <td style="padding: 30px; color: #000000; font-size: 18px; line-height: 1.7;">
+
+                  <p><strong>Dear Citizen Monitors,</strong></p>
+
+                  <p>For every democracy to survive, citizens must trust that justice is predictable, impartial and rooted in law. Unfortunately, many Nigerians are increasingly confronted with a troubling reality: court judgments that appear to contradict one another, sometimes within days, leaving citizens wondering whether the law is guided by principle or by convenience.</p>
+
+                  <p>One court delivers a judgment today. Another court, with coordinate jurisdiction, issues a different order tomorrow. Cases thought to be settled are suddenly reopened. Political office holders removed by one ruling, are restored by another. Party leadership disputes travel from one courtroom to the next, producing conflicting orders that leave Nigerians confused and institutions weakened.</p>
+
+                  <p>This growing culture of judicial contradictions has consequences beyond legal technicalities. It damages public confidence. Investors become wary. Citizens lose faith in the rule of law. Political actors increasingly view courtrooms as extensions of political battlefields rather than temples of justice.</p>
+
+                  <p>No democracy can function effectively when litigants shop for favourable courts, or when judges of equal jurisdiction issue orders that undermine one another. Justice should be based on established legal principles, not on which courtroom a litigant can reach first.</p>
+
+                  <p>When the Executive branch buys vehicles for judges, builds houses for them, or dispenses favours that should ordinarily come from the judiciary's own budget, perceptions of indebtedness are created. Justice must not only be done; it must be seen to be done. A judge should never appear beholden to the same arm of government whose actions he or she may be called upon to review.</p>
+
+                  <p>The judiciary remains the last hope of the common man. But hope itself depends on consistency and independence. Citizens may disagree with judgments, but they must never doubt that similar cases will be treated similarly and that the law speaks with one voice.</p>
+
+                  <p>The National Judicial Council must continue to strengthen discipline and accountability within the Bench. Equally important, the constitutional guarantee of financial autonomy for the judiciary must be fully implemented. Their salaries, housing, transportation and working conditions should be provided institutionally, not through the generosity of governors, presidents, ministers or political office holders. Judges deserve decent welfare, but that welfare must come through transparent appropriations, not executive gifts that can compromise, or be perceived to compromise their impartiality.</p>
+
+                  <p>Nigerians deserve a judiciary that inspires confidence, not confusion; certainty, not contradictions; independence, not dependence.</p>
+
+                  <p>The courts are not merely buildings where cases are decided. They are the guardians of justice and the foundation upon which democracy rests.</p>
+
+                  <p><strong>And so, Nigerian Judiciary, come outside. Who exactly is speaking for the law?</strong></p>
+
+                  <p style="margin-top: 20px; font-style: italic; color: #555555;">
+                    Promoting transparency, accountability and informed public discourse.
+                  </p>
+
+                  ${newsletterFooterTemplate()}
+
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+      </table>
+      `,
+});
+export const newsLetterTemplateEkitiElectionFlaws2027 = () => baseTemplate({
+    title: "Ekiti Election Flaws; A Sign for 2027 Elections?",
+    message: `
+      <table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
+        <tr>
+          <td>
+            <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 6px; overflow: hidden;">
+
+              <!-- Header -->
+              <tr>
+                <td style="background-color: #06BBAF; color: white; padding: 20px 30px; text-align: center;">
+                  <h3 style="color: #ffffff; margin: 0; font-size: 22px;">Ekiti Election Flaws; A Sign for 2027 Elections?</h3>
+                </td>
+              </tr>
+
+              <!-- Body -->
+              <tr>
+                <td style="padding: 30px; color: #000000; font-size: 18px; line-height: 1.7;">
+
+                  <p><strong>Dear Citizen Monitors,</strong></p>
+
+                  <p>The recently concluded Ekiti State governorship election was expected to reassure Nigerians that the country is making steady progress towards credible elections. Instead, it has raised difficult questions that deserve honest answers.</p>
+
+                  <p>While election day was largely peaceful in many areas, reports of logistical delays, malfunctioning technology, poor communication, allegations of vote buying, and concerns over result management; have once again exposed familiar weaknesses in Nigeria's electoral process. These are not merely isolated incidents; they are warning signs that the country ignores at her peril.</p>
+
+                  <p>The Ekiti election should not simply be viewed as a state election. It is a dress rehearsal for the 2027 general elections. If relatively smaller elections continue to experience avoidable operational failures, what confidence should Nigerians have when over ninety-three million voters head to the polls in 2027?</p>
+
+                  <p>Every election presents an opportunity to strengthen democracy by identifying weaknesses and correcting them before they become national crises. Unfortunately, Nigeria has often treated election flaws as temporary inconveniences, rather than systemic problems requiring urgent reforms.</p>
+
+                  <h4 style="color: #06BBAF; margin-top: 20px;">Several questions now confront electoral stakeholders.</h4>
+                  <ol style="padding-left: 22px; line-height: 1.9;">
+                    <li>Are election officials receiving adequate training?</li>
+                    <li>Is election technology being sufficiently tested before deployment?</li>
+                    <li>Are security agencies effectively preventing voter intimidation and vote buying?</li>
+                    <li>Are political parties committed to democratic competition or merely focused on winning at all costs?</li>
+                    <li>Most importantly, are electoral institutions learning from previous elections?</li>
+                  </ol>
+
+                  <p><strong>The forthcoming Osun State elections will show if we learnt anything.</strong></p>
+
+                  <p>Nigeria cannot afford another cycle where citizens celebrate peaceful voting only to lose confidence during collation and declaration of results. Electoral integrity is measured not only by what happens at polling units, but throughout the entire process, from voter registration to final declaration. This is why citizens must use the Citizen Monitors App for collating election results from their polling units, and remain engaged beyond election day.</p>
+
+                  <p>Democracy cannot be outsourced to election officials alone. Civil Society Organisations, political parties, the media, security agencies, and ordinary Nigerians all have roles to play in protecting the integrity of elections.</p>
+
+                  <p>Technology presents new opportunities. Digital tools for election observation, incident reporting, and independent verification, like the Citizen Monitors App, will improve transparency when deployed effectively. Citizen participation in documenting electoral processes has become increasingly important in strengthening public trust.</p>
+
+                  <p>The Electoral Act provides a framework, but laws alone cannot guarantee credible elections. Institutions must demonstrate independence. Officials must uphold professionalism. Political actors must respect the rules. Citizens must insist on, and contribute to, accountability.</p>
+
+                  <p>The lessons from Ekiti should trigger immediate reforms, not wait till after another disputed national election. Nigeria still has time before 2027, for deliberate action towards solving the Ekiti Election challenges.</p>
+
+                  <p>Will Ekiti become another forgotten election with familiar excuses, or will it become the turning point that helps Nigeria deliver her most credible elections yet? The answer depends on what we choose to do now. Democracy works best when citizens do more than vote.</p>
+
+                  <p style="margin-top: 20px; font-style: italic; color: #555555;">
+                    Promoting transparency, accountability and informed public discourse.
+                  </p>
+
+                  ${newsletterFooterTemplate()}
+
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+      </table>
+      `,
+});
+export const newsLetterTemplateNigeriaReadyFor2027Elections = () => baseTemplate({
+    title: "How Ready is Nigeria for the 2027 Elections?",
+    message: `
+      <table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
+        <tr>
+          <td>
+            <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 6px; overflow: hidden;">
+
+              <!-- Header -->
+              <tr>
+                <td style="background-color: #06BBAF; color: white; padding: 20px 30px; text-align: center;">
+                  <h3 style="color: #ffffff; margin: 0; font-size: 22px;">How Ready is Nigeria for the 2027 Elections?</h3>
+                </td>
+              </tr>
+
+              <!-- Body -->
+              <tr>
+                <td style="padding: 30px; color: #000000; font-size: 18px; line-height: 1.7;">
+
+                  <p><strong>Dear Citizen Monitors,</strong></p>
+
+                  <p>Is Nigeria truly ready to conduct an election that Nigerians can trust? Every election cycle, we promise ourselves that the next one will be better. Yet, after every election, we are left with familiar complaints: vote buying, violence, voter suppression, delayed logistics, poor result management, weak enforcement of electoral laws, and endless court cases.</p>
+
+                  <p><strong>Are the institutions responsible for delivering credible elections prepared?</strong></p>
+
+                  <p>A credible election is not built on election day. It is built over months, and years; through planning, transparency, training, technology, adequate funding, and above all, public confidence.</p>
+
+                  <p>Is the electoral umpire adequately prepared to manage one of Africa's largest elections? Are security agencies developing strategies that prioritise voter safety, rather than intimidation? Did political parties conduct transparent primaries? Are Nigerian courts ready to deliver timely justice without becoming the final destination for every electoral contest?</p>
+
+                  <h4 style="color: #06BBAF; margin-top: 20px;">Then there is the question of technology.</h4>
+                  <p>Technology has transformed elections around the world, but technology is only as effective as the integrity of those deploying it. Electronic accreditation, digital voter registers and electronic transmission of results can improve transparency, but cannot substitute for political will. Systems must be reliable, secure, and protected from manipulation.</p>
+
+                  <h4 style="color: #06BBAF; margin-top: 20px;">Another concern is voter participation.</h4>
+                  <p>Millions of Nigerians, especially young people, have become disillusioned with the electoral process. Many believe their votes do not count. Restoring confidence will require more than public assurances. It demands visible reforms, accountability for electoral offences, and consistent transparency throughout the electoral process. Political parties also have a responsibility. If internal party democracy fails, the quality of leadership presented to Nigerians also suffers.</p>
+
+                  <h4 style="color: #06BBAF; margin-top: 20px;">Perhaps the greatest challenge remains the Nigerian citizen.</h4>
+                  <p>Too often, citizens become active only during election campaigns and then disappear until the next cycle. Democracy requires continuous participation; asking questions, demanding accountability, verifying information, reporting violations, and insisting that institutions perform their constitutional duties.</p>
+
+                  <p><strong>The responsibility of protecting democracy cannot be outsourced.</strong></p>
+
+                  <p>This is where civic technology, like the Citizens Monitor App, and citizen participation become indispensable. Citizens equipped with the right tools can document incidents, monitor polling units, report irregularities, and strengthen public oversight. Transparency increases when ordinary Nigerians become active participants rather than passive observers.</p>
+
+                  <p>The 2027 elections will not simply determine who occupies public office. They will test the resilience of Nigeria's democratic institutions, the independence of electoral management, the professionalism of security agencies, the maturity of political parties, and the vigilance of citizens. The question, therefore, is not whether Nigeria will conduct elections in 2027. It certainly will. We have budgeted for it. The real question is whether those elections will deepen democracy or further weaken public trust. The answer depends on what all of us do between now and election day.</p>
+
+                  <p style="margin-top: 20px; font-style: italic; color: #555555;">
+                    Promoting transparency, accountability and informed public discourse.
+                  </p>
+
+                  ${newsletterFooterTemplate()}
+
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+      </table>
+      `,
+});
+export const newsLetterTemplateNigeriaFakeAgenciesRealGovernment = () => baseTemplate({
+    title: "Nigeria: Fake Agencies, Real Government?",
+    message: `
+      <table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
+        <tr>
+          <td>
+            <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 6px; overflow: hidden;">
+
+              <!-- Header -->
+              <tr>
+                <td style="background-color: #06BBAF; color: white; padding: 20px 30px; text-align: center;">
+                  <h3 style="color: #ffffff; margin: 0; font-size: 22px;">Nigeria: Fake Agencies, Real Government?</h3>
+                </td>
+              </tr>
+
+              <!-- Body -->
+              <tr>
+                <td style="padding: 30px; color: #000000; font-size: 18px; line-height: 1.7;">
+
+                  <p><strong>Dear Citizen Monitors,</strong></p>
+
+                  <p>In recent weeks, Nigerians have watched an alarming trend unfold. Individuals with no legal authority establishing government agencies, appointed themselves officials, printed identity cards, opened offices, collected fees from unsuspecting citizens, and operated for months, sometimes years (and even be appropriated for in the national budget), before being exposed.</p>
+
+                  <p><strong>How can fake institutions thrive in a country with real government institutions?</strong></p>
+
+                  <p>This goes beyond fraud. It is a reflection of deeper governance challenges. When regulatory oversight is weak, enforcement agencies are reactive rather than proactive, and citizens are left without clear channels to verify information, impostors find fertile ground. Every fake agency that survives for months; is evidence that legitimate institutions are either absent, overwhelmed, or simply not paying enough attention.</p>
+
+                  <p>The irony is striking. While ordinary Nigerians struggle with endless documentation, permits, taxes, and regulations from genuine government agencies, fraudulent operators are able to create parallel institutions with little resistance. It raises uncomfortable questions about coordination among security agencies, regulatory bodies, and public information systems.</p>
+
+                  <h4 style="color: #06BBAF; margin-top: 20px;">This is why citizen participation matters.</h4>
+                  <p>Governance cannot be left to government alone. Citizens must actively question, verify, report, and demand accountability. Public vigilance is one of the strongest defence against fraud, corruption, and institutional failure.</p>
+
+                  <h4 style="color: #06BBAF; margin-top: 20px;">Technology now gives us the opportunity to do exactly that.</h4>
+                  <p>We are pleased to announce that the <strong>Citizen Monitors App is now LIVE on Android</strong>.</p>
+                  <p>The app enables citizens to document incidents, report governance concerns, monitor elections, and contribute credible, verifiable information that strengthens transparency and accountability across Nigeria. Democracy works best when citizens are informed and actively engaged; not just during elections, but every single day.</p>
+
+                  <p>Whether it is election malpractice, abuse of office, public service failures, or suspicious activities affecting your community, your voice matters, and your evidence matters even more. The fight for accountability begins with participation. A stronger democracy emerges when citizens become active monitors.</p>
+
+                  <p>Download the Citizen Monitors App today on your Android device and become part of a growing movement committed to protecting Nigeria's democracy, strengthening institutions, and ensuring that public office remains accountable to the people. And do tell everyone you know about the App. If all the Polling Units in Nigeria are manned by Citizen Monitors, the next elections, starting with the Osun gubernatorial, will be more credible.</p>
+
+                  <p><strong>The future of Nigeria should never be left to fake institutions, nor passive citizens.</strong></p>
+
+                  <p>Stay informed. Stay engaged. Stay accountable.</p>
+
+                  <p style="margin-top: 20px; font-style: italic; color: #555555;">
+                    Promoting transparency, accountability and informed public discourse.
                   </p>
 
                   ${newsletterFooterTemplate()}

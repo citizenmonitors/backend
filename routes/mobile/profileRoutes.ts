@@ -2,6 +2,12 @@ import express from "express";
 import { authMiddleware } from "../../middleware/authMiddleware.ts";
 import { handleValidationErrors } from "../../validators/authValidators.ts";
 import {
+  deleteUser,
+  resendToken,
+  updateUserEmailCon,
+  verifyEmail,
+} from "../../controllers/UserDashboard/userController.ts";
+import {
   getElectionVaultMobile,
   generateAnonymousUsernameMobile,
   getMyProfileMobile,
@@ -23,6 +29,8 @@ import {
   mobileObserverDataValidation,
   mobilePollingUnitLookupValidation,
   mobileUpdatePasswordValidation,
+  profileEmailUpdateValidation,
+  profileVerifyEmailValidation,
 } from "../../validators/mobile/profileValidators.ts";
 
 const router = express.Router();
@@ -36,6 +44,23 @@ router.put(
   handleValidationErrors,
   updateMyPasswordMobile
 );
+
+router.put(
+  "/me/email",
+  authMiddleware,
+  profileEmailUpdateValidation,
+  handleValidationErrors,
+  updateUserEmailCon
+);
+router.post(
+  "/me/email/verify",
+  authMiddleware,
+  profileVerifyEmailValidation,
+  handleValidationErrors,
+  verifyEmail
+);
+router.post("/me/email/resend", authMiddleware, resendToken);
+router.delete("/me", authMiddleware, deleteUser);
 
 router.put(
   "/upgrade/volunteer-to-observer",

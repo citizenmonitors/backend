@@ -7,11 +7,11 @@ declare const _default: mongoose.Model<{
     fullName: string;
     xHandle: string;
     topicAngle: string;
+    status: "confirmed" | "cancelled" | "pending";
     slotId: mongoose.Types.ObjectId;
     inviteId: mongoose.Types.ObjectId;
     bioLink: string;
     phone: string;
-    status: "confirmed" | "cancelled" | "pending";
     remindersSent?: {
         sent7d: NativeDate;
         sent24h: NativeDate;
@@ -25,11 +25,11 @@ declare const _default: mongoose.Model<{
     fullName: string;
     xHandle: string;
     topicAngle: string;
+    status: "confirmed" | "cancelled" | "pending";
     slotId: mongoose.Types.ObjectId;
     inviteId: mongoose.Types.ObjectId;
     bioLink: string;
     phone: string;
-    status: "confirmed" | "cancelled" | "pending";
     remindersSent?: {
         sent7d: NativeDate;
         sent24h: NativeDate;
@@ -43,11 +43,11 @@ declare const _default: mongoose.Model<{
     fullName: string;
     xHandle: string;
     topicAngle: string;
+    status: "confirmed" | "cancelled" | "pending";
     slotId: mongoose.Types.ObjectId;
     inviteId: mongoose.Types.ObjectId;
     bioLink: string;
     phone: string;
-    status: "confirmed" | "cancelled" | "pending";
     remindersSent?: {
         sent7d: NativeDate;
         sent24h: NativeDate;
@@ -67,11 +67,11 @@ declare const _default: mongoose.Model<{
     fullName: string;
     xHandle: string;
     topicAngle: string;
+    status: "confirmed" | "cancelled" | "pending";
     slotId: mongoose.Types.ObjectId;
     inviteId: mongoose.Types.ObjectId;
     bioLink: string;
     phone: string;
-    status: "confirmed" | "cancelled" | "pending";
     remindersSent?: {
         sent7d: NativeDate;
         sent24h: NativeDate;
@@ -85,11 +85,11 @@ declare const _default: mongoose.Model<{
     fullName: string;
     xHandle: string;
     topicAngle: string;
+    status: "confirmed" | "cancelled" | "pending";
     slotId: mongoose.Types.ObjectId;
     inviteId: mongoose.Types.ObjectId;
     bioLink: string;
     phone: string;
-    status: "confirmed" | "cancelled" | "pending";
     remindersSent?: {
         sent7d: NativeDate;
         sent24h: NativeDate;
@@ -103,11 +103,11 @@ declare const _default: mongoose.Model<{
     fullName: string;
     xHandle: string;
     topicAngle: string;
+    status: "confirmed" | "cancelled" | "pending";
     slotId: mongoose.Types.ObjectId;
     inviteId: mongoose.Types.ObjectId;
     bioLink: string;
     phone: string;
-    status: "confirmed" | "cancelled" | "pending";
     remindersSent?: {
         sent7d: NativeDate;
         sent24h: NativeDate;

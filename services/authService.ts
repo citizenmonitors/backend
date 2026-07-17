@@ -281,9 +281,12 @@ export const selectUserRole = async (email: string, role: string) => {
       isPoliticalPartyMember: user.isPoliticalPartyMember,
       isElectionWitnessReady: user.isElectionWitnessReady,
       isOpenToSurvey: user.isOpenToSurvey,
+      nationality: user.nationality,
+      whyYouJoinUs: user.whyYouJoinUs,
       profileImage: user.profileImage,
       pendingObserverVerification: false,
       password: user.password,
+      hasSetPassword: user.hasSetPassword !== false,
     };
 
     // Save to CompletedUser

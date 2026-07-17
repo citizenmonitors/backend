@@ -41,6 +41,8 @@ import mobileAcademyRoutes from "./routes/mobile/academyRoutes.ts";
 import mobileFaqRoutes from "./routes/mobile/faqRoutes.ts";
 import mobileNewsInsightRoutes from "./routes/mobile/newsInsightRoutes.ts";
 import mobilePressCoverageRoutes from "./routes/mobile/pressCoverageRoutes.ts";
+import anonymousRoutes from "./routes/anonymousRoutes.ts";
+import collationDiscussionRoutes from "./routes/collationDiscussionRoutes.ts";
 import { inhouseApiAccessMiddleware } from "./middleware/inhouseApiAccessMiddleware.ts";
 import { initSocketServer } from "./services/realtime/socketServer.ts";
 import { setSocketServer } from "./services/realtime/socketBus.ts";
@@ -137,10 +139,15 @@ app.use("/api", bankRoutes);
 app.use("/api", userRoutes);
 app.use("/api/profile", mobileProfileRoutes);
 app.use("/api/dashboard", mobileDashboardRoutes);
+app.use("/api/academy", mobileAcademyRoutes);
+app.use("/api/pulse", mobilePulseRoutes);
+app.use("/api/anonymous", anonymousRoutes);
+app.use("/api/collation", collationDiscussionRoutes);
 app.use("/api", adminRoutes);
 app.use("/api", resourcesRoutes);
 app.use("/api/speaker-slots", speakerSlotsRoutes);
 app.use("/api/pvc-issues", pvcIssuesRoutes);
+
 
 // Versioned API aliases for safer incremental evolution (mobile/web clients)
 app.use("/api/v1/auth", authRoutes);
@@ -151,6 +158,10 @@ app.use("/api/v1", bankRoutes);
 app.use("/api/v1", userRoutes);
 app.use("/api/v1/profile", mobileProfileRoutes);
 app.use("/api/v1/dashboard", mobileDashboardRoutes);
+app.use("/api/v1/academy", mobileAcademyRoutes);
+app.use("/api/v1/pulse", mobilePulseRoutes);
+app.use("/api/v1/anonymous", anonymousRoutes);
+app.use("/api/v1/collation", collationDiscussionRoutes);
 app.use("/api/v1", adminRoutes);
 app.use("/api/v1", resourcesRoutes);
 app.use("/api/v1/speaker-slots", speakerSlotsRoutes);

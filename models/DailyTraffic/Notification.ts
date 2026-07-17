@@ -47,6 +47,11 @@ const notificationSchema = new mongoose.Schema({
   articleId: {
     type: String,
   },
+  activeElectionId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "ActiveElection",
+    index: true,
+  },
   recipients: {
     type: [String],
     enum: ["all", "super-admin", "admin", "observer", "volunteer", "public-viewer"],

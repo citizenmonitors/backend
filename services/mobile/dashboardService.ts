@@ -8,6 +8,7 @@ import PulsePost from "../../models/Pulse/PulsePost.ts";
 import PulseComment from "../../models/Pulse/PulseComment.ts";
 import { getMobileLiveElectionsCarousel } from "./electionService.ts";
 import { getOrSetCache } from "../../utils/cache.ts";
+import { buildHideConcludedElectionNotificationsFilter } from "../../utils/electionNotificationVisibility.ts";
 import { countCommentsForArticles } from "./newsInsightEngagementService.ts";
 import { countCommentsForPressCoverageArticles } from "./pressCoverageService.ts";
 
@@ -118,21 +119,28 @@ const buildMobileDashboard = async (user: AuthenticatedUser) => {
       ward?: string | null;
     }
   );
+  const concludedElectionNotificationFilter =
+    await buildHideConcludedElectionNotificationsFilter();
   const [electionNotifications, discussionPosts, pulsePosts, insights, pressCoverageFeed] =
     await Promise.all([
       Notification.find({
-        ...roleVisibilityFilter(userId, role),
-        type: {
-          $in: [
-            "election-day-alert",
-            "result-aggregated",
-            "result-upload",
-            "incident-upload",
-            "report-confirmed",
-            "report-flagged",
-            "security-alert",
-          ],
-        },
+        $and: [
+          roleVisibilityFilter(userId, role),
+          concludedElectionNotificationFilter,
+          {
+            type: {
+              $in: [
+                "election-day-alert",
+                "result-aggregated",
+                "result-upload",
+                "incident-upload",
+                "report-confirmed",
+                "report-flagged",
+                "security-alert",
+              ],
+            },
+          },
+        ],
       })
         .sort({ createdAt: -1 })
         .limit(20)

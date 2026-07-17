@@ -1,5 +1,6 @@
 import Notification from "../../models/DailyTraffic/Notification.ts";
 import type { AuthenticatedUser } from "../../types/authenticatedRequest.ts";
+import { buildHideConcludedElectionNotificationsFilter } from "../../utils/electionNotificationVisibility.ts";
 import { resolveNotificationDisplay } from "../../utils/notificationContent.ts";
 
 const toStringId = (value: unknown): string => String(value);
@@ -68,7 +69,10 @@ export const getMobileNotifications = async (input: {
   const limit = Math.min(50, Math.max(1, input.limit ?? 20));
   const skip = (page - 1) * limit;
 
-  const visibility = baseVisibilityFilter(userId, role);
+  const electionVisibility = await buildHideConcludedElectionNotificationsFilter();
+  const visibility = {
+    $and: [baseVisibilityFilter(userId, role), electionVisibility],
+  };
 
   const [rows, total, unreadCount] = await Promise.all([
     Notification.find(visibility)
@@ -97,7 +101,10 @@ export const getMobileNotificationDetail = async (input: {
   if (!userId) throw new Error("Authentication required");
   const role = String(input.user.role ?? "");
 
-  const visibility = baseVisibilityFilter(userId, role);
+  const electionVisibility = await buildHideConcludedElectionNotificationsFilter();
+  const visibility = {
+    $and: [baseVisibilityFilter(userId, role), electionVisibility],
+  };
   const notification = await Notification.findOne({
     _id: input.notificationId,
     ...visibility,
@@ -121,7 +128,10 @@ export const markMobileNotificationRead = async (input: {
   if (!userId) throw new Error("Authentication required");
   const role = String(input.user.role ?? "");
 
-  const visibility = baseVisibilityFilter(userId, role);
+  const electionVisibility = await buildHideConcludedElectionNotificationsFilter();
+  const visibility = {
+    $and: [baseVisibilityFilter(userId, role), electionVisibility],
+  };
   const notification = await Notification.findOne({
     _id: input.notificationId,
     ...visibility,
@@ -142,7 +152,10 @@ export const markAllMobileNotificationsRead = async (input: {
   const userId = String(input.user._id ?? "");
   if (!userId) throw new Error("Authentication required");
   const role = String(input.user.role ?? "");
-  const visibility = baseVisibilityFilter(userId, role);
+  const electionVisibility = await buildHideConcludedElectionNotificationsFilter();
+  const visibility = {
+    $and: [baseVisibilityFilter(userId, role), electionVisibility],
+  };
 
   await Notification.updateMany(visibility, { $addToSet: { readBy: userId } });
   return { message: "All notifications marked as read" };
@@ -156,7 +169,10 @@ export const dismissMobileNotification = async (input: {
   if (!userId) throw new Error("Authentication required");
   const role = String(input.user.role ?? "");
 
-  const visibility = baseVisibilityFilter(userId, role);
+  const electionVisibility = await buildHideConcludedElectionNotificationsFilter();
+  const visibility = {
+    $and: [baseVisibilityFilter(userId, role), electionVisibility],
+  };
   const notification = await Notification.findOne({
     _id: input.notificationId,
     ...visibility,

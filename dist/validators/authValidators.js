@@ -21,6 +21,13 @@ export const registerValidation = [
             throw new Error("Passwords do not match");
         return true;
     }),
+    body("platform")
+        .optional()
+        .isIn(["web", "ios", "android"])
+        .withMessage("Platform must be web, ios or android"),
+    body("deviceId").optional().isString(),
+    body("appVersion").optional().isString(),
+    body("pushToken").optional().isString(),
 ];
 // ---- Verify email ----
 export const verifyEmailValidation = [
@@ -39,8 +46,8 @@ export const resendTokenValidation = [
 export const pickRoleValidation = [
     body("email").isEmail().normalizeEmail({ gmail_remove_dots: false }).withMessage("Valid email is required"),
     body("role")
-        .isIn(["observer", "volunteer"])
-        .withMessage("Role must be observer or volunteer"),
+        .isIn(["observer", "volunteer", "public-viewer"])
+        .withMessage("Role must be observer, volunteer or public-viewer"),
 ];
 // ---- Sign in ----
 export const signInValidation = [
@@ -58,9 +65,11 @@ export const resetPasswordValidation = [
         .isLength({ min: 8 })
         .withMessage("Password must be at least 8 characters"),
 ];
-// ---- Submit details (role form) - email only; other fields validated by service ----
+// ---- Submit details (role form) ----
 export const submitDetailsValidation = [
     body("email").isEmail().normalizeEmail({ gmail_remove_dots: false }).withMessage("Valid email is required"),
+    body("nationality").optional().isString().withMessage("Nationality must be a string"),
+    body("whyYouJoinUs").optional().isString().withMessage("whyYouJoinUs must be a string"),
 ];
 // ---- Submit observer details ----
 export const submitObserverDetailsValidation = [

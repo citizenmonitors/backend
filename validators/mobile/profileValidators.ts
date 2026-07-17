@@ -54,3 +54,18 @@ export const mobileAnonymousIdentityToggleValidation = [
     .isBoolean()
     .withMessage("enabled must be true or false"),
 ];
+
+export const profileEmailUpdateValidation = [
+  body("newEmail")
+    .isEmail()
+    .normalizeEmail({ gmail_remove_dots: false })
+    .withMessage("Valid new email is required"),
+];
+
+export const profileVerifyEmailValidation = [
+  body("verificationCode")
+    .notEmpty()
+    .trim()
+    .isLength({ min: 6, max: 6 })
+    .withMessage("Verification code must be 6 digits"),
+];

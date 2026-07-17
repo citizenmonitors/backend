@@ -49,6 +49,7 @@ export declare const registrationCode: (verificationCode: string) => string;
 export declare const resendCode: (verificationCode: string) => string;
 /** Mobile app: password reset via OTP (expires in 5 minutes; set in service). */
 export declare const passwordResetOtpTemplate: (otp: string) => string;
+export declare const newsLetterTemplatePvcReportChallenges: () => string;
 export declare const mobileFeedbackTemplate: (email: string, title: string, message: string) => string;
 export declare const approveObserverTemplate: (firstName: string, pollingUnit: string) => string;
 export declare const observerRoleUpdateTemplate: (firstName: string, pollingUnit: string) => string;
@@ -121,5 +122,9 @@ export declare const newsLetterTemplatePartyPrimariesAndInsecurity: () => string
 export declare const newsLetterTemplateCitizenMonitors72Hours: () => string;
 export declare const newsLetterTemplate72HoursDemocracyWhatNext: () => string;
 export declare const newsLetterTemplateN210TrillionMissing: () => string;
+export declare const newsLetterTemplateNigerianJudiciaryComeOutside: () => string;
+export declare const newsLetterTemplateEkitiElectionFlaws2027: () => string;
+export declare const newsLetterTemplateNigeriaReadyFor2027Elections: () => string;
+export declare const newsLetterTemplateNigeriaFakeAgenciesRealGovernment: () => string;
 export {};
 //# sourceMappingURL=emailTemplates.d.ts.map

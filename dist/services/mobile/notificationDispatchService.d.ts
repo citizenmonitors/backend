@@ -7,6 +7,7 @@ export declare const dispatchMobileNotification: (input: {
     info?: string;
     articleSlug?: string;
     articleId?: string;
+    activeElectionId?: string;
     recipients: RecipientRole[];
     audienceQuery?: Record<string, unknown>;
     /** When false, delivers to all matched users regardless of notification prefs (transactional). */
@@ -22,6 +23,7 @@ export declare const dispatchMobileNotification: (input: {
     body?: string | null | undefined;
     articleSlug?: string | null | undefined;
     articleId?: string | null | undefined;
+    activeElectionId?: import("mongoose").Types.ObjectId | null | undefined;
     recipients?: string[] | null | undefined;
 }> & {
     createdAt: NativeDate;
@@ -34,6 +36,7 @@ export declare const dispatchMobileNotification: (input: {
     body?: string | null | undefined;
     articleSlug?: string | null | undefined;
     articleId?: string | null | undefined;
+    activeElectionId?: import("mongoose").Types.ObjectId | null | undefined;
     recipients?: string[] | null | undefined;
 } & {
     _id: import("mongoose").Types.ObjectId;
@@ -47,6 +50,7 @@ export declare const dispatchNotificationToUsers: (input: {
     info?: string;
     articleSlug?: string;
     articleId?: string;
+    activeElectionId?: string;
     userIds: Array<string>;
     respectPreferences?: boolean;
 }) => Promise<(import("mongoose").Document<unknown, {}, {
@@ -60,6 +64,7 @@ export declare const dispatchNotificationToUsers: (input: {
     body?: string | null | undefined;
     articleSlug?: string | null | undefined;
     articleId?: string | null | undefined;
+    activeElectionId?: import("mongoose").Types.ObjectId | null | undefined;
     recipients?: string[] | null | undefined;
 }> & {
     createdAt: NativeDate;
@@ -72,6 +77,7 @@ export declare const dispatchNotificationToUsers: (input: {
     body?: string | null | undefined;
     articleSlug?: string | null | undefined;
     articleId?: string | null | undefined;
+    activeElectionId?: import("mongoose").Types.ObjectId | null | undefined;
     recipients?: string[] | null | undefined;
 } & {
     _id: import("mongoose").Types.ObjectId;

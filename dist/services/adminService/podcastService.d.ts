@@ -20,6 +20,7 @@ type EditPodcastInput = {
 type SendNewsletterInput = {
     recipients: RecipientRole[] | RecipientRole;
     scheduleTime?: string | Date;
+    adminId?: Id;
 };
 export declare const sendPodcastService: ({ title, content, recipients, adminId, }: SendPodcastInput) => Promise<mongoose.Document<unknown, {}, {
     createdAt: NativeDate;
@@ -117,11 +118,16 @@ export declare const getUserInboxService: (userId: Id | undefined) => Promise<{
 export declare const markPodcastAsReadService: (podcastId: Id, userId: Id | undefined) => Promise<{
     message: string;
 }>;
-export declare const sendNewsletterService: ({ recipients, scheduleTime, }: SendNewsletterInput) => Promise<{
+export declare const sendNewsletterService: ({ recipients, scheduleTime, adminId, }: SendNewsletterInput) => Promise<{
     message: string;
     scheduleTime: string;
 } | {
     totalRecipients: number;
+    newsInsight: {
+        id: string;
+        slug: string;
+        title: string;
+    };
     message: string;
     scheduleTime?: undefined;
 }>;

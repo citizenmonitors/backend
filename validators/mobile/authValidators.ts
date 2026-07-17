@@ -14,8 +14,8 @@ export const mobileRegisterValidation = [
   }),
   body("platform")
     .optional()
-    .isIn(["ios", "android"])
-    .withMessage("Platform must be ios or android"),
+    .isIn(["web", "ios", "android"])
+    .withMessage("Platform must be web, ios or android"),
   body("deviceId").optional().isString(),
   body("appVersion").optional().isString(),
   body("pushToken").optional().isString(),
@@ -29,8 +29,8 @@ export const mobileSignInValidation = [
   body("password").notEmpty().withMessage("Password is required"),
   body("platform")
     .optional()
-    .isIn(["ios", "android"])
-    .withMessage("Platform must be ios or android"),
+    .isIn(["web", "ios", "android"])
+    .withMessage("Platform must be web, ios or android"),
   body("deviceId").optional().isString(),
   body("appVersion").optional().isString(),
   body("pushToken").optional().isString(),
@@ -59,8 +59,8 @@ export const mobileGoogleContinueValidation = [
   body("idToken").notEmpty().withMessage("Google idToken is required"),
   body("platform")
     .optional()
-    .isIn(["ios", "android"])
-    .withMessage("Platform must be ios or android"),
+    .isIn(["web", "ios", "android"])
+    .withMessage("Platform must be web, ios or android"),
   body("deviceId").optional().isString(),
   body("appVersion").optional().isString(),
   body("pushToken").optional().isString(),

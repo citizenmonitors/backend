@@ -1026,6 +1026,7 @@ export declare const adminNotificationService: (userId: Id) => Promise<{
     body?: string | null | undefined;
     articleSlug?: string | null | undefined;
     articleId?: string | null | undefined;
+    activeElectionId?: Types.ObjectId | null | undefined;
     recipients?: string[] | null | undefined;
     _id: Types.ObjectId;
     __v: number;

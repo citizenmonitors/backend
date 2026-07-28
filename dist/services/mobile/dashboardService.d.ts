@@ -13,7 +13,7 @@ export declare const getMobileDashboard: (user: AuthenticatedUser) => Promise<{
     }[];
     electionUpdates: {
         id: string;
-        type: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | "news-insight" | "press-coverage" | null | undefined;
+        type: "newsletter" | "election-day-alert" | "result-aggregated" | "result-upload" | "incident-upload" | "report-confirmed" | "report-flagged" | "security-alert" | "pending-approval" | "discussion-reply" | "news-insight" | "press-coverage" | null | undefined;
         title: string;
         info: string;
         timeAgo: string;

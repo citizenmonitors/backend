@@ -2193,7 +2193,9 @@ export declare const getUserElectionResultsAndReports: (userId: Id) => Promise<{
         } | null)[];
     };
 }>;
-export declare const getResultsAndPerformAction: (userId: Id, actionData: PollingUnitActionPayload | null | undefined, flagMediaFiles?: FlagMediaFiles) => Promise<{
+export declare const getResultsAndPerformAction: (userId: Id, actionData: PollingUnitActionPayload | null | undefined, flagMediaFiles?: FlagMediaFiles, options?: {
+    requireSamePollingUnit?: boolean;
+}) => Promise<{
     results: {
         electionTypeId: string | Types.ObjectId | undefined;
         electionId: string | Types.ObjectId;

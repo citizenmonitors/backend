@@ -2,9 +2,9 @@ import ActiveElection from "../../models/Election/ActiveElection.js";
 import ElectionData from "../../models/Election/ElectionData.js";
 import IncidentReport from "../../models/Election/IncidentReport.js";
 import CompletedUser from "../../models/CompletedUser.js";
-import { getLiveElectionService, buildObserverSubmissionLocationFilter, observerSubmissionDocMatchesLocationFilter, } from "../Election/electionLive.js";
-import { getResultsAndPerformAction, } from "../Election/electionService.js";
+import { getLiveElectionService, buildObserverSubmissionLocationFilter, } from "../Election/electionLive.js";
 import { isActiveElectionRelevantForUser } from "../../utils/electionRelevanceForUser.js";
+import { buildMobileGeoBreakdown } from "./geoBreakdown.js";
 export const assertMobileCollationAccess = async (activeElectionId, userId) => {
     const user = await CompletedUser.findById(userId).lean();
     if (!user)
@@ -70,11 +70,18 @@ export const getMobileCollationBundle = async (activeElectionId, userId) => {
         ? new Date(Math.max(...lastSyncCandidates.map((d) => new Date(d).getTime())))
         : null;
     const electionRef = active.election;
+    const geoBreakdown = buildMobileGeoBreakdown({
+        electionType: electionRef?.electionType,
+        user,
+        results: results,
+        incidents: incidents,
+    });
     return {
         electionDetails: collation.electionDetails,
         result: collation.result,
         incidentReport: collation.incidentReport,
         sentimentAnalysis: collation.sentimentAnalysis,
+        geoBreakdown,
         overview: {
             lastSyncAt,
             resultsUploadedCount: results.length,
@@ -96,38 +103,5 @@ export const getMobileCollationBundle = async (activeElectionId, userId) => {
             endDate: active.endDate,
         },
     };
-};
-export const mobileCollationUserAction = async (activeElectionId, userId, body, flagMediaFiles) => {
-    const { user, electionType } = await assertMobileCollationAccess(activeElectionId, userId);
-    if (!body?.action) {
-        return getResultsAndPerformAction(userId, null);
-    }
-    if (body.dataType === "election") {
-        const doc = await ElectionData.findById(body.electionId).lean();
-        if (!doc || String(doc.election) !== String(activeElectionId)) {
-            throw new Error("Result not found for this election");
-        }
-        if (!observerSubmissionDocMatchesLocationFilter(doc, electionType, user)) {
-            throw new Error("You cannot act on this result from your current location");
-        }
-    }
-    else if (body.dataType === "incident") {
-        const doc = await IncidentReport.findById(body.electionId).lean();
-        if (!doc || String(doc.election) !== String(activeElectionId)) {
-            throw new Error("Incident report not found for this election");
-        }
-        if (!observerSubmissionDocMatchesLocationFilter(doc, electionType, user)) {
-            throw new Error("You cannot act on this report from your current location");
-        }
-    }
-    else {
-        throw new Error("Invalid data type");
-    }
-    return getResultsAndPerformAction(userId, {
-        electionId: body.electionId,
-        action: body.action,
-        dataType: body.dataType,
-        flagReason: body.flagReason,
-    }, flagMediaFiles);
 };
 //# sourceMappingURL=collationBundleService.js.map

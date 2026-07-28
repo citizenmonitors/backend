@@ -109,12 +109,13 @@ export const markPodcastAsRead = async (req: Request, res: Response) => {
 
 export const sendNewsletter = async (req: Request, res: Response) => {
   try {
-    const { recipients, scheduleTime } = req.body;
+    const { recipients, scheduleTime, publishAsNewsInsight } = req.body;
     const adminId = (req as AuthenticatedRequest).user?._id;
     const newsletter = await PodcastService.sendNewsletterService({
       recipients,
       scheduleTime,
       adminId,
+      publishAsNewsInsight,
     });
     res.status(201).json({
       message: "Newsletter sent successfully",

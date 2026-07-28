@@ -3,7 +3,6 @@ import type { AuthenticatedRequest } from "../../types/authenticatedRequest.ts";
 import { asParamString, isValidObjectId } from "../../utils/validators.ts";
 import {
   getMobileCollationBundle,
-  mobileCollationUserAction,
 } from "../../services/mobile/collationBundleService.ts";
 import {
   addPostComment,
@@ -17,20 +16,6 @@ import {
   toggleReportCommentLike,
 } from "../../services/mobile/collationDiscussionService.ts";
 import { invalidateCacheByPrefixes } from "../../utils/cache.ts";
-
-type CollationFlagUploadFile = {
-  buffer: Buffer;
-  mimetype: string;
-  originalname: string;
-  size: number;
-};
-
-type CollationUserActionRequest = AuthenticatedRequest & {
-  files?: {
-    flagImage?: CollationFlagUploadFile[];
-    flagVideo?: CollationFlagUploadFile[];
-  };
-};
 
 const errMsg = (e: unknown): string => (e instanceof Error ? e.message : String(e));
 
@@ -85,60 +70,6 @@ export const getMobileCollation = async (req: Request, res: Response) => {
       return res.status(404).json({ message });
     }
     return res.status(500).json({ message });
-  }
-};
-
-export const postMobileCollationUserAction = async (req: Request, res: Response) => {
-  try {
-    const r = req as CollationUserActionRequest;
-    const activeElectionId = asParamString(req.params.activeElectionId);
-    if (!isValidObjectId(activeElectionId)) {
-      return res.status(400).json({ message: "Invalid election id" });
-    }
-    const userId = requireUserId(r);
-    const { electionId, action, dataType, flagReason } = req.body as Record<
-      string,
-      string | undefined
-    >;
-
-    const actionData =
-      electionId && action && dataType
-        ? {
-            electionId,
-            action: action as "agree" | "flag" | "unagree",
-            dataType: dataType as "election" | "incident",
-            flagReason,
-          }
-        : null;
-
-    if (actionData && !isValidObjectId(actionData.electionId)) {
-      return res.status(400).json({ message: "Invalid target id" });
-    }
-
-    const flagMediaFiles =
-      r.files?.flagImage?.length || r.files?.flagVideo?.length
-        ? { flagImage: r.files.flagImage, flagVideo: r.files.flagVideo }
-        : undefined;
-
-    const results = await mobileCollationUserAction(
-      activeElectionId,
-      userId,
-      actionData,
-      flagMediaFiles
-    );
-
-    return res.status(200).json({
-      message: actionData
-        ? "Updated successfully"
-        : "Fetched polling-unit verification feed (legacy)",
-      results,
-    });
-  } catch (error) {
-    const message = errMsg(error);
-    if (message.includes("not available for your location")) {
-      return res.status(403).json({ message });
-    }
-    return res.status(400).json({ message });
   }
 };
 

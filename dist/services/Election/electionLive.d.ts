@@ -150,13 +150,13 @@ export declare const getActivityBoardAndNotificationsService: () => Promise<{
         targetUsers: Types.ObjectId[];
         readBy: Types.ObjectId[];
         deletedBy: Types.ObjectId[];
-        type?: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | "news-insight" | "press-coverage" | null | undefined;
+        type?: "newsletter" | "election-day-alert" | "result-aggregated" | "result-upload" | "incident-upload" | "report-confirmed" | "report-flagged" | "security-alert" | "pending-approval" | "discussion-reply" | "news-insight" | "press-coverage" | null | undefined;
         info?: string | null | undefined;
+        activeElectionId?: Types.ObjectId | null | undefined;
         preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | "newsAndInsights" | "pressCoverage" | null | undefined;
         body?: string | null | undefined;
         articleSlug?: string | null | undefined;
         articleId?: string | null | undefined;
-        activeElectionId?: Types.ObjectId | null | undefined;
         recipients?: string[] | null | undefined;
     }> & {
         _id: Types.ObjectId;

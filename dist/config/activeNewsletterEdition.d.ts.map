@@ -1,0 +1,1 @@
+{"version":3,"file":"activeNewsletterEdition.d.ts","sourceRoot":"","sources":["../../config/activeNewsletterEdition.ts"],"names":[],"mappings":"AAEA,OAAO,KAAK,EAAE,yBAAyB,EAAE,MAAM,yBAAyB,CAAC;AAEzE,MAAM,MAAM,iBAAiB,GAAG;IAC9B,cAAc,EAAE,MAAM,MAAM,CAAC;IAC7B,cAAc,EAAE,MAAM,yBAAyB,CAAC;CACjD,CAAC;AAEF;;;;GAIG;AACH,eAAO,MAAM,yBAAyB,EAAE,iBAGvC,CAAC"}

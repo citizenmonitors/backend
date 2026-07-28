@@ -1,4 +1,25 @@
+import type { Types } from "mongoose";
 import type { AuthenticatedUser } from "../../types/authenticatedRequest.ts";
+import { type FlagMediaFiles } from "../Election/electionService.ts";
+type Id = Types.ObjectId | string;
+type PuVerificationFeed = {
+    results: Array<{
+        electionTypeId?: Types.ObjectId | string;
+    }>;
+    incidentReports: Array<{
+        electionTypeId?: Types.ObjectId | string;
+    }>;
+};
+/**
+ * Mobile agree/flag — same polling-unit rules as web `POST /user-action`,
+ * but scoped to one ActiveElection (user opens that election first).
+ */
+export declare const mobileElectionUserAction: (activeElectionId: string, userId: Id, body: {
+    electionId: string;
+    action: "agree" | "flag" | "unagree";
+    dataType: "election" | "incident";
+    flagReason?: string;
+} | null, flagMediaFiles?: FlagMediaFiles) => Promise<PuVerificationFeed>;
 type ElectionStatus = "all" | "live" | "upcoming" | "concluded";
 type ElectionScope = "all" | "polling-unit";
 export declare const getMobileActiveElections: (input: {
@@ -44,20 +65,20 @@ export declare const getMobileElectionSubmissionByActiveElection: (activeElectio
             lga: string;
             ward: string;
             pollingUnit: string;
-            election: import("mongoose").Types.ObjectId;
+            election: Types.ObjectId;
             flagged: boolean;
-            user: import("mongoose").Types.ObjectId;
-            partiesVotes: import("mongoose").Types.DocumentArray<{
+            user: Types.ObjectId;
+            partiesVotes: Types.DocumentArray<{
                 party?: string | null | undefined;
                 count?: number | null | undefined;
-            }, import("mongoose").Types.Subdocument<import("mongoose").Types.ObjectId, any, {
+            }, Types.Subdocument<Types.ObjectId, any, {
                 party?: string | null | undefined;
                 count?: number | null | undefined;
             }> & {
                 party?: string | null | undefined;
                 count?: number | null | undefined;
             }>;
-            actions: import("mongoose").Types.DocumentArray<{
+            actions: Types.DocumentArray<{
                 action: "agree" | "flag";
                 flagImage?: {
                     name?: string | null | undefined;
@@ -73,9 +94,9 @@ export declare const getMobileElectionSubmissionByActiveElection: (activeElectio
                     location?: string | null | undefined;
                     size?: number | null | undefined;
                 } | null | undefined;
-                userId?: import("mongoose").Types.ObjectId | null | undefined;
+                userId?: Types.ObjectId | null | undefined;
                 flagReason?: string | null | undefined;
-                evidenceId?: import("mongoose").Types.ObjectId | null | undefined;
+                evidenceId?: Types.ObjectId | null | undefined;
             } | {
                 action: "agree" | "flag";
                 flagImage?: {
@@ -97,7 +118,7 @@ export declare const getMobileElectionSubmissionByActiveElection: (activeElectio
                 evidenceId?: string | null | undefined;
                 _id: string;
                 __v: number;
-            }, import("mongoose").Types.Subdocument<string | import("mongoose").Types.ObjectId, any, {
+            }, Types.Subdocument<string | Types.ObjectId, any, {
                 action: "agree" | "flag";
                 flagImage?: {
                     name?: string | null | undefined;
@@ -113,9 +134,9 @@ export declare const getMobileElectionSubmissionByActiveElection: (activeElectio
                     location?: string | null | undefined;
                     size?: number | null | undefined;
                 } | null | undefined;
-                userId?: import("mongoose").Types.ObjectId | null | undefined;
+                userId?: Types.ObjectId | null | undefined;
                 flagReason?: string | null | undefined;
-                evidenceId?: import("mongoose").Types.ObjectId | null | undefined;
+                evidenceId?: Types.ObjectId | null | undefined;
             } | {
                 action: "agree" | "flag";
                 flagImage?: {
@@ -153,9 +174,9 @@ export declare const getMobileElectionSubmissionByActiveElection: (activeElectio
                     location?: string | null | undefined;
                     size?: number | null | undefined;
                 } | null | undefined;
-                userId?: import("mongoose").Types.ObjectId | null | undefined;
+                userId?: Types.ObjectId | null | undefined;
                 flagReason?: string | null | undefined;
-                evidenceId?: import("mongoose").Types.ObjectId | null | undefined;
+                evidenceId?: Types.ObjectId | null | undefined;
             } | {
                 action: "agree" | "flag";
                 flagImage?: {
@@ -211,7 +232,7 @@ export declare const getMobileElectionSubmissionByActiveElection: (activeElectio
             usedBallotPapers?: number | null | undefined;
             priorityLevel?: number | null | undefined;
         }> & {
-            _id: import("mongoose").Types.ObjectId;
+            _id: Types.ObjectId;
         } & {
             __v: number;
         })[];
@@ -223,11 +244,11 @@ export declare const getMobileElectionSubmissionByActiveElection: (activeElectio
             lga: string;
             ward: string;
             pollingUnit: string;
-            election: import("mongoose").Types.ObjectId;
+            election: Types.ObjectId;
             flagged: boolean;
-            user: import("mongoose").Types.ObjectId;
+            user: Types.ObjectId;
             userRole: string;
-            actions: import("mongoose").Types.DocumentArray<{
+            actions: Types.DocumentArray<{
                 action: "agree" | "flag";
                 flagImage?: {
                     name?: string | null | undefined;
@@ -243,9 +264,9 @@ export declare const getMobileElectionSubmissionByActiveElection: (activeElectio
                     location?: string | null | undefined;
                     size?: number | null | undefined;
                 } | null | undefined;
-                userId?: import("mongoose").Types.ObjectId | null | undefined;
+                userId?: Types.ObjectId | null | undefined;
                 flagReason?: string | null | undefined;
-                evidenceId?: import("mongoose").Types.ObjectId | null | undefined;
+                evidenceId?: Types.ObjectId | null | undefined;
             } | {
                 action: "agree" | "flag";
                 flagImage?: {
@@ -267,7 +288,7 @@ export declare const getMobileElectionSubmissionByActiveElection: (activeElectio
                 evidenceId?: string | null | undefined;
                 _id: string;
                 __v: number;
-            }, import("mongoose").Types.Subdocument<string | import("mongoose").Types.ObjectId, any, {
+            }, Types.Subdocument<string | Types.ObjectId, any, {
                 action: "agree" | "flag";
                 flagImage?: {
                     name?: string | null | undefined;
@@ -283,9 +304,9 @@ export declare const getMobileElectionSubmissionByActiveElection: (activeElectio
                     location?: string | null | undefined;
                     size?: number | null | undefined;
                 } | null | undefined;
-                userId?: import("mongoose").Types.ObjectId | null | undefined;
+                userId?: Types.ObjectId | null | undefined;
                 flagReason?: string | null | undefined;
-                evidenceId?: import("mongoose").Types.ObjectId | null | undefined;
+                evidenceId?: Types.ObjectId | null | undefined;
             } | {
                 action: "agree" | "flag";
                 flagImage?: {
@@ -323,9 +344,9 @@ export declare const getMobileElectionSubmissionByActiveElection: (activeElectio
                     location?: string | null | undefined;
                     size?: number | null | undefined;
                 } | null | undefined;
-                userId?: import("mongoose").Types.ObjectId | null | undefined;
+                userId?: Types.ObjectId | null | undefined;
                 flagReason?: string | null | undefined;
-                evidenceId?: import("mongoose").Types.ObjectId | null | undefined;
+                evidenceId?: Types.ObjectId | null | undefined;
             } | {
                 action: "agree" | "flag";
                 flagImage?: {
@@ -351,13 +372,13 @@ export declare const getMobileElectionSubmissionByActiveElection: (activeElectio
             agreed: boolean;
             selectIncident: "Ballot Stuffing" | "Thuggery & Violence" | "Underage Voting" | "INEC Misconduct" | "Result Alteration" | "Voter Intimidation" | "Late Opening" | "Missing Materials" | "Other Incidents" | "Thuggery and Violence" | "Lack of electoral materials" | "Fraudulent electoral officers" | "Late commencement" | "Over voting" | "Other";
             incidentNote: string;
-            incidentPictures: import("mongoose").Types.DocumentArray<{
+            incidentPictures: Types.DocumentArray<{
                 name?: string | null | undefined;
                 type?: string | null | undefined;
                 url?: string | null | undefined;
                 location?: string | null | undefined;
                 size?: number | null | undefined;
-            }, import("mongoose").Types.Subdocument<import("mongoose").Types.ObjectId, any, {
+            }, Types.Subdocument<Types.ObjectId, any, {
                 name?: string | null | undefined;
                 type?: string | null | undefined;
                 url?: string | null | undefined;
@@ -370,13 +391,13 @@ export declare const getMobileElectionSubmissionByActiveElection: (activeElectio
                 location?: string | null | undefined;
                 size?: number | null | undefined;
             }>;
-            incidentVideos: import("mongoose").Types.DocumentArray<{
+            incidentVideos: Types.DocumentArray<{
                 name?: string | null | undefined;
                 type?: string | null | undefined;
                 url?: string | null | undefined;
                 location?: string | null | undefined;
                 size?: number | null | undefined;
-            }, import("mongoose").Types.Subdocument<import("mongoose").Types.ObjectId, any, {
+            }, Types.Subdocument<Types.ObjectId, any, {
                 name?: string | null | undefined;
                 type?: string | null | undefined;
                 url?: string | null | undefined;
@@ -399,7 +420,7 @@ export declare const getMobileElectionSubmissionByActiveElection: (activeElectio
             priorityLevel?: number | null | undefined;
             electionRating?: string | null | undefined;
         }> & {
-            _id: import("mongoose").Types.ObjectId;
+            _id: Types.ObjectId;
         } & {
             __v: number;
         })[];
@@ -410,7 +431,7 @@ export declare const getMobileElectionSubmissionByActiveElection: (activeElectio
         resultsCount: number;
         mockElection: boolean;
         electionLocation?: string | null | undefined;
-        _id: import("mongoose").Types.ObjectId;
+        _id: Types.ObjectId;
         __v: number;
     };
 }>;

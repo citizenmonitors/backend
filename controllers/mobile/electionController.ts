@@ -4,6 +4,7 @@ import {
   getMobileActiveElections,
   getMobileElectionSubmissionByActiveElection,
   getMobileLiveElectionsCarousel,
+  mobileElectionUserAction,
 } from "../../services/mobile/electionService.ts";
 import {
   deleteElectionResultDataService,
@@ -18,6 +19,20 @@ import { invalidateCacheByPrefixes } from "../../utils/cache.ts";
 
 type ElectionStatus = "all" | "live" | "upcoming" | "concluded";
 type ElectionScope = "all" | "polling-unit";
+
+type FlagUploadFile = {
+  buffer: Buffer;
+  mimetype: string;
+  originalname: string;
+  size: number;
+};
+
+type UserActionRequest = AuthenticatedRequest & {
+  files?: {
+    flagImage?: FlagUploadFile[];
+    flagVideo?: FlagUploadFile[];
+  };
+};
 
 const getErrorMessage = (error: unknown): string =>
   error instanceof Error ? error.message : String(error);
@@ -249,8 +264,67 @@ export const deleteIncidentReportMobile = async (req: Request, res: Response) =>
   }
 };
 
+/**
+ * Mobile: PU-scoped agree/flag for one ActiveElection.
+ * Same rules as web POST /api/elections/user-action; path includes activeElectionId
+ * because the mobile UI opens an election first.
+ */
+export const postMobileElectionUserAction = async (req: Request, res: Response) => {
+  try {
+    const r = req as UserActionRequest;
+    const activeElectionId = asParam(req.params.activeElectionId);
+    if (!isValidObjectId(activeElectionId)) {
+      return res.status(400).json({ message: "Invalid election id" });
+    }
+    const userId = requireUserId(r);
+    const { electionId, action, dataType, flagReason } = req.body as Record<
+      string,
+      string | undefined
+    >;
 
+    const actionData =
+      electionId && action && dataType
+        ? {
+            electionId,
+            action: action as "agree" | "flag" | "unagree",
+            dataType: dataType as "election" | "incident",
+            flagReason,
+          }
+        : null;
 
+    if (actionData && !isValidObjectId(actionData.electionId)) {
+      return res.status(400).json({ message: "Invalid target id" });
+    }
 
+    const flagMediaFiles =
+      r.files?.flagImage?.length || r.files?.flagVideo?.length
+        ? { flagImage: r.files.flagImage, flagVideo: r.files.flagVideo }
+        : undefined;
 
+    const results = await mobileElectionUserAction(
+      activeElectionId,
+      userId,
+      actionData,
+      flagMediaFiles
+    );
+
+    return res.status(200).json({
+      message: actionData
+        ? "Updated successfully"
+        : "Fetched polling-unit verification feed for this election",
+      results,
+    });
+  } catch (error) {
+    const message = getErrorMessage(error);
+    if (
+      message.includes("not available for your location") ||
+      message.includes("only allowed while the election is live") ||
+      message.includes("Public viewers cannot") ||
+      message.includes("polling unit")
+    ) {
+      return res.status(403).json({ message });
+    }
+    return res.status(400).json({ message });
+  }
+};
 

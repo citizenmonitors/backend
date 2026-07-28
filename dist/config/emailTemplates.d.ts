@@ -126,5 +126,7 @@ export declare const newsLetterTemplateNigerianJudiciaryComeOutside: () => strin
 export declare const newsLetterTemplateEkitiElectionFlaws2027: () => string;
 export declare const newsLetterTemplateNigeriaReadyFor2027Elections: () => string;
 export declare const newsLetterTemplateNigeriaFakeAgenciesRealGovernment: () => string;
+export declare const newsLetterTemplateEfccVersusNigeriansAntiCorruptionOrAntiOpposition: () => string;
+export declare const newsLetterTemplate2027ElectionsWhoIsBuyingYourVote: () => string;
 export {};
 //# sourceMappingURL=emailTemplates.d.ts.map

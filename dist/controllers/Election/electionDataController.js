@@ -336,11 +336,15 @@ export const getResultsAndPerformActionController = async (req, res) => {
         });
     }
     catch (error) {
+        const message = error instanceof Error ? error.message : "Failed to fetch election results or perform action";
         console.error("Error fetching election results and performing action:", error);
-        return res.status(500).json({
-            message: "Failed to fetch election results or perform action",
-            error: error.message,
-        });
+        if (message.includes("only allowed while the election is live") ||
+            message.includes("not available for your location") ||
+            message.includes("Public viewers cannot") ||
+            message.includes("polling unit")) {
+            return res.status(403).json({ message });
+        }
+        return res.status(400).json({ message });
     }
 };
 export const checkUserStatusForFlagController = async (req, res) => {
@@ -366,9 +370,10 @@ export const checkUserStatusForFlagController = async (req, res) => {
     }
     catch (error) {
         console.error("Error checking user submission status for flag:", error);
+        const message = error instanceof Error ? error.message : "Failed to check submission status";
         return res.status(500).json({
             message: "Failed to check submission status",
-            error: error.message,
+            error: message,
         });
     }
 };

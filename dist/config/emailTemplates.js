@@ -2833,4 +2833,127 @@ export const newsLetterTemplateNigeriaFakeAgenciesRealGovernment = () => baseTem
       </table>
       `,
 });
+export const newsLetterTemplateEfccVersusNigeriansAntiCorruptionOrAntiOpposition = () => baseTemplate({
+    title: "EFCC versus Nigerians; anti-corruption or anti-opposition?",
+    message: `
+      <table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
+        <tr>
+          <td>
+            <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 6px; overflow: hidden;">
+
+              <!-- Header -->
+              <tr>
+                <td style="background-color: #06BBAF; color: white; padding: 20px 30px; text-align: center;">
+                  <h3 style="color: #ffffff; margin: 0; font-size: 22px;">EFCC versus Nigerians; anti-corruption or anti-opposition?</h3>
+                </td>
+              </tr>
+
+              <!-- Body -->
+              <tr>
+                <td style="padding: 30px; color: #000000; font-size: 18px; line-height: 1.7;">
+
+                  <p><strong>Dear Citizen Monitors,</strong></p>
+
+                  <p>The Economic and Financial Crimes Commission (EFCC) was established with a clear mandate to investigate and prosecute economic and financial crimes without fear nor favour. It was meant to be Nigeria's foremost anti-corruption institution, restoring public confidence that no one is above the law.</p>
+
+                  <p><strong>But increasingly, many Nigerians are asking:</strong></p>
+                  <p>Is the EFCC fighting corruption, or fighting the opposition?</p>
+
+                  <p>This question is not born out of sympathy for corruption. Far from it. Nigerians want corrupt public officials prosecuted, regardless of political affiliation. What concerns many citizens is the growing perception that the EFCC's actions are often loud against political opponents, but noticeably quieter when allegations involve those aligned with the government of the day.</p>
+
+                  <p>History offers examples that fuel this perception. Politicians under investigation have often found their legal troubles disappear after defecting to the ruling party. Others become the subject of dramatic raids, televised arrests, and prolonged media trials, only for cases to drag on indefinitely or quietly fade away. Whether these outcomes are coincidental or not, the public perception has become increasingly difficult to ignore.</p>
+
+                  <h4 style="color: #06BBAF; margin-top: 20px;">The problem with selective justice</h4>
+                  <p>The problem with selective justice is that it eventually ceases to be justice.</p>
+
+                  <p>An anti-corruption agency derives its legitimacy not from the number of arrests it makes, but from the consistency with which it applies the law. If similar offences receive different treatments depending on political affiliations, public trust inevitably erodes.</p>
+
+                  <h4 style="color: #06BBAF; margin-top: 20px;">Independence matters ahead of elections</h4>
+                  <p>This is particularly important as Nigeria approaches another election cycle. Institutions responsible for enforcing the law must remain demonstrably independent. The credibility of the EFCC matters not only in recovering stolen assets, but also in strengthening democracy. Citizens must believe that investigations are driven by evidence, not political calculations.</p>
+
+                  <p>This is not to suggest that public officials under investigation should enjoy immunity. On the contrary: anyone accused of financial crimes should be investigated thoroughly and, where sufficient evidence exists, prosecuted diligently. The same standard should apply to everyone - government officials, opposition politicians, business leaders, and ordinary citizens.</p>
+
+                  <h4 style="color: #06BBAF; margin-top: 20px;">A fearless EFCC, not a partisan one</h4>
+                  <p>The fight against corruption cannot succeed if it is seen as a weapon against political rivals. Once an institution acquires that reputation, every legitimate prosecution becomes open to suspicion, and genuine accountability becomes harder.</p>
+
+                  <p>Nigeria needs a fearless EFCC; not a partisan one. The Commission owes its allegiance to the Constitution, not to any administration. Its success should be measured by fairness, professionalism, and the confidence it inspires among Nigerians.</p>
+
+                  <p><strong>When the EFCC knocks on a politician's door, do Nigerians see justice at work, or politics in uniform?</strong></p>
+
+                  <p>A credible democracy depends on institutions that are trusted by all, not feared by some and protected by others.</p>
+
+                  <p style="margin-top: 20px; font-style: italic; color: #555555;">
+                    Promoting transparency, accountability and informed public discourse.
+                  </p>
+
+                  ${newsletterFooterTemplate()}
+
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+      </table>
+      `,
+});
+export const newsLetterTemplate2027ElectionsWhoIsBuyingYourVote = () => baseTemplate({
+    title: "2027 Elections; who is buying your vote and why?",
+    message: `
+      <table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
+        <tr>
+          <td>
+            <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 6px; overflow: hidden;">
+
+              <!-- Header -->
+              <tr>
+                <td style="background-color: #06BBAF; color: white; padding: 20px 30px; text-align: center;">
+                  <h3 style="color: #ffffff; margin: 0; font-size: 22px;">2027 Elections; who is buying your vote and why?</h3>
+                </td>
+              </tr>
+
+              <!-- Body -->
+              <tr>
+                <td style="padding: 30px; color: #000000; font-size: 18px; line-height: 1.7;">
+
+                  <p><strong>Dear Citizen Monitors,</strong></p>
+
+                  <p>Vote buying is no longer a rumour confined to election day. It has evolved into a sophisticated political strategy, disguised as "empowerment," "palliatives," "transport support," "thank-you packages," or outright cash inducements. The question every Nigerian should ask is why are politicians willing to pay for votes?</p>
+
+                  <p><strong>The answer is simple; because your vote is valuable.</strong></p>
+
+                  <p>A vote determines who controls public resources, who awards contracts, who appoints officials, who influences security, education, healthcare, infrastructure, and ultimately, who shapes the future of the nation. If a vote were worthless, no politician would spend billions of naira trying to obtain it.</p>
+
+                  <p>When politicians purchase votes, they are not making an investment in the people; they are making an investment in power. Like any investor, they expect returns. Those returns often come through inflated contracts, abandoned projects, diversion of public funds, and governance that prioritises political survival over public service. The cost of vote buying is ultimately paid by citizens through poor roads, inadequate schools, underfunded hospitals, unreliable electricity, insecurity, and lost economic opportunities.</p>
+
+                  <p>It is tempting to justify accepting money because of hardship. Many Nigerians face genuine economic challenges, and a few thousand naira can seem like immediate relief. Yet that short-term gain can translate into four years of diminished accountability. The value exchanged at polling units, is often far less than the value lost through ineffective governance.</p>
+
+                  <h4 style="color: #06BBAF; margin-top: 20px;">How vote buying weakens democracy</h4>
+                  <p>Vote buying also weakens democracy in another critical way. It shifts political competition away from ideas, competence and integrity, and towards financial muscle. Candidates with the best policies may lose to those with the deepest pockets. Elections become transactions rather than expressions of the people's will.</p>
+
+                  <h4 style="color: #06BBAF; margin-top: 20px;">This is why every citizen has a role to play.</h4>
+                  <p>Ask candidates difficult questions. Demand to know their plans before accepting their promises. Report incidents of vote buying where it is safe to do so. Encourage conversations in your communities about the long-term consequences of selling votes. Above all, remember that your ballot is a public trust, not a commodity.</p>
+
+                  <p>At Citizen Monitors, we believe that credible elections begin with informed citizens. Our mission is to equip Nigerians with the knowledge and tools needed to safeguard electoral integrity before, during and after election day.</p>
+                  <p>The Citizen Monitors App empowers citizens to verify polling unit information, report electoral incidents, document irregularities with evidence, and contribute to greater transparency throughout the electoral process. Every verified report strengthens public accountability and helps protect the credibility of our elections.</p>
+
+                  <p>As the countdown to 2027 continues, we ask; If someone is willing to buy your vote today, what do they expect to recover tomorrow? Democracy is strongest when citizens understand the true value of their vote and refuse to exchange it for temporary rewards.</p>
+
+                  <p><strong>Your vote is your voice. Protect it. Use it wisely.</strong></p>
+
+                  <p style="margin-top: 20px; font-style: italic; color: #555555;">
+                    Promoting transparency, accountability and informed public discourse.
+                  </p>
+
+                  ${newsletterFooterTemplate()}
+
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+      </table>
+      `,
+});
 //# sourceMappingURL=emailTemplates.js.map

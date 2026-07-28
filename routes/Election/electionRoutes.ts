@@ -36,11 +36,11 @@ import {
   uploadFlagEvidenceFiles,
 } from "../../config/electionMulter.ts";
 import { getActivityBoardAndNotifications, getLiveElectionDetails, getOngoingElections } from "../../controllers/Election/electionLive.ts";
+import { getMobileCollation } from "../../controllers/mobile/collationController.ts";
 import {
-  getMobileCollation,
-  postMobileCollationUserAction,
-} from "../../controllers/mobile/collationController.ts";
-import { getMyElectionSubmissionMobile } from "../../controllers/mobile/electionController.ts";
+  getMyElectionSubmissionMobile,
+  postMobileElectionUserAction,
+} from "../../controllers/mobile/electionController.ts";
 import collationDiscussionRoutes from "../collationDiscussionRoutes.ts";
 
 const router = express.Router();
@@ -224,7 +224,7 @@ router.get(
 );
 router.get("/:activeElectionId/collation", authMiddleware, getMobileCollation);
 router.post(
-  "/:activeElectionId/collation/user-action",
+  "/:activeElectionId/user-action",
   authMiddleware,
   (req: Request, res: Response, next: NextFunction) => {
     runMulter(
@@ -235,7 +235,7 @@ router.post(
       "Flag evidence upload Multer error"
     );
   },
-  postMobileCollationUserAction
+  postMobileElectionUserAction
 );
 router.use(collationDiscussionRoutes);
 

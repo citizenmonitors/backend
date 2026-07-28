@@ -1,6 +1,61 @@
 import ActiveElection from "../../models/Election/ActiveElection.js";
-import { getElectionById } from "../Election/electionService.js";
+import CompletedUser from "../../models/CompletedUser.js";
+import ElectionData from "../../models/Election/ElectionData.js";
+import IncidentReport from "../../models/Election/IncidentReport.js";
+import { getElectionById, getResultsAndPerformAction, } from "../Election/electionService.js";
 import { getOrSetCache } from "../../utils/cache.js";
+import { isActiveElectionRelevantForUser } from "../../utils/electionRelevanceForUser.js";
+const filterFeedToActiveElection = (feed, activeElectionId) => ({
+    results: feed.results.filter((r) => String(r.electionTypeId) === String(activeElectionId)),
+    incidentReports: feed.incidentReports.filter((r) => String(r.electionTypeId) === String(activeElectionId)),
+});
+/**
+ * Mobile agree/flag — same polling-unit rules as web `POST /user-action`,
+ * but scoped to one ActiveElection (user opens that election first).
+ */
+export const mobileElectionUserAction = async (activeElectionId, userId, body, flagMediaFiles) => {
+    const user = await CompletedUser.findById(userId).lean();
+    if (!user || !user.pollingUnit) {
+        throw new Error("User not found or polling unit is missing");
+    }
+    const active = await ActiveElection.findById(activeElectionId)
+        .populate("election", "electionType electionName")
+        .lean();
+    if (!active) {
+        throw new Error("Election not found");
+    }
+    const electionRef = active.election;
+    if (!isActiveElectionRelevantForUser(electionRef ?? undefined, active.electionLocation, user)) {
+        throw new Error("This election is not available for your location");
+    }
+    if (!body?.action) {
+        const feed = (await getResultsAndPerformAction(userId, null));
+        return filterFeedToActiveElection(feed, activeElectionId);
+    }
+    if (body.dataType === "election") {
+        const doc = await ElectionData.findById(body.electionId).lean();
+        if (!doc || String(doc.election) !== String(activeElectionId)) {
+            throw new Error("Result not found for this election");
+        }
+    }
+    else if (body.dataType === "incident") {
+        const doc = await IncidentReport.findById(body.electionId).lean();
+        if (!doc || String(doc.election) !== String(activeElectionId)) {
+            throw new Error("Incident report not found for this election");
+        }
+    }
+    else {
+        throw new Error("Invalid data type");
+    }
+    // Same PU check as web (default requireSamePollingUnit: true).
+    const feed = (await getResultsAndPerformAction(userId, {
+        electionId: body.electionId,
+        action: body.action,
+        dataType: body.dataType,
+        flagReason: body.flagReason,
+    }, flagMediaFiles));
+    return filterFeedToActiveElection(feed, activeElectionId);
+};
 const MOBILE_ELECTIONS_CACHE_TTL_SECONDS = 30;
 const standardizeName = (name) => String(name ?? "")
     .toLowerCase()

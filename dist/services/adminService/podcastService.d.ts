@@ -21,6 +21,8 @@ type SendNewsletterInput = {
     recipients: RecipientRole[] | RecipientRole;
     scheduleTime?: string | Date;
     adminId?: Id;
+    /** When false, send email (+ newsletter inbox push) only — skip News & Insight. Default: true. */
+    publishAsNewsInsight?: unknown;
 };
 export declare const sendPodcastService: ({ title, content, recipients, adminId, }: SendPodcastInput) => Promise<mongoose.Document<unknown, {}, {
     createdAt: NativeDate;
@@ -118,9 +120,14 @@ export declare const getUserInboxService: (userId: Id | undefined) => Promise<{
 export declare const markPodcastAsReadService: (podcastId: Id, userId: Id | undefined) => Promise<{
     message: string;
 }>;
-export declare const sendNewsletterService: ({ recipients, scheduleTime, adminId, }: SendNewsletterInput) => Promise<{
+export declare const sendNewsletterService: ({ recipients, scheduleTime, adminId, publishAsNewsInsight, }: SendNewsletterInput) => Promise<{
     message: string;
     scheduleTime: string;
+} | {
+    totalRecipients: number;
+    newsInsight: null;
+    message: string;
+    scheduleTime?: undefined;
 } | {
     totalRecipients: number;
     newsInsight: {

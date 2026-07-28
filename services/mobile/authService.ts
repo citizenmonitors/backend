@@ -118,7 +118,26 @@ export const mobileContinueWithGoogle = async (
 
   const existingCompletedUser = await CompletedUser.findOne({ email });
   if (existingCompletedUser) {
-    throw new Error("This email is already registered. Please sign in.");
+    await CompletedUser.updateOne(
+      { email },
+      {
+        $set: {
+          ...providerPatch,
+          isActive: true,
+          lastLogin: new Date(),
+        },
+      }
+    );
+    const refreshed = await CompletedUser.findOne({ email });
+    const u = refreshed ?? existingCompletedUser;
+    const { password, ...user } = u.toObject();
+    const token = generateToken({ email });
+    return {
+      token,
+      user,
+      requiresPasswordSetup: u.hasSetPassword === false,
+      nextStep: "done",
+    };
   }
 
   const existingUser = await User.findOne({ email });

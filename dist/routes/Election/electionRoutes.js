@@ -3,8 +3,8 @@ import { getUserElectionDataController, deleteElectionResultData, createElection
 import { authMiddleware, isAuthorized, } from "../../middleware/authMiddleware.js";
 import { uploadResultDataFiles, uploadReportDataFiles, uploadFlagEvidenceFiles, } from "../../config/electionMulter.js";
 import { getActivityBoardAndNotifications, getLiveElectionDetails, getOngoingElections } from "../../controllers/Election/electionLive.js";
-import { getMobileCollation, postMobileCollationUserAction, } from "../../controllers/mobile/collationController.js";
-import { getMyElectionSubmissionMobile } from "../../controllers/mobile/electionController.js";
+import { getMobileCollation } from "../../controllers/mobile/collationController.js";
+import { getMyElectionSubmissionMobile, postMobileElectionUserAction, } from "../../controllers/mobile/electionController.js";
 import collationDiscussionRoutes from "../collationDiscussionRoutes.js";
 const router = express.Router();
 const runMulter = (middleware, req, res, next, uploadErrorMessage) => {
@@ -59,9 +59,9 @@ router.get("/activity-board", authMiddleware, getActivityBoardAndNotifications);
 // Collation + discussion (activeElectionId = ActiveElection._id; same paths as mobile under /elections)
 router.get("/:activeElectionId/my-submission", authMiddleware, getMyElectionSubmissionMobile);
 router.get("/:activeElectionId/collation", authMiddleware, getMobileCollation);
-router.post("/:activeElectionId/collation/user-action", authMiddleware, (req, res, next) => {
+router.post("/:activeElectionId/user-action", authMiddleware, (req, res, next) => {
     runMulter(uploadFlagEvidenceFiles, req, res, next, "Flag evidence upload Multer error");
-}, postMobileCollationUserAction);
+}, postMobileElectionUserAction);
 router.use(collationDiscussionRoutes);
 export default router;
 //# sourceMappingURL=electionRoutes.js.map

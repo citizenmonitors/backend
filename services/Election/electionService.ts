@@ -14,6 +14,7 @@ import { electionNotificationTemplate } from "../../config/emailTemplates.ts";
 import { sendEmail } from "../../config/email.ts";
 import type { Types } from "mongoose";
 import { isActiveElectionRelevantForUser } from "../../utils/electionRelevanceForUser.ts";
+import { isActiveElectionConcluded } from "../../utils/electionNotificationVisibility.ts";
 import {
   dispatchMobileNotification,
   dispatchNotificationToUsers,
@@ -2006,23 +2007,34 @@ const formattedIncidentReports = (incidentReports as UserResultOrIncident[]).map
 export const getResultsAndPerformAction = async (
   userId: Id,
   actionData: PollingUnitActionPayload | null | undefined,
-  flagMediaFiles?: FlagMediaFiles
+  flagMediaFiles?: FlagMediaFiles,
+  options?: { requireSamePollingUnit?: boolean }
 ) => {
   try {
-    // Fetch user to get polling unit
+    const requireSamePollingUnit = options?.requireSamePollingUnit !== false;
     const user = await CompletedUser.findById(userId).lean();
     if (!user || !user.pollingUnit) {
       throw new Error("User not found or polling unit is missing");
     }
+    if (user.role === "public-viewer") {
+      throw new Error(
+        "Public viewers cannot agree or flag election results or incidents."
+      );
+    }
 
     const pollingUnit = user.pollingUnit;
 
-    // If no actionData is provided, skip action handling and just return results
     if (!actionData) {
       return await fetchResults(pollingUnit, userId);
     }
 
-    // Only two models are possible (keeps typing tight)
+    if (!["agree", "flag", "unagree"].includes(actionData.action)) {
+      throw new Error("Invalid action. Use agree, flag, or unagree.");
+    }
+    if (!["election", "incident"].includes(actionData.dataType)) {
+      throw new Error("Invalid data type. It must be 'election' or 'incident'.");
+    }
+
     const dataModel = (actionData.dataType === "election"
       ? ElectionData
       : IncidentReport) as unknown as {
@@ -2041,6 +2053,7 @@ export const getResultsAndPerformAction = async (
     type FlaggableDoc = {
       user: Types.ObjectId | string;
       election?: Types.ObjectId | string;
+      pollingUnit?: string | null;
       actions: ActionSubdoc[];
       flagged?: boolean;
       priorityLevel?: number;
@@ -2048,7 +2061,6 @@ export const getResultsAndPerformAction = async (
       save: () => Promise<unknown>;
     };
 
-    // Fetch the specific election result or incident report
     const data = (await dataModel.findById(
       actionData.electionId
     )) as FlaggableDoc | null;
@@ -2065,18 +2077,65 @@ export const getResultsAndPerformAction = async (
     const activeElectionId = data.election ? String(data.election) : undefined;
 
     if (String(data.user) === String(userId)) {
-      throw new Error("You cannot flag your own result or incident.");
+      throw new Error("You cannot act on your own result or incident.");
     }
 
-    // Ensure user has uploaded a result before flagging
+    // Web user-action is polling-unit scoped. Mobile collation uses election
+    // coverage filters instead (state / LGA / ward).
+    if (
+      requireSamePollingUnit &&
+      (!data.pollingUnit ||
+        String(data.pollingUnit).trim() !== String(pollingUnit).trim())
+    ) {
+      throw new Error(
+        "You can only agree or flag submissions from your polling unit."
+      );
+    }
+
+    if (!activeElectionId) {
+      throw new Error("Submission is not linked to an active election.");
+    }
+
+    const activeElection = await ActiveElection.findById(activeElectionId)
+      .populate("election", "electionType electionName")
+      .lean();
+    if (!activeElection) {
+      throw new Error("Active election not found.");
+    }
+
+    // Viewing concluded elections is allowed; agree/flag only while live.
+    if (isActiveElectionConcluded(activeElection.endDate)) {
+      throw new Error(
+        "Agree and flag are only allowed while the election is live. You can still view results and incidents."
+      );
+    }
+
+    const electionRef = activeElection.election as unknown as {
+      electionType?: string;
+      electionName?: string;
+    } | null;
+    if (
+      !isActiveElectionRelevantForUser(
+        electionRef ?? undefined,
+        activeElection.electionLocation,
+        user
+      )
+    ) {
+      throw new Error("This election is not available for your location");
+    }
+
+    // Flag requires a prior upload so the actor has counter-data. Agree does not.
     let evidenceId: Id | undefined;
     if (actionData.action === "flag") {
-      const submissionCheck = await checkUserSubmissionStatusForFlag(
-        userId,
-        actionData
-      );
+      const submissionCheck = await checkUserSubmissionStatusForFlag(userId, {
+        electionId: actionData.electionId,
+        action: "flag",
+        dataType: actionData.dataType,
+      });
       if (!submissionCheck.hasUploaded || !submissionCheck.evidenceId) {
-        throw new Error("You must have submitted a result/incident to flag one.");
+        throw new Error(
+          "You must have submitted a result or incident for this election before you can flag."
+        );
       }
       evidenceId = submissionCheck.evidenceId as Id;
     }
@@ -2092,21 +2151,24 @@ export const getResultsAndPerformAction = async (
       flagMediaEmbedded = await embedFlagEvidenceFiles(flagMediaFiles);
     }
 
-    // Locate the user's existing action
     const existingActionIndex = data.actions.findIndex(
-      (a) =>
-        a.userId != null && String(a.userId) === String(userId)
+      (a) => a.userId != null && String(a.userId) === String(userId)
     );
     const existingAction = data.actions[existingActionIndex];
+    const wasAlreadyFlaggedByActor = existingAction?.action === "flag";
+    const previousFlaggedCount = data.actions.filter(
+      (a) => a.action === "flag"
+    ).length;
 
-    // Process action based on actionData
     if (existingAction) {
       if (actionData.action === "agree") {
-        // Toggle agree: if already agreed, remove action; otherwise, set to agree
         if (existingAction.action === "agree") {
           data.actions.splice(existingActionIndex, 1);
-        } else if (existingAction.action !== "flag") {
+        } else if (existingAction.action === "flag") {
+          throw new Error("You cannot agree after flagging the result.");
+        } else {
           existingAction.action = "agree";
+          if (evidenceId) existingAction.evidenceId = evidenceId;
           await dispatchNotificationToUsers({
             type: "report-confirmed",
             preferenceKey: "reportConfirmed",
@@ -2115,8 +2177,6 @@ export const getResultsAndPerformAction = async (
             activeElectionId,
             userIds: [String(data.user)],
           });
-        } else {
-          throw new Error("You cannot agree after flagging the result.");
         }
       } else if (actionData.action === "flag") {
         existingAction.action = "flag";
@@ -2128,14 +2188,19 @@ export const getResultsAndPerformAction = async (
           existingAction.flagVideo = flagMediaEmbedded.flagVideo;
         }
         existingAction.evidenceId = evidenceId;
-        await dispatchNotificationToUsers({
-          type: "report-flagged",
-          preferenceKey: "reportFlagged",
-          body: "Your report/result was flagged for review.",
-          info: formatFlagNotificationInfo(actionData.flagReason, flagMediaEmbedded),
-          activeElectionId,
-          userIds: [String(data.user)],
-        });
+        if (!wasAlreadyFlaggedByActor) {
+          await dispatchNotificationToUsers({
+            type: "report-flagged",
+            preferenceKey: "reportFlagged",
+            body: "Your report/result was flagged for review.",
+            info: formatFlagNotificationInfo(
+              actionData.flagReason,
+              flagMediaEmbedded
+            ),
+            activeElectionId,
+            userIds: [String(data.user)],
+          });
+        }
       } else if (actionData.action === "unagree") {
         if (existingAction.action === "agree") {
           data.actions.splice(existingActionIndex, 1);
@@ -2144,7 +2209,10 @@ export const getResultsAndPerformAction = async (
         }
       }
     } else {
-      // Add a new action
+      if (actionData.action === "unagree") {
+        throw new Error("You haven't agreed to this result/report.");
+      }
+
       const newAction: ActionSubdoc = {
         userId,
         action: actionData.action,
@@ -2164,7 +2232,10 @@ export const getResultsAndPerformAction = async (
           type: "report-flagged",
           preferenceKey: "reportFlagged",
           body: "Your report/result was flagged for review.",
-          info: formatFlagNotificationInfo(actionData.flagReason, flagMediaEmbedded),
+          info: formatFlagNotificationInfo(
+            actionData.flagReason,
+            flagMediaEmbedded
+          ),
           activeElectionId,
           userIds: [String(data.user)],
         });
@@ -2183,32 +2254,43 @@ export const getResultsAndPerformAction = async (
 
     const totalUsersInPollingUnit = await CompletedUser.countDocuments({
       pollingUnit: user.pollingUnit,
+      role: { $in: ["observer", "volunteer"] },
     });
 
     const totalUsers =
       totalUsersInPollingUnit > 0 ? totalUsersInPollingUnit : 1;
     const flaggedCount = data.actions.filter((a) => a.action === "flag").length;
     const priorityLevel = Math.round((flaggedCount / totalUsers) * 100);
+    const previousPriority = Math.round(
+      (previousFlaggedCount / totalUsers) * 100
+    );
+
     if (flaggedCount > 0) {
       data.flagged = true;
       data.priorityLevel = priorityLevel;
+    } else {
+      data.flagged = false;
+      data.priorityLevel = 0;
     }
+
     if (priorityLevel >= 50) {
       data.hidden = true;
-      await dispatchMobileNotification({
-        type: "security-alert",
-        preferenceKey: "securityAlerts",
-        body: "Result flagged above 50% threshold.",
-        info: `Polling Unit: ${user.pollingUnit}, Priority Level: ${priorityLevel}%`,
-        activeElectionId,
-        recipients: ["admin", "super-admin"],
-      });
+      if (previousPriority < 50) {
+        await dispatchMobileNotification({
+          type: "security-alert",
+          preferenceKey: "securityAlerts",
+          body: "Result flagged above 50% threshold.",
+          info: `Polling Unit: ${user.pollingUnit}, Priority Level: ${priorityLevel}%`,
+          activeElectionId,
+          recipients: ["admin", "super-admin"],
+        });
+      }
+    } else {
+      data.hidden = false;
     }
 
-    // Save the updated election result or incident report
     await data.save();
 
-    // Fetch and return the updated results and reports
     return await fetchResults(pollingUnit, userId);
   } catch (error) {
     throw new Error(`Error processing action: ${error.message}`);
@@ -2296,7 +2378,8 @@ const fetchResults = async (pollingUnit: string, userId: Id) => {
     .lean();
 
   // Process election results
-  const resultData = (electionResults as unknown as ObserverResult[]).map((result) => {
+  const resultData = (electionResults as unknown as ObserverResult[]).map(
+    (result) => {
     const e = result.election;
     const userAction = result.actions.find(
       (a) => String(a.userId) === String(userId)
@@ -2333,7 +2416,8 @@ const fetchResults = async (pollingUnit: string, userId: Id) => {
   });
 
   // Process incident reports
-  const reportData = (incidentReports as unknown as ObserverIncident[]).map((report) => {
+  const reportData = (incidentReports as unknown as ObserverIncident[]).map(
+    (report) => {
     const e = report.election;
     const userAction = report.actions.find(
       (a) => String(a.userId) === String(userId)

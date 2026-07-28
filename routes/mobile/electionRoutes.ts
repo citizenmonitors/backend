@@ -10,16 +10,15 @@ import {
   updateIncidentReportMobile,
   deleteIncidentReportMobile,
   getLiveElectionsCarouselMobile,
+  postMobileElectionUserAction,
 } from "../../controllers/mobile/electionController.ts";
 import {
   uploadReportDataFiles,
   uploadResultDataFiles,
   uploadFlagEvidenceFiles,
 } from "../../config/electionMulter.ts";
-import {
-  getMobileCollation,
-  postMobileCollationUserAction,
-} from "../../controllers/mobile/collationController.ts";
+import { getMobileCollation } from "../../controllers/mobile/collationController.ts";
+import { checkUserStatusForFlagController } from "../../controllers/Election/electionDataController.ts";
 import collationDiscussionRoutes from "../collationDiscussionRoutes.ts";
 
 const router = express.Router();
@@ -27,6 +26,10 @@ const router = express.Router();
 // GET /api/v1/mobile/elections/active?status=live|upcoming|concluded&scope=all|polling-unit
 router.get("/active", authMiddleware, getActiveElectionsMobile);
 router.get("/live-carousel", authMiddleware, getLiveElectionsCarouselMobile);
+
+// Same as web POST /api/elections/flag-action — check if user can flag (has prior upload)
+router.post("/flag-action", authMiddleware, checkUserStatusForFlagController);
+
 router.get(
   "/:activeElectionId/my-submission",
   authMiddleware,
@@ -118,8 +121,10 @@ router.delete(
 
 // Collation / election live (active election id = ActiveElection._id)
 router.get("/:activeElectionId/collation", authMiddleware, getMobileCollation);
+
+// PU verification (agree/flag) — same rules as web /user-action, scoped to one election
 router.post(
-  "/:activeElectionId/collation/user-action",
+  "/:activeElectionId/user-action",
   authMiddleware,
   (req, res, next) => {
     uploadFlagEvidenceFiles(req, res, (err?: unknown) => {
@@ -133,7 +138,7 @@ router.post(
       next();
     });
   },
-  postMobileCollationUserAction
+  postMobileElectionUserAction
 );
 
 router.use(collationDiscussionRoutes);

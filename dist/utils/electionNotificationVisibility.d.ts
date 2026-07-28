@@ -8,7 +8,7 @@ export declare const isActiveElectionConcludedById: (activeElectionId: Id | null
 export declare const buildHideConcludedElectionNotificationsFilter: () => Promise<{
     $or: ({
         type: {
-            $nin: ("result-upload" | "incident-upload" | "security-alert" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert")[];
+            $nin: ("election-day-alert" | "result-aggregated" | "result-upload" | "incident-upload" | "report-confirmed" | "report-flagged" | "security-alert")[];
         };
         activeElectionId?: undefined;
     } | {

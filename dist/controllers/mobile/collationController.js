@@ -1,5 +1,5 @@
 import { asParamString, isValidObjectId } from "../../utils/validators.js";
-import { getMobileCollationBundle, mobileCollationUserAction, } from "../../services/mobile/collationBundleService.js";
+import { getMobileCollationBundle, } from "../../services/mobile/collationBundleService.js";
 import { addPostComment, addReportThreadComment, createDiscussionPost, listDiscussionPosts, listPostComments, listReportThreadComments, toggleDiscussionPostLike, togglePostCommentLike, toggleReportCommentLike, } from "../../services/mobile/collationDiscussionService.js";
 import { invalidateCacheByPrefixes } from "../../utils/cache.js";
 const errMsg = (e) => (e instanceof Error ? e.message : String(e));
@@ -53,45 +53,6 @@ export const getMobileCollation = async (req, res) => {
             return res.status(404).json({ message });
         }
         return res.status(500).json({ message });
-    }
-};
-export const postMobileCollationUserAction = async (req, res) => {
-    try {
-        const r = req;
-        const activeElectionId = asParamString(req.params.activeElectionId);
-        if (!isValidObjectId(activeElectionId)) {
-            return res.status(400).json({ message: "Invalid election id" });
-        }
-        const userId = requireUserId(r);
-        const { electionId, action, dataType, flagReason } = req.body;
-        const actionData = electionId && action && dataType
-            ? {
-                electionId,
-                action: action,
-                dataType: dataType,
-                flagReason,
-            }
-            : null;
-        if (actionData && !isValidObjectId(actionData.electionId)) {
-            return res.status(400).json({ message: "Invalid target id" });
-        }
-        const flagMediaFiles = r.files?.flagImage?.length || r.files?.flagVideo?.length
-            ? { flagImage: r.files.flagImage, flagVideo: r.files.flagVideo }
-            : undefined;
-        const results = await mobileCollationUserAction(activeElectionId, userId, actionData, flagMediaFiles);
-        return res.status(200).json({
-            message: actionData
-                ? "Updated successfully"
-                : "Fetched polling-unit verification feed (legacy)",
-            results,
-        });
-    }
-    catch (error) {
-        const message = errMsg(error);
-        if (message.includes("not available for your location")) {
-            return res.status(403).json({ message });
-        }
-        return res.status(400).json({ message });
     }
 };
 export const getReportThreadCommentsMobile = async (req, res) => {

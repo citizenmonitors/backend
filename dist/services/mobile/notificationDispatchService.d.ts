@@ -17,26 +17,26 @@ export declare const dispatchMobileNotification: (input: {
     targetUsers: import("mongoose").Types.ObjectId[];
     readBy: import("mongoose").Types.ObjectId[];
     deletedBy: import("mongoose").Types.ObjectId[];
-    type?: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | "news-insight" | "press-coverage" | null | undefined;
+    type?: "newsletter" | "election-day-alert" | "result-aggregated" | "result-upload" | "incident-upload" | "report-confirmed" | "report-flagged" | "security-alert" | "pending-approval" | "discussion-reply" | "news-insight" | "press-coverage" | null | undefined;
     info?: string | null | undefined;
+    activeElectionId?: import("mongoose").Types.ObjectId | null | undefined;
     preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | "newsAndInsights" | "pressCoverage" | null | undefined;
     body?: string | null | undefined;
     articleSlug?: string | null | undefined;
     articleId?: string | null | undefined;
-    activeElectionId?: import("mongoose").Types.ObjectId | null | undefined;
     recipients?: string[] | null | undefined;
 }> & {
     createdAt: NativeDate;
     targetUsers: import("mongoose").Types.ObjectId[];
     readBy: import("mongoose").Types.ObjectId[];
     deletedBy: import("mongoose").Types.ObjectId[];
-    type?: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | "news-insight" | "press-coverage" | null | undefined;
+    type?: "newsletter" | "election-day-alert" | "result-aggregated" | "result-upload" | "incident-upload" | "report-confirmed" | "report-flagged" | "security-alert" | "pending-approval" | "discussion-reply" | "news-insight" | "press-coverage" | null | undefined;
     info?: string | null | undefined;
+    activeElectionId?: import("mongoose").Types.ObjectId | null | undefined;
     preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | "newsAndInsights" | "pressCoverage" | null | undefined;
     body?: string | null | undefined;
     articleSlug?: string | null | undefined;
     articleId?: string | null | undefined;
-    activeElectionId?: import("mongoose").Types.ObjectId | null | undefined;
     recipients?: string[] | null | undefined;
 } & {
     _id: import("mongoose").Types.ObjectId;
@@ -58,26 +58,26 @@ export declare const dispatchNotificationToUsers: (input: {
     targetUsers: import("mongoose").Types.ObjectId[];
     readBy: import("mongoose").Types.ObjectId[];
     deletedBy: import("mongoose").Types.ObjectId[];
-    type?: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | "news-insight" | "press-coverage" | null | undefined;
+    type?: "newsletter" | "election-day-alert" | "result-aggregated" | "result-upload" | "incident-upload" | "report-confirmed" | "report-flagged" | "security-alert" | "pending-approval" | "discussion-reply" | "news-insight" | "press-coverage" | null | undefined;
     info?: string | null | undefined;
+    activeElectionId?: import("mongoose").Types.ObjectId | null | undefined;
     preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | "newsAndInsights" | "pressCoverage" | null | undefined;
     body?: string | null | undefined;
     articleSlug?: string | null | undefined;
     articleId?: string | null | undefined;
-    activeElectionId?: import("mongoose").Types.ObjectId | null | undefined;
     recipients?: string[] | null | undefined;
 }> & {
     createdAt: NativeDate;
     targetUsers: import("mongoose").Types.ObjectId[];
     readBy: import("mongoose").Types.ObjectId[];
     deletedBy: import("mongoose").Types.ObjectId[];
-    type?: "newsletter" | "result-upload" | "incident-upload" | "pending-approval" | "security-alert" | "discussion-reply" | "result-aggregated" | "report-confirmed" | "report-flagged" | "election-day-alert" | "news-insight" | "press-coverage" | null | undefined;
+    type?: "newsletter" | "election-day-alert" | "result-aggregated" | "result-upload" | "incident-upload" | "report-confirmed" | "report-flagged" | "security-alert" | "pending-approval" | "discussion-reply" | "news-insight" | "press-coverage" | null | undefined;
     info?: string | null | undefined;
+    activeElectionId?: import("mongoose").Types.ObjectId | null | undefined;
     preferenceKey?: "newsletter" | "pollingUnitActivity" | "electionDayAlert" | "discussionReplies" | "resultAggregated" | "reportConfirmed" | "reportFlagged" | "securityAlerts" | "newsAndInsights" | "pressCoverage" | null | undefined;
     body?: string | null | undefined;
     articleSlug?: string | null | undefined;
     articleId?: string | null | undefined;
-    activeElectionId?: import("mongoose").Types.ObjectId | null | undefined;
     recipients?: string[] | null | undefined;
 } & {
     _id: import("mongoose").Types.ObjectId;

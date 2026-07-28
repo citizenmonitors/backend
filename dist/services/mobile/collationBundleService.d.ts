@@ -1,5 +1,4 @@
 import type { Types } from "mongoose";
-import { type FlagMediaFiles } from "../Election/electionService.ts";
 type Id = Types.ObjectId | string;
 export declare const assertMobileCollationAccess: (activeElectionId: string, userId: Id) => Promise<{
     user: import("mongoose").FlattenMaps<{
@@ -197,6 +196,31 @@ export declare const getMobileCollationBundle: (activeElectionId: string, userId
             voteBuying: Record<string, number>;
         };
     } | null;
+    geoBreakdown: {
+        groupBy: "state" | "lga" | "ward";
+        summary: {
+            resultsCount: number;
+            incidentsCount: number;
+            reportedPollingUnits: number;
+            totalPollingUnits: number | null;
+            scopeLabel: string;
+        };
+        regions: {
+            regionName: string;
+            resultsCount: number;
+            incidentsCount: number;
+            reportedPollingUnits: number;
+            totalPollingUnits: number | null;
+            totalVotes: number;
+            percentOfTotalVotes: number;
+            parties: {
+                party: string;
+                votes: number;
+                percent: number;
+                color: string;
+            }[];
+        }[];
+    };
     overview: {
         lastSyncAt: Date | null;
         resultsUploadedCount: number;
@@ -222,86 +246,6 @@ export declare const getMobileCollationBundle: (activeElectionId: string, userId
         startDate: NativeDate;
         endDate: NativeDate;
     };
-}>;
-export declare const mobileCollationUserAction: (activeElectionId: string, userId: Id, body: {
-    electionId: string;
-    action: "agree" | "flag" | "unagree";
-    dataType: "election" | "incident";
-    flagReason?: string;
-} | null, flagMediaFiles?: FlagMediaFiles) => Promise<{
-    results: {
-        electionTypeId: string | Types.ObjectId | undefined;
-        electionId: string | Types.ObjectId;
-        electionType: string | undefined;
-        electionName: string | undefined;
-        pollingUnit: string | undefined;
-        electionYear: string;
-        uploadedAt: string | Date | undefined;
-        partiesVotes: unknown;
-        voteRating: string | null | undefined;
-        voterIntimidation: string | null | undefined;
-        voteBuying: string | null | undefined;
-        resultPicture: unknown;
-        resultVideo: unknown;
-        agreed: boolean;
-        flagged: boolean;
-        hidden: boolean | undefined;
-        priorityLevel: number | undefined;
-        actions: {
-            userId?: Types.ObjectId | string;
-            action?: string;
-        }[];
-        timeBegan: string | null | undefined;
-        isApproved: boolean | undefined;
-        election: {
-            _id?: Types.ObjectId | string;
-            election?: {
-                electionType?: string;
-                electionName?: string;
-            };
-            startDate?: Date | string | null;
-            endDate?: Date | string | null;
-            electionLocation?: string | null;
-        } | null | undefined;
-        electionLocation: string | null | undefined;
-        startDate: string | Date | null;
-        endDate: string | Date | null;
-    }[];
-    incidentReports: {
-        electionTypeId: string | Types.ObjectId | undefined;
-        electionId: string | Types.ObjectId;
-        electionType: string | undefined;
-        electionName: string | undefined;
-        electionYear: string;
-        pollingUnit: string | undefined;
-        uploadedAt: string | Date | undefined;
-        selectIncident: string | null | undefined;
-        incidentNote: string | null | undefined;
-        electionRating: string | null | undefined;
-        incidentPictures: unknown;
-        incidentVideos: unknown;
-        agreed: boolean;
-        flagged: boolean;
-        hidden: boolean | undefined;
-        priorityLevel: number | undefined;
-        actions: {
-            userId?: Types.ObjectId | string;
-            action?: string;
-        }[];
-        electionLocation: string | null | undefined;
-        startDate: string | Date | null;
-        endDate: string | Date | null;
-        election: {
-            _id?: Types.ObjectId | string;
-            election?: {
-                electionType?: string;
-                electionName?: string;
-            };
-            startDate?: Date | string | null;
-            endDate?: Date | string | null;
-            electionLocation?: string | null;
-        } | null | undefined;
-    }[];
 }>;
 export {};
 //# sourceMappingURL=collationBundleService.d.ts.map

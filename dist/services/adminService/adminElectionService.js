@@ -7,6 +7,7 @@ import IncidentReport from "../../models/Election/IncidentReport.js";
 import ActiveElection from "../../models/Election/ActiveElection.js";
 import AdminLog from "../../models/admin/AdminLog.js";
 import Notification from "../../models/DailyTraffic/Notification.js";
+import { detachIncidentFromActiveElection, detachResultFromActiveElection, } from "../Election/electionService.js";
 function toObjectId(id) {
     return id instanceof mongoose.Types.ObjectId ? id : new mongoose.Types.ObjectId(String(id));
 }
@@ -236,11 +237,13 @@ export const deleteResultOrIncidentService = async (id, adminId) => {
         const result = await ElectionData.findByIdAndDelete(id);
         if (result) {
             deletedType = "Election Result";
+            await detachResultFromActiveElection(result.election, result._id);
         }
         else {
             const incident = await IncidentReport.findByIdAndDelete(id);
             if (incident) {
                 deletedType = "Incident Report";
+                await detachIncidentFromActiveElection(incident.election, incident._id);
             }
         }
         if (!deletedType) {
@@ -278,10 +281,12 @@ export const deleteFlaggedResults = async (id, adminId) => {
         if (result) {
             await ElectionData.findByIdAndDelete(id);
             deletedType = "Flagged Election Result";
+            await detachResultFromActiveElection(result.election, result._id);
         }
         if (incident) {
             await IncidentReport.findByIdAndDelete(id);
             deletedType = "Flagged Incident Report";
+            await detachIncidentFromActiveElection(incident.election, incident._id);
         }
         const results = await fetchUpdatedFlaggedResults();
         // Log admin action

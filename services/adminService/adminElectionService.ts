@@ -10,6 +10,10 @@ import IncidentReport from "../../models/Election/IncidentReport.ts";
 import ActiveElection from "../../models/Election/ActiveElection.ts";
 import AdminLog from "../../models/admin/AdminLog.ts";
 import Notification from "../../models/DailyTraffic/Notification.ts";
+import {
+  detachIncidentFromActiveElection,
+  detachResultFromActiveElection,
+} from "../Election/electionService.ts";
 
 type Id = string | Types.ObjectId;
 
@@ -301,10 +305,12 @@ export const deleteResultOrIncidentService = async (id: Id, adminId: Id) => {
     const result = await ElectionData.findByIdAndDelete(id);
     if (result) {
       deletedType = "Election Result";
+      await detachResultFromActiveElection(result.election, result._id);
     } else {
       const incident = await IncidentReport.findByIdAndDelete(id);
       if (incident) {
         deletedType = "Incident Report";
+        await detachIncidentFromActiveElection(incident.election, incident._id);
       }
     }
 
@@ -352,10 +358,12 @@ export const deleteFlaggedResults = async (id: Id, adminId: Id) => {
     if (result) {
       await ElectionData.findByIdAndDelete(id);
       deletedType = "Flagged Election Result";
+      await detachResultFromActiveElection(result.election, result._id);
     }
     if (incident) {
       await IncidentReport.findByIdAndDelete(id);
       deletedType = "Flagged Incident Report";
+      await detachIncidentFromActiveElection(incident.election, incident._id);
     }
 
     const results = await fetchUpdatedFlaggedResults();

@@ -15,6 +15,7 @@ import {
   dispatchMobileNotification,
   dispatchNotificationToUsers,
 } from "../mobile/notificationDispatchService.ts";
+import { detachSubmissionsFromActiveElections } from "../Election/electionService.ts";
 
 type Id = string | Types.ObjectId;
 
@@ -347,11 +348,17 @@ export const deleteUserService = async (userId: Id, adminId: Id) => {
       throw new Error("User not found or already deleted");
     }
 
-    // Delete user's election results
+    // Delete user's election results / incidents and detach from ActiveElection
+    const [userResults, userIncidents] = await Promise.all([
+      ElectionData.find({ user: userId }).select("_id election").lean(),
+      IncidentReport.find({ user: userId }).select("_id election").lean(),
+    ]);
     await ElectionData.deleteMany({ user: userId });
-
-    // Delete user's incident reports
     await IncidentReport.deleteMany({ user: userId });
+    await detachSubmissionsFromActiveElections({
+      results: userResults,
+      incidents: userIncidents,
+    });
 
     // Delete the user
     await CompletedUser.findByIdAndDelete(userId);

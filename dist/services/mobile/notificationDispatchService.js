@@ -1,6 +1,7 @@
 import CompletedUser from "../../models/CompletedUser.js";
 import Notification from "../../models/DailyTraffic/Notification.js";
 import { isActiveElectionConcludedById } from "../../utils/electionNotificationVisibility.js";
+import { defaultNotificationSubtitle, sanitizeNotificationSubtitle, } from "../../utils/notificationContent.js";
 import { invalidateAllMobileReadCaches } from "../../utils/cache.js";
 import { getSocketServer } from "../realtime/socketBus.js";
 import { userRoomName } from "../realtime/socketServer.js";
@@ -34,7 +35,8 @@ const emitRealtimeNotification = (input) => {
         type: input.notification.type,
         preferenceKey: input.notification.preferenceKey,
         body: input.notification.body,
-        info: input.notification.info,
+        info: sanitizeNotificationSubtitle(input.notification.info) ||
+            defaultNotificationSubtitle(input.notification.type),
         createdAt: input.notification.createdAt ?? new Date(),
     };
     for (const userId of input.targetUserIds) {

@@ -286,7 +286,7 @@ export const postMobileElectionUserAction = async (req: Request, res: Response) 
       electionId && action && dataType
         ? {
             electionId,
-            action: action as "agree" | "flag" | "unagree",
+            action: action as "agree" | "flag" | "unagree" | "unflag",
             dataType: dataType as "election" | "incident",
             flagReason,
           }

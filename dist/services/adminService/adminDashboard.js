@@ -11,6 +11,7 @@ import AdminLog from "../../models/admin/AdminLog.js";
 import { adminRoleInvitationTemplate, adminSuspensionTemplate, approveObserverTemplate, observerDowngradeTemplate, observerRoleAvailableTemplate, observerNotApprovedInvalidPvcTemplate, observerRoleUpdateTemplate } from "../../config/emailTemplates.js";
 import { getPopulatedElectionLabels } from "./adminElectionService.js";
 import { dispatchNotificationToUsers, } from "../mobile/notificationDispatchService.js";
+import { detachSubmissionsFromActiveElections } from "../Election/electionService.js";
 const errMsg = (error) => error instanceof Error ? error.message : String(error);
 export const getDashboardData = async () => {
     const today = moment().startOf("day");
@@ -272,10 +273,17 @@ export const deleteUserService = async (userId, adminId) => {
         if (!user) {
             throw new Error("User not found or already deleted");
         }
-        // Delete user's election results
+        // Delete user's election results / incidents and detach from ActiveElection
+        const [userResults, userIncidents] = await Promise.all([
+            ElectionData.find({ user: userId }).select("_id election").lean(),
+            IncidentReport.find({ user: userId }).select("_id election").lean(),
+        ]);
         await ElectionData.deleteMany({ user: userId });
-        // Delete user's incident reports
         await IncidentReport.deleteMany({ user: userId });
+        await detachSubmissionsFromActiveElections({
+            results: userResults,
+            incidents: userIncidents,
+        });
         // Delete the user
         await CompletedUser.findByIdAndDelete(userId);
         // Log the admin action

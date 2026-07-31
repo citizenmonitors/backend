@@ -42,7 +42,7 @@ export const mobileElectionUserAction = async (
   userId: Id,
   body: {
     electionId: string;
-    action: "agree" | "flag" | "unagree";
+    action: "agree" | "flag" | "unagree" | "unflag";
     dataType: "election" | "incident";
     flagReason?: string;
   } | null,

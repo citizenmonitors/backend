@@ -8,6 +8,7 @@ import PulseComment from "../../models/Pulse/PulseComment.js";
 import { getMobileLiveElectionsCarousel } from "./electionService.js";
 import { getOrSetCache } from "../../utils/cache.js";
 import { buildHideConcludedElectionNotificationsFilter } from "../../utils/electionNotificationVisibility.js";
+import { sanitizeNotificationSubtitle } from "../../utils/notificationContent.js";
 import { countCommentsForArticles } from "./newsInsightEngagementService.js";
 import { countCommentsForPressCoverageArticles } from "./pressCoverageService.js";
 const roleVisibilityFilter = (userId, role) => ({
@@ -182,7 +183,7 @@ const buildMobileDashboard = async (user) => {
             id: String(n._id),
             type: n.type,
             title: n.body ?? "",
-            info: n.info ?? "",
+            info: sanitizeNotificationSubtitle(n.info) || String(n.info ?? ""),
             timeAgo: relativeTime(n.createdAt),
             createdAt: n.createdAt,
         }))

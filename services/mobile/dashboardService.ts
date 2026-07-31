@@ -9,6 +9,7 @@ import PulseComment from "../../models/Pulse/PulseComment.ts";
 import { getMobileLiveElectionsCarousel } from "./electionService.ts";
 import { getOrSetCache } from "../../utils/cache.ts";
 import { buildHideConcludedElectionNotificationsFilter } from "../../utils/electionNotificationVisibility.ts";
+import { sanitizeNotificationSubtitle } from "../../utils/notificationContent.ts";
 import { countCommentsForArticles } from "./newsInsightEngagementService.ts";
 import { countCommentsForPressCoverageArticles } from "./pressCoverageService.ts";
 
@@ -214,7 +215,7 @@ const buildMobileDashboard = async (user: AuthenticatedUser) => {
         id: String(n._id),
         type: n.type,
         title: n.body ?? "",
-        info: n.info ?? "",
+        info: sanitizeNotificationSubtitle(n.info) || String(n.info ?? ""),
         timeAgo: relativeTime(n.createdAt),
         createdAt: n.createdAt,
       }))

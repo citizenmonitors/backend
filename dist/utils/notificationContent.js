@@ -27,6 +27,40 @@ export const parseArticleLinkFromInfo = (info) => {
         return null;
     }
 };
+/**
+ * Make notification `info` safe for push/inbox display.
+ * Strips raw media URLs (legacy flag evidence dumps) and keeps human text.
+ */
+export const sanitizeNotificationSubtitle = (info) => {
+    let text = String(info ?? "").trim();
+    if (!text)
+        return "";
+    // Legacy: "Image: https://..." / "Video: https://..."
+    const hadImage = /(?:^|\|\s*)Image:\s*https?:\/\/\S+/i.test(text);
+    const hadVideo = /(?:^|\|\s*)Video:\s*https?:\/\/\S+/i.test(text);
+    text = text.replace(/(?:^|\|\s*)Image:\s*https?:\/\/\S+/gi, "");
+    text = text.replace(/(?:^|\|\s*)Video:\s*https?:\/\/\S+/gi, "");
+    // Any remaining bare URLs
+    text = text.replace(/https?:\/\/\S+/gi, "");
+    text = text
+        .replace(/\s*\|\s*/g, ". ")
+        .replace(/\s{2,}/g, " ")
+        .replace(/\.\s*\./g, ".")
+        .replace(/^\.\s*/, "")
+        .replace(/\s*\.$/, "")
+        .trim();
+    const evidenceBits = [];
+    if (hadImage)
+        evidenceBits.push("photo evidence attached");
+    if (hadVideo)
+        evidenceBits.push("video evidence attached");
+    if (evidenceBits.length > 0) {
+        const evidenceSentence = evidenceBits[0].charAt(0).toUpperCase() +
+            evidenceBits.join(" and ").slice(1);
+        text = text ? `${text}. ${evidenceSentence}` : evidenceSentence;
+    }
+    return text.trim();
+};
 export const resolveNotificationDisplay = (input) => {
     const title = String(input.body ?? "").trim() || "Citizen Monitors";
     const storedLink = input.articleSlug || input.articleId
@@ -37,9 +71,10 @@ export const resolveNotificationDisplay = (input) => {
         : parseArticleLinkFromInfo(input.info);
     const rawInfo = String(input.info ?? "").trim();
     const legacyJsonLink = parseArticleLinkFromInfo(rawInfo);
-    const subtitle = rawInfo && !legacyJsonLink
-        ? rawInfo
-        : defaultNotificationSubtitle(input.type);
+    const cleanedInfo = legacyJsonLink
+        ? ""
+        : sanitizeNotificationSubtitle(rawInfo);
+    const subtitle = cleanedInfo || defaultNotificationSubtitle(input.type);
     const link = storedLink ?? legacyJsonLink ?? null;
     return { title, subtitle, link };
 };

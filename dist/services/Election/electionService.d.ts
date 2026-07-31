@@ -1,5 +1,20 @@
 import type { Types } from "mongoose";
 type Id = Types.ObjectId | string;
+/** Keep ActiveElection.results / resultsCount in sync after a result is deleted. */
+export declare const detachResultFromActiveElection: (activeElectionId: Id | null | undefined, resultId: Id) => Promise<void>;
+/** Keep ActiveElection.incidentReports in sync after an incident is deleted. */
+export declare const detachIncidentFromActiveElection: (activeElectionId: Id | null | undefined, incidentId: Id) => Promise<void>;
+/** Bulk-detach many result/incident ids grouped by active election. */
+export declare const detachSubmissionsFromActiveElections: (input: {
+    results?: Array<{
+        _id: Id;
+        election?: Id | null;
+    }>;
+    incidents?: Array<{
+        _id: Id;
+        election?: Id | null;
+    }>;
+}) => Promise<void>;
 type MulterMemoryFile = {
     buffer: Buffer;
     mimetype: string;
@@ -63,7 +78,7 @@ type IncidentReportBody = {
 type PollingUnitActionPayload = {
     dataType: "election" | "incident";
     electionId: Id;
-    action: "agree" | "flag" | "unagree";
+    action: "agree" | "flag" | "unagree" | "unflag";
     /** Required when `action` is `flag` (trimmed non-empty). */
     flagReason?: string;
     evidenceId?: string;

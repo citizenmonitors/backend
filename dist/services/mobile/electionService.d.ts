@@ -16,7 +16,7 @@ type PuVerificationFeed = {
  */
 export declare const mobileElectionUserAction: (activeElectionId: string, userId: Id, body: {
     electionId: string;
-    action: "agree" | "flag" | "unagree";
+    action: "agree" | "flag" | "unagree" | "unflag";
     dataType: "election" | "incident";
     flagReason?: string;
 } | null, flagMediaFiles?: FlagMediaFiles) => Promise<PuVerificationFeed>;

@@ -16,6 +16,60 @@ import { isActiveElectionRelevantForUser } from "../../utils/electionRelevanceFo
 import { isActiveElectionConcluded } from "../../utils/electionNotificationVisibility.js";
 import { dispatchMobileNotification, dispatchNotificationToUsers, } from "../mobile/notificationDispatchService.js";
 const BACKEND_URL = process.env.BACKEND_URL;
+/** Keep ActiveElection.results / resultsCount in sync after a result is deleted. */
+export const detachResultFromActiveElection = async (activeElectionId, resultId) => {
+    if (!activeElectionId)
+        return;
+    const updated = await ActiveElection.findByIdAndUpdate(activeElectionId, { $pull: { results: resultId } }, { new: true });
+    if (!updated)
+        return;
+    const nextCount = Array.isArray(updated.results) ? updated.results.length : 0;
+    if (updated.resultsCount !== nextCount) {
+        updated.resultsCount = Math.max(0, nextCount);
+        await updated.save();
+    }
+};
+/** Keep ActiveElection.incidentReports in sync after an incident is deleted. */
+export const detachIncidentFromActiveElection = async (activeElectionId, incidentId) => {
+    if (!activeElectionId)
+        return;
+    await ActiveElection.findByIdAndUpdate(activeElectionId, {
+        $pull: { incidentReports: incidentId },
+    });
+};
+/** Bulk-detach many result/incident ids grouped by active election. */
+export const detachSubmissionsFromActiveElections = async (input) => {
+    const resultsByElection = new Map();
+    for (const row of input.results ?? []) {
+        if (!row.election)
+            continue;
+        const key = String(row.election);
+        const list = resultsByElection.get(key) ?? [];
+        list.push(row._id);
+        resultsByElection.set(key, list);
+    }
+    for (const [electionId, ids] of resultsByElection) {
+        const updated = await ActiveElection.findByIdAndUpdate(electionId, { $pull: { results: { $in: ids } } }, { new: true });
+        if (!updated)
+            continue;
+        updated.resultsCount = Math.max(0, Array.isArray(updated.results) ? updated.results.length : 0);
+        await updated.save();
+    }
+    const incidentsByElection = new Map();
+    for (const row of input.incidents ?? []) {
+        if (!row.election)
+            continue;
+        const key = String(row.election);
+        const list = incidentsByElection.get(key) ?? [];
+        list.push(row._id);
+        incidentsByElection.set(key, list);
+    }
+    for (const [electionId, ids] of incidentsByElection) {
+        await ActiveElection.findByIdAndUpdate(electionId, {
+            $pull: { incidentReports: { $in: ids } },
+        });
+    }
+};
 const embedFlagEvidenceFiles = async (files) => {
     const out = {};
     if (files?.flagImage?.[0]) {
@@ -63,11 +117,11 @@ const formatFlagNotificationInfo = (reason, media) => {
     const trimmed = reason?.trim();
     if (trimmed)
         parts.push(`Reason: ${trimmed}`);
-    if (media.flagImage?.url)
-        parts.push(`Image: ${media.flagImage.url}`);
-    if (media.flagVideo?.url)
-        parts.push(`Video: ${media.flagVideo.url}`);
-    return parts.length > 0 ? parts.join(" | ") : "Flagged for review.";
+    if (media.flagImage)
+        parts.push("Photo evidence attached");
+    if (media.flagVideo)
+        parts.push("Video evidence attached");
+    return parts.length > 0 ? parts.join(". ") : "Flagged for review.";
 };
 const parseUploadLocation = (raw) => {
     if (!raw)
@@ -925,11 +979,7 @@ export const deleteElectionResultDataService = async (electionId, userId) => {
         if (!result) {
             throw new Error("Result data not found or unauthorized");
         }
-        // Update the election to remove the reference to the deleted result
-        await ActiveElection.findByIdAndUpdate(electionId, {
-            $pull: { results: result._id },
-            $inc: { resultsCount: -1 },
-        });
+        await detachResultFromActiveElection(result.election, result._id);
         return { message: "Result data deleted successfully" };
     }
     catch (error) {
@@ -1263,10 +1313,7 @@ export const deleteIncidentReportDataService = async (electionId, userId) => {
         if (!incidentReport) {
             throw new Error("Incident report not found or unauthorized");
         }
-        // Update the election to remove the reference to the deleted incident report
-        await ActiveElection.findByIdAndUpdate(electionId, {
-            $pull: { incidentReports: incidentReport._id },
-        });
+        await detachIncidentFromActiveElection(incidentReport.election, incidentReport._id);
         return { message: "Incident report deleted successfully" };
     }
     catch (error) {
@@ -1370,8 +1417,8 @@ export const getResultsAndPerformAction = async (userId, actionData, flagMediaFi
         if (!actionData) {
             return await fetchResults(pollingUnit, userId);
         }
-        if (!["agree", "flag", "unagree"].includes(actionData.action)) {
-            throw new Error("Invalid action. Use agree, flag, or unagree.");
+        if (!["agree", "flag", "unagree", "unflag"].includes(actionData.action)) {
+            throw new Error("Invalid action. Use agree, flag, unagree, or unflag.");
         }
         if (!["election", "incident"].includes(actionData.dataType)) {
             throw new Error("Invalid data type. It must be 'election' or 'incident'.");
@@ -1405,7 +1452,7 @@ export const getResultsAndPerformAction = async (userId, actionData, flagMediaFi
         if (!activeElection) {
             throw new Error("Active election not found.");
         }
-        // Viewing concluded elections is allowed; agree/flag only while live.
+        // Viewing concluded elections is allowed; agree/flag/unflag only while live.
         if (isActiveElectionConcluded(activeElection.endDate)) {
             throw new Error("Agree and flag are only allowed while the election is live. You can still view results and incidents.");
         }
@@ -1488,10 +1535,21 @@ export const getResultsAndPerformAction = async (userId, actionData, flagMediaFi
                     throw new Error("You haven't agreed to this result/report.");
                 }
             }
+            else if (actionData.action === "unflag") {
+                if (existingAction.action === "flag") {
+                    data.actions.splice(existingActionIndex, 1);
+                }
+                else {
+                    throw new Error("You haven't flagged this result/report.");
+                }
+            }
         }
         else {
             if (actionData.action === "unagree") {
                 throw new Error("You haven't agreed to this result/report.");
+            }
+            if (actionData.action === "unflag") {
+                throw new Error("You haven't flagged this result/report.");
             }
             const newAction = {
                 userId,

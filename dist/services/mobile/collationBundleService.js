@@ -23,18 +23,26 @@ export const assertMobileCollationAccess = async (activeElectionId, userId) => {
 export const getMobileCollationBundle = async (activeElectionId, userId) => {
     const { user, active, electionType } = await assertMobileCollationAccess(activeElectionId, userId);
     const collation = await getLiveElectionService(activeElectionId, userId);
+    // Same source set as live chart (getLiveElectionService): approved observers +
+    // location filter OR the viewer's own submissions. Geo was previously stricter
+    // (hidden:false + exact loc only), so chart could have data while geo was empty.
+    const approvedObservers = await CompletedUser.find({ role: "observer", isObserverInPollingUnit: true }, "_id").lean();
+    const approvedObserverIds = approvedObservers.map((u) => u._id);
     const loc = buildObserverSubmissionLocationFilter(electionType, user);
+    const locationOrSelf = Object.keys(loc).length > 0
+        ? { $or: [loc, { user: userId }] }
+        : {};
     const resultQuery = {
         election: active._id,
         userRole: "observer",
-        hidden: false,
-        ...loc,
+        user: { $in: approvedObserverIds },
+        ...locationOrSelf,
     };
     const incidentQuery = {
         election: active._id,
         userRole: "observer",
-        hidden: false,
-        ...loc,
+        user: { $in: approvedObserverIds },
+        ...locationOrSelf,
     };
     const [results, incidents, rMax, iMax] = await Promise.all([
         ElectionData.find(resultQuery).lean(),
@@ -70,9 +78,11 @@ export const getMobileCollationBundle = async (activeElectionId, userId) => {
         ? new Date(Math.max(...lastSyncCandidates.map((d) => new Date(d).getTime())))
         : null;
     const electionRef = active.election;
+    // Build geo from the same live `result` that powers the chart (not a second query).
     const geoBreakdown = buildMobileGeoBreakdown({
         electionType: electionRef?.electionType,
         user,
+        liveResult: collation.result,
         results: results,
         incidents: incidents,
     });

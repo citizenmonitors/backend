@@ -179,7 +179,7 @@ export const uploadResultData = async (req, res) => {
             return res.status(400).json({ message: "Invalid election ID" });
         }
         const userId = requireUserId(req);
-        const resultData = await uploadResultDataService(electionId, userId, req.body, req.files);
+        const resultData = await uploadResultDataService(electionId, userId, req.body, req.files, { requireObserverUploadLocation: false });
         res.status(201).json(resultData);
     }
     catch (error) {
@@ -224,7 +224,7 @@ export const uploadIncidentReportData = async (req, res) => {
         if (!isValidObjectId(electionId)) {
             return res.status(400).json({ message: "Invalid election ID" });
         }
-        const report = await uploadIncidentReportDataService(electionId, requireUserId(req), req.body, req.files);
+        const report = await uploadIncidentReportDataService(electionId, requireUserId(req), req.body, req.files, { requireObserverUploadLocation: false });
         res.status(201).json(report);
     }
     catch (error) {

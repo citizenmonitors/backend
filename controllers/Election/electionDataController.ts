@@ -216,7 +216,8 @@ export const uploadResultData = async (req: AuthenticatedRequest, res: Response)
       electionId,
       userId,
       req.body,
-      req.files as Parameters<typeof uploadResultDataService>[3]
+      req.files as Parameters<typeof uploadResultDataService>[3],
+      { requireObserverUploadLocation: false }
     );
     res.status(201).json(resultData);
   } catch (error) {
@@ -271,7 +272,8 @@ export const uploadIncidentReportData = async (req: AuthenticatedRequest, res: R
       electionId,
       requireUserId(req),
       req.body,
-      req.files as Parameters<typeof uploadIncidentReportDataService>[3]
+      req.files as Parameters<typeof uploadIncidentReportDataService>[3],
+      { requireObserverUploadLocation: false }
     );
     res.status(201).json(report);
   } catch (error) {

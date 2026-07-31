@@ -1,12 +1,14 @@
 import { readFileSync } from "fs";
 import { projectPath } from "../../utils/projectRoot.ts";
 import lgaData from "../../data/lgaData.json" with { type: "json" };
+import { aggregateElectionResultsByGeo } from "../Election/electionLive.ts";
 
 type GroupByField = "state" | "lga" | "ward";
 
-type PartyVote = { party: string; count: number };
+type PartyVote = { party: string; count?: number; votes?: number };
 
 type ResultRow = {
+  userRole?: string | null;
   state?: string | null;
   lga?: string | null;
   ward?: string | null;
@@ -25,6 +27,19 @@ type Viewer = {
   state?: string | null;
   lga?: string | null;
   ward?: string | null;
+};
+
+type ChartRow = Record<string, unknown> & { party?: string };
+
+type LiveRegionRow = Record<string, unknown> & {
+  regionKey?: string;
+  chart?: ChartRow[];
+};
+
+type LiveResultObject = {
+  chart?: ChartRow[];
+  regions?: LiveRegionRow[];
+  aggregateAnalysis?: Record<string, number>;
 };
 
 type PollingUnitsState = {
@@ -118,7 +133,6 @@ const totalPollingUnitsForRegion = (
     const key = `${stateKey}|${normalize(regionKey)}`;
     const direct = index.byLga.get(key);
     if (direct != null) return direct;
-    // Fallback: match LGA across any state (district elections)
     for (const [k, v] of index.byLga) {
       if (k.endsWith(`|${normalize(regionKey)}`)) return v;
     }
@@ -138,18 +152,15 @@ const regionKeyFromRow = (
 ): string | null => {
   const raw = row[groupBy];
   if (raw == null || String(raw).trim() === "") return null;
-  return normalize(raw);
+  return String(raw).trim();
 };
 
 export const resolveGeoGroupBy = (
   electionType: string | undefined
 ): { groupBy: GroupByField; scopeLabel: string } => {
-  const t = String(electionType ?? "").toLowerCase();
-  if (t === "national") {
-    return {
-      groupBy: "state",
-      scopeLabel: "Nigeria",
-    };
+  const t = String(electionType ?? "").toLowerCase().trim();
+  if (t === "national" || t === "presidential") {
+    return { groupBy: "state", scopeLabel: "Nigeria" };
   }
   if (t === "senatorial" || t === "house-of-representatives") {
     return {
@@ -161,21 +172,12 @@ export const resolveGeoGroupBy = (
     };
   }
   if (t === "gubernatorial" || t === "house-of-assembly") {
-    return {
-      groupBy: "lga",
-      scopeLabel: "State",
-    };
+    return { groupBy: "lga", scopeLabel: "State" };
   }
-  if (t === "lga") {
-    return {
-      groupBy: "ward",
-      scopeLabel: "LGA",
-    };
+  if (t === "lga" || t === "local-government" || t === "local_government") {
+    return { groupBy: "ward", scopeLabel: "LGA" };
   }
-  return {
-    groupBy: "lga",
-    scopeLabel: "Coverage",
-  };
+  return { groupBy: "lga", scopeLabel: "Coverage" };
 };
 
 const resolveScopeDisplay = (
@@ -183,12 +185,12 @@ const resolveScopeDisplay = (
   user: Viewer,
   scopeLabel: string
 ): string => {
-  const t = String(electionType ?? "").toLowerCase();
-  if (t === "national") return "Nigeria";
+  const t = String(electionType ?? "").toLowerCase().trim();
+  if (t === "national" || t === "presidential") return "Nigeria";
   if (t === "gubernatorial" || t === "house-of-assembly") {
     return displayName(String(user.state ?? scopeLabel));
   }
-  if (t === "lga") {
+  if (t === "lga" || t === "local-government" || t === "local_government") {
     return displayName(String(user.lga ?? scopeLabel));
   }
   if (t === "senatorial" || t === "house-of-representatives") {
@@ -204,15 +206,74 @@ const resolveScopeDisplay = (
   return scopeLabel;
 };
 
+/** Live chart rows look like `{ party: "APC", APC: 1200 }`. */
+export const chartRowsToVotesMap = (
+  chart: ChartRow[] | undefined
+): Record<string, number> => {
+  const map: Record<string, number> = {};
+  for (const row of chart ?? []) {
+    const party = String(row.party ?? "").trim();
+    if (!party) continue;
+    const votes =
+      Number(row[party] ?? row.votes ?? row.count ?? row.Votes ?? 0) || 0;
+    if (votes <= 0) continue;
+    map[party] = (map[party] || 0) + votes;
+  }
+  return map;
+};
+
+const partiesFromVotesMap = (
+  partiesVotes: Record<string, number>,
+  totalVotes: number
+) =>
+  Object.entries(partiesVotes)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 7)
+    .map(([party, votes]) => ({
+      party,
+      votes,
+      percent:
+        totalVotes > 0 ? Math.round((votes / totalVotes) * 1000) / 10 : 0,
+      color: PARTY_COLORS[party.toUpperCase()] ?? null,
+    }));
+
+const votesMapToChartRows = (
+  partiesVotes: Record<string, number>
+): ChartRow[] =>
+  Object.entries(partiesVotes)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 7)
+    .map(([party, votes]) => ({ party, [party]: votes }));
+
+const emptyGeo = (
+  groupBy: GroupByField,
+  scopeDisplay: string,
+  resultsCount: number,
+  incidentsCount: number
+) => ({
+  groupBy,
+  summary: {
+    resultsCount,
+    incidentsCount,
+    reportedPollingUnits: 0,
+    totalPollingUnits: null as number | null,
+    scopeLabel: scopeDisplay,
+    totalVotes: 0,
+  },
+  regions: [] as Array<Record<string, unknown>>,
+});
+
 /**
- * Mobile Collation “Geo Breakdown” cards — grouped by election-type location filter.
- * national → state; gubernatorial/HoA/senatorial/HoR → LGA; lga → ward.
+ * Prefer live `result` (same object that powers the chart). Falls back to
+ * re-aggregating raw observer rows only if live result has no usable regions.
  */
 export const buildMobileGeoBreakdown = (input: {
   electionType: string | undefined;
   user: Viewer;
-  results: ResultRow[];
-  incidents: IncidentRow[];
+  /** Live collation `result` — chart + regions from getLiveElectionService. */
+  liveResult?: unknown;
+  results?: ResultRow[];
+  incidents?: IncidentRow[];
 }) => {
   const { groupBy, scopeLabel } = resolveGeoGroupBy(input.electionType);
   const scopeDisplay = resolveScopeDisplay(
@@ -220,117 +281,240 @@ export const buildMobileGeoBreakdown = (input: {
     input.user,
     scopeLabel
   );
+  const incidents = input.incidents ?? [];
+  const results = input.results ?? [];
 
-  type RegionAgg = {
+  type RegionSeed = {
     regionKey: string;
-    regionName: string;
     partiesVotes: Record<string, number>;
-    resultPollingUnits: Set<string>;
-    incidentPollingUnits: Set<string>;
     resultsCount: number;
-    incidentsCount: number;
+    chart: ChartRow[];
   };
 
-  const regions = new Map<string, RegionAgg>();
+  const seeds: RegionSeed[] = [];
+  let overallChart: ChartRow[] = [];
+  let aggregateAnalysis: Record<string, number> = {};
 
-  const ensure = (key: string, rawName: string): RegionAgg => {
-    let row = regions.get(key);
-    if (!row) {
-      row = {
-        regionKey: key,
-        regionName: displayName(rawName),
-        partiesVotes: {},
-        resultPollingUnits: new Set(),
-        incidentPollingUnits: new Set(),
+  const live = input.liveResult;
+
+  // National: result is an array of `{ state, chart, aggregateAnalysis }`.
+  if (Array.isArray(live) && live.length > 0) {
+    const first = live[0] as LiveResultObject & { state?: string };
+    aggregateAnalysis = { ...(first.aggregateAnalysis ?? {}) };
+    overallChart = votesMapToChartRows(aggregateAnalysis);
+
+    for (const item of live as Array<
+      LiveResultObject & { state?: string; chart?: ChartRow[] }
+    >) {
+      const regionKey = String(item.state ?? "").trim();
+      if (!regionKey) continue;
+      const partiesVotes = chartRowsToVotesMap(item.chart);
+      seeds.push({
+        regionKey,
+        partiesVotes,
         resultsCount: 0,
-        incidentsCount: 0,
-      };
-      regions.set(key, row);
+        chart: item.chart ?? votesMapToChartRows(partiesVotes),
+      });
     }
-    return row;
-  };
+  } else if (live && typeof live === "object") {
+    const obj = live as LiveResultObject;
+    aggregateAnalysis = { ...(obj.aggregateAnalysis ?? {}) };
+    overallChart = Array.isArray(obj.chart)
+      ? obj.chart
+      : votesMapToChartRows(aggregateAnalysis);
 
-  for (const result of input.results) {
-    const key = regionKeyFromRow(result, groupBy);
-    if (!key) continue;
-    const raw = String(result[groupBy] ?? key);
-    const agg = ensure(key, raw);
-    agg.resultsCount += 1;
-    if (result.pollingUnit) {
-      agg.resultPollingUnits.add(String(result.pollingUnit).trim());
+    // Preferred: live already computed per-location regions for the chart.
+    for (const row of obj.regions ?? []) {
+      const regionKey = String(
+        row.regionKey ?? row[groupBy] ?? row.state ?? row.lga ?? row.ward ?? ""
+      ).trim();
+      if (!regionKey) continue;
+      const fromMap =
+        row.partiesVotes &&
+        typeof row.partiesVotes === "object" &&
+        !Array.isArray(row.partiesVotes)
+          ? (row.partiesVotes as Record<string, number>)
+          : null;
+      const partiesVotes = fromMap ?? chartRowsToVotesMap(row.chart);
+      seeds.push({
+        regionKey,
+        partiesVotes,
+        resultsCount: Number(row.resultsCount) || 0,
+        chart: row.chart ?? votesMapToChartRows(partiesVotes),
+      });
     }
-    for (const pv of result.partiesVotes ?? []) {
-      if (!pv?.party) continue;
-      const votes = Number(pv.count) || 0;
-      agg.partiesVotes[pv.party] = (agg.partiesVotes[pv.party] || 0) + votes;
+
+    // Chart has totals but regions missing/empty → one region from overall chart
+    // is wrong for geo; re-aggregate from raw rows instead.
+    if (seeds.length === 0 && results.length > 0) {
+      const geo = aggregateElectionResultsByGeo(
+        results.map((r) => ({
+          userRole: r.userRole ?? "observer",
+          state: r.state ?? undefined,
+          lga: r.lga ?? undefined,
+          ward: r.ward ?? undefined,
+          partiesVotes: (r.partiesVotes ?? []).map((pv) => ({
+            party: String(pv.party ?? ""),
+            count: Number(pv.count ?? pv.votes) || 0,
+          })),
+        })),
+        groupBy
+      );
+      aggregateAnalysis = geo.aggregateAnalysis;
+      overallChart = geo.overallChart as ChartRow[];
+      for (const r of geo.regions) {
+        seeds.push({
+          regionKey: r.regionKey,
+          partiesVotes: r.partiesVotes,
+          resultsCount: r.resultsCount,
+          chart: r.chart as ChartRow[],
+        });
+      }
+    }
+
+    // Last resort: expose overall chart as a single coverage region so UI
+    // is never empty when chart has numbers.
+    if (seeds.length === 0) {
+      const partiesVotes =
+        Object.keys(aggregateAnalysis).length > 0
+          ? aggregateAnalysis
+          : chartRowsToVotesMap(overallChart);
+      if (Object.keys(partiesVotes).length > 0) {
+        seeds.push({
+          regionKey: scopeDisplay || "Coverage",
+          partiesVotes,
+          resultsCount: results.length,
+          chart: overallChart.length
+            ? overallChart
+            : votesMapToChartRows(partiesVotes),
+        });
+      }
+    }
+  } else if (results.length > 0) {
+    const geo = aggregateElectionResultsByGeo(
+      results.map((r) => ({
+        userRole: r.userRole ?? "observer",
+        state: r.state ?? undefined,
+        lga: r.lga ?? undefined,
+        ward: r.ward ?? undefined,
+        partiesVotes: (r.partiesVotes ?? []).map((pv) => ({
+          party: String(pv.party ?? ""),
+          count: Number(pv.count ?? pv.votes) || 0,
+        })),
+      })),
+      groupBy
+    );
+    aggregateAnalysis = geo.aggregateAnalysis;
+    overallChart = geo.overallChart as ChartRow[];
+    for (const r of geo.regions) {
+      seeds.push({
+        regionKey: r.regionKey,
+        partiesVotes: r.partiesVotes,
+        resultsCount: r.resultsCount,
+        chart: r.chart as ChartRow[],
+      });
     }
   }
 
-  for (const incident of input.incidents) {
+  if (seeds.length === 0) {
+    return emptyGeo(groupBy, scopeDisplay, results.length, incidents.length);
+  }
+
+  const incidentByRegion = new Map<
+    string,
+    { count: number; pollingUnits: Set<string> }
+  >();
+  for (const incident of incidents) {
     const key = regionKeyFromRow(incident, groupBy);
     if (!key) continue;
-    const raw = String(incident[groupBy] ?? key);
-    const agg = ensure(key, raw);
-    agg.incidentsCount += 1;
+    let row = incidentByRegion.get(key);
+    if (!row) {
+      row = { count: 0, pollingUnits: new Set() };
+      incidentByRegion.set(key, row);
+    }
+    row.count += 1;
     if (incident.pollingUnit) {
-      agg.incidentPollingUnits.add(String(incident.pollingUnit).trim());
+      row.pollingUnits.add(String(incident.pollingUnit).trim());
     }
   }
 
-  let grandTotalVotes = 0;
-  const regionList = [...regions.values()].map((agg) => {
-    const totalVotes = Object.values(agg.partiesVotes).reduce(
-      (sum, n) => sum + n,
-      0
-    );
-    grandTotalVotes += totalVotes;
-    const reportedPollingUnits = new Set([
-      ...agg.resultPollingUnits,
-      ...agg.incidentPollingUnits,
-    ]).size;
-    const totalPollingUnits = totalPollingUnitsForRegion(
-      groupBy,
-      agg.regionKey,
-      input.user
-    );
+  const resultPuByRegion = new Map<string, Set<string>>();
+  const resultsCountByRegion = new Map<string, number>();
+  for (const result of results) {
+    const key = regionKeyFromRow(result, groupBy);
+    if (!key) continue;
+    resultsCountByRegion.set(key, (resultsCountByRegion.get(key) ?? 0) + 1);
+    if (!result.pollingUnit) continue;
+    let set = resultPuByRegion.get(key);
+    if (!set) {
+      set = new Set();
+      resultPuByRegion.set(key, set);
+    }
+    set.add(String(result.pollingUnit).trim());
+  }
 
-    const parties = Object.entries(agg.partiesVotes)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 7)
-      .map(([party, votes]) => ({
-        party,
-        votes,
-        percent:
-          totalVotes > 0 ? Math.round((votes / totalVotes) * 1000) / 10 : 0,
-        color: PARTY_COLORS[party.toUpperCase()] ?? null,
-      }));
+  // Merge incident-only regions.
+  for (const key of incidentByRegion.keys()) {
+    if (!seeds.some((s) => s.regionKey === key)) {
+      seeds.push({
+        regionKey: key,
+        partiesVotes: {},
+        resultsCount: 0,
+        chart: [],
+      });
+    }
+  }
+
+  const chartTotalVotes = Object.values(aggregateAnalysis).reduce(
+    (sum, n) => sum + Number(n || 0),
+    0
+  );
+  const fallbackTotal =
+    chartTotalVotes > 0
+      ? chartTotalVotes
+      : seeds.reduce(
+          (sum, s) =>
+            sum +
+            Object.values(s.partiesVotes).reduce((a, b) => a + b, 0),
+          0
+        );
+
+  const regionList = seeds.map((seed) => {
+    const partiesVotes = seed.partiesVotes;
+    const totalVotes = Object.values(partiesVotes).reduce((s, n) => s + n, 0);
+    const incident = incidentByRegion.get(seed.regionKey);
+    const reportedPollingUnits = new Set([
+      ...(resultPuByRegion.get(seed.regionKey) ?? []),
+      ...(incident?.pollingUnits ?? []),
+    ]).size;
 
     return {
-      regionName: agg.regionName,
-      resultsCount: agg.resultsCount,
-      incidentsCount: agg.incidentsCount,
+      regionName: displayName(seed.regionKey),
+      resultsCount:
+        seed.resultsCount || resultsCountByRegion.get(seed.regionKey) || 0,
+      incidentsCount: incident?.count ?? 0,
       reportedPollingUnits,
-      totalPollingUnits,
+      totalPollingUnits: totalPollingUnitsForRegion(
+        groupBy,
+        seed.regionKey,
+        input.user
+      ),
       totalVotes,
-      percentOfTotalVotes: 0, // filled after grand total known
-      parties,
+      percentOfTotalVotes:
+        fallbackTotal > 0
+          ? Math.round((totalVotes / fallbackTotal) * 1000) / 10
+          : 0,
+      parties: partiesFromVotesMap(partiesVotes, totalVotes),
     };
   });
-
-  for (const region of regionList) {
-    region.percentOfTotalVotes =
-      grandTotalVotes > 0
-        ? Math.round((region.totalVotes / grandTotalVotes) * 1000) / 10
-        : 0;
-  }
 
   regionList.sort((a, b) => b.totalVotes - a.totalVotes);
 
   const summaryReportedPus = new Set<string>();
-  for (const r of input.results) {
+  for (const r of results) {
     if (r.pollingUnit) summaryReportedPus.add(String(r.pollingUnit).trim());
   }
-  for (const i of input.incidents) {
+  for (const i of incidents) {
     if (i.pollingUnit) summaryReportedPus.add(String(i.pollingUnit).trim());
   }
 
@@ -362,11 +546,12 @@ export const buildMobileGeoBreakdown = (input: {
   return {
     groupBy,
     summary: {
-      resultsCount: input.results.length,
-      incidentsCount: input.incidents.length,
+      resultsCount: results.length,
+      incidentsCount: incidents.length,
       reportedPollingUnits: summaryReportedPus.size,
       totalPollingUnits: summaryTotalPus,
       scopeLabel: scopeDisplay,
+      totalVotes: fallbackTotal,
     },
     regions: regionList,
   };

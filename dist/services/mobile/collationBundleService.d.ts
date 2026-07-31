@@ -147,7 +147,9 @@ export declare const getMobileCollationBundle: (activeElectionId: string, userId
         endDate: NativeDate;
     };
     result: {
-        aggregateAnalysis: Record<string, number>;
+        aggregateAnalysis: {
+            [x: string]: number;
+        };
         footer: {
             [x: string]: number;
         };
@@ -155,17 +157,30 @@ export declare const getMobileCollationBundle: (activeElectionId: string, userId
         chart: {
             [x: string]: string | number;
             party: string;
-        }[] | {
-            state: string;
+        }[];
+        regions: {
+            [x: string]: string | number | {
+                [x: string]: number;
+            } | {
+                [x: string]: string | number;
+                party: string;
+            }[];
+            regionKey: string;
             chart: {
                 [x: string]: string | number;
                 party: string;
             }[];
+            partiesVotes: {
+                [x: string]: number;
+            };
+            resultsCount: number;
         }[];
         footer: {
             [x: string]: number;
         };
-        aggregateAnalysis: Record<string, number>;
+        aggregateAnalysis: {
+            [x: string]: number;
+        };
         restriction: {
             name: string;
             value: string | null | undefined;
@@ -204,6 +219,18 @@ export declare const getMobileCollationBundle: (activeElectionId: string, userId
             reportedPollingUnits: number;
             totalPollingUnits: number | null;
             scopeLabel: string;
+            totalVotes: number;
+        };
+        regions: Array<Record<string, unknown>>;
+    } | {
+        groupBy: "state" | "lga" | "ward";
+        summary: {
+            resultsCount: number;
+            incidentsCount: number;
+            reportedPollingUnits: number;
+            totalPollingUnits: number | null;
+            scopeLabel: string;
+            totalVotes: number;
         };
         regions: {
             regionName: string;

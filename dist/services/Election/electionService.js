@@ -502,7 +502,7 @@ export const getLiveElectionById = async (electionId) => {
         throw new Error(`Error fetching election data: ${error.message}`);
     }
 };
-export const uploadResultDataService = async (electionId, userId, data, files) => {
+export const uploadResultDataService = async (electionId, userId, data, files, options) => {
     try {
         let { partiesVotes, voterIntimidation, voteBuying, voteRating, timeBegan, accreditedVoters, rejectedPapers, spoiledBallotPapers, usedBallotPapers, uploadLocation, } = data;
         // Ensure that partiesVotes is properly parsed as JSON
@@ -554,7 +554,10 @@ export const uploadResultDataService = async (electionId, userId, data, files) =
             throw new Error("You have already submitted an incident report for this election. Only one submission (result or incident) is allowed.");
         }
         const parsedUploadLocation = parseUploadLocation(uploadLocation);
-        if (user.role === "observer" && !parsedUploadLocation) {
+        const requireObserverUploadLocation = options?.requireObserverUploadLocation !== false;
+        if (requireObserverUploadLocation &&
+            user.role === "observer" &&
+            !parsedUploadLocation) {
             throw new Error("Observers must enable and provide upload location before submitting election results.");
         }
         // Convert partiesVotes.count to numbers
@@ -1002,7 +1005,7 @@ export const getAllElectionResults = async () => {
         throw new Error(`Error fetching all election results: ${error.message}`);
     }
 };
-export const uploadIncidentReportDataService = async (electionId, userId, data, files) => {
+export const uploadIncidentReportDataService = async (electionId, userId, data, files, options) => {
     try {
         const { selectIncident, incidentNote, electionRating, uploadLocation } = data;
         const normalizedIncidentNote = typeof incidentNote === "string" ? incidentNote.trim() : "";
@@ -1038,7 +1041,10 @@ export const uploadIncidentReportDataService = async (electionId, userId, data, 
             throw new Error("You have already submitted an election result for this election. Only one submission (result or incident) is allowed.");
         }
         const parsedUploadLocation = parseUploadLocation(uploadLocation);
-        if (user.role === "observer" && !parsedUploadLocation) {
+        const requireObserverUploadLocation = options?.requireObserverUploadLocation !== false;
+        if (requireObserverUploadLocation &&
+            user.role === "observer" &&
+            !parsedUploadLocation) {
             throw new Error("Observers must enable and provide upload location before submitting incident reports.");
         }
         const allowedVideoExtensions = [".mp4", ".avi", ".mov", ".webm", ".wmv"];

@@ -1085,7 +1085,9 @@ export declare const getLiveElectionById: (electionId: Id) => Promise<{
         }[];
     };
 }>;
-export declare const uploadResultDataService: (electionId: Id, userId: Id, data: UploadResultPayload, files: ElectionResultUploadFiles) => Promise<{
+export declare const uploadResultDataService: (electionId: Id, userId: Id, data: UploadResultPayload, files: ElectionResultUploadFiles, options?: {
+    requireObserverUploadLocation?: boolean;
+}) => Promise<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
@@ -1664,7 +1666,9 @@ export declare const getUserElectionData: (userId: Id) => Promise<(import("mongo
     __v: number;
 })[]>;
 export declare const getAllElectionResults: () => Promise<Record<string, unknown>>;
-export declare const uploadIncidentReportDataService: (electionId: Id, userId: Id, data: IncidentReportBody, files: IncidentReportUploadLike) => Promise<import("mongoose").Document<unknown, {}, {
+export declare const uploadIncidentReportDataService: (electionId: Id, userId: Id, data: IncidentReportBody, files: IncidentReportUploadLike, options?: {
+    requireObserverUploadLocation?: boolean;
+}) => Promise<import("mongoose").Document<unknown, {}, {
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {

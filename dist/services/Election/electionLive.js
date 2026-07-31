@@ -266,6 +266,7 @@ export const getLiveElectionService = async (electionId, userId, options) => {
         let restriction = null;
         switch (electionRef?.electionType) {
             case "national":
+            case "presidential":
                 groupBy = "state";
                 break;
             case "senatorial":
@@ -288,6 +289,8 @@ export const getLiveElectionService = async (electionId, userId, options) => {
                 restriction = { name: "State", value: user.state };
                 break;
             case "lga":
+            case "local-government":
+            case "local_government":
                 groupBy = "ward";
                 restriction = { name: "LGA", value: user.lga };
                 break;
@@ -313,18 +316,27 @@ export const getLiveElectionService = async (electionId, userId, options) => {
                 : {}),
         }).lean();
         if (electionResults.length > 0) {
-            const { resultData, aggregateAnalysis } = aggregateResultsAndTopParties(electionResults, groupBy, electionRef?.electionType);
+            const { resultData, regions, aggregateAnalysis, overallChart } = aggregateResultsAndTopParties(electionResults, groupBy, electionRef?.electionType);
             const sentimentData = await getSentimentAnalysisService(electionId, groupBy, user, activeElection);
+            const footer = calculateFooter(electionResults, groupBy, activeElection, user);
             result =
-                electionRef?.electionType === "national"
+                electionRef?.electionType === "national" ||
+                    electionRef?.electionType === "presidential"
                     ? resultData.map((stateResult) => ({
                         ...stateResult,
                         aggregateAnalysis,
-                        footer: calculateFooter(electionResults, groupBy, activeElection, user),
+                        footer,
                     }))
                     : {
-                        chart: resultData,
-                        footer: calculateFooter(electionResults, groupBy, activeElection, user),
+                        chart: overallChart ?? resultData,
+                        regions: regions.map((r) => ({
+                            [groupBy]: r.regionKey,
+                            regionKey: r.regionKey,
+                            chart: r.chart,
+                            partiesVotes: r.partiesVotes,
+                            resultsCount: r.resultsCount,
+                        })),
+                        footer,
                         aggregateAnalysis,
                         restriction,
                     };
@@ -368,34 +380,83 @@ export const getLiveElectionService = async (electionId, userId, options) => {
         throw new Error(`Error fetching election details: ${error.message}`);
     }
 };
-// Aggregates election results and calculates the top seven parties for each grouping level (state, lga, or ward)
-const aggregateResultsAndTopParties = (results, groupBy, electionType) => {
+// Aggregates election results by geo level (state / lga / ward) — same math for all
+// election types. Overall chart totals = sum of regional party votes.
+export const aggregateElectionResultsByGeo = (results, groupBy) => {
     const aggregated = {};
     const totalVotesByParty = {};
-    results.forEach((result) => {
-        const { state, partiesVotes, userRole } = result;
-        if (userRole !== "observer" || !partiesVotes?.length)
-            return;
-        const key = groupBy === "state" ? state : null;
-        const storageKey = String(key);
-        if (!aggregated[storageKey]) {
-            aggregated[storageKey] = { partiesVotes: {} };
+    for (const result of results) {
+        const role = String(result.userRole ?? "observer").toLowerCase().trim();
+        if (role && role !== "observer")
+            continue;
+        if (!result.partiesVotes?.length)
+            continue;
+        const rawKey = result[groupBy];
+        const fallbackKey = (rawKey != null && String(rawKey).trim() !== ""
+            ? String(rawKey).trim()
+            : null) ||
+            (result.lga != null && String(result.lga).trim() !== ""
+                ? String(result.lga).trim()
+                : null) ||
+            (result.state != null && String(result.state).trim() !== ""
+                ? String(result.state).trim()
+                : null) ||
+            (result.ward != null && String(result.ward).trim() !== ""
+                ? String(result.ward).trim()
+                : null) ||
+            "Unknown";
+        if (!aggregated[fallbackKey]) {
+            aggregated[fallbackKey] = { partiesVotes: {}, resultsCount: 0 };
         }
-        partiesVotes.forEach(({ party, count }) => {
-            aggregated[storageKey].partiesVotes[party] =
-                (aggregated[storageKey].partiesVotes[party] || 0) + count;
-            totalVotesByParty[party] = (totalVotesByParty[party] || 0) + count;
-        });
+        aggregated[fallbackKey].resultsCount += 1;
+        for (const entry of result.partiesVotes) {
+            const party = entry?.party;
+            if (!party)
+                continue;
+            const votes = Number(entry.count ??
+                entry.votes) || 0;
+            if (votes <= 0)
+                continue;
+            aggregated[fallbackKey].partiesVotes[party] =
+                (aggregated[fallbackKey].partiesVotes[party] || 0) + votes;
+            totalVotesByParty[party] = (totalVotesByParty[party] || 0) + votes;
+        }
+    }
+    const regions = Object.entries(aggregated).map(([region, data]) => ({
+        regionKey: region,
+        regionName: region,
+        partiesVotes: data.partiesVotes,
+        resultsCount: data.resultsCount,
+        chart: getTopSevenParties(data.partiesVotes),
+    }));
+    regions.sort((a, b) => {
+        const aTotal = Object.values(a.partiesVotes).reduce((s, n) => s + n, 0);
+        const bTotal = Object.values(b.partiesVotes).reduce((s, n) => s + n, 0);
+        return bTotal - aTotal;
     });
-    const resultData = electionType === "national"
-        ? Object.entries(aggregated).map(([state, data]) => ({
-            state,
-            chart: getTopSevenParties(data.partiesVotes),
+    return {
+        groupBy,
+        regions,
+        aggregateAnalysis: totalVotesByParty,
+        overallChart: getTopSevenParties(totalVotesByParty),
+    };
+};
+/** @deprecated Prefer aggregateElectionResultsByGeo — kept for call-site compatibility. */
+const aggregateResultsAndTopParties = (results, groupBy, electionType) => {
+    const geo = aggregateElectionResultsByGeo(results, groupBy);
+    // National: array of per-state charts (existing web/mobile contract).
+    // Others: overall chart = sum of all regions (existing contract), plus regions.
+    const resultData = electionType === "national" || electionType === "presidential"
+        ? geo.regions.map((r) => ({
+            state: r.regionKey,
+            chart: r.chart,
         }))
-        : getTopSevenParties(totalVotesByParty);
+        : geo.overallChart;
     return {
         resultData,
-        aggregateAnalysis: totalVotesByParty,
+        regions: geo.regions,
+        aggregateAnalysis: geo.aggregateAnalysis,
+        overallChart: geo.overallChart,
     };
 };
 // Extracts the top seven parties with vote counts

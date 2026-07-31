@@ -1,4 +1,8 @@
 import type { Types } from "mongoose";
+type PartyVote = {
+    party: string;
+    count: number;
+};
 type ElectionRef = {
     electionType: string;
     electionName?: string;
@@ -10,6 +14,17 @@ type Viewer = {
 };
 type Id = Types.ObjectId | string;
 type GroupByField = "state" | "lga" | "ward";
+type PartiesVoteMap = Record<string, number>;
+type LeanElectionDataRow = {
+    state?: string;
+    lga?: string;
+    ward?: string;
+    partiesVotes?: PartyVote[];
+    userRole?: string;
+    voteRating?: string;
+    voterIntimidation?: string;
+    voteBuying?: string;
+};
 type ActiveElectionLeanDoc = {
     _id: Types.ObjectId;
     election: ElectionRef;
@@ -66,7 +81,7 @@ export declare const getLiveElectionService: (electionId: Id, userId: Id, option
         endDate: NativeDate;
     };
     result: {
-        aggregateAnalysis: Record<string, number>;
+        aggregateAnalysis: PartiesVoteMap;
         footer: {
             [x: string]: number;
         };
@@ -74,17 +89,24 @@ export declare const getLiveElectionService: (electionId: Id, userId: Id, option
         chart: {
             [x: string]: string | number;
             party: string;
-        }[] | {
-            state: string;
+        }[];
+        regions: {
+            [x: string]: string | number | PartiesVoteMap | {
+                [x: string]: string | number;
+                party: string;
+            }[];
+            regionKey: string;
             chart: {
                 [x: string]: string | number;
                 party: string;
             }[];
+            partiesVotes: PartiesVoteMap;
+            resultsCount: number;
         }[];
         footer: {
             [x: string]: number;
         };
-        aggregateAnalysis: Record<string, number>;
+        aggregateAnalysis: PartiesVoteMap;
         restriction: {
             name: string;
             value: string | null | undefined;
@@ -116,6 +138,24 @@ export declare const getLiveElectionService: (electionId: Id, userId: Id, option
         };
     } | null;
 }>;
+export declare const aggregateElectionResultsByGeo: (results: LeanElectionDataRow[], groupBy: GroupByField) => {
+    groupBy: GroupByField;
+    regions: {
+        regionKey: string;
+        regionName: string;
+        partiesVotes: PartiesVoteMap;
+        resultsCount: number;
+        chart: {
+            [x: string]: string | number;
+            party: string;
+        }[];
+    }[];
+    aggregateAnalysis: PartiesVoteMap;
+    overallChart: {
+        [x: string]: string | number;
+        party: string;
+    }[];
+};
 /** Mongo filter for observer result/incident rows visible in collation for this user. */
 export declare const buildObserverSubmissionLocationFilter: (electionType: string | undefined, user: {
     state?: string | null;

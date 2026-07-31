@@ -42,19 +42,31 @@ export const getMobileCollationBundle = async (activeElectionId: string, userId:
 
   const collation = await getLiveElectionService(activeElectionId, userId);
 
+  // Same source set as live chart (getLiveElectionService): approved observers +
+  // location filter OR the viewer's own submissions. Geo was previously stricter
+  // (hidden:false + exact loc only), so chart could have data while geo was empty.
+  const approvedObservers = await CompletedUser.find(
+    { role: "observer", isObserverInPollingUnit: true },
+    "_id"
+  ).lean();
+  const approvedObserverIds = approvedObservers.map((u) => u._id);
   const loc = buildObserverSubmissionLocationFilter(electionType, user);
+  const locationOrSelf =
+    Object.keys(loc).length > 0
+      ? { $or: [loc, { user: userId }] }
+      : {};
 
   const resultQuery = {
     election: active._id,
     userRole: "observer",
-    hidden: false,
-    ...loc,
+    user: { $in: approvedObserverIds },
+    ...locationOrSelf,
   };
   const incidentQuery = {
     election: active._id,
     userRole: "observer",
-    hidden: false,
-    ...loc,
+    user: { $in: approvedObserverIds },
+    ...locationOrSelf,
   };
 
   const [results, incidents, rMax, iMax] = await Promise.all([
@@ -100,15 +112,18 @@ export const getMobileCollationBundle = async (activeElectionId: string, userId:
 
   const electionRef = active.election as unknown as ElectionRef | null;
 
+  // Build geo from the same live `result` that powers the chart (not a second query).
   const geoBreakdown = buildMobileGeoBreakdown({
     electionType: electionRef?.electionType,
     user,
+    liveResult: collation.result,
     results: results as Array<{
+      userRole?: string | null;
       state?: string | null;
       lga?: string | null;
       ward?: string | null;
       pollingUnit?: string | null;
-      partiesVotes?: Array<{ party: string; count: number }>;
+      partiesVotes?: Array<{ party: string; count?: number; votes?: number }>;
     }>,
     incidents: incidents as Array<{
       state?: string | null;

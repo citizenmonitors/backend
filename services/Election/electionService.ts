@@ -811,7 +811,8 @@ export const uploadResultDataService = async (
   electionId: Id,
   userId: Id,
   data: UploadResultPayload,
-  files: ElectionResultUploadFiles
+  files: ElectionResultUploadFiles,
+  options?: { requireObserverUploadLocation?: boolean }
 ) => {
   try {
     let {
@@ -894,7 +895,13 @@ export const uploadResultDataService = async (
     }
 
     const parsedUploadLocation = parseUploadLocation(uploadLocation);
-    if (user.role === "observer" && !parsedUploadLocation) {
+    const requireObserverUploadLocation =
+      options?.requireObserverUploadLocation !== false;
+    if (
+      requireObserverUploadLocation &&
+      user.role === "observer" &&
+      !parsedUploadLocation
+    ) {
       throw new Error(
         "Observers must enable and provide upload location before submitting election results."
       );
@@ -1509,7 +1516,8 @@ export const uploadIncidentReportDataService = async (
   electionId: Id,
   userId: Id,
   data: IncidentReportBody,
-  files: IncidentReportUploadLike
+  files: IncidentReportUploadLike,
+  options?: { requireObserverUploadLocation?: boolean }
 ) => {
   try {
     const { selectIncident, incidentNote, electionRating, uploadLocation } = data;
@@ -1552,7 +1560,13 @@ export const uploadIncidentReportDataService = async (
     }
 
     const parsedUploadLocation = parseUploadLocation(uploadLocation);
-    if (user.role === "observer" && !parsedUploadLocation) {
+    const requireObserverUploadLocation =
+      options?.requireObserverUploadLocation !== false;
+    if (
+      requireObserverUploadLocation &&
+      user.role === "observer" &&
+      !parsedUploadLocation
+    ) {
       throw new Error(
         "Observers must enable and provide upload location before submitting incident reports."
       );

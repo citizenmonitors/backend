@@ -1,7 +1,7 @@
 import express from "express";
-import { register, verifyEmail, resendToken, submitRoleForm, signIn, pickRole, validateUserSession, forgotPassword, resetPassword, submitObserverDetailsController, } from "../controllers/authController.js";
+import { register, verifyEmail, resendToken, submitRoleForm, signIn, pickRole, validateUserSession, forgotPassword, resetPassword, submitObserverDetailsController, refreshSession, logout, } from "../controllers/authController.js";
 import { continueWithGoogleMobile, forgotPasswordMobile, resendForgotPasswordOtpMobile, resetPasswordMobile, setPasswordMobile, submitObserverDetailsMobile, } from "../controllers/mobile/authController.js";
-import { handleValidationErrors, registerValidation, verifyEmailValidation, resendTokenValidation, pickRoleValidation, signInValidation, forgotPasswordValidation, resetPasswordValidation, submitDetailsValidation, submitObserverDetailsValidation, } from "../validators/authValidators.js";
+import { handleValidationErrors, registerValidation, verifyEmailValidation, resendTokenValidation, pickRoleValidation, signInValidation, forgotPasswordValidation, resetPasswordValidation, submitDetailsValidation, submitObserverDetailsValidation, refreshTokenValidation, logoutValidation, } from "../validators/authValidators.js";
 import { mobileGoogleContinueValidation, mobileResendTokenValidation, mobileResetPasswordValidation, mobileSetPasswordValidation, mobileSubmitObserverDetailsValidation, } from "../validators/mobile/authValidators.js";
 import upload from "../config/multer.js";
 const router = express.Router();
@@ -12,6 +12,8 @@ router.post("/select-role", pickRoleValidation, handleValidationErrors, pickRole
 router.post("/submit-details", upload.single("profileImage"), submitDetailsValidation, handleValidationErrors, submitRoleForm);
 router.post("/submit-role", upload.fields([{ name: "observerId[]", maxCount: 2 }]), submitObserverDetailsValidation, handleValidationErrors, submitObserverDetailsController);
 router.post("/signin", signInValidation, handleValidationErrors, signIn);
+router.post("/refresh", refreshTokenValidation, handleValidationErrors, refreshSession);
+router.post("/logout", logoutValidation, handleValidationErrors, logout);
 router.post("/validate", validateUserSession);
 router.post("/forgot-password", forgotPasswordValidation, handleValidationErrors, forgotPassword);
 router.post("/reset-password", resetPasswordValidation, handleValidationErrors, resetPassword);

@@ -1,4 +1,5 @@
 import { mobileContinueWithGoogle, mobileForgotPassword, mobileRegister, mobileResendForgotPasswordOtp, mobileResendToken, mobileResetPassword, mobileSelectRole, mobileSetPassword, mobileSignIn, mobileSubmitDetails, mobileSubmitObserverDetails, mobileValidateSession, mobileVerifyEmail, } from "../../services/mobile/authService.js";
+import { refreshAuthTokens, revokeRefreshToken, } from "../../services/authTokenService.js";
 import { extractBearerToken } from "../../utils/authToken.js";
 const getErrorMessage = (error) => error instanceof Error ? error.message : String(error);
 const getMobileMeta = (req) => ({
@@ -42,11 +43,41 @@ export const resendTokenMobile = async (req, res) => {
 };
 export const signInMobile = async (req, res) => {
     try {
-        const { token, user } = await mobileSignIn({
+        const { token, refreshToken, expiresIn, user } = await mobileSignIn({
             email: req.body.email,
             password: req.body.password,
         }, getMobileMeta(req));
-        return res.status(200).json({ token, user, message: "Login successfully" });
+        return res.status(200).json({
+            token,
+            refreshToken,
+            expiresIn,
+            user,
+            message: "Login successfully",
+        });
+    }
+    catch (error) {
+        return res.status(400).json({ message: getErrorMessage(error) });
+    }
+};
+export const refreshSessionMobile = async (req, res) => {
+    try {
+        const tokens = await refreshAuthTokens(req.body.refreshToken, {
+            userAgent: req.get("user-agent"),
+            deviceId: req.body.deviceId ?? getMobileMeta(req).deviceId,
+        });
+        return res.status(200).json({
+            ...tokens,
+            message: "Token refreshed successfully",
+        });
+    }
+    catch (error) {
+        return res.status(401).json({ message: getErrorMessage(error) });
+    }
+};
+export const logoutMobile = async (req, res) => {
+    try {
+        await revokeRefreshToken(req.body.refreshToken);
+        return res.status(200).json({ message: "Logged out successfully" });
     }
     catch (error) {
         return res.status(400).json({ message: getErrorMessage(error) });

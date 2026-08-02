@@ -10,6 +10,8 @@ import {
   forgotPassword,
   resetPassword,
   submitObserverDetailsController,
+  refreshSession,
+  logout,
 } from "../controllers/authController.ts";
 import {
   continueWithGoogleMobile,
@@ -30,6 +32,8 @@ import {
   resetPasswordValidation,
   submitDetailsValidation,
   submitObserverDetailsValidation,
+  refreshTokenValidation,
+  logoutValidation,
 } from "../validators/authValidators.ts";
 import {
   mobileGoogleContinueValidation,
@@ -49,6 +53,8 @@ router.post("/select-role", pickRoleValidation, handleValidationErrors, pickRole
 router.post("/submit-details", upload.single("profileImage"), submitDetailsValidation, handleValidationErrors, submitRoleForm);
 router.post("/submit-role", upload.fields([{ name: "observerId[]", maxCount: 2 }]), submitObserverDetailsValidation, handleValidationErrors, submitObserverDetailsController);
 router.post("/signin", signInValidation, handleValidationErrors, signIn);
+router.post("/refresh", refreshTokenValidation, handleValidationErrors, refreshSession);
+router.post("/logout", logoutValidation, handleValidationErrors, logout);
 router.post("/validate", validateUserSession);
 router.post("/forgot-password", forgotPasswordValidation, handleValidationErrors, forgotPassword);
 router.post("/reset-password", resetPasswordValidation, handleValidationErrors, resetPassword);

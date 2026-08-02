@@ -14,6 +14,10 @@ import {
   mobileValidateSession,
   mobileVerifyEmail,
 } from "../../services/mobile/authService.ts";
+import {
+  refreshAuthTokens,
+  revokeRefreshToken,
+} from "../../services/authTokenService.ts";
 import { extractBearerToken } from "../../utils/authToken.ts";
 
 const getErrorMessage = (error: unknown): string =>
@@ -84,14 +88,44 @@ export const resendTokenMobile = async (req: Request, res: Response) => {
 
 export const signInMobile = async (req: Request, res: Response) => {
   try {
-    const { token, user } = await mobileSignIn(
+    const { token, refreshToken, expiresIn, user } = await mobileSignIn(
       {
         email: req.body.email,
         password: req.body.password,
       },
       getMobileMeta(req)
     );
-    return res.status(200).json({ token, user, message: "Login successfully" });
+    return res.status(200).json({
+      token,
+      refreshToken,
+      expiresIn,
+      user,
+      message: "Login successfully",
+    });
+  } catch (error) {
+    return res.status(400).json({ message: getErrorMessage(error) });
+  }
+};
+
+export const refreshSessionMobile = async (req: Request, res: Response) => {
+  try {
+    const tokens = await refreshAuthTokens(req.body.refreshToken, {
+      userAgent: req.get("user-agent"),
+      deviceId: req.body.deviceId ?? getMobileMeta(req).deviceId,
+    });
+    return res.status(200).json({
+      ...tokens,
+      message: "Token refreshed successfully",
+    });
+  } catch (error) {
+    return res.status(401).json({ message: getErrorMessage(error) });
+  }
+};
+
+export const logoutMobile = async (req: Request, res: Response) => {
+  try {
+    await revokeRefreshToken(req.body.refreshToken);
+    return res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
     return res.status(400).json({ message: getErrorMessage(error) });
   }

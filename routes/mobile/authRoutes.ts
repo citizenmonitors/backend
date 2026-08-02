@@ -2,6 +2,8 @@ import express from "express";
 import {
   continueWithGoogleMobile,
   forgotPasswordMobile,
+  logoutMobile,
+  refreshSessionMobile,
   registerMobile,
   resendForgotPasswordOtpMobile,
   resendTokenMobile,
@@ -18,6 +20,8 @@ import upload from "../../config/multer.ts";
 import { handleValidationErrors } from "../../validators/authValidators.ts";
 import {
   mobileGoogleContinueValidation,
+  mobileLogoutValidation,
+  mobileRefreshTokenValidation,
   mobileRegisterValidation,
   mobileResendTokenValidation,
   mobileResetPasswordValidation,
@@ -37,6 +41,8 @@ router.post("/register", mobileRegisterValidation, handleValidationErrors, regis
 router.post("/verify-email", mobileVerifyEmailValidation, handleValidationErrors, verifyEmailMobile);
 router.post("/resend-token", mobileResendTokenValidation, handleValidationErrors, resendTokenMobile);
 router.post("/signin", mobileSignInValidation, handleValidationErrors, signInMobile);
+router.post("/refresh", mobileRefreshTokenValidation, handleValidationErrors, refreshSessionMobile);
+router.post("/logout", mobileLogoutValidation, handleValidationErrors, logoutMobile);
 router.post("/google", mobileGoogleContinueValidation, handleValidationErrors, continueWithGoogleMobile);
 router.post("/set-password", mobileSetPasswordValidation, handleValidationErrors, setPasswordMobile);
 router.post("/validate", validateSessionMobile);
@@ -48,5 +54,3 @@ router.post("/submit-details", upload.single("profileImage"), mobileSubmitDetail
 router.post("/observer-role", upload.fields([{ name: "observerId[]", maxCount: 2 }]), mobileSubmitObserverDetailsValidation, handleValidationErrors, submitObserverDetailsMobile);
 
 export default router;
-
-

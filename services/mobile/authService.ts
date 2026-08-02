@@ -14,9 +14,12 @@ import {
 } from "../authService.ts";
 import { sendEmail } from "../../config/email.ts";
 import { passwordResetOtpTemplate } from "../../config/emailTemplates.ts";
-import { generateToken } from "../../utils/generateToken.ts";
 import { hashPassword } from "../../utils/hashPassword.ts";
 import { verifyJwtEmail } from "../../utils/authToken.ts";
+import {
+  issueAuthTokens,
+  revokeAllRefreshTokensForEmail,
+} from "../authTokenService.ts";
 
 type MobileMetaInput = {
   platform?: string;
@@ -131,9 +134,11 @@ export const mobileContinueWithGoogle = async (
     const refreshed = await CompletedUser.findOne({ email });
     const u = refreshed ?? existingCompletedUser;
     const { password, ...user } = u.toObject();
-    const token = generateToken({ email });
+    const tokens = await issueAuthTokens(email, {
+      deviceId: mobileMeta?.deviceId,
+    });
     return {
-      token,
+      ...tokens,
       user,
       requiresPasswordSetup: u.hasSetPassword === false,
       nextStep: "done",
@@ -161,7 +166,9 @@ export const mobileContinueWithGoogle = async (
       }
     );
     const refreshed = await User.findOne({ email });
-    const token = generateToken({ email });
+    const tokens = await issueAuthTokens(email, {
+      deviceId: mobileMeta?.deviceId,
+    });
     const u = refreshed ?? existingUser;
     const { password, ...user } = u.toObject();
     const mustSetPassword = u.hasSetPassword === false || needsPlaceholder;
@@ -169,7 +176,7 @@ export const mobileContinueWithGoogle = async (
     ? "user_coverage"
       : "select_role";
     return {
-      token,
+      ...tokens,
       user,
       requiresPasswordSetup: mustSetPassword,
       nextStep: mustSetPassword ? "set_password" : nextAfterPassword,
@@ -201,10 +208,12 @@ export const mobileContinueWithGoogle = async (
     },
   });
 
-  const token = generateToken({ email });
+  const tokens = await issueAuthTokens(email, {
+    deviceId: mobileMeta?.deviceId,
+  });
   const { password, ...user } = newUser.toObject();
   return {
-    token,
+    ...tokens,
     user,
     requiresPasswordSetup: true,
     nextStep: "set_password",
@@ -282,13 +291,13 @@ export const mobileSelectRole = async (email: string, role: string) => {
     await completedUser.save();
     await user.deleteOne();
 
-    const token = generateToken({ email: completedUser.email });
+    const tokens = await issueAuthTokens(completedUser.email);
     const { password, ...userDetails } = completedUser.toObject();
 
     return {
       message:
         "Public viewer role selected and completed. You have been registered.",
-      token,
+      ...tokens,
       user: userDetails,
       nextStep: "done",
     };
@@ -332,12 +341,12 @@ export const mobileSignIn = async (
     throw new Error(googleOnlySignInMessage);
   }
 
-  const { token, user } = await authenticateUser(payload);
+  const auth = await authenticateUser(payload);
   await CompletedUser.findOneAndUpdate(
     { email: payload.email },
     { $set: mobileMetaPatch(mobileMeta) }
   );
-  return { token, user };
+  return auth;
 };
 
 export const mobileForgotPassword = async (email: string) => {
@@ -394,6 +403,7 @@ export const mobileResetPassword = async (
     completedUser.resetPasswordOTP = undefined;
     completedUser.resetPasswordOTPExpires = undefined;
     await completedUser.save();
+    await revokeAllRefreshTokensForEmail(email);
     return { message: "Password reset successful." };
   }
 

@@ -5,9 +5,9 @@ import User from "../../models/User.js";
 import { authenticateUser, registerUser, resendTokenService, selectUserRole, submitObserverDetails, submitRoleFormDetails, validateTokenService, verifyUserEmail, } from "../authService.js";
 import { sendEmail } from "../../config/email.js";
 import { passwordResetOtpTemplate } from "../../config/emailTemplates.js";
-import { generateToken } from "../../utils/generateToken.js";
 import { hashPassword } from "../../utils/hashPassword.js";
 import { verifyJwtEmail } from "../../utils/authToken.js";
+import { issueAuthTokens, revokeAllRefreshTokensForEmail, } from "../authTokenService.js";
 const googleOAuthClient = new OAuth2Client();
 const getAllowedGoogleClientIds = () => {
     const candidates = [
@@ -79,9 +79,11 @@ export const mobileContinueWithGoogle = async (idToken, mobileMeta) => {
         const refreshed = await CompletedUser.findOne({ email });
         const u = refreshed ?? existingCompletedUser;
         const { password, ...user } = u.toObject();
-        const token = generateToken({ email });
+        const tokens = await issueAuthTokens(email, {
+            deviceId: mobileMeta?.deviceId,
+        });
         return {
-            token,
+            ...tokens,
             user,
             requiresPasswordSetup: u.hasSetPassword === false,
             nextStep: "done",
@@ -102,7 +104,9 @@ export const mobileContinueWithGoogle = async (idToken, mobileMeta) => {
             },
         });
         const refreshed = await User.findOne({ email });
-        const token = generateToken({ email });
+        const tokens = await issueAuthTokens(email, {
+            deviceId: mobileMeta?.deviceId,
+        });
         const u = refreshed ?? existingUser;
         const { password, ...user } = u.toObject();
         const mustSetPassword = u.hasSetPassword === false || needsPlaceholder;
@@ -110,7 +114,7 @@ export const mobileContinueWithGoogle = async (idToken, mobileMeta) => {
             ? "user_coverage"
             : "select_role";
         return {
-            token,
+            ...tokens,
             user,
             requiresPasswordSetup: mustSetPassword,
             nextStep: mustSetPassword ? "set_password" : nextAfterPassword,
@@ -138,10 +142,12 @@ export const mobileContinueWithGoogle = async (idToken, mobileMeta) => {
             },
         },
     });
-    const token = generateToken({ email });
+    const tokens = await issueAuthTokens(email, {
+        deviceId: mobileMeta?.deviceId,
+    });
     const { password, ...user } = newUser.toObject();
     return {
-        token,
+        ...tokens,
         user,
         requiresPasswordSetup: true,
         nextStep: "set_password",
@@ -208,11 +214,11 @@ export const mobileSelectRole = async (email, role) => {
         const completedUser = new CompletedUser(completedUserData);
         await completedUser.save();
         await user.deleteOne();
-        const token = generateToken({ email: completedUser.email });
+        const tokens = await issueAuthTokens(completedUser.email);
         const { password, ...userDetails } = completedUser.toObject();
         return {
             message: "Public viewer role selected and completed. You have been registered.",
-            token,
+            ...tokens,
             user: userDetails,
             nextStep: "done",
         };
@@ -238,9 +244,9 @@ export const mobileSignIn = async (payload, mobileMeta) => {
         onboardingUser.authProviders?.google?.googleId) {
         throw new Error(googleOnlySignInMessage);
     }
-    const { token, user } = await authenticateUser(payload);
+    const auth = await authenticateUser(payload);
     await CompletedUser.findOneAndUpdate({ email: payload.email }, { $set: mobileMetaPatch(mobileMeta) });
-    return { token, user };
+    return auth;
 };
 export const mobileForgotPassword = async (email) => {
     const otp = crypto.randomInt(100000, 1000000).toString();
@@ -284,6 +290,7 @@ export const mobileResetPassword = async (email, otp, password) => {
         completedUser.resetPasswordOTP = undefined;
         completedUser.resetPasswordOTPExpires = undefined;
         await completedUser.save();
+        await revokeAllRefreshTokensForEmail(email);
         return { message: "Password reset successful." };
     }
     const user = await User.findOne({ email });

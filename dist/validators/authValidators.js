@@ -76,4 +76,10 @@ export const submitObserverDetailsValidation = [
     body("email").isEmail().normalizeEmail({ gmail_remove_dots: false }).withMessage("Valid email is required"),
     body("phoneNumber").notEmpty().trim().withMessage("Phone number is required"),
 ];
+export const refreshTokenValidation = [
+    body("refreshToken").notEmpty().trim().withMessage("Refresh token is required"),
+];
+export const logoutValidation = [
+    body("refreshToken").notEmpty().trim().withMessage("Refresh token is required"),
+];
 //# sourceMappingURL=authValidators.js.map

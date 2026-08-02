@@ -1,13 +1,15 @@
 import express from "express";
-import { continueWithGoogleMobile, forgotPasswordMobile, registerMobile, resendForgotPasswordOtpMobile, resendTokenMobile, resetPasswordMobile, selectRoleMobile, setPasswordMobile, signInMobile, submitDetailsMobile, submitObserverDetailsMobile, validateSessionMobile, verifyEmailMobile, } from "../../controllers/mobile/authController.js";
+import { continueWithGoogleMobile, forgotPasswordMobile, logoutMobile, refreshSessionMobile, registerMobile, resendForgotPasswordOtpMobile, resendTokenMobile, resetPasswordMobile, selectRoleMobile, setPasswordMobile, signInMobile, submitDetailsMobile, submitObserverDetailsMobile, validateSessionMobile, verifyEmailMobile, } from "../../controllers/mobile/authController.js";
 import upload from "../../config/multer.js";
 import { handleValidationErrors } from "../../validators/authValidators.js";
-import { mobileGoogleContinueValidation, mobileRegisterValidation, mobileResendTokenValidation, mobileResetPasswordValidation, mobileSelectRoleValidation, mobileSetPasswordValidation, mobileSignInValidation, mobileSubmitDetailsValidation, mobileSubmitObserverDetailsValidation, mobileVerifyEmailValidation, } from "../../validators/mobile/authValidators.js";
+import { mobileGoogleContinueValidation, mobileLogoutValidation, mobileRefreshTokenValidation, mobileRegisterValidation, mobileResendTokenValidation, mobileResetPasswordValidation, mobileSelectRoleValidation, mobileSetPasswordValidation, mobileSignInValidation, mobileSubmitDetailsValidation, mobileSubmitObserverDetailsValidation, mobileVerifyEmailValidation, } from "../../validators/mobile/authValidators.js";
 const router = express.Router();
 router.post("/register", mobileRegisterValidation, handleValidationErrors, registerMobile);
 router.post("/verify-email", mobileVerifyEmailValidation, handleValidationErrors, verifyEmailMobile);
 router.post("/resend-token", mobileResendTokenValidation, handleValidationErrors, resendTokenMobile);
 router.post("/signin", mobileSignInValidation, handleValidationErrors, signInMobile);
+router.post("/refresh", mobileRefreshTokenValidation, handleValidationErrors, refreshSessionMobile);
+router.post("/logout", mobileLogoutValidation, handleValidationErrors, logoutMobile);
 router.post("/google", mobileGoogleContinueValidation, handleValidationErrors, continueWithGoogleMobile);
 router.post("/set-password", mobileSetPasswordValidation, handleValidationErrors, setPasswordMobile);
 router.post("/validate", validateSessionMobile);

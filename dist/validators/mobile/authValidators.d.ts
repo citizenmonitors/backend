@@ -8,4 +8,6 @@ export declare const mobileResetPasswordValidation: import("express-validator").
 export declare const mobileSelectRoleValidation: import("express-validator").ValidationChain[];
 export declare const mobileSubmitDetailsValidation: import("express-validator").ValidationChain[];
 export declare const mobileSubmitObserverDetailsValidation: import("express-validator").ValidationChain[];
+export declare const mobileRefreshTokenValidation: import("express-validator").ValidationChain[];
+export declare const mobileLogoutValidation: import("express-validator").ValidationChain[];
 //# sourceMappingURL=authValidators.d.ts.map

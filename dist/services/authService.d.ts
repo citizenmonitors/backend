@@ -73,8 +73,8 @@ export declare const submitRoleFormDetails: ({ email, details, file, }: SubmitRo
         verificationCode?: string | null | undefined;
         verificationCodeExpires?: NativeDate | null | undefined;
         mobileMeta?: {
-            platform?: string | null | undefined;
             deviceId?: string | null | undefined;
+            platform?: string | null | undefined;
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
@@ -92,8 +92,6 @@ export declare const submitRoleFormDetails: ({ email, details, file, }: SubmitRo
     isObserverInPollingUnit: boolean;
 }>;
 export declare const selectUserRole: (email: string, role: string) => Promise<{
-    message: string;
-    token: string;
     user: {
         createdAt: NativeDate;
         updatedAt: NativeDate;
@@ -155,8 +153,8 @@ export declare const selectUserRole: (email: string, role: string) => Promise<{
         verificationCode?: string | null | undefined;
         verificationCodeExpires?: NativeDate | null | undefined;
         mobileMeta?: {
-            platform?: string | null | undefined;
             deviceId?: string | null | undefined;
+            platform?: string | null | undefined;
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
@@ -196,14 +194,14 @@ export declare const selectUserRole: (email: string, role: string) => Promise<{
         _id: import("mongoose").Types.ObjectId;
         __v: number;
     };
+    token: string;
+    refreshToken: string;
+    expiresIn: number;
+    message: string;
 } | {
     message: string;
-    token?: undefined;
-    user?: undefined;
 }>;
 export declare const submitObserverDetails: ({ email, observerIdFiles: observerIdFilesInput, phoneNumber, bankName, bankAccountNumber, bankAccountName, }: SubmitObserverDetailsInput) => Promise<{
-    message: string;
-    token: string;
     user: {
         createdAt: NativeDate;
         updatedAt: NativeDate;
@@ -265,8 +263,8 @@ export declare const submitObserverDetails: ({ email, observerIdFiles: observerI
         verificationCode?: string | null | undefined;
         verificationCodeExpires?: NativeDate | null | undefined;
         mobileMeta?: {
-            platform?: string | null | undefined;
             deviceId?: string | null | undefined;
+            platform?: string | null | undefined;
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
@@ -306,9 +304,12 @@ export declare const submitObserverDetails: ({ email, observerIdFiles: observerI
         _id: import("mongoose").Types.ObjectId;
         __v: number;
     };
+    token: string;
+    refreshToken: string;
+    expiresIn: number;
+    message: string;
 }>;
 export declare const authenticateUser: ({ email, password }: AuthCredentials) => Promise<{
-    token: string;
     user: {
         createdAt: NativeDate;
         updatedAt: NativeDate;
@@ -370,8 +371,8 @@ export declare const authenticateUser: ({ email, password }: AuthCredentials) =>
         verificationCode?: string | null | undefined;
         verificationCodeExpires?: NativeDate | null | undefined;
         mobileMeta?: {
-            platform?: string | null | undefined;
             deviceId?: string | null | undefined;
+            platform?: string | null | undefined;
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
@@ -411,6 +412,9 @@ export declare const authenticateUser: ({ email, password }: AuthCredentials) =>
         _id: import("mongoose").Types.ObjectId;
         __v: number;
     };
+    token: string;
+    refreshToken: string;
+    expiresIn: number;
 }>;
 export declare const generateResetToken: (email: string) => Promise<{
     message: string;
@@ -480,8 +484,8 @@ export declare const validateTokenService: (token: string) => Promise<{
         verificationCode?: string | null | undefined;
         verificationCodeExpires?: NativeDate | null | undefined;
         mobileMeta?: {
-            platform?: string | null | undefined;
             deviceId?: string | null | undefined;
+            platform?: string | null | undefined;
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;

@@ -22,7 +22,6 @@ export declare const mobileResendToken: (email: string) => Promise<{
     message: string;
 }>;
 export declare const mobileContinueWithGoogle: (idToken: string, mobileMeta?: MobileMetaInput) => Promise<{
-    token: string;
     user: {
         createdAt: NativeDate;
         updatedAt: NativeDate;
@@ -84,8 +83,8 @@ export declare const mobileContinueWithGoogle: (idToken: string, mobileMeta?: Mo
         verificationCode?: string | null | undefined;
         verificationCodeExpires?: NativeDate | null | undefined;
         mobileMeta?: {
-            platform?: string | null | undefined;
             deviceId?: string | null | undefined;
+            platform?: string | null | undefined;
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
@@ -127,8 +126,10 @@ export declare const mobileContinueWithGoogle: (idToken: string, mobileMeta?: Mo
     };
     requiresPasswordSetup: boolean;
     nextStep: string;
-} | {
     token: string;
+    refreshToken: string;
+    expiresIn: number;
+} | {
     user: {
         email: string;
         isVerified: boolean;
@@ -169,8 +170,8 @@ export declare const mobileContinueWithGoogle: (idToken: string, mobileMeta?: Mo
         verificationCode?: string | null | undefined;
         verificationCodeExpires?: NativeDate | null | undefined;
         mobileMeta?: {
-            platform?: string | null | undefined;
             deviceId?: string | null | undefined;
+            platform?: string | null | undefined;
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
@@ -187,6 +188,9 @@ export declare const mobileContinueWithGoogle: (idToken: string, mobileMeta?: Mo
     };
     requiresPasswordSetup: boolean;
     nextStep: string;
+    token: string;
+    refreshToken: string;
+    expiresIn: number;
 }>;
 export declare const mobileSetPassword: (bearerToken: string, password: string) => Promise<{
     message: string;
@@ -231,8 +235,8 @@ export declare const mobileSubmitDetails: (input: {
         verificationCode?: string | null | undefined;
         verificationCodeExpires?: NativeDate | null | undefined;
         mobileMeta?: {
-            platform?: string | null | undefined;
             deviceId?: string | null | undefined;
+            platform?: string | null | undefined;
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
@@ -251,7 +255,7 @@ export declare const mobileSubmitDetails: (input: {
 }>;
 export declare const mobileSelectRole: (email: string, role: string) => Promise<{
     message: string;
-    token: string;
+} | {
     user: {
         createdAt: NativeDate;
         updatedAt: NativeDate;
@@ -313,117 +317,8 @@ export declare const mobileSelectRole: (email: string, role: string) => Promise<
         verificationCode?: string | null | undefined;
         verificationCodeExpires?: NativeDate | null | undefined;
         mobileMeta?: {
-            platform?: string | null | undefined;
             deviceId?: string | null | undefined;
-            appVersion?: string | null | undefined;
-            pushToken?: string | null | undefined;
-            lastLoginAt?: NativeDate | null | undefined;
-        } | null | undefined;
-        authProviders?: {
-            google?: {
-                googleId?: string | null | undefined;
-                emailVerified?: boolean | null | undefined;
-                linkedAt?: NativeDate | null | undefined;
-            } | null | undefined;
-        } | null | undefined;
-        isActive?: boolean | null | undefined;
-        lastLogin?: NativeDate | null | undefined;
-        resetPasswordToken?: string | null | undefined;
-        resetPasswordExpires?: NativeDate | null | undefined;
-        anonymousUsername?: string | null | undefined;
-        adminPermissions?: import("mongoose").Types.ObjectId | null | undefined;
-        notifications?: {
-            email?: {
-                inbox: boolean;
-                election: boolean;
-                newsletter: boolean;
-            } | null | undefined;
-            mobile?: {
-                newsletter: boolean;
-                pollingUnitActivity: boolean;
-                electionDayAlert: boolean;
-                discussionReplies: boolean;
-                resultAggregated: boolean;
-                reportConfirmed: boolean;
-                reportFlagged: boolean;
-                securityAlerts: boolean;
-                newsAndInsights: boolean;
-                pressCoverage: boolean;
-            } | null | undefined;
-        } | null | undefined;
-        _id: import("mongoose").Types.ObjectId;
-        __v: number;
-    };
-} | {
-    message: string;
-    token?: undefined;
-    user?: undefined;
-} | {
-    message: string;
-    token: string;
-    user: {
-        createdAt: NativeDate;
-        updatedAt: NativeDate;
-        email: string;
-        isObserverInPollingUnit: boolean;
-        pendingObserverVerification: boolean;
-        hasSubmittedRoleForm: boolean;
-        hasSetPassword: boolean;
-        useAnonymousIdentity: boolean;
-        coverageUpdateCount: number;
-        observerId: import("mongoose").Types.DocumentArray<{
-            name?: string | null | undefined;
-            type?: string | null | undefined;
-            url?: string | null | undefined;
-            location?: string | null | undefined;
-            size?: number | null | undefined;
-        }, import("mongoose").Types.Subdocument<import("mongoose").Types.ObjectId, any, {
-            name?: string | null | undefined;
-            type?: string | null | undefined;
-            url?: string | null | undefined;
-            location?: string | null | undefined;
-            size?: number | null | undefined;
-        }> & {
-            name?: string | null | undefined;
-            type?: string | null | undefined;
-            url?: string | null | undefined;
-            location?: string | null | undefined;
-            size?: number | null | undefined;
-        }>;
-        role?: "observer" | "volunteer" | "public-viewer" | "admin" | "super-admin" | null | undefined;
-        pendingEmail?: string | null | undefined;
-        firstName?: string | null | undefined;
-        lastName?: string | null | undefined;
-        gender?: string | null | undefined;
-        dateOfBirth?: string | null | undefined;
-        nationality?: string | null | undefined;
-        profileImage?: {
-            name?: string | null | undefined;
-            type?: string | null | undefined;
-            url?: string | null | undefined;
-            location?: string | null | undefined;
-            size?: number | null | undefined;
-        } | null | undefined;
-        state?: string | null | undefined;
-        lga?: string | null | undefined;
-        ward?: string | null | undefined;
-        pollingUnit?: string | null | undefined;
-        isRegisteredVoter?: boolean | null | undefined;
-        isPoliticalPartyMember?: boolean | null | undefined;
-        isElectionWitnessReady?: boolean | null | undefined;
-        isOpenToSurvey?: boolean | null | undefined;
-        whyYouJoinUs?: string | null | undefined;
-        phoneNumber?: string | null | undefined;
-        bankName?: string | null | undefined;
-        bankAccountNumber?: string | null | undefined;
-        bankAccountName?: string | null | undefined;
-        resetPasswordOTP?: string | null | undefined;
-        resetPasswordOTPExpires?: NativeDate | null | undefined;
-        verificationCode?: string | null | undefined;
-        verificationCodeExpires?: NativeDate | null | undefined;
-        mobileMeta?: {
             platform?: string | null | undefined;
-            deviceId?: string | null | undefined;
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
@@ -464,13 +359,15 @@ export declare const mobileSelectRole: (email: string, role: string) => Promise<
         __v: number;
     };
     nextStep: string;
+    token: string;
+    refreshToken: string;
+    expiresIn: number;
+    message: string;
 }>;
 export declare const mobileSubmitObserverDetails: (input: {
     email: string;
     observerIdFiles?: MulterLikeFile[];
 }) => Promise<{
-    message: string;
-    token: string;
     user: {
         createdAt: NativeDate;
         updatedAt: NativeDate;
@@ -532,8 +429,8 @@ export declare const mobileSubmitObserverDetails: (input: {
         verificationCode?: string | null | undefined;
         verificationCodeExpires?: NativeDate | null | undefined;
         mobileMeta?: {
-            platform?: string | null | undefined;
             deviceId?: string | null | undefined;
+            platform?: string | null | undefined;
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
@@ -573,12 +470,15 @@ export declare const mobileSubmitObserverDetails: (input: {
         _id: import("mongoose").Types.ObjectId;
         __v: number;
     };
+    token: string;
+    refreshToken: string;
+    expiresIn: number;
+    message: string;
 }>;
 export declare const mobileSignIn: (payload: {
     email: string;
     password: string;
 }, mobileMeta?: MobileMetaInput) => Promise<{
-    token: string;
     user: {
         createdAt: NativeDate;
         updatedAt: NativeDate;
@@ -640,8 +540,8 @@ export declare const mobileSignIn: (payload: {
         verificationCode?: string | null | undefined;
         verificationCodeExpires?: NativeDate | null | undefined;
         mobileMeta?: {
-            platform?: string | null | undefined;
             deviceId?: string | null | undefined;
+            platform?: string | null | undefined;
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
@@ -681,6 +581,9 @@ export declare const mobileSignIn: (payload: {
         _id: import("mongoose").Types.ObjectId;
         __v: number;
     };
+    token: string;
+    refreshToken: string;
+    expiresIn: number;
 }>;
 export declare const mobileForgotPassword: (email: string) => Promise<{
     message: string;
@@ -753,8 +656,8 @@ export declare const mobileValidateSession: (token: string) => Promise<{
         verificationCode?: string | null | undefined;
         verificationCodeExpires?: NativeDate | null | undefined;
         mobileMeta?: {
-            platform?: string | null | undefined;
             deviceId?: string | null | undefined;
+            platform?: string | null | undefined;
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;

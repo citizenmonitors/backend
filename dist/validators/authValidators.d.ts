@@ -12,4 +12,6 @@ export declare const forgotPasswordValidation: import("express-validator").Valid
 export declare const resetPasswordValidation: import("express-validator").ValidationChain[];
 export declare const submitDetailsValidation: import("express-validator").ValidationChain[];
 export declare const submitObserverDetailsValidation: import("express-validator").ValidationChain[];
+export declare const refreshTokenValidation: import("express-validator").ValidationChain[];
+export declare const logoutValidation: import("express-validator").ValidationChain[];
 //# sourceMappingURL=authValidators.d.ts.map

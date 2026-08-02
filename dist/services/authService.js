@@ -5,7 +5,6 @@ import CompletedUser from "../models/CompletedUser.js";
 import Traffic from "../models/DailyTraffic/dailyTraffic.js";
 import ActiveUser from "../models/ActiveMontlyUsers/activeMontlyUsers.js";
 import { sendEmail } from "../config/email.js";
-import { generateToken } from "../utils/generateToken.js";
 import { hashPassword } from "../utils/hashPassword.js";
 import moment from "moment";
 import ProfileImageModel from "../models/UserProfileImage/ProfileImageModel.js";
@@ -13,6 +12,7 @@ import observerIdModel from "../models/observerIds/observerIdModel.js";
 import { forgotPasswordTemplate, registrationCode, resendCode } from "../config/emailTemplates.js";
 import { uploadFileToFirebase } from "../config/firebaseUploader.js";
 import { verifyJwtEmail } from "../utils/authToken.js";
+import { issueAuthTokens, revokeAllRefreshTokensForEmail, } from "./authTokenService.js";
 // import { uploadFileToGCS } from "./GoogleCloud/gcsService.js";
 const FRONTEND_URL = process.env.FRONTEND_URL;
 const BACKEND_URL = process.env.BACKEND_URL;
@@ -203,13 +203,11 @@ export const selectUserRole = async (email, role) => {
         await completedUser.save();
         // Remove user from the User collection
         await user.deleteOne();
-        // Generate a token for the completed user
-        const token = generateToken({ email: completedUser.email });
-        // Return the completed user details and token
+        const tokens = await issueAuthTokens(completedUser.email);
         const { password, ...userDetails } = completedUser.toObject();
         return {
             message: "Volunteer role selected and completed. You have been registered.",
-            token,
+            ...tokens,
             user: userDetails,
         };
     }
@@ -275,12 +273,11 @@ export const submitObserverDetails = async ({ email, observerIdFiles: observerId
     await completedUser.save();
     // Remove the original user from the User collection
     await user.deleteOne();
-    // Return the user details and token, excluding the password
-    const token = generateToken({ email: completedUser.email });
+    const tokens = await issueAuthTokens(completedUser.email);
     const { password, ...userDetails } = completedUser.toObject();
     return {
         message: "Observer details submitted successfully, pending admin verification.",
-        token,
+        ...tokens,
         user: userDetails,
     };
 };
@@ -302,10 +299,9 @@ export const authenticateUser = async ({ email, password }) => {
     // Add user to monthly active users
     const currentMonth = moment().format("YYYY-MM");
     const activeUser = await ActiveUser.findOneAndUpdate({ month: currentMonth }, { $addToSet: { users: user._id } }, { upsert: true, new: true });
-    // Generate JWT token
-    const token = generateToken({ email: user.email });
+    const tokens = await issueAuthTokens(user.email);
     const { password: userPassword, ...usersDetails } = user.toObject();
-    return { token, user: usersDetails };
+    return { ...tokens, user: usersDetails };
 };
 export const generateResetToken = async (email) => {
     const user = await CompletedUser.findOne({ email });
@@ -339,6 +335,7 @@ export const resetUserPassword = async (token, newPassword) => {
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
     await user.save();
+    await revokeAllRefreshTokensForEmail(user.email);
     return { message: "Password reset successfully." };
 };
 export const validateTokenService = async (token) => {

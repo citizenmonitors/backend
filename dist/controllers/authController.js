@@ -1,3 +1,4 @@
+import { refreshAuthTokens, revokeRefreshToken, } from "../services/authTokenService.js";
 import { verifyUserEmail, resendTokenService, submitRoleFormDetails, authenticateUser, generateResetToken, resetUserPassword, validateTokenService, submitObserverDetails, } from "../services/authService.js";
 import { mobileRegister, mobileSelectRole } from "../services/mobile/authService.js";
 const getErrorMessage = (error) => error instanceof Error ? error.message : String(error);
@@ -88,6 +89,8 @@ export const submitObserverDetailsController = async (req, res) => {
         return res.status(200).json({
             message: result.message,
             token: result.token,
+            refreshToken: result.refreshToken,
+            expiresIn: result.expiresIn,
             user: result.user,
         });
     }
@@ -98,12 +101,38 @@ export const submitObserverDetailsController = async (req, res) => {
 };
 export const signIn = async (req, res) => {
     try {
-        const { token, user } = await authenticateUser(req.body);
+        const { token, refreshToken, expiresIn, user } = await authenticateUser(req.body);
         res.status(200).json({
             token,
+            refreshToken,
+            expiresIn,
             user,
             message: "Login successfully",
         });
+    }
+    catch (err) {
+        return res.status(400).json({ message: getErrorMessage(err) });
+    }
+};
+export const refreshSession = async (req, res) => {
+    try {
+        const tokens = await refreshAuthTokens(req.body.refreshToken, {
+            userAgent: req.get("user-agent"),
+            deviceId: req.body.deviceId,
+        });
+        return res.status(200).json({
+            ...tokens,
+            message: "Token refreshed successfully",
+        });
+    }
+    catch (err) {
+        return res.status(401).json({ message: getErrorMessage(err) });
+    }
+};
+export const logout = async (req, res) => {
+    try {
+        await revokeRefreshToken(req.body.refreshToken);
+        return res.status(200).json({ message: "Logged out successfully" });
     }
     catch (err) {
         return res.status(400).json({ message: getErrorMessage(err) });

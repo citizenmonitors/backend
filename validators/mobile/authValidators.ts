@@ -116,3 +116,11 @@ export const mobileSubmitObserverDetailsValidation = [
     .normalizeEmail({ gmail_remove_dots: false })
     .withMessage("Valid email is required"),
 ];
+
+export const mobileRefreshTokenValidation = [
+  body("refreshToken").notEmpty().trim().withMessage("Refresh token is required"),
+];
+
+export const mobileLogoutValidation = [
+  body("refreshToken").notEmpty().trim().withMessage("Refresh token is required"),
+];

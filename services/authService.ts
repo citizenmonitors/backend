@@ -5,7 +5,6 @@ import CompletedUser from "../models/CompletedUser.ts";
 import  Traffic  from "../models/DailyTraffic/dailyTraffic.ts";
 import  ActiveUser  from "../models/ActiveMontlyUsers/activeMontlyUsers.ts";
 import  { sendEmail } from "../config/email.ts";
-import { generateToken } from "../utils/generateToken.ts";
 import { hashPassword } from "../utils/hashPassword.ts";
 import moment from "moment";
 import ProfileImageModel from "../models/UserProfileImage/ProfileImageModel.ts";
@@ -13,6 +12,10 @@ import observerIdModel from "../models/observerIds/observerIdModel.ts";
 import { forgotPasswordTemplate, registrationCode, resendCode } from "../config/emailTemplates.ts";
 import { uploadFileToFirebase } from "../config/firebaseUploader.ts";
 import { verifyJwtEmail } from "../utils/authToken.ts";
+import {
+  issueAuthTokens,
+  revokeAllRefreshTokensForEmail,
+} from "./authTokenService.ts";
 // import { uploadFileToGCS } from "./GoogleCloud/gcsService.js";
 
 const FRONTEND_URL = process.env.FRONTEND_URL;
@@ -296,16 +299,13 @@ export const selectUserRole = async (email: string, role: string) => {
     // Remove user from the User collection
     await user.deleteOne();
 
-    // Generate a token for the completed user
-    const token = generateToken({ email: completedUser.email });
-
-    // Return the completed user details and token
+    const tokens = await issueAuthTokens(completedUser.email);
     const { password, ...userDetails } = completedUser.toObject();
 
     return {
       message:
         "Volunteer role selected and completed. You have been registered.",
-      token,
+      ...tokens,
       user: userDetails,
     };
   }
@@ -394,14 +394,13 @@ export const submitObserverDetails = async ({
   // Remove the original user from the User collection
   await user.deleteOne();
 
-  // Return the user details and token, excluding the password
-  const token = generateToken({ email: completedUser.email });
+  const tokens = await issueAuthTokens(completedUser.email);
   const { password, ...userDetails } = completedUser.toObject();
 
   return {
     message:
       "Observer details submitted successfully, pending admin verification.",
-      token,
+    ...tokens,
     user: userDetails,
   };
 };
@@ -437,11 +436,9 @@ export const authenticateUser = async ({ email, password }: AuthCredentials) => 
     { upsert: true, new: true }
   );
 
-  // Generate JWT token
-
-  const token = generateToken({ email: user.email });
+  const tokens = await issueAuthTokens(user.email);
   const { password: userPassword, ...usersDetails } = user.toObject();
-  return { token, user: usersDetails };
+  return { ...tokens, user: usersDetails };
 };
 
 
@@ -485,6 +482,7 @@ export const resetUserPassword = async (token: string, newPassword: string) => {
   user.resetPasswordExpires = undefined;
 
   await user.save();
+  await revokeAllRefreshTokensForEmail(user.email);
   return { message: "Password reset successfully." };
 };
 

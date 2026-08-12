@@ -128,5 +128,7 @@ export declare const newsLetterTemplateNigeriaReadyFor2027Elections: () => strin
 export declare const newsLetterTemplateNigeriaFakeAgenciesRealGovernment: () => string;
 export declare const newsLetterTemplateEfccVersusNigeriansAntiCorruptionOrAntiOpposition: () => string;
 export declare const newsLetterTemplate2027ElectionsWhoIsBuyingYourVote: () => string;
+export declare const newsLetterTemplateArePoliceInecJudiciaryNeutral: () => string;
+export declare const newsLetterTemplateTwoFakeAgenciesDistractionOrDisaster: () => string;
 export {};
 //# sourceMappingURL=emailTemplates.d.ts.map

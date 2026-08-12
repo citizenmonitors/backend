@@ -381,7 +381,6 @@ export const sendNewsletterService = async ({
       }
 
 
-
     
 
       totalTargetedUsers += completedUsers.length;
@@ -395,6 +394,7 @@ export const sendNewsletterService = async ({
       "oluwaloninyo@yahoo.com",
       "yunusmustapha01@yahoo.com",
     ];
+
 
 
     const newsletter = getActiveNewsletter();

@@ -122,8 +122,8 @@ export declare const upgradeVolunteerToObserver: ({ email, details, files, }: Ob
     verificationCode?: string | null | undefined;
     verificationCodeExpires?: NativeDate | null | undefined;
     mobileMeta?: {
-        platform?: string | null | undefined;
         deviceId?: string | null | undefined;
+        platform?: string | null | undefined;
         appVersion?: string | null | undefined;
         pushToken?: string | null | undefined;
         lastLoginAt?: NativeDate | null | undefined;

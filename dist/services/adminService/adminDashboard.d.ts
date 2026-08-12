@@ -88,8 +88,8 @@ export declare const getDashboardData: () => Promise<{
         verificationCode?: string | null | undefined;
         verificationCodeExpires?: NativeDate | null | undefined;
         mobileMeta?: {
-            platform?: string | null | undefined;
             deviceId?: string | null | undefined;
+            platform?: string | null | undefined;
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
@@ -189,8 +189,8 @@ export declare const getDashboardData: () => Promise<{
         verificationCode?: string | null | undefined;
         verificationCodeExpires?: NativeDate | null | undefined;
         mobileMeta?: {
-            platform?: string | null | undefined;
             deviceId?: string | null | undefined;
+            platform?: string | null | undefined;
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
@@ -325,8 +325,8 @@ export declare const getAllUsersService: () => Promise<{
         verificationCode?: string | null | undefined;
         verificationCodeExpires?: NativeDate | null | undefined;
         mobileMeta?: {
-            platform?: string | null | undefined;
             deviceId?: string | null | undefined;
+            platform?: string | null | undefined;
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
@@ -431,8 +431,8 @@ export declare const getUserByIdService: (id: Id) => Promise<import("mongoose").
     verificationCode?: string | null | undefined;
     verificationCodeExpires?: NativeDate | null | undefined;
     mobileMeta?: {
-        platform?: string | null | undefined;
         deviceId?: string | null | undefined;
+        platform?: string | null | undefined;
         appVersion?: string | null | undefined;
         pushToken?: string | null | undefined;
         lastLoginAt?: NativeDate | null | undefined;
@@ -541,8 +541,8 @@ export declare const approveObserverService: (id: Id, adminId: Id) => Promise<{
         verificationCode?: string | null | undefined;
         verificationCodeExpires?: NativeDate | null | undefined;
         mobileMeta?: {
-            platform?: string | null | undefined;
             deviceId?: string | null | undefined;
+            platform?: string | null | undefined;
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
@@ -649,8 +649,8 @@ export declare const getAllObsersverService: () => Promise<{
         verificationCode?: string | null | undefined;
         verificationCodeExpires?: NativeDate | null | undefined;
         mobileMeta?: {
-            platform?: string | null | undefined;
             deviceId?: string | null | undefined;
+            platform?: string | null | undefined;
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
@@ -757,8 +757,8 @@ export declare const unapproveObserverService: (id: Id, adminId: Id) => Promise<
         verificationCode?: string | null | undefined;
         verificationCodeExpires?: NativeDate | null | undefined;
         mobileMeta?: {
-            platform?: string | null | undefined;
             deviceId?: string | null | undefined;
+            platform?: string | null | undefined;
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
@@ -865,8 +865,8 @@ export declare const downgradeObserverService: (id: Id, adminReason: string, adm
         verificationCode?: string | null | undefined;
         verificationCodeExpires?: NativeDate | null | undefined;
         mobileMeta?: {
-            platform?: string | null | undefined;
             deviceId?: string | null | undefined;
+            platform?: string | null | undefined;
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
@@ -1092,8 +1092,8 @@ export declare const createAdminService: (adminId: Id | undefined, { email, role
         verificationCode?: string | null | undefined;
         verificationCodeExpires?: NativeDate | null | undefined;
         mobileMeta?: {
-            platform?: string | null | undefined;
             deviceId?: string | null | undefined;
+            platform?: string | null | undefined;
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
@@ -1193,8 +1193,8 @@ export declare const createAdminService: (adminId: Id | undefined, { email, role
         verificationCode?: string | null | undefined;
         verificationCodeExpires?: NativeDate | null | undefined;
         mobileMeta?: {
-            platform?: string | null | undefined;
             deviceId?: string | null | undefined;
+            platform?: string | null | undefined;
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
@@ -1360,8 +1360,8 @@ export declare const suspendAdminService: (adminId: Id, suspendedBy: Id) => Prom
         verificationCode?: string | null | undefined;
         verificationCodeExpires?: NativeDate | null | undefined;
         mobileMeta?: {
-            platform?: string | null | undefined;
             deviceId?: string | null | undefined;
+            platform?: string | null | undefined;
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
@@ -1461,8 +1461,8 @@ export declare const suspendAdminService: (adminId: Id, suspendedBy: Id) => Prom
         verificationCode?: string | null | undefined;
         verificationCodeExpires?: NativeDate | null | undefined;
         mobileMeta?: {
-            platform?: string | null | undefined;
             deviceId?: string | null | undefined;
+            platform?: string | null | undefined;
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
@@ -1568,8 +1568,8 @@ export declare const getAllAdminsService: () => Promise<{
         verificationCode?: string | null | undefined;
         verificationCodeExpires?: NativeDate | null | undefined;
         mobileMeta?: {
-            platform?: string | null | undefined;
             deviceId?: string | null | undefined;
+            platform?: string | null | undefined;
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;

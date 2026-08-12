@@ -1,0 +1,10 @@
+import express from "express";
+import { createDonationCheckoutController, getDonationSessionController, } from "../controllers/donationController.js";
+import { createDonationCheckoutValidation, donationSessionValidation, handleValidationErrors, } from "../validators/donationValidators.js";
+const router = express.Router();
+/** Web: create anonymous Stripe Checkout Session (amount + currency only) */
+router.post("/checkout", createDonationCheckoutValidation, handleValidationErrors, createDonationCheckoutController);
+/** Web: verify payment status from Stripe after redirect (nothing stored locally) */
+router.get("/session/:sessionId", donationSessionValidation, handleValidationErrors, getDonationSessionController);
+export default router;
+//# sourceMappingURL=donationRoutes.js.map

@@ -2956,4 +2956,142 @@ export const newsLetterTemplate2027ElectionsWhoIsBuyingYourVote = () => baseTemp
       </table>
       `,
 });
+export const newsLetterTemplateArePoliceInecJudiciaryNeutral = () => baseTemplate({
+    title: "Are the Nigeria Police, INEC and Judiciary Neutral?",
+    message: `
+      <table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
+        <tr>
+          <td>
+            <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 6px; overflow: hidden;">
+
+              <!-- Header -->
+              <tr>
+                <td style="background-color: #06BBAF; color: white; padding: 20px 30px; text-align: center;">
+                  <h3 style="color: #ffffff; margin: 0; font-size: 22px;">Are the Nigeria Police, INEC and Judiciary Neutral?</h3>
+                </td>
+              </tr>
+
+              <!-- Body -->
+              <tr>
+                <td style="padding: 30px; color: #000000; font-size: 18px; line-height: 1.7;">
+
+                  <p><strong>Dear Citizen Monitors,</strong></p>
+
+                  <p>For citizens to believe in the outcome of any election, they must have confidence that the institutions responsible for conducting, securing and adjudicating the process are impartial. Three institutions stand at the heart of that confidence: the Nigeria Police Force, the Independent National Electoral Commission (INEC), and the Judiciary.</p>
+
+                  <p><strong>Are these institutions truly neutral?</strong></p>
+                  <p>This is a democratic question that deserves democratic answers.</p>
+
+                  <h4 style="color: #06BBAF; margin-top: 20px;">The Nigeria Police Force</h4>
+                  <p>The Police are expected to provide security for voters, election officials, journalists, observers and political actors. They are empowered to prevent violence, investigate electoral offences and enforce the law without fear or favour. Yet, every election cycle brings allegations of selective arrests, uneven deployment of officers, excessive use of force in some areas and apparent inaction in others.</p>
+                  <p>Whether these allegations are true in every instance is less important than the public perception they create. Confidence in policing is built not only on fairness but also on the appearance of fairness. And leadership matters in this regard. If leadership is not neutral, the Police cannot be neutral.</p>
+
+                  <h4 style="color: #06BBAF; margin-top: 20px;">INEC</h4>
+                  <p>INEC occupies an equally delicate position.</p>
+                  <p>Its constitutional responsibility is to organise elections that are transparent, credible and accepted by winners and losers alike. Nigerians have witnessed improvements over the years through innovations such as voter accreditation technology and greater transparency in election management. At the same time, operational failures, logistical challenges, delayed result uploads and inconsistencies have continued to raise questions.</p>
+                  <p>Public confidence is strengthened when electoral rules are applied consistently, decisions are clearly explained and transparency remains the guiding principle throughout the electoral process.</p>
+
+                  <h4 style="color: #06BBAF; margin-top: 20px;">The Judiciary</h4>
+                  <p>Then comes the Judiciary.</p>
+                  <p>Election petitions often determine the final outcome of fiercely contested elections. Courts are expected to interpret the law independently and without political influence. In many instances, judicial intervention has corrected electoral irregularities and strengthened constitutional democracy. In others, controversial judgments have divided public opinion and fuelled debates over legal interpretation, judicial consistency and public accountability.</p>
+                  <p>The Judiciary does not exist to satisfy public opinion. It exists to uphold the law. However, confidence in judicial independence grows when court processes are transparent, judgments are well reasoned and justice is seen to be delivered without undue delay or external influence.</p>
+
+                  <p>The question is not whether these institutions are perfect. No institution is. The real question is whether they are becoming stronger, more transparent and more accountable with every election.</p>
+
+                  <p>Democracy requires institutions that can withstand political pressure, resist public intimidation and remain faithful to the Constitution rather than to individuals or political parties.</p>
+
+                  <h4 style="color: #06BBAF; margin-top: 20px;">Citizens also have responsibilities.</h4>
+                  <p>Neutral institutions flourish when citizens remain vigilant, document irregularities, demand accountability through lawful means and engage constructively instead of surrendering to cynicism.</p>
+
+                  <p>That is why Citizen Monitors exists.</p>
+                  <p>Our mission is not to attack institutions, but to strengthen democracy by empowering citizens to observe, document and report electoral processes responsibly. Credible evidence and informed civic participation help build stronger institutions and more credible elections.</p>
+
+                  <p>The future of Nigeria's democracy will not be determined by politicians alone. It will also depend on whether the institutions entrusted with protecting the electoral process continue to earn, and deserve, the confidence of the Nigerian people.</p>
+
+                  <h4 style="color: #06BBAF; margin-top: 20px;">Question of the Week</h4>
+                  <p>Which institution do you believe requires the greatest reform before the 2027 General Elections; the Police, INEC or the Judiciary? Tell us why by replying to this message, or joining the conversation on our social media platforms.</p>
+
+                  <p>Together, we can build a democracy where institutions inspire confidence and every vote truly counts.</p>
+
+                  <p style="margin-top: 20px; font-style: italic; color: #555555;">
+                    Promoting transparency, accountability and informed public discourse.
+                  </p>
+
+                  ${newsletterFooterTemplate()}
+
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+      </table>
+      `,
+});
+export const newsLetterTemplateTwoFakeAgenciesDistractionOrDisaster = () => baseTemplate({
+    title: "Two More Fake Agencies: Distraction or Disaster?",
+    message: `
+        <table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; padding: 20px 0;">
+          <tr>
+            <td>
+              <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 6px; overflow: hidden;">
+  
+                <!-- Header -->
+                <tr>
+                  <td style="background-color: #06BBAF; color: white; padding: 20px 30px; text-align: center;">
+                    <h3 style="color: #ffffff; margin: 0; font-size: 22px;">Two More Fake Agencies: Distraction or Disaster?</h3>
+                  </td>
+                </tr>
+  
+                <!-- Body -->
+                <tr>
+                  <td style="padding: 30px; color: #000000; font-size: 18px; line-height: 1.7;">
+  
+                    <p><strong>Dear Citizen Monitors,</strong></p>
+  
+                    <p>Nigeria thought the Presidential Foreign Intervention Promotion Council (PFIPC) scandal was already unbelievable. A supposedly non-existent government agency operated from a government office, presented itself as a Presidential institution, interacted with public institutions and foreign interests, and was even associated with a ₦1.3 billion provision in the 2026 Appropriation Act.</p>
+  
+                    <p>After 30 days of investigation, the ICPC says the story is worse: it has uncovered two additional fictitious agencies allegedly linked to Adeniyi Adeyemi Matthew, at the centre of the PFIPC controversy…the FCT Investment Promotion Agency and the Foreign Investment Promotion Agency.</p>
+  
+                    <p>According to the ICPC, forged legislative instruments were allegedly used to make these entities appear legitimate and facilitate the opening of bank accounts. This is no longer just about one alleged impostor. It is about institutional vulnerability. How does a fake agency become real enough for government institutions to recognise and engage with?</p>
+  
+                    <p>The ICPC says PFIPC was never established by an Act of the National Assembly, executive order, nor any valid government instrument. Yet it allegedly gained access to government premises and operated using the identity and facilities of the former Presidential Economic Advisory Council (PEAC). The investigation also identified weaknesses in verification and inter-agency oversight.</p>
+  
+                    <p>The ICPC says there is no evidence that Federal Government funds were approved or disbursed to PFIPC/PEAC, and that the purported appointment letter did not originate from the Presidency. But that leaves the bigger question:</p>
+  
+                    <p><strong>How did the system fail to detect the alleged fraud earlier?</strong></p>
+  
+                    <p>Finding the alleged mastermind is necessary. But stopping there would be a mistake. The ICPC has recommended administrative sanctions against public officials whose actions, omissions or negligence allegedly facilitated the operation. That means Nigerians must ask:</p>
+  
+                    <p><strong>Who approved what? Who verified what? Who failed to verify what? Who saw the warning signs and ignored them?</strong></p>
+  
+                    <p>As former Vice President Atiku Abubakar has demanded, the collaborators, if any, must also be identified and named.</p>
+  
+                    <h4 style="color: #06BBAF; margin-top: 20px;">So, are two more fake agencies a distraction or a disaster?</h4>
+                    <p>They become a distraction if the story ends with prosecuting one individual.</p>
+                    <p>They become a governance disaster if Nigeria fails to investigate the institutional weaknesses that allowed fictitious entities to acquire the appearance of legitimacy.</p>
+  
+                    <p>The solution should be straightforward: Nigeria needs a public, authoritative register of every legitimate federal government institution, including its enabling law or executive instrument, leadership, mandate, office and official contact channels. A government institution should not become legitimate simply because it has an office, letterhead, website, seal or government connections.</p>
+  
+                    <p><strong>Legitimacy comes from law. Accountability begins with verification.</strong></p>
+  
+                    <p>The PFIPC may have been fake. But the weaknesses it exposed are very real.</p>
+  
+                    <p><strong>How many other "PFIPCs" are hiding inside Nigeria's bureaucracy?</strong></p>
+  
+                    <p style="margin-top: 20px; font-style: italic; color: #555555;">
+                      Promoting transparency, accountability and informed public discourse.
+                    </p>
+  
+                    ${newsletterFooterTemplate()}
+  
+                  </td>
+                </tr>
+  
+              </table>
+            </td>
+          </tr>
+        </table>
+        `,
+});
 //# sourceMappingURL=emailTemplates.js.map

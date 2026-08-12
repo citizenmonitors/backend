@@ -43,6 +43,8 @@ import mobileNewsInsightRoutes from "./routes/mobile/newsInsightRoutes.ts";
 import mobilePressCoverageRoutes from "./routes/mobile/pressCoverageRoutes.ts";
 import anonymousRoutes from "./routes/anonymousRoutes.ts";
 import collationDiscussionRoutes from "./routes/collationDiscussionRoutes.ts";
+import donationRoutes from "./routes/donationRoutes.ts";
+import mobileDonationRoutes from "./routes/mobile/donationRoutes.ts";
 import { inhouseApiAccessMiddleware } from "./middleware/inhouseApiAccessMiddleware.ts";
 import { initSocketServer } from "./services/realtime/socketServer.ts";
 import { setSocketServer } from "./services/realtime/socketBus.ts";
@@ -147,6 +149,7 @@ app.use("/api", adminRoutes);
 app.use("/api", resourcesRoutes);
 app.use("/api/speaker-slots", speakerSlotsRoutes);
 app.use("/api/pvc-issues", pvcIssuesRoutes);
+app.use("/api/donations", donationRoutes);
 
 
 // Versioned API aliases for safer incremental evolution (mobile/web clients)
@@ -166,6 +169,7 @@ app.use("/api/v1", adminRoutes);
 app.use("/api/v1", resourcesRoutes);
 app.use("/api/v1/speaker-slots", speakerSlotsRoutes);
 app.use("/api/v1/pvc-issues", pvcIssuesRoutes);
+app.use("/api/v1/donations", donationRoutes);
 app.use("/api/v1/mobile/auth", mobileAuthRoutes);
 app.use("/api/v1/mobile/locations", mobileLocationRoutes);
 app.use("/api/v1/mobile/banks", mobileBankRoutes);
@@ -178,6 +182,7 @@ app.use("/api/v1/mobile/academy", mobileAcademyRoutes);
 app.use("/api/v1/mobile/faq", mobileFaqRoutes);
 app.use("/api/v1/mobile/news-insights", mobileNewsInsightRoutes);
 app.use("/api/v1/mobile/press-coverage", mobilePressCoverageRoutes);
+app.use("/api/v1/mobile/donations", mobileDonationRoutes);
 
 app.use("/observerid", express.static(path.join(__dirname, "observerId")));
 app.use("/profileimage", express.static(path.join(__dirname, "profileImage")));

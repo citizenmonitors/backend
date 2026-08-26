@@ -39,6 +39,7 @@ import { getActivityBoardAndNotifications, getLiveElectionDetails, getOngoingEle
 import { getMobileCollation } from "../../controllers/mobile/collationController.ts";
 import {
   getMyElectionSubmissionMobile,
+  getMobileElectionUserAction,
   postMobileElectionUserAction,
 } from "../../controllers/mobile/electionController.ts";
 import collationDiscussionRoutes from "../collationDiscussionRoutes.ts";
@@ -223,8 +224,32 @@ router.get(
   getMyElectionSubmissionMobile
 );
 router.get("/:activeElectionId/collation", authMiddleware, getMobileCollation);
+router.get(
+  "/:activeElectionId/user-action",
+  authMiddleware,
+  getMobileElectionUserAction
+);
+router.get(
+  "/:activeElectionId/collation/user-action",
+  authMiddleware,
+  getMobileElectionUserAction
+);
 router.post(
   "/:activeElectionId/user-action",
+  authMiddleware,
+  (req: Request, res: Response, next: NextFunction) => {
+    runMulter(
+      uploadFlagEvidenceFiles,
+      req,
+      res,
+      next,
+      "Flag evidence upload Multer error"
+    );
+  },
+  postMobileElectionUserAction
+);
+router.post(
+  "/:activeElectionId/collation/user-action",
   authMiddleware,
   (req: Request, res: Response, next: NextFunction) => {
     runMulter(

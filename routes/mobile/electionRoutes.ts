@@ -10,6 +10,7 @@ import {
   updateIncidentReportMobile,
   deleteIncidentReportMobile,
   getLiveElectionsCarouselMobile,
+  getMobileElectionUserAction,
   postMobileElectionUserAction,
 } from "../../controllers/mobile/electionController.ts";
 import {
@@ -122,9 +123,36 @@ router.delete(
 // Collation / election live (active election id = ActiveElection._id)
 router.get("/:activeElectionId/collation", authMiddleware, getMobileCollation);
 
-// PU verification (agree/flag) — same rules as web /user-action, scoped to one election
+// PU verification feed + agree/flag — same rules as web /user-action, scoped to one election
+router.get(
+  "/:activeElectionId/user-action",
+  authMiddleware,
+  getMobileElectionUserAction
+);
+router.get(
+  "/:activeElectionId/collation/user-action",
+  authMiddleware,
+  getMobileElectionUserAction
+);
 router.post(
   "/:activeElectionId/user-action",
+  authMiddleware,
+  (req, res, next) => {
+    uploadFlagEvidenceFiles(req, res, (err?: unknown) => {
+      if (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        return res.status(400).json({
+          message: "Flag evidence upload Multer error",
+          error: message,
+        });
+      }
+      next();
+    });
+  },
+  postMobileElectionUserAction
+);
+router.post(
+  "/:activeElectionId/collation/user-action",
   authMiddleware,
   (req, res, next) => {
     uploadFlagEvidenceFiles(req, res, (err?: unknown) => {

@@ -148,6 +148,8 @@ router.get(
 );
 
 router.post("/admin/podcast", authMiddleware, isAdmin, PodcastController.sendPodcast);
+router.get("/admin/newsletter/active", authMiddleware, isAdmin, PodcastController.getActiveNewsletter);
+router.post("/admin/newsletter/preview", authMiddleware, isAdmin, PodcastController.previewNewsletterCompose);
 router.post("/admin/newsletter", authMiddleware, isAdmin, PodcastController.sendNewsletter);
 router.patch("/admin/podcast/:id", authMiddleware, isAdmin, PodcastController.editPodcast);
 router.get("/admin/podcast", authMiddleware, isAdmin, PodcastController.getAllPodcasts);

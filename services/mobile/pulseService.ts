@@ -183,6 +183,60 @@ export const listPulsePosts = async (userId: Id, page = 1, limit = 20) => {
   return { posts, total, page, limit: safeLimit };
 };
 
+/** Public web feed: no auth, no location restriction. */
+export const listPulsePostsPublic = async (page = 1, limit = 20) => {
+  const safeLimit = Math.min(50, Math.max(1, limit));
+  const skip = Math.max(0, (page - 1) * safeLimit);
+
+  const [rows, total] = await Promise.all([
+    PulsePost.find({})
+      .populate("author", "firstName lastName anonymousUsername")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(safeLimit)
+      .lean(),
+    PulsePost.countDocuments({}),
+  ]);
+
+  const postIds = rows.map((r) => r._id);
+  const commentCounts = await PulseComment.aggregate<{ _id: Id; count: number }>([
+    { $match: { post: { $in: postIds } } },
+    { $group: { _id: "$post", count: { $sum: 1 } } },
+  ]);
+  const commentCountByPost = new Map(
+    commentCounts.map((entry) => [String(entry._id), entry.count])
+  );
+
+  const posts = rows.map((row) => {
+    const likes = Array.isArray(row.likes) ? row.likes : [];
+    const { displayName, usedAnonymous } = formatAuthorDisplay(
+      row.author as AuthorLean,
+      Boolean(row.useAnonymousDisplay)
+    );
+    return {
+      id: String(row._id),
+      body: row.body,
+      imageUrl: row.imageUrl ?? null,
+      visibilityScope: row.visibilityScope ?? "lga",
+      audienceState: row.audienceState ?? null,
+      audienceLga: row.audienceLga ?? null,
+      audienceWard: row.audienceWard ?? null,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+      author: {
+        id: row.author?._id != null ? String((row.author as { _id: Id })._id) : undefined,
+        displayName,
+        usedAnonymous,
+      },
+      likesCount: likes.length,
+      commentsCount: commentCountByPost.get(String(row._id)) ?? 0,
+      isLikedByCurrentUser: false,
+    };
+  });
+
+  return { posts, total, page, limit: safeLimit };
+};
+
 export const createPulsePost = async (
   userId: Id,
   input: {
@@ -254,6 +308,17 @@ export const createPulsePost = async (
 
 export const togglePulsePostLike = async (userId: Id, postId: string) => {
   await assertPostVisibleToUser(postId, userId);
+  return togglePulsePostLikeCore(userId, postId);
+};
+
+/** Auth required, but no location restriction (web). */
+export const togglePulsePostLikeAnyLocation = async (userId: Id, postId: string) => {
+  const post = await PulsePost.findById(postId).lean();
+  if (!post) throw new Error("Post not found");
+  return togglePulsePostLikeCore(userId, postId);
+};
+
+const togglePulsePostLikeCore = async (userId: Id, postId: string) => {
   const post = await PulsePost.findById(postId);
   if (!post) throw new Error("Post not found");
 
@@ -280,12 +345,64 @@ export const listPulsePostComments = async (userId: Id, postId: string) => {
   return rows.map((row) => serializePulseComment(row, userId));
 };
 
+/** Public web comments: no auth, no location restriction. */
+export const listPulsePostCommentsPublic = async (postId: string) => {
+  const post = await PulsePost.findById(postId).lean();
+  if (!post) throw new Error("Post not found");
+
+  const rows = await PulseComment.find({ post: postId })
+    .populate("author", "firstName lastName anonymousUsername")
+    .sort({ createdAt: -1 })
+    .lean();
+
+  return rows.map((row) => {
+    const likes = Array.isArray(row.likes) ? row.likes : [];
+    const { displayName, usedAnonymous } = formatAuthorDisplay(
+      row.author as AuthorLean,
+      Boolean(row.useAnonymousDisplay)
+    );
+    return {
+      id: String(row._id),
+      body: row.body,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+      author: {
+        id: row.author?._id != null ? String((row.author as { _id: Id })._id) : undefined,
+        displayName,
+        usedAnonymous,
+      },
+      likesCount: likes.length,
+      isLikedByCurrentUser: false,
+    };
+  });
+};
+
 export const addPulsePostComment = async (
   userId: Id,
   postId: string,
   input: { body: string; useAnonymousDisplay?: boolean }
 ) => {
   const { post } = await assertPostVisibleToUser(postId, userId);
+  return addPulsePostCommentCore(userId, postId, input, post.author);
+};
+
+/** Auth required; no location gate (for public web feed engagement). */
+export const addPulsePostCommentAnyLocation = async (
+  userId: Id,
+  postId: string,
+  input: { body: string; useAnonymousDisplay?: boolean }
+) => {
+  const post = await PulsePost.findById(postId).lean();
+  if (!post) throw new Error("Post not found");
+  return addPulsePostCommentCore(userId, postId, input, post.author);
+};
+
+const addPulsePostCommentCore = async (
+  userId: Id,
+  postId: string,
+  input: { body: string; useAnonymousDisplay?: boolean },
+  postAuthor: unknown
+) => {
   const author = await ensureViewer(userId);
 
   const useAnonymous = Boolean(input.useAnonymousDisplay);
@@ -305,13 +422,13 @@ export const addPulsePostComment = async (
     .populate("author", "firstName lastName anonymousUsername")
     .lean();
 
-  if (post.author && String(post.author) !== String(userId)) {
+  if (postAuthor && String(postAuthor) !== String(userId)) {
     await dispatchNotificationToUsers({
       type: "discussion-reply",
       preferenceKey: "discussionReplies",
       body: "Someone replied to your pulse post.",
       info: String(input.body).slice(0, 120),
-      userIds: [String(post.author)],
+      userIds: [String(postAuthor)],
     });
   }
 
@@ -325,6 +442,25 @@ export const togglePulseCommentLike = async (
   commentId: string
 ) => {
   await assertPostVisibleToUser(postId, userId);
+  return togglePulseCommentLikeCore(userId, postId, commentId);
+};
+
+/** Auth required; no location gate (for public web feed engagement). */
+export const togglePulseCommentLikeAnyLocation = async (
+  userId: Id,
+  postId: string,
+  commentId: string
+) => {
+  const post = await PulsePost.exists({ _id: postId });
+  if (!post) throw new Error("Post not found");
+  return togglePulseCommentLikeCore(userId, postId, commentId);
+};
+
+const togglePulseCommentLikeCore = async (
+  userId: Id,
+  postId: string,
+  commentId: string
+) => {
   const comment = await PulseComment.findOne({ _id: commentId, post: postId });
   if (!comment) throw new Error("Comment not found");
 

@@ -12,6 +12,7 @@ import AdminLog from "../../models/admin/AdminLog.ts";
 import Podcast from "../../models/admin/Podcast.ts";
 import CompletedUser from "../../models/CompletedUser.ts";
 import { invalidateAllMobileReadCaches } from "../../utils/cache.ts";
+import { buildNewsletterFromPaste, buildComposePreview } from "../../utils/newsletterFromPaste.ts";
 import { dispatchMobileNotification } from "../mobile/notificationDispatchService.ts";
 import { createNewsInsightArticle } from "./newsInsightAdminService.ts";
 
@@ -86,11 +87,37 @@ type EditPodcastInput = {
   adminId: Id | undefined;
 };
 type SendNewsletterInput = {
-  recipients: RecipientRole[] | RecipientRole;
+  recipients?: RecipientRole[] | RecipientRole;
   scheduleTime?: string | Date;
   adminId?: Id;
-  /** When false, send email (+ newsletter inbox push) only — skip News & Insight. Default: true. */
+  /** When false, skip email send. Default: true. */
+  sendEmail?: unknown;
+  /** When false, send email only — skip News & Insight. Default: true. */
   publishAsNewsInsight?: unknown;
+  /**
+   * When true:
+   * - emails go only to `testEmails` (required)
+   * - mobile notifications (inbox + news-insight push) are skipped
+   */
+  isTest?: unknown;
+  /** One or more emails for test sends. Required when isTest is true and sendEmail is true. */
+  testEmails?: unknown;
+  /**
+   * Frontend compose page: paste the full draft (with or without Subject:),
+   * or send title + content separately.
+   */
+  paste?: unknown;
+  title?: unknown;
+  content?: unknown;
+  excerpt?: unknown;
+};
+
+type NewsletterPayload = {
+  title: string;
+  excerpt: string;
+  content: string;
+  buildEmailHtml: () => string;
+  source: "paste" | "active-edition";
 };
 
 const toBooleanFlag = (value: unknown, defaultValue: boolean): boolean => {
@@ -104,17 +131,155 @@ const toBooleanFlag = (value: unknown, defaultValue: boolean): boolean => {
   return defaultValue;
 };
 
-const NEWSLETTER_NEWS_THUMBNAIL =
-  process.env.NEWSLETTER_NEWS_THUMBNAIL_URL?.trim() ||
-  "https://www.citizenmonitors.com/assets/citizen-monitors-logo.png";
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const getActiveNewsletter = () => {
+const normalizeTestEmails = (value: unknown): string[] => {
+  if (value === undefined || value === null || value === "") return [];
+  const list = Array.isArray(value)
+    ? value
+    : typeof value === "string"
+      ? value.split(/[,;\s]+/)
+      : [];
+  const emails = list
+    .map((item) => String(item ?? "").trim().toLowerCase())
+    .filter((email) => email.length > 0);
+  const invalid = emails.filter((email) => !EMAIL_PATTERN.test(email));
+  if (invalid.length > 0) {
+    throw new Error(`Invalid testEmails: ${invalid.join(", ")}`);
+  }
+  return [...new Set(emails)];
+};
+
+const NEWSLETTER_COVER_FILES = [
+  "newsletter-abstract-01.jpg",
+  "newsletter-abstract-02.jpg",
+  "newsletter-abstract-03.jpg",
+  "newsletter-abstract-04.jpg",
+  "newsletter-abstract-05.jpg",
+  "newsletter-abstract-06.jpg",
+] as const;
+
+const pickNewsletterCoverImageUrl = (): string => {
+  const override = process.env.NEWSLETTER_NEWS_THUMBNAIL_URL?.trim();
+  if (override) return override;
+
+  const file =
+    NEWSLETTER_COVER_FILES[
+      Math.floor(Math.random() * NEWSLETTER_COVER_FILES.length)
+    ];
+  const base = (
+    process.env.BACKEND_URL ||
+    process.env.FRONTEND_URL ||
+    "https://www.citizenmonitors.com"
+  ).replace(/\/$/, "");
+  return `${base}/newsletter-covers/${file}`;
+};
+
+const getActiveNewsletter = (): NewsletterPayload => {
   const newsInsight = ACTIVE_NEWSLETTER_EDITION.getNewsInsight();
   return {
     title: newsInsight.title,
     excerpt: newsInsight.excerpt,
     content: newsInsight.content,
     buildEmailHtml: ACTIVE_NEWSLETTER_EDITION.buildEmailHtml,
+    source: "active-edition",
+  };
+};
+
+const resolveNewsletterPayload = (input?: {
+  paste?: unknown;
+  title?: unknown;
+  content?: unknown;
+  excerpt?: unknown;
+}): NewsletterPayload => {
+  const hasPaste = String(input?.paste ?? "").trim().length > 0;
+  const hasTitle = String(input?.title ?? "").trim().length > 0;
+  const hasContent = String(input?.content ?? "").trim().length > 0;
+
+  if (hasPaste || hasTitle || hasContent) {
+    const built = buildNewsletterFromPaste({
+      paste: input?.paste,
+      title: input?.title,
+      content: input?.content,
+      excerpt: input?.excerpt,
+    });
+    return {
+      title: built.title,
+      excerpt: built.excerpt,
+      content: built.content,
+      buildEmailHtml: () => built.emailHtml,
+      source: "paste",
+    };
+  }
+
+  return getActiveNewsletter();
+};
+
+/**
+ * Frontend compose page Step 1:
+ * paste draft → dual preview (newsletter email + News & Insight).
+ */
+export const composeNewsletterPreviewService = (input: {
+  paste?: unknown;
+  title?: unknown;
+  content?: unknown;
+  excerpt?: unknown;
+}) => {
+  const preview = buildComposePreview(input);
+  return {
+    ...preview,
+    nextStep: {
+      endpoint: "POST /api/admin/newsletter",
+      description:
+        "Reuse the same paste/title/content, then set isTest true (test) or false (live).",
+      testExample: {
+        paste: "<same paste>",
+        isTest: true,
+        testEmails: ["you@example.com"],
+        sendEmail: true,
+        publishAsNewsInsight: true,
+      },
+      liveExample: {
+        paste: "<same paste>",
+        recipients: "all",
+        isTest: false,
+        sendEmail: true,
+        publishAsNewsInsight: true,
+      },
+    },
+  };
+};
+
+/** @deprecated Prefer composeNewsletterPreviewService for the paste → preview page. */
+export const getActiveNewsletterPreviewService = (input?: {
+  paste?: unknown;
+  title?: unknown;
+  content?: unknown;
+  excerpt?: unknown;
+}) => {
+  const hasPasteInput =
+    String(input?.paste ?? "").trim() ||
+    String(input?.title ?? "").trim() ||
+    String(input?.content ?? "").trim();
+
+  if (hasPasteInput) {
+    return composeNewsletterPreviewService(input ?? {});
+  }
+
+  const newsletter = getActiveNewsletter();
+  return {
+    title: newsletter.title,
+    excerpt: newsletter.excerpt,
+    newsletter: {
+      subject: newsletter.title,
+      html: newsletter.buildEmailHtml(),
+    },
+    newsInsight: {
+      title: newsletter.title,
+      excerpt: newsletter.excerpt,
+      content: newsletter.content,
+    },
+    source: newsletter.source,
   };
 };
 
@@ -139,19 +304,23 @@ const resolveNewsletterPublisherId = async (adminId?: Id): Promise<Id> => {
   return admin._id;
 };
 
-const publishNewsletterAsNewsInsight = async (adminId?: Id) => {
+const publishNewsletterAsNewsInsight = async (
+  newsletter: NewsletterPayload,
+  adminId?: Id,
+  notifySubscribers = true
+) => {
   const publisherId = await resolveNewsletterPublisherId(adminId);
-  const newsletter = getActiveNewsletter();
+  const coverImageUrl = pickNewsletterCoverImageUrl();
 
   return createNewsInsightArticle({
     adminId: publisherId,
     title: newsletter.title,
     excerpt: newsletter.excerpt,
     content: newsletter.content,
-    thumbnailURLUrl: NEWSLETTER_NEWS_THUMBNAIL,
-    heroImageURL: NEWSLETTER_NEWS_THUMBNAIL,
+    thumbnailURLUrl: coverImageUrl,
+    heroImageURL: coverImageUrl,
     isPublished: true,
-    notifySubscribers: true,
+    notifySubscribers,
   });
 };
 
@@ -354,96 +523,149 @@ export const sendNewsletterService = async ({
   recipients,
   scheduleTime,
   adminId,
+  sendEmail: sendEmailFlag,
   publishAsNewsInsight,
+  isTest,
+  testEmails,
+  paste,
+  title,
+  content,
+  excerpt,
 }: SendNewsletterInput) => {
-  const normalizedRecipients = normalizeRecipients(recipients);
+  const shouldSendEmail = toBooleanFlag(sendEmailFlag, true);
   const shouldPublishNewsInsight = toBooleanFlag(publishAsNewsInsight, true);
+  const isTestSend = toBooleanFlag(isTest, false);
+  const normalizedTestEmails = normalizeTestEmails(testEmails);
+  const newsletter = resolveNewsletterPayload({ paste, title, content, excerpt });
+
+  if (!shouldSendEmail && !shouldPublishNewsInsight) {
+    throw new Error(
+      "Nothing to do: set sendEmail and/or publishAsNewsInsight to true"
+    );
+  }
+
+  if (isTestSend && shouldSendEmail && normalizedTestEmails.length === 0) {
+    throw new Error(
+      "testEmails is required when isTest is true and sendEmail is true"
+    );
+  }
+
+  let normalizedRecipients: RecipientRole[] = ["all"];
+  if (!isTestSend && shouldSendEmail) {
+    if (recipients === undefined || recipients === null || recipients === "") {
+      throw new Error("recipients is required for a live newsletter send");
+    }
+    normalizedRecipients = normalizeRecipients(recipients);
+  } else if (recipients !== undefined && recipients !== null && recipients !== "") {
+    normalizedRecipients = normalizeRecipients(recipients);
+  }
 
   const sendEmails = async () => {
-    // Count estimated recipients and fetch their email addresses
-    let totalTargetedUsers = 0;
     let userEmails: string[] = [];
-    for (const role of normalizedRecipients) {
-      let completedUsers: UserEmailOnly[] = [];
 
-      if (role === "all") {
-        // Fetch emails from CompletedUser model where notifications.email.newsletter is true
-        completedUsers = await CompletedUser.find(
-          { "notifications.email.newsletter": true },
-          "email"
-        ).lean();
+    if (shouldSendEmail) {
+      if (isTestSend) {
+        userEmails = normalizedTestEmails;
       } else {
-        // Fetch emails by role from CompletedUser model where notifications.email.newsletter is true
-        completedUsers = await CompletedUser.find(
-          { role, "notifications.email.newsletter": true },
-          "email"
-        ).lean();
+        for (const role of normalizedRecipients) {
+          let completedUsers: UserEmailOnly[] = [];
+
+          if (role === "all") {
+            completedUsers = await CompletedUser.find(
+              { "notifications.email.newsletter": true },
+              "email"
+            ).lean();
+          } else {
+            completedUsers = await CompletedUser.find(
+              { role, "notifications.email.newsletter": true },
+              "email"
+            ).lean();
+          }
+
+          userEmails.push(...completedUsers.map((user) => user.email));
+        }
+        userEmails = [
+          ...new Set(
+            userEmails.map((e) => e.trim().toLowerCase()).filter(Boolean)
+          ),
+        ];
       }
 
+      if (userEmails.length === 0) {
+        throw new Error("No newsletter recipients found");
+      }
 
-    
+      const htmlContent = newsletter.buildEmailHtml();
+      const listUnsubscribeUrl = getNewsletterUnsubscribeUrl();
 
-      totalTargetedUsers += completedUsers.length;
-      userEmails.push(...completedUsers.map((user) => user.email));
-    }
-    
-    // For testing, override userEmails with your email
-    userEmails = [
-      "yunusmustapha2@gmail.com",
-      "citizenmonitors@yahoo.com",
-      "oluwaloninyo@yahoo.com",
-      "yunusmustapha01@yahoo.com",
-    ];
-
-
-
-    const newsletter = getActiveNewsletter();
-    const htmlContent = newsletter.buildEmailHtml();
-
-    const listUnsubscribeUrl = getNewsletterUnsubscribeUrl();
-
-    // Send emails to all targeted users
-    const emailPromises = userEmails.map((email) =>
-      sendEmail({
-        to: email,
-        subject: newsletter.title,
-        htmlbody: htmlContent,
-        listUnsubscribeUrl,
-        trackClicks: false,
-        trackOpens: false,
-      }).catch((err) => {
-        console.error(`Failed to send email to ${email}:`, err);
-      })
-    );
-
-    await Promise.all(emailPromises);
-
-    await dispatchNewsletterMobileInbox({
-      recipients: normalizedRecipients,
-      title: newsletter.title,
-      info: newsletter.excerpt,
-    });
-
-    if (!shouldPublishNewsInsight) {
-      console.log(
-        `Newsletter sent successfully to ${userEmails.length} recipients (email only).`
+      const emailPromises = userEmails.map((email) =>
+        sendEmail({
+          to: email,
+          subject: newsletter.title,
+          htmlbody: htmlContent,
+          listUnsubscribeUrl,
+          trackClicks: false,
+          trackOpens: false,
+        }).catch((err) => {
+          console.error(`Failed to send email to ${email}:`, err);
+        })
       );
-      return { totalRecipients: userEmails.length, newsInsight: null };
+
+      await Promise.all(emailPromises);
     }
 
-    // Mirror newsletter into mobile News & Insights (DB + push in news-insight format)
-    const newsInsight = await publishNewsletterAsNewsInsight(adminId);
+    const notificationsSent =
+      !isTestSend && (shouldSendEmail || shouldPublishNewsInsight);
 
-    console.log(
-      `Newsletter sent successfully to ${userEmails.length} recipients; News & Insight published (${newsInsight.slug}).`
-    );
-    return {
-      totalRecipients: userEmails.length,
-      newsInsight: {
+    if (!isTestSend && shouldSendEmail) {
+      await dispatchNewsletterMobileInbox({
+        recipients: normalizedRecipients,
+        title: newsletter.title,
+        info: newsletter.excerpt,
+      });
+    }
+
+    let newsInsightResult: {
+      id: string;
+      slug: string;
+      title: string;
+    } | null = null;
+
+    if (shouldPublishNewsInsight) {
+      const newsInsight = await publishNewsletterAsNewsInsight(
+        newsletter,
+        adminId,
+        !isTestSend
+      );
+      newsInsightResult = {
         id: String(newsInsight._id),
         slug: newsInsight.slug,
         title: newsInsight.title,
-      },
+      };
+    }
+
+    const modeParts = [
+      shouldSendEmail ? "email" : null,
+      shouldPublishNewsInsight ? "news-insight" : null,
+      isTestSend ? "test" : "live",
+      newsletter.source,
+    ].filter(Boolean);
+
+    console.log(
+      `Newsletter completed (${modeParts.join(" + ")}); recipients=${userEmails.length}`
+    );
+
+    return {
+      totalRecipients: userEmails.length,
+      recipients: isTestSend ? userEmails : undefined,
+      emailSent: shouldSendEmail,
+      newsInsightPublished: shouldPublishNewsInsight,
+      notificationsSent: Boolean(notificationsSent && !isTestSend),
+      isTest: isTestSend,
+      source: newsletter.source,
+      newsInsight: newsInsightResult,
+      title: newsletter.title,
+      excerpt: newsletter.excerpt,
     };
   };
 
@@ -478,13 +700,16 @@ export const sendNewsletterService = async ({
     return {
       message: "Newsletter scheduled successfully",
       scheduleTime: formattedTime,
+      isTest: isTestSend,
+      emailSent: shouldSendEmail,
+      newsInsightPublished: shouldPublishNewsInsight,
+      source: newsletter.source,
+      title: newsletter.title,
+      excerpt: newsletter.excerpt,
     };
-  } else {
-    // Send immediately if no scheduleTime is provided
-    const result = await sendEmails();
-    return { message: "Newsletter sent successfully", ...result };
   }
+
+  const result = await sendEmails();
+  return { message: "Newsletter sent successfully", ...result };
 };
-
-
 

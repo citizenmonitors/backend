@@ -142,3 +142,130 @@ export const newsInsightArePoliceInecJudiciaryNeutral =
 <p><strong>How many other "PFIPCs" are hiding inside Nigeria's bureaucracy?</strong></p>
 `.trim(),
   });
+
+export const newsInsightOsunElections2026FreeAndFair =
+  (): NewsInsightArticleContent => ({
+    title: "Osun Elections 2026; Free and Fair?",
+    excerpt:
+      "Osun is the warning. 2027 is the real test. Can we trust the system that told us who won?",
+    content: `
+<p><strong>Dear Citizen Monitors,</strong></p>
+<p>As the dust settles on the 2026 Osun gubernatorial election, the key question is no longer just who won, but whether the process was free, fair and verifiable.</p>
+<p>Reports from the field point to mixed experiences with electoral technology. While BVAS reportedly worked in many areas, technical issues with IReV raised a bigger concern; if IReV experienced glitches with just 3,763 polling units in Osun, what happens during a nationwide election involving 176,974 polling units?</p>
+<p>We have seen this before. During the 2023 presidential election, INEC acknowledged technical problems that affected the uploading of polling-unit results to IReV and deployed a software "hotfix."</p>
+<p><strong>The lesson is simple: every election is a stress test.</strong></p>
+<p>Technology must work not only under normal conditions, but under the enormous pressure of a national election involving millions of voters, thousands of officials, political parties, journalists, observers and citizens.</p>
+<h4>And what happens to independent monitoring when IReV is unavailable?</h4>
+<p>IReV was created to improve transparency by making polling-unit results publicly accessible. If its failure can disrupt independent monitoring during a state election, Nigerians have every right to ask what happens during a presidential election.</p>
+<h4>This is where Citizen Monitors comes in.</h4>
+<p>Citizen Monitors provides an independent, crowd-sourced mechanism for collecting polling-unit results directly from voters (Observers). Results can be compared (through Volunteers) and collated to provide an independent picture of what happened at polling-unit, ward, local government and state levels.</p>
+<p><strong>IReV glitch should never mean no independent verification.</strong></p>
+<p>A glitch is not evidence of sabotage. But democracy cannot depend on assumptions. It must depend on verifiable safeguards. Nigeria needs redundancy, independent audit trails, immutable timestamps, accessible polling-unit results and clear contingency plans for prolonged technology failures.</p>
+<p>INEC says it has strengthened IReV since 2023. That is welcome. But trust is not created by saying a system has improved. Trust comes when that system is demonstrably resilient, independently tested and transparent when things go wrong.</p>
+<p>Osun should therefore be judged not only by whether voting was peaceful or a winner was declared, but by what it teaches us about the resilience of Nigeria's electoral infrastructure.</p>
+<p><strong>Osun is the warning. 2027 is the real test.</strong></p>
+<p>Free and fair elections require more than voting. They require a process Nigerians can independently observe, verify, audit and trust. So, the question remains; Can we trust the system that told us who won the Osun State election?</p>
+<p><em>Promoting transparency, accountability and informed public discourse.</em></p>
+`.trim(),
+  });
+export const newsInsightHowWillNigeriansDefendTheirVotesIn2027 =
+  (): NewsInsightArticleContent => ({
+    title: "How Will Nigerians Defend Their Votes in 2027?",
+    excerpt:
+      "Your vote is your voice. Your evidence is your protection. Your vigilance is your power.",
+    content: `
+<p><strong>Dear Citizen Monitors,</strong></p>
+<p>Nigeria's 2027 general elections are no longer a distant political event. When the votes are cast, who will protect them?</p>
+<p>For years, Nigerians have been told that their vote is their power. But a vote only becomes meaningful when it is accurately recorded, transmitted, collated and ultimately reflected in the result. Are Nigerian voters prepared to defend their votes like we saw Osun citizens do in the Osun Gubernatorial elections two Saturdays ago?</p>
+<h4>The polling unit is only the beginning</h4>
+<p>Election day is often treated as the climax of democracy. But in reality, a voter can arrive at a polling unit, authenticate their identity through BVAS, cast their ballot and watch the votes counted; yet, between that polling unit and the final declaration, there are several stages where electoral data can be manipulated. Nigerians must understand the journey of their vote. What was recorded at the polling unit? What was entered on the result sheet? Was the result properly uploaded? Was it accurately collated? Does the final result correspond with what voters witnessed?</p>
+<h4>Technology is not a substitute for citizens</h4>
+<p>Nigeria has invested in electoral technology; BVAS and the IReV platform. The experience of recent elections however has demonstrated that systems can experience glitches, platforms can become inaccessible. The lesson from Osun is: Citizens must not outsource the defence of their votes to technology. Technology should provide evidence. Citizens must preserve it, scrutinise it and demand accountability when something does not add up.</p>
+<h4>Evidence will matter</h4>
+<p>In 2027, the most powerful voter will be the voter who has evidence.</p>
+<h4>The danger of election-day apathy</h4>
+<p>There used to be a dangerous misconception that citizens have done their part once they vote. If citizens leave the polling unit immediately after voting, they surrender the opportunity to observe the counting process. And if nobody is watching, documenting and questioning the process, accountability becomes much more difficult. Your vote does not end when you put your ballot in the box.</p>
+<h4>So, how will Nigerians defend their votes?</h4>
+<p>By becoming more than voters. They must become participants, witnesses and watchdogs. Millions of ordinary Nigerians who will be physically present at polling units, are the first line of defence. They must become registered Citizen Monitors; download Citizen Monitors App on their phones; pay attention to the counting and ensure that the result declared there is properly documented, both on Citizen Monitors and iReV.</p>
+<h4>2027 must be different</h4>
+<p>The credibility of the 2027 election will not be determined solely by what INEC does. It will also be determined by what Nigerians are willing to do. Will citizens demand transparency, document irregularities, challenge discrepancies, refuse to sell their votes and then defend the ballot after casting it?</p>
+<p><strong>Your vote is your voice. Your evidence is your protection. Your vigilance is your power.</strong></p>
+<p><em>Promoting transparency, accountability and informed public discourse.</em></p>
+`.trim(),
+  });
+
+export const newsInsightTerribleFederalRoadsWhichCandidateHasCapacity =
+  (): NewsInsightArticleContent => ({
+    title: "Terrible Federal Roads; Which Candidate Has the Capacity?",
+    excerpt:
+      "Who has the capacity to actually fix Nigeria's federal roads?",
+    content: `
+<p><strong>Dear Citizen Monitors,</strong></p>
+<p>Who actually has the capacity to fix Nigeria's federal roads?</p>
+<p>Across the country, major highways have deteriorated into dangerous corridors. Potholes have become craters, failed sections are forcing motorists into opposing lanes, bridges and drainage systems are deteriorating, and journeys that should take hours, can stretch into days.</p>
+<p>The consequences go far beyond inconvenience. Bad roads kill. They damage vehicles, increase transport fares, raise the cost of food and goods, disrupt businesses and make it harder for farmers to move produce from rural communities to markets. And yet, every election cycle, Nigerians hear the same promises: "We will fix the roads."</p>
+<p><strong>But 2027 should be different.</strong></p>
+<p>The presidential contest should not simply be about who can deliver the most powerful speech, mobilise the biggest crowd or make the most attractive promises. Nigerians should be asking, which candidate understands the scale of Nigeria's infrastructure deficit? Which candidate has a credible financing model for road construction and maintenance? Which candidate has a record of delivering infrastructure; not merely commissioning projects? Which candidate can reform the agencies responsible for federal roads and hold contractors accountable? Most importantly; which candidate has the political courage to stop treating road construction as a vehicle for patronage and start treating it as critical economic infrastructure?</p>
+<h4>We don't just need more roads. We need better governance</h4>
+<p>Nigeria does not necessarily need another endless cycle of awarding, abandoning, re-awarding and rehabilitating the same road projects. We need proper engineering standards, realistic project costs, transparent procurement, effective supervision and enforceable maintenance obligations. We also need to ask why roads that were recently constructed deteriorate so quickly. Is it poor design, poor materials, overloading, inadequate drainage, weak supervision, corruption; or a combination of all of them? Until these questions are answered honestly, pouring more money into roads may simply reproduce the same failures.</p>
+<h4>2027 should be a competence test</h4>
+<p>For voters, the coming election should provide an opportunity to move beyond slogans. Ask every presidential candidate: Show us your national road map. Tell us which roads you will prioritise, how much it will cost, where the money will come from, how projects will be procured, how contractors will be monitored and how Nigerians will know whether you are delivering.</p>
+<p>The condition of our roads is not merely an infrastructure problem. It is a test of leadership. A country that cannot reliably move its people, food and goods cannot fully unlock its economic potential. So, as political campaigns gather momentum, perhaps the most important question Nigerians can ask is not: "Who is promising to fix Nigeria?"</p>
+<p><strong>It is: "Who has the capacity to actually fix it?"</strong></p>
+<p><em>Promoting transparency, accountability and informed public discourse.</em></p>
+`.trim(),
+  });
+
+export const newsInsightAreWeVotingForChangeOrRepeatingSameMistakes =
+  (): NewsInsightArticleContent => ({
+    title: "Are We Voting for Change or Repeating the Same Mistakes?",
+    excerpt:
+      "Are we genuinely voting for change; or simply preparing to repeat the same mistakes?",
+    content: `
+<p><strong>Dear Citizen Monitors,</strong></p>
+<p>As political parties position their candidates for 2027, politicians are travelling across the country, making promises, holding rallies and asking Nigerians for their votes. But there is a question every voter should be asking:</p>
+<p><strong>Are we genuinely voting for change; or simply preparing to repeat the same mistakes?</strong></p>
+<p>In 2015, Nigerians voted for "Change". By 2019, we repeated our mistakes, thinking that a Messiah could save Nigeria. For decades, Nigerians complained about poor leadership, insecurity, unemployment, bad roads, unreliable electricity, weak institutions, corruption and the rising cost of living. Yet, when elections arrive, many of us return to the same political calculations; ethnicity, religion, party loyalty, financial inducement, personality cults and promises that are rarely subjected to serious scrutiny. We cannot demand a different Nigeria while repeatedly rewarding the same behaviour.</p>
+<h4>A Candidate Is Not a Messiah</h4>
+<p>One of the biggest mistakes voters make is treating elections as a choice between personalities rather than policies, competence and accountability. No candidate will fix Nigeria alone. We should be asking; what has this person done with responsibility before? What do they understand about governance? Who are the people around them? What is their plan? How will they pay for it? Most importantly, how will citizens hold them accountable?</p>
+<p>A candidate's campaign speech is not evidence of competence. A manifesto is not a performance record. And popularity is not the same as capacity.</p>
+<h4>Our Votes Must Become Demands</h4>
+<p>Citizens must begin demanding measurable commitments before casting their ballots.</p>
+<p>If a candidate promises better roads, which roads, by when and at what cost?</p>
+<p>If they promise jobs, how many jobs and through what economic policies?</p>
+<p>If they promise security, what exactly will they change?</p>
+<p>If they promise to fight corruption, will they subject their own government to transparency and independent scrutiny?</p>
+<p>These are the minimum requirements of responsible citizenship.</p>
+<h4>The Choice Is Ours</h4>
+<p>Voting for CHANGE in 2027 will be ensuring credible elections, where whoever wins, knows they were voted in (not rigged in).</p>
+<p>Politicians will start to respect the will of Citizens and know that the ONLY people who determine who gets into office, are Citizens. If voters reward money, identity politics, propaganda and empty promises, politicians will continue to give us exactly that. 2027 elections should therefore be more than another contest. It should be a referendum on the kind of leadership Nigerians will accept.</p>
+<p>Citizen Monitors helps us to achieve that. Download the app on Android now and tell every Nigerian Voter to do the same, so we can cover all 176,974 Polling Units in the country, document and collate results, and make it impossible to falsify results during collation.</p>
+<p>We must look beyond the campaign posters, party logos, money being shared. Beyond religious and ethnic appeals. We must ask; will this candidate make Nigeria better, or will we simply be repeating the same mistakes with a different name?</p>
+<p>Our votes are not gifts. They are instruments of accountability. Before you vote, investigate. Before you believe, question. Before you support, demand evidence. Because if we vote the same way, for the same reasons, and expect a completely different outcome, the problem may not only be our politicians. It may also be the choices we make as citizens.</p>
+<p><em>Promoting transparency, accountability and informed public discourse.</em></p>
+`.trim(),
+  });
+
+export const newsInsightFakeProductsFakePromisesWhyDoNigeriansAcceptLess =
+  (): NewsInsightArticleContent => ({
+    title: "Fake Products, Fake Promises: Why Do Nigerians Accept Less?",
+    excerpt:
+      "The standard we tolerate becomes the standard we receive. Is it genuine and does it actually work?",
+    content: `
+<p><strong>Dear Citizen Monitors,</strong></p>
+<p>We complain about fake products and inferior consumer goods. We complain about politicians who make promises they never intend to keep. We complain about poor roads, unreliable electricity, bad public services and institutions that routinely fail the people. Yet, somehow, we have become remarkably good at adjusting…. accepting less.</p>
+<p>We buy the fake product because the original is "too expensive. We vote for politicians who have failed repeatedly because we are told there is no better alternative.</p>
+<h4>When did survival become acceptance?</h4>
+<p>There is a difference between being resilient and becoming accustomed to failure. Nigerians are extraordinarily resilient. We repair things that should have been replaced. We create businesses where government has failed to provide opportunities. But resilience should not become an excuse for institutions to continue underperforming. Perhaps we have become so accustomed to receiving less, that demanding more now feels unrealistic. And that is dangerous.</p>
+<h4>The politics of "manage it"</h4>
+<p>"Manage it" is increasingly a national attitude. When consumers continue buying substandard products, dishonest businesses have little incentive to improve. When citizens continue rewarding politicians who deliver little, politicians have little incentive to deliver more. When institutions know that outrage will last only until the next headline, accountability becomes optional. The standard we tolerate becomes the standard we receive.</p>
+<h4>But who is responsible?</h4>
+<p>It is easy to blame Nigerians. But regulators have responsibilities. Businesses have responsibilities. Political leaders have responsibilities. Law-enforcement agencies have responsibilities. And citizens have responsibilities too. We must demand receipts, standards, warranties and accountability. We must stop rewarding businesses that consistently deceive us. And, most importantly, we must stop treating our votes as gifts to politicians. A political candidate is not doing us a favour by promising roads, security, jobs, healthcare or electricity. That is the job.</p>
+<h4>Fake promises are also a product</h4>
+<p>Perhaps the most dangerous counterfeit product in Nigeria is the political promise. Every election cycle, we are presented beautifully packaged promises. New roads. Better economy. Affordable healthcare. Reliable electricity. Security. Education. Elections end, and the packaging disappears. The solution is not simply to complain after the purchase. The solution is to become smarter consumers and more demanding citizens before we buy. What exactly is being promised, how will it be delivered, how much will it cost, who will be responsible and what has this person delivered before?</p>
+<h4>Nigerians deserve better</h4>
+<p>A country cannot build a culture of excellence if mediocrity is constantly excused. We should be able to demand genuine products, competent leadership and functional public institutions; without being labelled difficult, unrealistic or ungrateful. Why should survival be the ambition when citizens deserve to live well? Whether it is a product on a shelf, or a promise on a campaign platform, Nigerians must ask; Is it genuine and does it actually work?</p>
+<p>Citizen Monitors App is live on Android. Download and tell other Voters about it.</p>
+<p><em>Promoting transparency, accountability and informed public discourse.</em></p>
+`.trim(),
+  });

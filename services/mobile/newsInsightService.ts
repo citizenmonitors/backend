@@ -1,6 +1,7 @@
 import type { Types } from "mongoose";
 import NewsInsight from "../../models/admin/NewsInsight.ts";
 import NewsInsightComment from "../../models/admin/NewsInsightComment.ts";
+import { wrapMobileArticleHtml } from "../../utils/mobileArticleHtml.ts";
 import { countCommentsForArticles } from "./newsInsightEngagementService.ts";
 
 const likesArray = (row: { likes?: { user?: unknown }[] }): { user?: unknown }[] =>
@@ -33,17 +34,20 @@ const resolveHeroImageURL = (row: NewsInsightLean): string => {
 
 const toNewsInsightMobileArticle = (
   row: NewsInsightLean,
-  input: { viewerUserId?: string; commentsCount: number }
+  input: { viewerUserId?: string; commentsCount: number; wrapForMobile?: boolean }
 ) => {
   const likes = likesArray(row);
   const heroImageURL = resolveHeroImageURL(row);
+  const content = input.wrapForMobile
+    ? wrapMobileArticleHtml(row.content)
+    : row.content;
 
   return {
     id: String(row._id),
     slug: row.slug,
     title: row.title,
     excerpt: row.excerpt?.trim() || undefined,
-    content: row.content,
+    content,
     thumbnailURLUrl: row.thumbnailURLUrl,
     heroImageURL,
     publishedAt: row.publishedAt,
@@ -106,5 +110,6 @@ export const getPublishedNewsInsightBySlugMobile = async (
   return toNewsInsightMobileArticle(row as NewsInsightLean, {
     viewerUserId,
     commentsCount,
+    wrapForMobile: true,
   });
 };

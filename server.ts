@@ -37,6 +37,7 @@ import mobileElectionRoutes from "./routes/mobile/electionRoutes.ts";
 import mobileNotificationRoutes from "./routes/mobile/notificationRoutes.ts";
 import mobileDashboardRoutes from "./routes/mobile/dashboardRoutes.ts";
 import mobilePulseRoutes from "./routes/mobile/pulseRoutes.ts";
+import webPulseRoutes from "./routes/web/pulseRoutes.ts";
 import mobileAcademyRoutes from "./routes/mobile/academyRoutes.ts";
 import mobileFaqRoutes from "./routes/mobile/faqRoutes.ts";
 import mobileNewsInsightRoutes from "./routes/mobile/newsInsightRoutes.ts";
@@ -142,7 +143,7 @@ app.use("/api", userRoutes);
 app.use("/api/profile", mobileProfileRoutes);
 app.use("/api/dashboard", mobileDashboardRoutes);
 app.use("/api/academy", mobileAcademyRoutes);
-app.use("/api/pulse", mobilePulseRoutes);
+app.use("/api/pulse", webPulseRoutes);
 app.use("/api/anonymous", anonymousRoutes);
 app.use("/api/collation", collationDiscussionRoutes);
 app.use("/api", adminRoutes);
@@ -162,7 +163,7 @@ app.use("/api/v1", userRoutes);
 app.use("/api/v1/profile", mobileProfileRoutes);
 app.use("/api/v1/dashboard", mobileDashboardRoutes);
 app.use("/api/v1/academy", mobileAcademyRoutes);
-app.use("/api/v1/pulse", mobilePulseRoutes);
+app.use("/api/v1/pulse", webPulseRoutes);
 app.use("/api/v1/anonymous", anonymousRoutes);
 app.use("/api/v1/collation", collationDiscussionRoutes);
 app.use("/api/v1", adminRoutes);
@@ -188,6 +189,10 @@ app.use("/observerid", express.static(path.join(__dirname, "observerId")));
 app.use("/profileimage", express.static(path.join(__dirname, "profileImage")));
 app.use("/resultpicture", express.static(path.join(__dirname, "electionsData")));
 app.use("/incidentreport", express.static(path.join(__dirname, "electionsData")));
+app.use(
+  "/newsletter-covers",
+  express.static(path.join(__dirname, "public/newsletter-covers"))
+);
 
 type ErrorWithStatus = Error & { status?: number };
 app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {

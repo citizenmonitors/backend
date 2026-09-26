@@ -1,5 +1,7 @@
 import NewsInsight from "../../models/admin/NewsInsight.js";
 import NewsInsightComment from "../../models/admin/NewsInsightComment.js";
+import { wrapMobileArticleHtml } from "../../utils/mobileArticleHtml.js";
+import { rewriteLegacyCoverUrl, rewriteLegacyCoverUrlsInHtml, } from "../../utils/newsletterCover.js";
 import { countCommentsForArticles } from "./newsInsightEngagementService.js";
 const likesArray = (row) => Array.isArray(row.likes) ? row.likes : [];
 const resolveHeroImageURL = (row) => {
@@ -10,14 +12,19 @@ const resolveHeroImageURL = (row) => {
 };
 const toNewsInsightMobileArticle = (row, input) => {
     const likes = likesArray(row);
-    const heroImageURL = resolveHeroImageURL(row);
+    const thumbnailURLUrl = rewriteLegacyCoverUrl(row.thumbnailURLUrl);
+    const heroImageURL = rewriteLegacyCoverUrl(resolveHeroImageURL(row));
+    const rewrittenContent = rewriteLegacyCoverUrlsInHtml(row.content);
+    const content = input.wrapForMobile
+        ? wrapMobileArticleHtml(rewrittenContent)
+        : rewrittenContent;
     return {
         id: String(row._id),
         slug: row.slug,
         title: row.title,
         excerpt: row.excerpt?.trim() || undefined,
-        content: row.content,
-        thumbnailURLUrl: row.thumbnailURLUrl,
+        content,
+        thumbnailURLUrl,
         heroImageURL,
         publishedAt: row.publishedAt,
         isPublished: row.isPublished ?? true,
@@ -64,6 +71,7 @@ export const getPublishedNewsInsightBySlugMobile = async (slug, viewerUserId) =>
     return toNewsInsightMobileArticle(row, {
         viewerUserId,
         commentsCount,
+        wrapForMobile: true,
     });
 };
 //# sourceMappingURL=newsInsightService.js.map

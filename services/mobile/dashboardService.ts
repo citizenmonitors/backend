@@ -12,6 +12,7 @@ import { buildHideConcludedElectionNotificationsFilter } from "../../utils/elect
 import { sanitizeNotificationSubtitle } from "../../utils/notificationContent.ts";
 import { countCommentsForArticles } from "./newsInsightEngagementService.ts";
 import { countCommentsForPressCoverageArticles } from "./pressCoverageService.ts";
+import { rewriteLegacyCoverUrl } from "../../utils/newsletterCover.ts";
 
 const roleVisibilityFilter = (userId: string, role: string) => ({
   $and: [
@@ -57,31 +58,6 @@ const normalizeLocationKey = (value: unknown): string =>
     .trim()
     .toLowerCase();
 
-const buildPulseVisibilityFilter = (user: {
-  state?: string | null;
-  lga?: string | null;
-  ward?: string | null;
-}) => {
-  const state = normalizeLocationKey(user.state);
-  const lga = normalizeLocationKey(user.lga);
-  const ward = normalizeLocationKey(user.ward);
-  if (!state || !lga) return null;
-  return {
-    $or: [
-      {
-        visibilityScope: "lga",
-        audienceState: state,
-        audienceLga: lga,
-      },
-      {
-        visibilityScope: "ward",
-        audienceState: state,
-        audienceLga: lga,
-        audienceWard: ward,
-      },
-    ],
-  };
-};
 
 const resolveAuthorName = (
   author:
@@ -113,13 +89,6 @@ const buildMobileDashboard = async (user: AuthenticatedUser) => {
   const liveElections = await getMobileLiveElectionsCarousel(user);
   const liveIds = liveElections.map((e) => e.id);
 
-  const pulseVisibility = buildPulseVisibilityFilter(
-    user as AuthenticatedUser & {
-      state?: string | null;
-      lga?: string | null;
-      ward?: string | null;
-    }
-  );
   const concludedElectionNotificationFilter =
     await buildHideConcludedElectionNotificationsFilter();
   const [electionNotifications, discussionPosts, pulsePosts, insights, pressCoverageFeed] =
@@ -153,13 +122,11 @@ const buildMobileDashboard = async (user: AuthenticatedUser) => {
             .limit(10)
             .lean()
         : Promise.resolve([]),
-      pulseVisibility
-        ? PulsePost.find(pulseVisibility)
-            .populate("author", "firstName lastName anonymousUsername")
-            .sort({ createdAt: -1 })
-            .limit(10)
-            .lean()
-        : Promise.resolve([]),
+      PulsePost.find({})
+        .populate("author", "firstName lastName anonymousUsername")
+        .sort({ createdAt: -1 })
+        .limit(10)
+        .lean(),
       NewsInsight.find({
         isPublished: true,
       })
@@ -266,7 +233,7 @@ const buildMobileDashboard = async (user: AuthenticatedUser) => {
         id: String(i._id),
         slug: i.slug,
         title: i.title,
-        thumbnailURLUrl: i.thumbnailURLUrl,
+        thumbnailURLUrl: rewriteLegacyCoverUrl(String(i.thumbnailURLUrl ?? "")),
         summary:
           (typeof i.excerpt === "string" ? i.excerpt.trim() : "") ||
           textPreview(String(i.content ?? ""), 240),

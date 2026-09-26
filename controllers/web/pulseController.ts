@@ -7,6 +7,9 @@ import {
   createPulsePost,
   listPulsePostCommentsPublic,
   listPulsePostsPublic,
+  parsePulseFeedScope,
+  parseVisibilityScope,
+  repostPulsePost,
   togglePulseCommentLikeAnyLocation,
   togglePulsePostLikeAnyLocation,
 } from "../../services/mobile/pulseService.ts";
@@ -30,13 +33,12 @@ const toBooleanIfBooleanLike = (value: unknown): boolean => {
   if (typeof value === "boolean") return value;
   if (typeof value === "string") {
     const lowered = value.trim().toLowerCase();
-    if (lowered === "true") return true;
-    if (lowered === "false") return false;
+    return lowered === "true" || lowered === "1" || lowered === "yes";
   }
-  return Boolean(value);
+  return false;
 };
 
-/** Public web pulse feed — no auth, no location filter. */
+/** Public GET. scope=all needs no auth; state/lga/ward/polling-unit uses the signed-in user's location. */
 export const getPulsePostsPublic = async (req: Request, res: Response) => {
   try {
     const page = Math.max(1, parseInt(String(req.query.page ?? "1"), 10) || 1);
@@ -44,10 +46,32 @@ export const getPulsePostsPublic = async (req: Request, res: Response) => {
       50,
       Math.max(1, parseInt(String(req.query.limit ?? "20"), 10) || 20)
     );
-    const data = await listPulsePostsPublic(page, limit);
+    const scope = parsePulseFeedScope(req.query.scope);
+    const viewerUserId = (req as AuthenticatedRequest).user?._id;
+    if (scope !== "all" && viewerUserId == null) {
+      return res.status(401).json({
+        message: "Sign in to filter Pulse by your location",
+      });
+    }
+    const data = await listPulsePostsPublic(page, limit, scope, viewerUserId);
     return res.status(200).json(data);
   } catch (error) {
-    return res.status(500).json({ message: errMsg(error) });
+    const message = errMsg(error);
+    if (
+      message.includes("Sign in") ||
+      message.includes("Authentication") ||
+      message.includes("User not found")
+    ) {
+      return res.status(401).json({ message });
+    }
+    if (
+      message.includes("Invalid Pulse") ||
+      message.includes("profile") ||
+      message.includes("Complete your")
+    ) {
+      return res.status(400).json({ message });
+    }
+    return res.status(500).json({ message });
   }
 };
 
@@ -58,7 +82,8 @@ export const getPulsePostCommentsPublic = async (req: Request, res: Response) =>
     if (!isValidObjectId(postId)) {
       return res.status(400).json({ message: "Invalid post id" });
     }
-    const comments = await listPulsePostCommentsPublic(postId);
+    const viewerUserId = (req as AuthenticatedRequest).user?._id;
+    const comments = await listPulsePostCommentsPublic(postId, viewerUserId);
     return res.status(200).json({ comments });
   } catch (error) {
     const message = errMsg(error);
@@ -92,7 +117,7 @@ export const postPulsePostWeb = async (req: Request, res: Response) => {
       userId,
       {
         body,
-        visibilityScope: b.visibilityScope === "ward" ? "ward" : "lga",
+        visibilityScope: parseVisibilityScope(b.visibilityScope, "all"),
         useAnonymousDisplay: toBooleanIfBooleanLike(b.useAnonymousDisplay),
       },
       { image }
@@ -106,12 +131,41 @@ export const postPulsePostWeb = async (req: Request, res: Response) => {
     }
     if (
       message.includes("anonymous username") ||
+      message.includes("Invalid Pulse") ||
       message.includes("profile") ||
+      message.includes("Complete your") ||
+      message.includes("body must") ||
       message.includes("location")
     ) {
       return res.status(400).json({ message });
     }
     return res.status(500).json({ message });
+  }
+};
+
+export const postPulseRepostWeb = async (req: Request, res: Response) => {
+  try {
+    const r = req as AuthenticatedRequest;
+    const postId = asParamString(req.params.postId);
+    if (!isValidObjectId(postId)) {
+      return res.status(400).json({ message: "Invalid post id" });
+    }
+    const userId = requireUserId(r);
+    const post = await repostPulsePost(userId, postId);
+    await invalidateMobileReadCaches(userId);
+    return res.status(201).json({ post });
+  } catch (error) {
+    const message = errMsg(error);
+    if (message.includes("Authentication required")) {
+      return res.status(401).json({ message });
+    }
+    if (message.includes("already reposted") || message.includes("your own post")) {
+      return res.status(409).json({ message });
+    }
+    if (message.includes("not found")) {
+      return res.status(404).json({ message });
+    }
+    return res.status(400).json({ message });
   }
 };
 
@@ -162,7 +216,7 @@ export const postPulsePostCommentWeb = async (req: Request, res: Response) => {
     if (message.includes("Authentication required")) {
       return res.status(401).json({ message });
     }
-    if (message.includes("anonymous username")) {
+    if (message.includes("anonymous username") || message.includes("body must")) {
       return res.status(400).json({ message });
     }
     if (message.includes("not found")) {

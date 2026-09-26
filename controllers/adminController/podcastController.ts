@@ -120,6 +120,7 @@ export const sendNewsletter = async (req: Request, res: Response) => {
       title,
       content,
       excerpt,
+      thumbnailURLUrl,
     } = req.body;
     const adminId = (req as AuthenticatedRequest).user?._id;
     const newsletter = await PodcastService.sendNewsletterService({
@@ -134,6 +135,7 @@ export const sendNewsletter = async (req: Request, res: Response) => {
       title,
       content,
       excerpt,
+      thumbnailURLUrl,
     });
     res.status(201).json(newsletter);
   } catch (error) {
@@ -160,12 +162,13 @@ export const sendNewsletter = async (req: Request, res: Response) => {
  */
 export const previewNewsletterCompose = async (req: Request, res: Response) => {
   try {
-    const { paste, title, content, excerpt } = req.body ?? {};
-    const preview = PodcastService.composeNewsletterPreviewService({
+    const { paste, title, content, excerpt, thumbnailURLUrl } = req.body ?? {};
+    const preview = await PodcastService.composeNewsletterPreviewService({
       paste,
       title,
       content,
       excerpt,
+      thumbnailURLUrl,
     });
     return res.status(200).json(preview);
   } catch (error) {
@@ -185,7 +188,7 @@ export const previewNewsletterCompose = async (req: Request, res: Response) => {
 /** GET active hardcoded edition preview (fallback). */
 export const getActiveNewsletter = async (_req: Request, res: Response) => {
   try {
-    const preview = PodcastService.getActiveNewsletterPreviewService();
+    const preview = await PodcastService.getActiveNewsletterPreviewService();
     return res.status(200).json(preview);
   } catch (error) {
     return res.status(500).json({ message: getErrorMessage(error) });

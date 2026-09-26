@@ -18,28 +18,149 @@ type EditPodcastInput = {
     adminId: Id | undefined;
 };
 type SendNewsletterInput = {
-    recipients: RecipientRole[] | RecipientRole;
+    recipients?: RecipientRole[] | RecipientRole;
     scheduleTime?: string | Date;
     adminId?: Id;
-    /** When false, send email (+ newsletter inbox push) only — skip News & Insight. Default: true. */
+    /** When false, skip email send. Default: true. */
+    sendEmail?: unknown;
+    /** When false, send email only — skip News & Insight. Default: true. */
     publishAsNewsInsight?: unknown;
+    /**
+     * When true:
+     * - emails go only to `testEmails` (required)
+     * - mobile notifications (inbox + news-insight push) are skipped
+     */
+    isTest?: unknown;
+    /** One or more emails for test sends. Required when isTest is true and sendEmail is true. */
+    testEmails?: unknown;
+    /**
+     * Frontend compose page: paste the full draft (with or without Subject:),
+     * or send title + content separately.
+     */
+    paste?: unknown;
+    title?: unknown;
+    content?: unknown;
+    excerpt?: unknown;
+    /** Optional cover override for News & Insight thumbnail + in-article image. */
+    thumbnailURLUrl?: unknown;
 };
+/**
+ * Frontend compose page Step 1:
+ * paste draft → dual preview (newsletter email + News & Insight).
+ */
+export declare const composeNewsletterPreviewService: (input: {
+    paste?: unknown;
+    title?: unknown;
+    content?: unknown;
+    excerpt?: unknown;
+    thumbnailURLUrl?: unknown;
+}) => Promise<{
+    newsInsight: {
+        content: string;
+        thumbnailURLUrl: string;
+        heroImageURL: string;
+        title: string;
+        excerpt: string;
+    };
+    cover: import("../../utils/newsletterCover.ts").NewsletterCover;
+    nextStep: {
+        endpoint: string;
+        description: string;
+        testExample: {
+            paste: string;
+            isTest: boolean;
+            testEmails: string[];
+            sendEmail: boolean;
+            publishAsNewsInsight: boolean;
+        };
+        liveExample: {
+            paste: string;
+            recipients: string;
+            isTest: boolean;
+            sendEmail: boolean;
+            publishAsNewsInsight: boolean;
+        };
+    };
+    title: string;
+    excerpt: string;
+    newsletter: {
+        subject: string;
+        html: string;
+    };
+}>;
+/** @deprecated Prefer composeNewsletterPreviewService for the paste → preview page. */
+export declare const getActiveNewsletterPreviewService: (input?: {
+    paste?: unknown;
+    title?: unknown;
+    content?: unknown;
+    excerpt?: unknown;
+    thumbnailURLUrl?: unknown;
+}) => Promise<{
+    newsInsight: {
+        content: string;
+        thumbnailURLUrl: string;
+        heroImageURL: string;
+        title: string;
+        excerpt: string;
+    };
+    cover: import("../../utils/newsletterCover.ts").NewsletterCover;
+    nextStep: {
+        endpoint: string;
+        description: string;
+        testExample: {
+            paste: string;
+            isTest: boolean;
+            testEmails: string[];
+            sendEmail: boolean;
+            publishAsNewsInsight: boolean;
+        };
+        liveExample: {
+            paste: string;
+            recipients: string;
+            isTest: boolean;
+            sendEmail: boolean;
+            publishAsNewsInsight: boolean;
+        };
+    };
+    title: string;
+    excerpt: string;
+    newsletter: {
+        subject: string;
+        html: string;
+    };
+} | {
+    title: string;
+    excerpt: string;
+    newsletter: {
+        subject: string;
+        html: string;
+    };
+    newsInsight: {
+        title: string;
+        excerpt: string;
+        content: string;
+        thumbnailURLUrl: string;
+        heroImageURL: string;
+    };
+    cover: import("../../utils/newsletterCover.ts").NewsletterCover;
+    source: "paste" | "active-edition";
+}>;
 export declare const sendPodcastService: ({ title, content, recipients, adminId, }: SendPodcastInput) => Promise<mongoose.Document<unknown, {}, {
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
+    title: string;
     recipients: string[];
     readBy: Types.ObjectId[];
-    title: string;
     content: string;
     sender: Types.ObjectId;
 }> & {
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
+    title: string;
     recipients: string[];
     readBy: Types.ObjectId[];
-    title: string;
     content: string;
     sender: Types.ObjectId;
 } & {
@@ -51,18 +172,18 @@ export declare const editPodcastService: ({ podcastId, updates, adminId, }: Edit
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
+    title: string;
     recipients: string[];
     readBy: Types.ObjectId[];
-    title: string;
     content: string;
     sender: Types.ObjectId;
 }> & {
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
+    title: string;
     recipients: string[];
     readBy: Types.ObjectId[];
-    title: string;
     content: string;
     sender: Types.ObjectId;
 } & {
@@ -74,18 +195,18 @@ export declare const getAllPodcastsService: () => Promise<(mongoose.Document<unk
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
+    title: string;
     recipients: string[];
     readBy: Types.ObjectId[];
-    title: string;
     content: string;
     sender: Types.ObjectId;
 }> & {
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
+    title: string;
     recipients: string[];
     readBy: Types.ObjectId[];
-    title: string;
     content: string;
     sender: Types.ObjectId;
 } & {
@@ -96,8 +217,8 @@ export declare const getAllPodcastsService: () => Promise<(mongoose.Document<unk
 export declare const getSinglePodcastService: (id: Id, userId: Id | undefined) => Promise<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
-    recipients: string[];
     title: string;
+    recipients: string[];
     content: string;
     sender: Types.ObjectId;
     _id: Types.ObjectId;
@@ -110,8 +231,8 @@ export declare const getUserInboxService: (userId: Id | undefined) => Promise<{
     read: boolean;
     createdAt: NativeDate;
     updatedAt: NativeDate;
-    recipients: string[];
     title: string;
+    recipients: string[];
     content: string;
     sender: Types.ObjectId;
     _id: Types.ObjectId;
@@ -120,21 +241,35 @@ export declare const getUserInboxService: (userId: Id | undefined) => Promise<{
 export declare const markPodcastAsReadService: (podcastId: Id, userId: Id | undefined) => Promise<{
     message: string;
 }>;
-export declare const sendNewsletterService: ({ recipients, scheduleTime, adminId, publishAsNewsInsight, }: SendNewsletterInput) => Promise<{
+export declare const sendNewsletterService: ({ recipients, scheduleTime, adminId, sendEmail: sendEmailFlag, publishAsNewsInsight, isTest, testEmails, paste, title, content, excerpt, thumbnailURLUrl, }: SendNewsletterInput) => Promise<{
     message: string;
     scheduleTime: string;
+    isTest: boolean;
+    emailSent: boolean;
+    newsInsightPublished: boolean;
+    source: "paste" | "active-edition";
+    title: string;
+    excerpt: string;
 } | {
     totalRecipients: number;
-    newsInsight: null;
-    message: string;
-    scheduleTime?: undefined;
-} | {
-    totalRecipients: number;
+    recipients: string[] | undefined;
+    emailSent: boolean;
+    newsInsightPublished: boolean;
+    notificationsSent: boolean;
+    isTest: boolean;
+    source: "paste" | "active-edition";
     newsInsight: {
         id: string;
         slug: string;
         title: string;
-    };
+        thumbnailURLUrl: string;
+    } | null;
+    cover: {
+        file: string;
+        url: string;
+    } | undefined;
+    title: string;
+    excerpt: string;
     message: string;
     scheduleTime?: undefined;
 }>;

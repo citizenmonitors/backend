@@ -1,5 +1,5 @@
-import { newsLetterTemplateFakeProductsFakePromisesWhyDoNigeriansAcceptLess } from "./emailTemplates.ts";
-import { newsInsightFakeProductsFakePromisesWhyDoNigeriansAcceptLess } from "./newsInsightContent.ts";
+import { newsLetterTemplateFactCheckPeterObiMoneyOrDebtsAsGovernor } from "./emailTemplates.ts";
+import { newsInsightFactCheckPeterObiMoneyOrDebtsAsGovernor } from "./newsInsightContent.ts";
 import type { NewsInsightArticleContent } from "./newsInsightContent.ts";
 
 export type NewsletterEdition = {
@@ -13,6 +13,6 @@ export type NewsletterEdition = {
  * - Mobile News & Insight body: config/newsInsightContent.ts
  */
 export const ACTIVE_NEWSLETTER_EDITION: NewsletterEdition = {
-  buildEmailHtml: newsLetterTemplateFakeProductsFakePromisesWhyDoNigeriansAcceptLess,
-  getNewsInsight: newsInsightFakeProductsFakePromisesWhyDoNigeriansAcceptLess,
+  buildEmailHtml: newsLetterTemplateFactCheckPeterObiMoneyOrDebtsAsGovernor,
+  getNewsInsight: newsInsightFactCheckPeterObiMoneyOrDebtsAsGovernor,
 };

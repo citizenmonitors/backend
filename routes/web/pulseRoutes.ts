@@ -1,5 +1,5 @@
 import express from "express";
-import { authMiddleware } from "../../middleware/authMiddleware.ts";
+import { authMiddleware, optionalAuthMiddleware } from "../../middleware/authMiddleware.ts";
 import { uploadPulsePostFiles } from "../../config/electionMulter.ts";
 import {
   getPulsePostCommentsPublic,
@@ -8,13 +8,14 @@ import {
   postPulsePostCommentWeb,
   postPulsePostLikeWeb,
   postPulsePostWeb,
+  postPulseRepostWeb,
 } from "../../controllers/web/pulseController.ts";
 
 const router = express.Router();
 
-/** Public reads — no Bearer auth, no location restriction. */
-router.get("/posts", getPulsePostsPublic);
-router.get("/posts/:postId/comments", getPulsePostCommentsPublic);
+/** Public reads — All needs no auth. Location filters use optional Bearer token. */
+router.get("/posts", optionalAuthMiddleware, getPulsePostsPublic);
+router.get("/posts/:postId/comments", optionalAuthMiddleware, getPulsePostCommentsPublic);
 
 /** Writes require auth. */
 router.post(
@@ -34,6 +35,7 @@ router.post(
   },
   postPulsePostWeb
 );
+router.post("/posts/:postId/repost", authMiddleware, postPulseRepostWeb);
 router.post("/posts/:postId/like", authMiddleware, postPulsePostLikeWeb);
 router.post("/posts/:postId/comments", authMiddleware, postPulsePostCommentWeb);
 router.post(

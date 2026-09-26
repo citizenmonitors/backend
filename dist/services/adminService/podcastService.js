@@ -8,6 +8,8 @@ import AdminLog from "../../models/admin/AdminLog.js";
 import Podcast from "../../models/admin/Podcast.js";
 import CompletedUser from "../../models/CompletedUser.js";
 import { invalidateAllMobileReadCaches } from "../../utils/cache.js";
+import { embedNewsletterCoverInContent, pickNewsletterCover, } from "../../utils/newsletterCover.js";
+import { buildNewsletterFromPaste, buildComposePreview } from "../../utils/newsletterFromPaste.js";
 import { dispatchMobileNotification } from "../mobile/notificationDispatchService.js";
 import { createNewsInsightArticle } from "./newsInsightAdminService.js";
 const toMobileDispatchRecipients = (recipients) => {
@@ -54,8 +56,40 @@ const toBooleanFlag = (value, defaultValue) => {
     }
     return defaultValue;
 };
-const NEWSLETTER_NEWS_THUMBNAIL = process.env.NEWSLETTER_NEWS_THUMBNAIL_URL?.trim() ||
-    "https://www.citizenmonitors.com/assets/citizen-monitors-logo.png";
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+/** Default test recipients when isTest is true and testEmails is omitted. */
+const DEFAULT_NEWSLETTER_TEST_EMAILS = [
+    "yunusmustapha2@gmail.com",
+    "citizenmonitors@yahoo.com",
+    "oluwaloninyo@yahoo.com",
+    "yunusmustapha01@yahoo.com",
+];
+const normalizeTestEmails = (value) => {
+    if (value === undefined || value === null || value === "")
+        return [];
+    const list = Array.isArray(value)
+        ? value
+        : typeof value === "string"
+            ? value.split(/[,;\s]+/)
+            : [];
+    const emails = list
+        .map((item) => String(item ?? "").trim().toLowerCase())
+        .filter((email) => email.length > 0);
+    const invalid = emails.filter((email) => !EMAIL_PATTERN.test(email));
+    if (invalid.length > 0) {
+        throw new Error(`Invalid testEmails: ${invalid.join(", ")}`);
+    }
+    return [...new Set(emails)];
+};
+const resolveTestEmails = (value) => {
+    const fromRequest = normalizeTestEmails(value);
+    if (fromRequest.length > 0)
+        return fromRequest;
+    const fromEnv = normalizeTestEmails(process.env.NEWSLETTER_TEST_EMAILS?.trim() || "");
+    if (fromEnv.length > 0)
+        return fromEnv;
+    return [...DEFAULT_NEWSLETTER_TEST_EMAILS];
+};
 const getActiveNewsletter = () => {
     const newsInsight = ACTIVE_NEWSLETTER_EDITION.getNewsInsight();
     return {
@@ -63,6 +97,101 @@ const getActiveNewsletter = () => {
         excerpt: newsInsight.excerpt,
         content: newsInsight.content,
         buildEmailHtml: ACTIVE_NEWSLETTER_EDITION.buildEmailHtml,
+        source: "active-edition",
+    };
+};
+const resolveNewsletterPayload = (input) => {
+    const hasPaste = String(input?.paste ?? "").trim().length > 0;
+    const hasTitle = String(input?.title ?? "").trim().length > 0;
+    const hasContent = String(input?.content ?? "").trim().length > 0;
+    if (hasPaste || hasTitle || hasContent) {
+        const built = buildNewsletterFromPaste({
+            paste: input?.paste,
+            title: input?.title,
+            content: input?.content,
+            excerpt: input?.excerpt,
+        });
+        return {
+            title: built.title,
+            excerpt: built.excerpt,
+            content: built.content,
+            buildEmailHtml: () => built.emailHtml,
+            source: "paste",
+        };
+    }
+    return getActiveNewsletter();
+};
+/**
+ * Frontend compose page Step 1:
+ * paste draft → dual preview (newsletter email + News & Insight).
+ */
+export const composeNewsletterPreviewService = async (input) => {
+    const preview = buildComposePreview(input);
+    const cover = await pickNewsletterCover({
+        title: preview.title,
+        excerpt: preview.excerpt,
+        overrideUrl: String(input.thumbnailURLUrl ?? "").trim() || undefined,
+    });
+    const newsInsightContent = embedNewsletterCoverInContent(preview.newsInsight.content, cover, preview.title);
+    return {
+        ...preview,
+        newsInsight: {
+            ...preview.newsInsight,
+            content: newsInsightContent,
+            thumbnailURLUrl: cover.url,
+            heroImageURL: cover.url,
+        },
+        cover,
+        nextStep: {
+            endpoint: "POST /api/admin/newsletter",
+            description: "Reuse the same paste/title/content, then set isTest true (test) or false (live).",
+            testExample: {
+                paste: "<same paste>",
+                isTest: true,
+                testEmails: ["you@example.com"],
+                sendEmail: true,
+                publishAsNewsInsight: true,
+            },
+            liveExample: {
+                paste: "<same paste>",
+                recipients: "all",
+                isTest: false,
+                sendEmail: true,
+                publishAsNewsInsight: true,
+            },
+        },
+    };
+};
+/** @deprecated Prefer composeNewsletterPreviewService for the paste → preview page. */
+export const getActiveNewsletterPreviewService = async (input) => {
+    const hasPasteInput = String(input?.paste ?? "").trim() ||
+        String(input?.title ?? "").trim() ||
+        String(input?.content ?? "").trim();
+    if (hasPasteInput) {
+        return composeNewsletterPreviewService(input ?? {});
+    }
+    const newsletter = getActiveNewsletter();
+    const cover = await pickNewsletterCover({
+        title: newsletter.title,
+        excerpt: newsletter.excerpt,
+        overrideUrl: String(input?.thumbnailURLUrl ?? "").trim() || undefined,
+    });
+    return {
+        title: newsletter.title,
+        excerpt: newsletter.excerpt,
+        newsletter: {
+            subject: newsletter.title,
+            html: newsletter.buildEmailHtml(),
+        },
+        newsInsight: {
+            title: newsletter.title,
+            excerpt: newsletter.excerpt,
+            content: embedNewsletterCoverInContent(newsletter.content, cover, newsletter.title),
+            thumbnailURLUrl: cover.url,
+            heroImageURL: cover.url,
+        },
+        cover,
+        source: newsletter.source,
     };
 };
 const resolveNewsletterPublisherId = async (adminId) => {
@@ -81,19 +210,25 @@ const resolveNewsletterPublisherId = async (adminId) => {
     }
     return admin._id;
 };
-const publishNewsletterAsNewsInsight = async (adminId) => {
+const publishNewsletterAsNewsInsight = async (newsletter, adminId, notifySubscribers = true, thumbnailOverride) => {
     const publisherId = await resolveNewsletterPublisherId(adminId);
-    const newsletter = getActiveNewsletter();
-    return createNewsInsightArticle({
+    const cover = await pickNewsletterCover({
+        title: newsletter.title,
+        excerpt: newsletter.excerpt,
+        overrideUrl: thumbnailOverride,
+    });
+    const content = embedNewsletterCoverInContent(newsletter.content, cover, newsletter.title);
+    const article = await createNewsInsightArticle({
         adminId: publisherId,
         title: newsletter.title,
         excerpt: newsletter.excerpt,
-        content: newsletter.content,
-        thumbnailURLUrl: NEWSLETTER_NEWS_THUMBNAIL,
-        heroImageURL: NEWSLETTER_NEWS_THUMBNAIL,
+        content,
+        thumbnailURLUrl: cover.url,
+        heroImageURL: cover.url,
         isPublished: true,
-        notifySubscribers: true,
+        notifySubscribers,
     });
+    return { article, cover };
 };
 export const sendPodcastService = async ({ title, content, recipients, adminId, }) => {
     const senderId = requireId(adminId, "adminId");
@@ -239,67 +374,113 @@ export const markPodcastAsReadService = async (podcastId, userId) => {
     }
     return { message: "Podcast marked as read" };
 };
-export const sendNewsletterService = async ({ recipients, scheduleTime, adminId, publishAsNewsInsight, }) => {
-    const normalizedRecipients = normalizeRecipients(recipients);
+export const sendNewsletterService = async ({ recipients, scheduleTime, adminId, sendEmail: sendEmailFlag, publishAsNewsInsight, isTest, testEmails, paste, title, content, excerpt, thumbnailURLUrl, }) => {
+    const shouldSendEmail = toBooleanFlag(sendEmailFlag, true);
     const shouldPublishNewsInsight = toBooleanFlag(publishAsNewsInsight, true);
+    const isTestSend = toBooleanFlag(isTest, false);
+    const normalizedTestEmails = isTestSend
+        ? resolveTestEmails(testEmails)
+        : normalizeTestEmails(testEmails);
+    const newsletter = resolveNewsletterPayload({ paste, title, content, excerpt });
+    const thumbnailOverride = String(thumbnailURLUrl ?? "").trim() || undefined;
+    if (!shouldSendEmail && !shouldPublishNewsInsight) {
+        throw new Error("Nothing to do: set sendEmail and/or publishAsNewsInsight to true");
+    }
+    if (isTestSend && shouldSendEmail && normalizedTestEmails.length === 0) {
+        throw new Error("testEmails is required when isTest is true and sendEmail is true");
+    }
+    let normalizedRecipients = ["all"];
+    const providedRecipients = recipients === undefined || recipients === null
+        ? null
+        : Array.isArray(recipients) && recipients.length === 0
+            ? null
+            : recipients;
+    if (!isTestSend && shouldSendEmail) {
+        if (!providedRecipients) {
+            throw new Error("recipients is required for a live newsletter send");
+        }
+        normalizedRecipients = normalizeRecipients(providedRecipients);
+    }
+    else if (providedRecipients) {
+        normalizedRecipients = normalizeRecipients(providedRecipients);
+    }
     const sendEmails = async () => {
-        // Count estimated recipients and fetch their email addresses
-        let totalTargetedUsers = 0;
         let userEmails = [];
-        for (const role of normalizedRecipients) {
-            let completedUsers = [];
-            if (role === "all") {
-                // Fetch emails from CompletedUser model where notifications.email.newsletter is true
-                completedUsers = await CompletedUser.find({ "notifications.email.newsletter": true }, "email").lean();
+        if (shouldSendEmail) {
+            if (isTestSend) {
+                userEmails = normalizedTestEmails;
             }
             else {
-                // Fetch emails by role from CompletedUser model where notifications.email.newsletter is true
-                completedUsers = await CompletedUser.find({ role, "notifications.email.newsletter": true }, "email").lean();
+                for (const role of normalizedRecipients) {
+                    let completedUsers = [];
+                    if (role === "all") {
+                        completedUsers = await CompletedUser.find({ "notifications.email.newsletter": true }, "email").lean();
+                    }
+                    else {
+                        completedUsers = await CompletedUser.find({ role, "notifications.email.newsletter": true }, "email").lean();
+                    }
+                    userEmails.push(...completedUsers.map((user) => user.email));
+                }
+                userEmails = [
+                    ...new Set(userEmails.map((e) => e.trim().toLowerCase()).filter(Boolean)),
+                ];
             }
-            totalTargetedUsers += completedUsers.length;
-            userEmails.push(...completedUsers.map((user) => user.email));
+            if (userEmails.length === 0) {
+                throw new Error("No newsletter recipients found");
+            }
+            const htmlContent = newsletter.buildEmailHtml();
+            const listUnsubscribeUrl = getNewsletterUnsubscribeUrl();
+            const emailPromises = userEmails.map((email) => sendEmail({
+                to: email,
+                subject: newsletter.title,
+                htmlbody: htmlContent,
+                listUnsubscribeUrl,
+                trackClicks: false,
+                trackOpens: false,
+            }).catch((err) => {
+                console.error(`Failed to send email to ${email}:`, err);
+            }));
+            await Promise.all(emailPromises);
         }
-        // For testing, override userEmails with your email
-        userEmails = [
-            "yunusmustapha2@gmail.com",
-            "citizenmonitors@yahoo.com",
-            "oluwaloninyo@yahoo.com",
-            "yunusmustapha01@yahoo.com",
-        ];
-        const newsletter = getActiveNewsletter();
-        const htmlContent = newsletter.buildEmailHtml();
-        const listUnsubscribeUrl = getNewsletterUnsubscribeUrl();
-        // Send emails to all targeted users
-        const emailPromises = userEmails.map((email) => sendEmail({
-            to: email,
-            subject: newsletter.title,
-            htmlbody: htmlContent,
-            listUnsubscribeUrl,
-            trackClicks: false,
-            trackOpens: false,
-        }).catch((err) => {
-            console.error(`Failed to send email to ${email}:`, err);
-        }));
-        await Promise.all(emailPromises);
-        await dispatchNewsletterMobileInbox({
-            recipients: normalizedRecipients,
-            title: newsletter.title,
-            info: newsletter.excerpt,
-        });
-        if (!shouldPublishNewsInsight) {
-            console.log(`Newsletter sent successfully to ${userEmails.length} recipients (email only).`);
-            return { totalRecipients: userEmails.length, newsInsight: null };
+        const notificationsSent = !isTestSend && (shouldSendEmail || shouldPublishNewsInsight);
+        if (!isTestSend && shouldSendEmail) {
+            await dispatchNewsletterMobileInbox({
+                recipients: normalizedRecipients,
+                title: newsletter.title,
+                info: newsletter.excerpt,
+            });
         }
-        // Mirror newsletter into mobile News & Insights (DB + push in news-insight format)
-        const newsInsight = await publishNewsletterAsNewsInsight(adminId);
-        console.log(`Newsletter sent successfully to ${userEmails.length} recipients; News & Insight published (${newsInsight.slug}).`);
+        let newsInsightResult = null;
+        let cover;
+        if (shouldPublishNewsInsight) {
+            const published = await publishNewsletterAsNewsInsight(newsletter, adminId, !isTestSend, thumbnailOverride);
+            cover = { file: published.cover.file, url: published.cover.url };
+            newsInsightResult = {
+                id: String(published.article._id),
+                slug: published.article.slug,
+                title: published.article.title,
+                thumbnailURLUrl: published.cover.url,
+            };
+        }
+        const modeParts = [
+            shouldSendEmail ? "email" : null,
+            shouldPublishNewsInsight ? "news-insight" : null,
+            isTestSend ? "test" : "live",
+            newsletter.source,
+        ].filter(Boolean);
+        console.log(`Newsletter completed (${modeParts.join(" + ")}); recipients=${userEmails.length}`);
         return {
             totalRecipients: userEmails.length,
-            newsInsight: {
-                id: String(newsInsight._id),
-                slug: newsInsight.slug,
-                title: newsInsight.title,
-            },
+            recipients: isTestSend ? userEmails : undefined,
+            emailSent: shouldSendEmail,
+            newsInsightPublished: shouldPublishNewsInsight,
+            notificationsSent: Boolean(notificationsSent && !isTestSend),
+            isTest: isTestSend,
+            source: newsletter.source,
+            newsInsight: newsInsightResult,
+            cover,
+            title: newsletter.title,
+            excerpt: newsletter.excerpt,
         };
     };
     if (scheduleTime) {
@@ -323,12 +504,15 @@ export const sendNewsletterService = async ({ recipients, scheduleTime, adminId,
         return {
             message: "Newsletter scheduled successfully",
             scheduleTime: formattedTime,
+            isTest: isTestSend,
+            emailSent: shouldSendEmail,
+            newsInsightPublished: shouldPublishNewsInsight,
+            source: newsletter.source,
+            title: newsletter.title,
+            excerpt: newsletter.excerpt,
         };
     }
-    else {
-        // Send immediately if no scheduleTime is provided
-        const result = await sendEmails();
-        return { message: "Newsletter sent successfully", ...result };
-    }
+    const result = await sendEmails();
+    return { message: "Newsletter sent successfully", ...result };
 };
 //# sourceMappingURL=podcastService.js.map

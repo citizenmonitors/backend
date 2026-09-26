@@ -25,6 +25,17 @@
     "maxNodeModuleJsDepth": 2
   },
   "include": ["**/*.ts", "**/*.js", "**/*.d.ts"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "tmp",
+    "scripts/irev",
+    "services/irev",
+    "controllers/irev",
+    "models/Irev",
+    "utils/irev",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ]
 }
 

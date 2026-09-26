@@ -1,9 +1,9 @@
 import express from "express";
-import { authMiddleware } from "../../middleware/authMiddleware.js";
+import { authMiddleware, optionalAuthMiddleware } from "../../middleware/authMiddleware.js";
 import { uploadPulsePostFiles } from "../../config/electionMulter.js";
-import { getPulsePostCommentsMobile, getPulsePostsMobile, postPulseCommentLikeMobile, postPulsePostCommentMobile, postPulsePostLikeMobile, postPulsePostMobile, } from "../../controllers/mobile/pulseController.js";
+import { getPulsePostCommentsMobile, getPulsePostsMobile, postPulseCommentLikeMobile, postPulsePostCommentMobile, postPulsePostLikeMobile, postPulsePostMobile, postPulseRepostMobile, } from "../../controllers/mobile/pulseController.js";
 const router = express.Router();
-router.get("/posts", authMiddleware, getPulsePostsMobile);
+router.get("/posts", optionalAuthMiddleware, getPulsePostsMobile);
 router.post("/posts", authMiddleware, (req, res, next) => {
     uploadPulsePostFiles(req, res, (err) => {
         if (err) {
@@ -16,8 +16,9 @@ router.post("/posts", authMiddleware, (req, res, next) => {
         next();
     });
 }, postPulsePostMobile);
+router.post("/posts/:postId/repost", authMiddleware, postPulseRepostMobile);
 router.post("/posts/:postId/like", authMiddleware, postPulsePostLikeMobile);
-router.get("/posts/:postId/comments", authMiddleware, getPulsePostCommentsMobile);
+router.get("/posts/:postId/comments", optionalAuthMiddleware, getPulsePostCommentsMobile);
 router.post("/posts/:postId/comments", authMiddleware, postPulsePostCommentMobile);
 router.post("/posts/:postId/comments/:commentId/like", authMiddleware, postPulseCommentLikeMobile);
 export default router;

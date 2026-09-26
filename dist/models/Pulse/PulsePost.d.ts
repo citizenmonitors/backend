@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-declare const _default: mongoose.Model<{
+declare const PulsePost: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
@@ -13,11 +13,14 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
-    visibilityScope: "lga" | "ward";
-    audienceState: string;
-    audienceLga: string;
+    visibilityScope: "state" | "lga" | "ward" | "all" | "polling-unit";
+    repostCount: number;
     imageUrl?: string | null | undefined;
+    audienceState?: string | null | undefined;
+    audienceLga?: string | null | undefined;
     audienceWard?: string | null | undefined;
+    audiencePollingUnit?: string | null | undefined;
+    repostedFrom?: mongoose.Types.ObjectId | null | undefined;
 }, {}, {}, {}, mongoose.Document<unknown, {}, {
     createdAt: NativeDate;
     updatedAt: NativeDate;
@@ -32,11 +35,14 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
-    visibilityScope: "lga" | "ward";
-    audienceState: string;
-    audienceLga: string;
+    visibilityScope: "state" | "lga" | "ward" | "all" | "polling-unit";
+    repostCount: number;
     imageUrl?: string | null | undefined;
+    audienceState?: string | null | undefined;
+    audienceLga?: string | null | undefined;
     audienceWard?: string | null | undefined;
+    audiencePollingUnit?: string | null | undefined;
+    repostedFrom?: mongoose.Types.ObjectId | null | undefined;
 }> & {
     createdAt: NativeDate;
     updatedAt: NativeDate;
@@ -51,11 +57,14 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
-    visibilityScope: "lga" | "ward";
-    audienceState: string;
-    audienceLga: string;
+    visibilityScope: "state" | "lga" | "ward" | "all" | "polling-unit";
+    repostCount: number;
     imageUrl?: string | null | undefined;
+    audienceState?: string | null | undefined;
+    audienceLga?: string | null | undefined;
     audienceWard?: string | null | undefined;
+    audiencePollingUnit?: string | null | undefined;
+    repostedFrom?: mongoose.Types.ObjectId | null | undefined;
 } & {
     _id: mongoose.Types.ObjectId;
 } & {
@@ -76,11 +85,14 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
-    visibilityScope: "lga" | "ward";
-    audienceState: string;
-    audienceLga: string;
+    visibilityScope: "state" | "lga" | "ward" | "all" | "polling-unit";
+    repostCount: number;
     imageUrl?: string | null | undefined;
+    audienceState?: string | null | undefined;
+    audienceLga?: string | null | undefined;
     audienceWard?: string | null | undefined;
+    audiencePollingUnit?: string | null | undefined;
+    repostedFrom?: mongoose.Types.ObjectId | null | undefined;
 }, mongoose.Document<unknown, {}, mongoose.FlatRecord<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
@@ -95,11 +107,14 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
-    visibilityScope: "lga" | "ward";
-    audienceState: string;
-    audienceLga: string;
+    visibilityScope: "state" | "lga" | "ward" | "all" | "polling-unit";
+    repostCount: number;
     imageUrl?: string | null | undefined;
+    audienceState?: string | null | undefined;
+    audienceLga?: string | null | undefined;
     audienceWard?: string | null | undefined;
+    audiencePollingUnit?: string | null | undefined;
+    repostedFrom?: mongoose.Types.ObjectId | null | undefined;
 }>> & mongoose.FlatRecord<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
@@ -114,15 +129,18 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
-    visibilityScope: "lga" | "ward";
-    audienceState: string;
-    audienceLga: string;
+    visibilityScope: "state" | "lga" | "ward" | "all" | "polling-unit";
+    repostCount: number;
     imageUrl?: string | null | undefined;
+    audienceState?: string | null | undefined;
+    audienceLga?: string | null | undefined;
     audienceWard?: string | null | undefined;
+    audiencePollingUnit?: string | null | undefined;
+    repostedFrom?: mongoose.Types.ObjectId | null | undefined;
 }> & {
     _id: mongoose.Types.ObjectId;
 } & {
     __v: number;
 }>>;
-export default _default;
+export default PulsePost;
 //# sourceMappingURL=PulsePost.d.ts.map

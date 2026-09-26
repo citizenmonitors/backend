@@ -17,13 +17,20 @@ const pulsePostSchema = new mongoose.Schema({
     imageUrl: { type: String, trim: true },
     visibilityScope: {
         type: String,
-        enum: ["ward", "lga"],
-        default: "lga",
+        enum: ["all", "state", "lga", "ward", "polling-unit"],
+        default: "all",
         index: true,
     },
-    audienceState: { type: String, trim: true, required: true, index: true },
-    audienceLga: { type: String, trim: true, required: true, index: true },
+    audienceState: { type: String, trim: true, index: true },
+    audienceLga: { type: String, trim: true, index: true },
     audienceWard: { type: String, trim: true, index: true },
+    audiencePollingUnit: { type: String, trim: true, index: true },
+    repostedFrom: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "PulsePost",
+        index: true,
+    },
+    repostCount: { type: Number, default: 0, min: 0 },
     useAnonymousDisplay: { type: Boolean, default: false },
     likes: [likeUserSchema],
 }, { timestamps: true });
@@ -32,7 +39,34 @@ pulsePostSchema.index({
     audienceState: 1,
     audienceLga: 1,
     audienceWard: 1,
+    audiencePollingUnit: 1,
     createdAt: -1,
 });
-export default mongoose.model("PulsePost", pulsePostSchema);
+pulsePostSchema.index({ author: 1, repostedFrom: 1 });
+const PulsePost = mongoose.model("PulsePost", pulsePostSchema);
+/** Drop the old sparse unique index — `repostedFrom: null` collided and broke likes/creates. */
+const dropUnsafeRepostUniqueIndex = async () => {
+    try {
+        const indexes = await PulsePost.collection.indexes();
+        const unsafe = indexes.find((idx) => Boolean(idx.unique) &&
+            idx.key?.author === 1 &&
+            idx.key?.repostedFrom === 1 &&
+            !idx.partialFilterExpression);
+        if (unsafe?.name) {
+            await PulsePost.collection.dropIndex(unsafe.name);
+        }
+    }
+    catch {
+        // Collection or index may not exist yet.
+    }
+};
+if (mongoose.connection.readyState === 1) {
+    void dropUnsafeRepostUniqueIndex();
+}
+else {
+    mongoose.connection.once("open", () => {
+        void dropUnsafeRepostUniqueIndex();
+    });
+}
+export default PulsePost;
 //# sourceMappingURL=PulsePost.js.map

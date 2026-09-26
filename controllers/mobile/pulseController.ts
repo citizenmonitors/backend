@@ -2,12 +2,15 @@ import type { Request, Response } from "express";
 import type { AuthenticatedRequest } from "../../types/authenticatedRequest.ts";
 import { asParamString, isValidObjectId } from "../../utils/validators.ts";
 import {
-  addPulsePostComment,
+  addPulsePostCommentAnyLocation,
   createPulsePost,
-  listPulsePostComments,
-  listPulsePosts,
-  togglePulseCommentLike,
-  togglePulsePostLike,
+  listPulsePostCommentsPublic,
+  listPulseFeed,
+  parsePulseFeedScope,
+  parseVisibilityScope,
+  repostPulsePost,
+  togglePulseCommentLikeAnyLocation,
+  togglePulsePostLikeAnyLocation,
 } from "../../services/mobile/pulseService.ts";
 import { invalidateCacheByPrefixes } from "../../utils/cache.ts";
 
@@ -27,10 +30,9 @@ const toBooleanIfBooleanLike = (value: unknown): boolean => {
   if (typeof value === "boolean") return value;
   if (typeof value === "string") {
     const lowered = value.trim().toLowerCase();
-    if (lowered === "true") return true;
-    if (lowered === "false") return false;
+    return lowered === "true" || lowered === "1" || lowered === "yes";
   }
-  return Boolean(value);
+  return false;
 };
 
 export const getPulsePostsMobile = async (req: Request, res: Response) => {
@@ -38,12 +40,35 @@ export const getPulsePostsMobile = async (req: Request, res: Response) => {
     const r = req as AuthenticatedRequest;
     const page = Math.max(1, parseInt(String(req.query.page ?? "1"), 10) || 1);
     const limit = Math.min(50, Math.max(1, parseInt(String(req.query.limit ?? "20"), 10) || 20));
-    const userId = requireUserId(r);
-    const data = await listPulsePosts(userId, page, limit);
+    const scope = parsePulseFeedScope(req.query.scope);
+    const viewerUserId = r.user?._id;
+    if (scope !== "all" && viewerUserId == null) {
+      return res.status(401).json({
+        message: "Sign in to filter Pulse by your location",
+      });
+    }
+    const data = await listPulseFeed({
+      page,
+      limit,
+      scope,
+      viewerUserId,
+    });
     return res.status(200).json(data);
   } catch (error) {
     const message = errMsg(error);
-    if (message.includes("profile") || message.includes("location")) {
+    if (
+      message.includes("Sign in") ||
+      message.includes("Authentication") ||
+      message.includes("User not found")
+    ) {
+      return res.status(401).json({ message });
+    }
+    if (
+      message.includes("Invalid Pulse") ||
+      message.includes("profile") ||
+      message.includes("Complete your") ||
+      message.includes("location")
+    ) {
       return res.status(400).json({ message });
     }
     return res.status(500).json({ message });
@@ -70,7 +95,7 @@ export const postPulsePostMobile = async (req: Request, res: Response) => {
       userId,
       {
         body,
-        visibilityScope: b.visibilityScope === "ward" ? "ward" : "lga",
+        visibilityScope: parseVisibilityScope(b.visibilityScope, "all"),
         useAnonymousDisplay: toBooleanIfBooleanLike(b.useAnonymousDisplay),
       },
       { image }
@@ -79,14 +104,41 @@ export const postPulsePostMobile = async (req: Request, res: Response) => {
     return res.status(201).json({ post });
   } catch (error) {
     const message = errMsg(error);
+    if (message.includes("Authentication required")) {
+      return res.status(401).json({ message });
+    }
     if (
       message.includes("anonymous username") ||
+      message.includes("Invalid Pulse") ||
       message.includes("profile") ||
+      message.includes("Complete your") ||
+      message.includes("body must") ||
       message.includes("location")
     ) {
       return res.status(400).json({ message });
     }
     return res.status(500).json({ message });
+  }
+};
+
+export const postPulseRepostMobile = async (req: Request, res: Response) => {
+  try {
+    const r = req as AuthenticatedRequest;
+    const postId = asParamString(req.params.postId);
+    if (!isValidObjectId(postId)) return res.status(400).json({ message: "Invalid post id" });
+    const userId = requireUserId(r);
+    const post = await repostPulsePost(userId, postId);
+    await invalidateMobileReadCaches(userId);
+    return res.status(201).json({ post });
+  } catch (error) {
+    const message = errMsg(error);
+    if (message.includes("already reposted") || message.includes("your own post")) {
+      return res.status(409).json({ message });
+    }
+    if (message.includes("not found")) {
+      return res.status(404).json({ message });
+    }
+    return res.status(400).json({ message });
   }
 };
 
@@ -96,7 +148,7 @@ export const postPulsePostLikeMobile = async (req: Request, res: Response) => {
     const postId = asParamString(req.params.postId);
     if (!isValidObjectId(postId)) return res.status(400).json({ message: "Invalid post id" });
     const userId = requireUserId(r);
-    const data = await togglePulsePostLike(userId, postId);
+    const data = await togglePulsePostLikeAnyLocation(userId, postId);
     await invalidateMobileReadCaches(userId);
     return res.status(200).json(data);
   } catch (error) {
@@ -116,8 +168,7 @@ export const getPulsePostCommentsMobile = async (req: Request, res: Response) =>
     const r = req as AuthenticatedRequest;
     const postId = asParamString(req.params.postId);
     if (!isValidObjectId(postId)) return res.status(400).json({ message: "Invalid post id" });
-    const userId = requireUserId(r);
-    const comments = await listPulsePostComments(userId, postId);
+    const comments = await listPulsePostCommentsPublic(postId, r.user?._id);
     return res.status(200).json({ comments });
   } catch (error) {
     const message = errMsg(error);
@@ -142,7 +193,7 @@ export const postPulsePostCommentMobile = async (req: Request, res: Response) =>
     const useAnonymousDisplay = toBooleanIfBooleanLike(
       (req.body as { useAnonymousDisplay?: unknown })?.useAnonymousDisplay
     );
-    const comment = await addPulsePostComment(userId, postId, {
+    const comment = await addPulsePostCommentAnyLocation(userId, postId, {
       body,
       useAnonymousDisplay,
     });
@@ -152,6 +203,7 @@ export const postPulsePostCommentMobile = async (req: Request, res: Response) =>
     const message = errMsg(error);
     if (
       message.includes("anonymous username") ||
+      message.includes("body must") ||
       message.includes("not available for your location")
     ) {
       return res.status(400).json({ message });
@@ -172,7 +224,7 @@ export const postPulseCommentLikeMobile = async (req: Request, res: Response) =>
       return res.status(400).json({ message: "Invalid id" });
     }
     const userId = requireUserId(r);
-    const comment = await togglePulseCommentLike(userId, postId, commentId);
+    const comment = await togglePulseCommentLikeAnyLocation(userId, postId, commentId);
     await invalidateMobileReadCaches(userId);
     return res.status(200).json({ comment });
   } catch (error) {

@@ -269,3 +269,30 @@ export const newsInsightFakeProductsFakePromisesWhyDoNigeriansAcceptLess =
 <p><em>Promoting transparency, accountability and informed public discourse.</em></p>
 `.trim(),
   });
+
+export const newsInsightFactCheckPeterObiMoneyOrDebtsAsGovernor =
+  (): NewsInsightArticleContent => ({
+    title: "Fact Check: Did Peter Obi Leave Money or Debts as Governor?",
+    excerpt:
+      "A government can have money in the bank and still owe money. Public money demands public evidence.",
+    content: `
+<p><strong>Dear Citizen Monitors,</strong></p>
+<p>The question deserves a careful examination of financial records, the nature of government obligations, and what was actually transferred to the succeeding administration.</p>
+<h4>The short answer</h4>
+<p>Peter Obi's administration publicly maintained that it left substantial financial resources for Anambra State's incoming government. However, determining whether the state was left with a net financial surplus, outstanding debts, or both; requires distinguishing between cash balances, investments, government liabilities and contractual commitments. A government can have money in the bank and still owe money. Equally, a government can have outstanding obligations while leaving behind valuable investments and assets.</p>
+<h4>What the evidence tells us</h4>
+<p><strong>1. Obi's claim: No borrowing and no unpaid contractors;</strong></p>
+<p>In June 2015, Obi said his administration had not borrowed money or raised bonds. His media aide acknowledged one loan guarantee of ₦1 billion for farmers, while disputing reports that the state had inherited a ₦17.6 billion debt. In a June 2025 Arise TV interview, Obi reiterated that he left office without owing contractors, suppliers, pensioners, or public servants, and said he left enough money to pay salaries for three months.</p>
+<p><strong>2. The ₦75 billion handover controversy;</strong></p>
+<p>One of the most repeated claims is that Obi left ₦75 billion for his successor, Willie Obiano. But what did that amount actually represent? Obi's media aide, Valentine Obienyem, described the ₦75 billion as a combination of cash and investments. Obiano's administration disputed the characterisation, saying the handover included investments and other balances that were not immediately available as cash. The distinction matters: a portfolio of investments, government receivables and cash deposits cannot automatically be treated as one immediately spendable cash balance.</p>
+<p><strong>3. What about the debts?</strong> The debt question also requires precision.</p>
+<p>In June 2015, Obi rejected reports that he had left Anambra with ₦17.6 billion in debt. However, the Debt Management Office data showed that, as of December 2013, Anambra had approximately ₦3.03 billion in domestic debt and $30.32 million in external debt. These figures relate to the state's recorded debt at a specific date, not necessarily every liability outstanding at the handover. They do not, by themselves, establish whether Obi personally authorized every obligation or whether all such obligations were overdue. They also do not establish the full value of the state's cash, investments and other assets at the end of his tenure.</p>
+<h4>So, what is the verdict?</h4>
+<p>The claim that Obi left money is plausible, but the exact amount and liquidity require qualification. DMO figures cited in a 2021 fact-check showed recorded domestic and external debt before the March 2014 handover.</p>
+<h4>What Nigerians should demand</h4>
+<p>The public should be able to examine: Audited financial statements covering the final year of Obi's administration.</p>
+<p>A breakdown of cash, investments, receivables and restricted funds. A schedule of domestic and external debt, guarantees, unpaid certificates and other liabilities. Independent reconciliation of the figures by the relevant state and federal financial authorities. Without these documents, political arguments can easily confuse cash with investments, debt with unpaid bills, and allegations with audited findings.</p>
+<p>A governor's financial legacy should not be measured by a headline figure alone, but a transparent, verifiable financial position: what it owned, what it owed, what it had invested, and what obligations it passed to its successor. Peter Obi's record in Anambra deserves to be examined with the same standard applied to every governor and President, regardless of party or political ambition. Public money demands public evidence.</p>
+<p><em>Promoting transparency, accountability and informed public discourse.</em></p>
+`.trim(),
+  });

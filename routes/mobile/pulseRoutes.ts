@@ -1,5 +1,5 @@
 import express from "express";
-import { authMiddleware } from "../../middleware/authMiddleware.ts";
+import { authMiddleware, optionalAuthMiddleware } from "../../middleware/authMiddleware.ts";
 import { uploadPulsePostFiles } from "../../config/electionMulter.ts";
 import {
   getPulsePostCommentsMobile,
@@ -8,11 +8,12 @@ import {
   postPulsePostCommentMobile,
   postPulsePostLikeMobile,
   postPulsePostMobile,
+  postPulseRepostMobile,
 } from "../../controllers/mobile/pulseController.ts";
 
 const router = express.Router();
 
-router.get("/posts", authMiddleware, getPulsePostsMobile);
+router.get("/posts", optionalAuthMiddleware, getPulsePostsMobile);
 router.post(
   "/posts",
   authMiddleware,
@@ -30,8 +31,9 @@ router.post(
   },
   postPulsePostMobile
 );
+router.post("/posts/:postId/repost", authMiddleware, postPulseRepostMobile);
 router.post("/posts/:postId/like", authMiddleware, postPulsePostLikeMobile);
-router.get("/posts/:postId/comments", authMiddleware, getPulsePostCommentsMobile);
+router.get("/posts/:postId/comments", optionalAuthMiddleware, getPulsePostCommentsMobile);
 router.post("/posts/:postId/comments", authMiddleware, postPulsePostCommentMobile);
 router.post(
   "/posts/:postId/comments/:commentId/like",

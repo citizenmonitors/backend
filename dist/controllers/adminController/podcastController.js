@@ -98,18 +98,71 @@ export const markPodcastAsRead = async (req, res) => {
 };
 export const sendNewsletter = async (req, res) => {
     try {
-        const { recipients, scheduleTime, publishAsNewsInsight } = req.body;
+        const { recipients, scheduleTime, sendEmail, publishAsNewsInsight, isTest, testEmails, paste, title, content, excerpt, thumbnailURLUrl, } = req.body;
         const adminId = req.user?._id;
         const newsletter = await PodcastService.sendNewsletterService({
             recipients,
             scheduleTime,
             adminId,
+            sendEmail,
             publishAsNewsInsight,
+            isTest,
+            testEmails,
+            paste,
+            title,
+            content,
+            excerpt,
+            thumbnailURLUrl,
         });
-        res.status(201).json({
-            message: "Newsletter sent successfully",
-            newsletter,
+        res.status(201).json(newsletter);
+    }
+    catch (error) {
+        const message = getErrorMessage(error);
+        if (message.includes("required") ||
+            message.includes("Invalid") ||
+            message.includes("Nothing to do") ||
+            message.includes("No newsletter recipients") ||
+            message.includes("must be in the future") ||
+            message.includes("Could not find a subject") ||
+            message.includes("Send `paste`") ||
+            message.includes("paste body")) {
+            return res.status(400).json({ message });
+        }
+        return res.status(500).json({ message });
+    }
+};
+/**
+ * Compose page: paste draft → preview newsletter email + News & Insight HTML.
+ * POST /api/admin/newsletter/preview
+ */
+export const previewNewsletterCompose = async (req, res) => {
+    try {
+        const { paste, title, content, excerpt, thumbnailURLUrl } = req.body ?? {};
+        const preview = await PodcastService.composeNewsletterPreviewService({
+            paste,
+            title,
+            content,
+            excerpt,
+            thumbnailURLUrl,
         });
+        return res.status(200).json(preview);
+    }
+    catch (error) {
+        const message = getErrorMessage(error);
+        if (message.includes("required") ||
+            message.includes("Could not find a subject") ||
+            message.includes("Send `paste`") ||
+            message.includes("paste body")) {
+            return res.status(400).json({ message });
+        }
+        return res.status(500).json({ message });
+    }
+};
+/** GET active hardcoded edition preview (fallback). */
+export const getActiveNewsletter = async (_req, res) => {
+    try {
+        const preview = await PodcastService.getActiveNewsletterPreviewService();
+        return res.status(200).json(preview);
     }
     catch (error) {
         return res.status(500).json({ message: getErrorMessage(error) });

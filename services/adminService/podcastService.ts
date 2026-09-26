@@ -12,6 +12,10 @@ import AdminLog from "../../models/admin/AdminLog.ts";
 import Podcast from "../../models/admin/Podcast.ts";
 import CompletedUser from "../../models/CompletedUser.ts";
 import { invalidateAllMobileReadCaches } from "../../utils/cache.ts";
+import {
+  embedNewsletterCoverInContent,
+  pickNewsletterCover,
+} from "../../utils/newsletterCover.ts";
 import { buildNewsletterFromPaste, buildComposePreview } from "../../utils/newsletterFromPaste.ts";
 import { dispatchMobileNotification } from "../mobile/notificationDispatchService.ts";
 import { createNewsInsightArticle } from "./newsInsightAdminService.ts";
@@ -110,6 +114,8 @@ type SendNewsletterInput = {
   title?: unknown;
   content?: unknown;
   excerpt?: unknown;
+  /** Optional cover override for News & Insight thumbnail + in-article image. */
+  thumbnailURLUrl?: unknown;
 };
 
 type NewsletterPayload = {
@@ -133,6 +139,14 @@ const toBooleanFlag = (value: unknown, defaultValue: boolean): boolean => {
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+/** Default test recipients when isTest is true and testEmails is omitted. */
+const DEFAULT_NEWSLETTER_TEST_EMAILS = [
+  "yunusmustapha2@gmail.com",
+  "citizenmonitors@yahoo.com",
+  "oluwaloninyo@yahoo.com",
+  "yunusmustapha01@yahoo.com",
+] as const;
+
 const normalizeTestEmails = (value: unknown): string[] => {
   if (value === undefined || value === null || value === "") return [];
   const list = Array.isArray(value)
@@ -150,29 +164,16 @@ const normalizeTestEmails = (value: unknown): string[] => {
   return [...new Set(emails)];
 };
 
-const NEWSLETTER_COVER_FILES = [
-  "newsletter-abstract-01.jpg",
-  "newsletter-abstract-02.jpg",
-  "newsletter-abstract-03.jpg",
-  "newsletter-abstract-04.jpg",
-  "newsletter-abstract-05.jpg",
-  "newsletter-abstract-06.jpg",
-] as const;
+const resolveTestEmails = (value: unknown): string[] => {
+  const fromRequest = normalizeTestEmails(value);
+  if (fromRequest.length > 0) return fromRequest;
 
-const pickNewsletterCoverImageUrl = (): string => {
-  const override = process.env.NEWSLETTER_NEWS_THUMBNAIL_URL?.trim();
-  if (override) return override;
+  const fromEnv = normalizeTestEmails(
+    process.env.NEWSLETTER_TEST_EMAILS?.trim() || ""
+  );
+  if (fromEnv.length > 0) return fromEnv;
 
-  const file =
-    NEWSLETTER_COVER_FILES[
-      Math.floor(Math.random() * NEWSLETTER_COVER_FILES.length)
-    ];
-  const base = (
-    process.env.BACKEND_URL ||
-    process.env.FRONTEND_URL ||
-    "https://www.citizenmonitors.com"
-  ).replace(/\/$/, "");
-  return `${base}/newsletter-covers/${file}`;
+  return [...DEFAULT_NEWSLETTER_TEST_EMAILS];
 };
 
 const getActiveNewsletter = (): NewsletterPayload => {
@@ -219,15 +220,34 @@ const resolveNewsletterPayload = (input?: {
  * Frontend compose page Step 1:
  * paste draft → dual preview (newsletter email + News & Insight).
  */
-export const composeNewsletterPreviewService = (input: {
+export const composeNewsletterPreviewService = async (input: {
   paste?: unknown;
   title?: unknown;
   content?: unknown;
   excerpt?: unknown;
+  thumbnailURLUrl?: unknown;
 }) => {
   const preview = buildComposePreview(input);
+  const cover = await pickNewsletterCover({
+    title: preview.title,
+    excerpt: preview.excerpt,
+    overrideUrl: String(input.thumbnailURLUrl ?? "").trim() || undefined,
+  });
+  const newsInsightContent = embedNewsletterCoverInContent(
+    preview.newsInsight.content,
+    cover,
+    preview.title
+  );
+
   return {
     ...preview,
+    newsInsight: {
+      ...preview.newsInsight,
+      content: newsInsightContent,
+      thumbnailURLUrl: cover.url,
+      heroImageURL: cover.url,
+    },
+    cover,
     nextStep: {
       endpoint: "POST /api/admin/newsletter",
       description:
@@ -251,11 +271,12 @@ export const composeNewsletterPreviewService = (input: {
 };
 
 /** @deprecated Prefer composeNewsletterPreviewService for the paste → preview page. */
-export const getActiveNewsletterPreviewService = (input?: {
+export const getActiveNewsletterPreviewService = async (input?: {
   paste?: unknown;
   title?: unknown;
   content?: unknown;
   excerpt?: unknown;
+  thumbnailURLUrl?: unknown;
 }) => {
   const hasPasteInput =
     String(input?.paste ?? "").trim() ||
@@ -267,6 +288,11 @@ export const getActiveNewsletterPreviewService = (input?: {
   }
 
   const newsletter = getActiveNewsletter();
+  const cover = await pickNewsletterCover({
+    title: newsletter.title,
+    excerpt: newsletter.excerpt,
+    overrideUrl: String(input?.thumbnailURLUrl ?? "").trim() || undefined,
+  });
   return {
     title: newsletter.title,
     excerpt: newsletter.excerpt,
@@ -277,8 +303,15 @@ export const getActiveNewsletterPreviewService = (input?: {
     newsInsight: {
       title: newsletter.title,
       excerpt: newsletter.excerpt,
-      content: newsletter.content,
+      content: embedNewsletterCoverInContent(
+        newsletter.content,
+        cover,
+        newsletter.title
+      ),
+      thumbnailURLUrl: cover.url,
+      heroImageURL: cover.url,
     },
+    cover,
     source: newsletter.source,
   };
 };
@@ -307,21 +340,33 @@ const resolveNewsletterPublisherId = async (adminId?: Id): Promise<Id> => {
 const publishNewsletterAsNewsInsight = async (
   newsletter: NewsletterPayload,
   adminId?: Id,
-  notifySubscribers = true
+  notifySubscribers = true,
+  thumbnailOverride?: string
 ) => {
   const publisherId = await resolveNewsletterPublisherId(adminId);
-  const coverImageUrl = pickNewsletterCoverImageUrl();
+  const cover = await pickNewsletterCover({
+    title: newsletter.title,
+    excerpt: newsletter.excerpt,
+    overrideUrl: thumbnailOverride,
+  });
+  const content = embedNewsletterCoverInContent(
+    newsletter.content,
+    cover,
+    newsletter.title
+  );
 
-  return createNewsInsightArticle({
+  const article = await createNewsInsightArticle({
     adminId: publisherId,
     title: newsletter.title,
     excerpt: newsletter.excerpt,
-    content: newsletter.content,
-    thumbnailURLUrl: coverImageUrl,
-    heroImageURL: coverImageUrl,
+    content,
+    thumbnailURLUrl: cover.url,
+    heroImageURL: cover.url,
     isPublished: true,
     notifySubscribers,
   });
+
+  return { article, cover };
 };
 
 
@@ -531,12 +576,16 @@ export const sendNewsletterService = async ({
   title,
   content,
   excerpt,
+  thumbnailURLUrl,
 }: SendNewsletterInput) => {
   const shouldSendEmail = toBooleanFlag(sendEmailFlag, true);
   const shouldPublishNewsInsight = toBooleanFlag(publishAsNewsInsight, true);
   const isTestSend = toBooleanFlag(isTest, false);
-  const normalizedTestEmails = normalizeTestEmails(testEmails);
+  const normalizedTestEmails = isTestSend
+    ? resolveTestEmails(testEmails)
+    : normalizeTestEmails(testEmails);
   const newsletter = resolveNewsletterPayload({ paste, title, content, excerpt });
+  const thumbnailOverride = String(thumbnailURLUrl ?? "").trim() || undefined;
 
   if (!shouldSendEmail && !shouldPublishNewsInsight) {
     throw new Error(
@@ -551,13 +600,20 @@ export const sendNewsletterService = async ({
   }
 
   let normalizedRecipients: RecipientRole[] = ["all"];
+  const providedRecipients =
+    recipients === undefined || recipients === null
+      ? null
+      : Array.isArray(recipients) && recipients.length === 0
+        ? null
+        : recipients;
+
   if (!isTestSend && shouldSendEmail) {
-    if (recipients === undefined || recipients === null || recipients === "") {
+    if (!providedRecipients) {
       throw new Error("recipients is required for a live newsletter send");
     }
-    normalizedRecipients = normalizeRecipients(recipients);
-  } else if (recipients !== undefined && recipients !== null && recipients !== "") {
-    normalizedRecipients = normalizeRecipients(recipients);
+    normalizedRecipients = normalizeRecipients(providedRecipients);
+  } else if (providedRecipients) {
+    normalizedRecipients = normalizeRecipients(providedRecipients);
   }
 
   const sendEmails = async () => {
@@ -629,18 +685,23 @@ export const sendNewsletterService = async ({
       id: string;
       slug: string;
       title: string;
+      thumbnailURLUrl: string;
     } | null = null;
+    let cover: { file: string; url: string } | undefined;
 
     if (shouldPublishNewsInsight) {
-      const newsInsight = await publishNewsletterAsNewsInsight(
+      const published = await publishNewsletterAsNewsInsight(
         newsletter,
         adminId,
-        !isTestSend
+        !isTestSend,
+        thumbnailOverride
       );
+      cover = { file: published.cover.file, url: published.cover.url };
       newsInsightResult = {
-        id: String(newsInsight._id),
-        slug: newsInsight.slug,
-        title: newsInsight.title,
+        id: String(published.article._id),
+        slug: published.article.slug,
+        title: published.article.title,
+        thumbnailURLUrl: published.cover.url,
       };
     }
 
@@ -664,6 +725,7 @@ export const sendNewsletterService = async ({
       isTest: isTestSend,
       source: newsletter.source,
       newsInsight: newsInsightResult,
+      cover,
       title: newsletter.title,
       excerpt: newsletter.excerpt,
     };

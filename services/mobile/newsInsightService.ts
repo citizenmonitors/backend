@@ -2,6 +2,10 @@ import type { Types } from "mongoose";
 import NewsInsight from "../../models/admin/NewsInsight.ts";
 import NewsInsightComment from "../../models/admin/NewsInsightComment.ts";
 import { wrapMobileArticleHtml } from "../../utils/mobileArticleHtml.ts";
+import {
+  rewriteLegacyCoverUrl,
+  rewriteLegacyCoverUrlsInHtml,
+} from "../../utils/newsletterCover.ts";
 import { countCommentsForArticles } from "./newsInsightEngagementService.ts";
 
 const likesArray = (row: { likes?: { user?: unknown }[] }): { user?: unknown }[] =>
@@ -37,10 +41,12 @@ const toNewsInsightMobileArticle = (
   input: { viewerUserId?: string; commentsCount: number; wrapForMobile?: boolean }
 ) => {
   const likes = likesArray(row);
-  const heroImageURL = resolveHeroImageURL(row);
+  const thumbnailURLUrl = rewriteLegacyCoverUrl(row.thumbnailURLUrl);
+  const heroImageURL = rewriteLegacyCoverUrl(resolveHeroImageURL(row));
+  const rewrittenContent = rewriteLegacyCoverUrlsInHtml(row.content);
   const content = input.wrapForMobile
-    ? wrapMobileArticleHtml(row.content)
-    : row.content;
+    ? wrapMobileArticleHtml(rewrittenContent)
+    : rewrittenContent;
 
   return {
     id: String(row._id),
@@ -48,7 +54,7 @@ const toNewsInsightMobileArticle = (
     title: row.title,
     excerpt: row.excerpt?.trim() || undefined,
     content,
-    thumbnailURLUrl: row.thumbnailURLUrl,
+    thumbnailURLUrl,
     heroImageURL,
     publishedAt: row.publishedAt,
     isPublished: row.isPublished ?? true,

@@ -110,6 +110,14 @@ export declare const newsLetterTemplateCitizensGetUp: () => string;
 export declare const getNewsletterUnsubscribeUrl: (unsubscribeLink?: string) => string;
 export declare const newsletterPlainTextFooter: (unsubscribeLink?: string) => string;
 export declare const newsletterFooterTemplate: (unsubscribeLink?: string) => string;
+/** Responsive CSS: mobile-first defaults in inline styles; desktop scales up here. */
+export declare const newsletterResponsiveEmailStyles: () => string;
+/** Shared newsletter email shell — mobile-first (12px body / 14px headings), full-width on phones. */
+export declare const buildNewsletterEditionEmailHtml: ({ title, bodyHtml, unsubscribeLink, }: {
+    title: string;
+    bodyHtml: string;
+    unsubscribeLink?: string;
+}) => string;
 export declare const newsLetterTemplateAmendedElectoralAct: () => string;
 export declare const newsLetterTemplateNigeriansOppositionSpearhead: () => string;
 export declare const newsLetterTemplateInecIndependence: () => string;
@@ -130,5 +138,11 @@ export declare const newsLetterTemplateEfccVersusNigeriansAntiCorruptionOrAntiOp
 export declare const newsLetterTemplate2027ElectionsWhoIsBuyingYourVote: () => string;
 export declare const newsLetterTemplateArePoliceInecJudiciaryNeutral: () => string;
 export declare const newsLetterTemplateTwoFakeAgenciesDistractionOrDisaster: () => string;
+export declare const newsLetterTemplateOsunElections2026FreeAndFair: () => string;
+export declare const newsLetterTemplateHowWillNigeriansDefendTheirVotesIn2027: () => string;
+export declare const newsLetterTemplateTerribleFederalRoadsWhichCandidateHasCapacity: () => string;
+export declare const newsLetterTemplateAreWeVotingForChangeOrRepeatingSameMistakes: () => string;
+export declare const newsLetterTemplateFakeProductsFakePromisesWhyDoNigeriansAcceptLess: () => string;
+export declare const newsLetterTemplateFactCheckPeterObiMoneyOrDebtsAsGovernor: () => string;
 export {};
 //# sourceMappingURL=emailTemplates.d.ts.map

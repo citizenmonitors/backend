@@ -10,7 +10,7 @@ declare const _default: mongoose.Model<{
     pollingUnit: string;
     election: mongoose.Types.ObjectId;
     flagged: boolean;
-    user: mongoose.Types.ObjectId;
+    uploaderDeleted: boolean;
     partiesVotes: mongoose.Types.DocumentArray<{
         party?: string | null | undefined;
         count?: number | null | undefined;
@@ -80,6 +80,7 @@ declare const _default: mongoose.Model<{
         evidenceId?: mongoose.Types.ObjectId | null | undefined;
     }>;
     agreed: boolean;
+    user?: mongoose.Types.ObjectId | null | undefined;
     resultPicture?: {
         name?: string | null | undefined;
         type?: string | null | undefined;
@@ -122,7 +123,7 @@ declare const _default: mongoose.Model<{
     pollingUnit: string;
     election: mongoose.Types.ObjectId;
     flagged: boolean;
-    user: mongoose.Types.ObjectId;
+    uploaderDeleted: boolean;
     partiesVotes: mongoose.Types.DocumentArray<{
         party?: string | null | undefined;
         count?: number | null | undefined;
@@ -192,6 +193,7 @@ declare const _default: mongoose.Model<{
         evidenceId?: mongoose.Types.ObjectId | null | undefined;
     }>;
     agreed: boolean;
+    user?: mongoose.Types.ObjectId | null | undefined;
     resultPicture?: {
         name?: string | null | undefined;
         type?: string | null | undefined;
@@ -234,7 +236,7 @@ declare const _default: mongoose.Model<{
     pollingUnit: string;
     election: mongoose.Types.ObjectId;
     flagged: boolean;
-    user: mongoose.Types.ObjectId;
+    uploaderDeleted: boolean;
     partiesVotes: mongoose.Types.DocumentArray<{
         party?: string | null | undefined;
         count?: number | null | undefined;
@@ -304,6 +306,7 @@ declare const _default: mongoose.Model<{
         evidenceId?: mongoose.Types.ObjectId | null | undefined;
     }>;
     agreed: boolean;
+    user?: mongoose.Types.ObjectId | null | undefined;
     resultPicture?: {
         name?: string | null | undefined;
         type?: string | null | undefined;
@@ -352,7 +355,7 @@ declare const _default: mongoose.Model<{
     pollingUnit: string;
     election: mongoose.Types.ObjectId;
     flagged: boolean;
-    user: mongoose.Types.ObjectId;
+    uploaderDeleted: boolean;
     partiesVotes: mongoose.Types.DocumentArray<{
         party?: string | null | undefined;
         count?: number | null | undefined;
@@ -422,6 +425,7 @@ declare const _default: mongoose.Model<{
         evidenceId?: mongoose.Types.ObjectId | null | undefined;
     }>;
     agreed: boolean;
+    user?: mongoose.Types.ObjectId | null | undefined;
     resultPicture?: {
         name?: string | null | undefined;
         type?: string | null | undefined;
@@ -464,7 +468,7 @@ declare const _default: mongoose.Model<{
     pollingUnit: string;
     election: mongoose.Types.ObjectId;
     flagged: boolean;
-    user: mongoose.Types.ObjectId;
+    uploaderDeleted: boolean;
     partiesVotes: mongoose.Types.DocumentArray<{
         party?: string | null | undefined;
         count?: number | null | undefined;
@@ -534,6 +538,7 @@ declare const _default: mongoose.Model<{
         evidenceId?: mongoose.Types.ObjectId | null | undefined;
     }>;
     agreed: boolean;
+    user?: mongoose.Types.ObjectId | null | undefined;
     resultPicture?: {
         name?: string | null | undefined;
         type?: string | null | undefined;
@@ -576,7 +581,7 @@ declare const _default: mongoose.Model<{
     pollingUnit: string;
     election: mongoose.Types.ObjectId;
     flagged: boolean;
-    user: mongoose.Types.ObjectId;
+    uploaderDeleted: boolean;
     partiesVotes: mongoose.Types.DocumentArray<{
         party?: string | null | undefined;
         count?: number | null | undefined;
@@ -646,6 +651,7 @@ declare const _default: mongoose.Model<{
         evidenceId?: mongoose.Types.ObjectId | null | undefined;
     }>;
     agreed: boolean;
+    user?: mongoose.Types.ObjectId | null | undefined;
     resultPicture?: {
         name?: string | null | undefined;
         type?: string | null | undefined;

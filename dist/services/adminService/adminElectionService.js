@@ -107,61 +107,59 @@ export const getAllResultService = async () => {
             })
                 .populate("user", "firstName lastName email role")
                 .lean();
-            // Consolidate results
+            // Consolidate results (include anonymized uploads after account deletion)
             for (const result of electionResults) {
                 const resultUser = userSummaryFromLean(result.user);
-                if (result.user) {
-                    allResults.push({
-                        id: result._id,
-                        firstName: resultUser?.firstName || "N/A",
-                        lastName: resultUser?.lastName || "N/A",
-                        email: resultUser?.email || "N/A",
-                        role: resultUser?.role || "N/A",
-                        election: electionTypeLabel,
-                        electionName: electionNameLabel,
-                        state: result.state,
-                        lga: result.lga,
-                        pictures: Array.isArray(result.resultPicture)
-                            ? result.resultPicture
-                            : result.resultPicture
-                                ? [result.resultPicture]
-                                : [],
-                        videos: Array.isArray(result.resultVideo)
-                            ? result.resultVideo
-                            : result.resultVideo
-                                ? [result.resultVideo]
-                                : [],
-                        createdAt: result.createdAt,
-                        resultUploaded: "Election Result",
-                    });
-                }
-                else {
-                    console.warn(`Result without user reference: ${result._id}`);
-                }
+                const deleted = Boolean(result.uploaderDeleted) || !result.user;
+                allResults.push({
+                    id: result._id,
+                    firstName: deleted ? "Deleted" : resultUser?.firstName || "N/A",
+                    lastName: deleted ? "user" : resultUser?.lastName || "N/A",
+                    email: deleted ? "N/A" : resultUser?.email || "N/A",
+                    role: deleted
+                        ? result.userRole || "N/A"
+                        : resultUser?.role || "N/A",
+                    election: electionTypeLabel,
+                    electionName: electionNameLabel,
+                    state: result.state,
+                    lga: result.lga,
+                    pictures: Array.isArray(result.resultPicture)
+                        ? result.resultPicture
+                        : result.resultPicture
+                            ? [result.resultPicture]
+                            : [],
+                    videos: Array.isArray(result.resultVideo)
+                        ? result.resultVideo
+                        : result.resultVideo
+                            ? [result.resultVideo]
+                            : [],
+                    createdAt: result.createdAt,
+                    resultUploaded: "Election Result",
+                    uploaderDeleted: deleted,
+                });
             }
-            // Consolidate incidents
+            // Consolidate incidents (include anonymized uploads after account deletion)
             for (const incident of electionIncidents) {
                 const incidentUser = userSummaryFromLean(incident.user);
-                if (incident.user) {
-                    allResults.push({
-                        id: incident._id,
-                        firstName: incidentUser?.firstName || "N/A",
-                        lastName: incidentUser?.lastName || "N/A",
-                        email: incidentUser?.email || "N/A",
-                        role: incidentUser?.role || "N/A",
-                        election: electionTypeLabel,
-                        electionName: electionNameLabel,
-                        state: incident.state,
-                        lga: incident.lga,
-                        pictures: incident.incidentPictures || [],
-                        videos: incident.incidentVideos || [],
-                        createdAt: incident.createdAt,
-                        resultUploaded: "Incident Report",
-                    });
-                }
-                else {
-                    console.warn(`Incident without user reference: ${incident._id}`);
-                }
+                const deleted = Boolean(incident.uploaderDeleted) || !incident.user;
+                allResults.push({
+                    id: incident._id,
+                    firstName: deleted ? "Deleted" : incidentUser?.firstName || "N/A",
+                    lastName: deleted ? "user" : incidentUser?.lastName || "N/A",
+                    email: deleted ? "N/A" : incidentUser?.email || "N/A",
+                    role: deleted
+                        ? incident.userRole || "N/A"
+                        : incidentUser?.role || "N/A",
+                    election: electionTypeLabel,
+                    electionName: electionNameLabel,
+                    state: incident.state,
+                    lga: incident.lga,
+                    pictures: incident.incidentPictures || [],
+                    videos: incident.incidentVideos || [],
+                    createdAt: incident.createdAt,
+                    resultUploaded: "Incident Report",
+                    uploaderDeleted: deleted,
+                });
             }
         }
         return allResults;
@@ -484,12 +482,15 @@ const fetchUpdatedFlaggedResults = async () => {
         // Consolidate flagged results
         for (const result of electionResults) {
             const resultUser = userSummaryFromLean(result.user);
+            const deleted = Boolean(result.uploaderDeleted) || !result.user;
             allResults.push({
                 id: result._id,
-                firstName: resultUser?.firstName || "N/A",
-                lastName: resultUser?.lastName || "N/A",
-                email: resultUser?.email || "N/A",
-                role: resultUser?.role || "N/A",
+                firstName: deleted ? "Deleted" : resultUser?.firstName || "N/A",
+                lastName: deleted ? "user" : resultUser?.lastName || "N/A",
+                email: deleted ? "N/A" : resultUser?.email || "N/A",
+                role: deleted
+                    ? result.userRole || "N/A"
+                    : resultUser?.role || "N/A",
                 election: electionTypeLabel === "N/A" ? "Unknown" : electionTypeLabel,
                 electionName: electionNameLabel === "N/A" ? "Unknown" : electionNameLabel,
                 state: result.state,
@@ -509,17 +510,21 @@ const fetchUpdatedFlaggedResults = async () => {
                         : [],
                 createdAt: result.createdAt,
                 resultUploaded: "Election Result",
+                uploaderDeleted: deleted,
             });
         }
         // Consolidate flagged incidents
         for (const incident of electionIncidents) {
             const incidentUser = userSummaryFromLean(incident.user);
+            const deleted = Boolean(incident.uploaderDeleted) || !incident.user;
             allResults.push({
                 id: incident._id,
-                firstName: incidentUser?.firstName || "N/A",
-                lastName: incidentUser?.lastName || "N/A",
-                email: incidentUser?.email || "N/A",
-                role: incidentUser?.role || "N/A",
+                firstName: deleted ? "Deleted" : incidentUser?.firstName || "N/A",
+                lastName: deleted ? "user" : incidentUser?.lastName || "N/A",
+                email: deleted ? "N/A" : incidentUser?.email || "N/A",
+                role: deleted
+                    ? incident.userRole || "N/A"
+                    : incidentUser?.role || "N/A",
                 election: electionTypeLabel === "N/A" ? "Unknown" : electionTypeLabel,
                 electionName: electionNameLabel === "N/A" ? "Unknown" : electionNameLabel,
                 state: incident.state,
@@ -540,6 +545,7 @@ const fetchUpdatedFlaggedResults = async () => {
                         : [],
                 createdAt: incident.createdAt,
                 resultUploaded: "Incident Report",
+                uploaderDeleted: deleted,
             });
         }
     }

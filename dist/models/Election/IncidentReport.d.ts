@@ -10,7 +10,7 @@ declare const _default: mongoose.Model<{
     pollingUnit: string;
     election: mongoose.Types.ObjectId;
     flagged: boolean;
-    user: mongoose.Types.ObjectId;
+    uploaderDeleted: boolean;
     userRole: string;
     actions: mongoose.Types.DocumentArray<{
         action: "agree" | "flag";
@@ -111,6 +111,7 @@ declare const _default: mongoose.Model<{
         location?: string | null | undefined;
         size?: number | null | undefined;
     }>;
+    user?: mongoose.Types.ObjectId | null | undefined;
     uploadLocation?: {
         latitude?: number | null | undefined;
         longitude?: number | null | undefined;
@@ -131,7 +132,7 @@ declare const _default: mongoose.Model<{
     pollingUnit: string;
     election: mongoose.Types.ObjectId;
     flagged: boolean;
-    user: mongoose.Types.ObjectId;
+    uploaderDeleted: boolean;
     userRole: string;
     actions: mongoose.Types.DocumentArray<{
         action: "agree" | "flag";
@@ -232,6 +233,7 @@ declare const _default: mongoose.Model<{
         location?: string | null | undefined;
         size?: number | null | undefined;
     }>;
+    user?: mongoose.Types.ObjectId | null | undefined;
     uploadLocation?: {
         latitude?: number | null | undefined;
         longitude?: number | null | undefined;
@@ -252,7 +254,7 @@ declare const _default: mongoose.Model<{
     pollingUnit: string;
     election: mongoose.Types.ObjectId;
     flagged: boolean;
-    user: mongoose.Types.ObjectId;
+    uploaderDeleted: boolean;
     userRole: string;
     actions: mongoose.Types.DocumentArray<{
         action: "agree" | "flag";
@@ -353,6 +355,7 @@ declare const _default: mongoose.Model<{
         location?: string | null | undefined;
         size?: number | null | undefined;
     }>;
+    user?: mongoose.Types.ObjectId | null | undefined;
     uploadLocation?: {
         latitude?: number | null | undefined;
         longitude?: number | null | undefined;
@@ -379,7 +382,7 @@ declare const _default: mongoose.Model<{
     pollingUnit: string;
     election: mongoose.Types.ObjectId;
     flagged: boolean;
-    user: mongoose.Types.ObjectId;
+    uploaderDeleted: boolean;
     userRole: string;
     actions: mongoose.Types.DocumentArray<{
         action: "agree" | "flag";
@@ -480,6 +483,7 @@ declare const _default: mongoose.Model<{
         location?: string | null | undefined;
         size?: number | null | undefined;
     }>;
+    user?: mongoose.Types.ObjectId | null | undefined;
     uploadLocation?: {
         latitude?: number | null | undefined;
         longitude?: number | null | undefined;
@@ -500,7 +504,7 @@ declare const _default: mongoose.Model<{
     pollingUnit: string;
     election: mongoose.Types.ObjectId;
     flagged: boolean;
-    user: mongoose.Types.ObjectId;
+    uploaderDeleted: boolean;
     userRole: string;
     actions: mongoose.Types.DocumentArray<{
         action: "agree" | "flag";
@@ -601,6 +605,7 @@ declare const _default: mongoose.Model<{
         location?: string | null | undefined;
         size?: number | null | undefined;
     }>;
+    user?: mongoose.Types.ObjectId | null | undefined;
     uploadLocation?: {
         latitude?: number | null | undefined;
         longitude?: number | null | undefined;
@@ -621,7 +626,7 @@ declare const _default: mongoose.Model<{
     pollingUnit: string;
     election: mongoose.Types.ObjectId;
     flagged: boolean;
-    user: mongoose.Types.ObjectId;
+    uploaderDeleted: boolean;
     userRole: string;
     actions: mongoose.Types.DocumentArray<{
         action: "agree" | "flag";
@@ -722,6 +727,7 @@ declare const _default: mongoose.Model<{
         location?: string | null | undefined;
         size?: number | null | undefined;
     }>;
+    user?: mongoose.Types.ObjectId | null | undefined;
     uploadLocation?: {
         latitude?: number | null | undefined;
         longitude?: number | null | undefined;

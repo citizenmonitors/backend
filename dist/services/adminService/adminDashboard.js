@@ -11,7 +11,10 @@ import AdminLog from "../../models/admin/AdminLog.js";
 import { adminRoleInvitationTemplate, adminSuspensionTemplate, approveObserverTemplate, observerDowngradeTemplate, observerRoleAvailableTemplate, observerNotApprovedInvalidPvcTemplate, observerRoleUpdateTemplate } from "../../config/emailTemplates.js";
 import { getPopulatedElectionLabels } from "./adminElectionService.js";
 import { dispatchNotificationToUsers, } from "../mobile/notificationDispatchService.js";
-import { detachSubmissionsFromActiveElections } from "../Election/electionService.js";
+import { notifyPollingUnitAfterObserverLeft, removeVolunteerSubmissionsForAccountDelete, scrubUserElectionActions, } from "../UserDashboard/userService.js";
+import { revokeAllRefreshTokensForEmail } from "../authTokenService.js";
+import { invalidateAllMobileReadCaches } from "../../utils/cache.js";
+import User from "../../models/User.js";
 const errMsg = (error) => error instanceof Error ? error.message : String(error);
 export const getDashboardData = async () => {
     const today = moment().startOf("day");
@@ -273,27 +276,55 @@ export const deleteUserService = async (userId, adminId) => {
         if (!user) {
             throw new Error("User not found or already deleted");
         }
-        // Delete user's election results / incidents and detach from ActiveElection
-        const [userResults, userIncidents] = await Promise.all([
-            ElectionData.find({ user: userId }).select("_id election").lean(),
-            IncidentReport.find({ user: userId }).select("_id election").lean(),
+        const role = String(user.role ?? "");
+        const wasApprovedObserver = role === "observer" && Boolean(user.isObserverInPollingUnit);
+        const pollingUnit = user.pollingUnit;
+        const [resultsCount, incidentsCount] = await Promise.all([
+            ElectionData.countDocuments({ user: userId }),
+            IncidentReport.countDocuments({ user: userId }),
         ]);
-        await ElectionData.deleteMany({ user: userId });
-        await IncidentReport.deleteMany({ user: userId });
-        await detachSubmissionsFromActiveElections({
-            results: userResults,
-            incidents: userIncidents,
-        });
-        // Delete the user
+        const hasSubmissions = resultsCount + incidentsCount > 0;
+        let deletedResults = 0;
+        let deletedIncidents = 0;
+        // Admin delete always removes the user's results/incidents (including
+        // observers). Self-delete still blocks observers who have uploads.
+        if (hasSubmissions || role === "volunteer" || role === "observer") {
+            const removed = await removeVolunteerSubmissionsForAccountDelete(userId);
+            deletedResults = removed.deletedResults;
+            deletedIncidents = removed.deletedIncidents;
+        }
+        else {
+            await scrubUserElectionActions(userId);
+        }
+        await revokeAllRefreshTokensForEmail(user.email);
+        await User.deleteMany({ email: user.email });
         await CompletedUser.findByIdAndDelete(userId);
-        // Log the admin action
+        await invalidateAllMobileReadCaches();
+        if (wasApprovedObserver) {
+            try {
+                await notifyPollingUnitAfterObserverLeft(pollingUnit, userId);
+            }
+            catch (err) {
+                console.error("Admin deleted observer but failed to notify polling unit:", err);
+            }
+        }
         await AdminLog.create({
             admin: adminId,
             action: "Deleted user",
-            details: { userId, email: user.email },
+            details: {
+                userId,
+                email: user.email,
+                role,
+                deletedResults,
+                deletedIncidents,
+            },
             timestamp: new Date(),
         });
-        return { message: "User deleted successfully" };
+        return {
+            message: "User deleted successfully",
+            deletedResults,
+            deletedIncidents,
+        };
     }
     catch (error) {
         throw new Error(`Error deleting user: ${errMsg(error)}`);

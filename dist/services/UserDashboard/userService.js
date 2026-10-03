@@ -11,11 +11,14 @@ import fs from "fs";
 import profileImageModel from "../../models/UserProfileImage/ProfileImageModel.js";
 import { fileURLToPath } from "url";
 import observerIdModel from "../../models/observerIds/observerIdModel.js";
-import { emailChangeNotificationTemplate, emailVerificationCodeTemplate, resendVerificationCodeTemplate } from "../../config/emailTemplates.js";
+import { emailChangeNotificationTemplate, emailVerificationCodeTemplate, observerRoleAvailableTemplate, resendVerificationCodeTemplate, } from "../../config/emailTemplates.js";
 import { uploadFileToFirebase } from "../../config/firebaseUploader.js";
 import bucket from "../../config/firebaseConfig.js";
 import crypto from "crypto";
 import { dispatchMobileNotification } from "../mobile/notificationDispatchService.js";
+import { revokeAllRefreshTokensForEmail } from "../authTokenService.js";
+import { detachSubmissionsFromActiveElections } from "../Election/electionService.js";
+import { invalidateAllMobileReadCaches } from "../../utils/cache.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const BACKEND_URL = process.env.BACKEND_URL;
@@ -446,16 +449,237 @@ export const resendTokenService = async (userId) => {
         throw new Error(`Error resending verification code: ${error.message}`);
     }
 };
+export class AccountDeletionBlockedError extends Error {
+    statusCode = 403;
+    constructor(message) {
+        super(message);
+        this.name = "AccountDeletionBlockedError";
+    }
+}
+const countUserSubmissions = async (userId) => {
+    const [resultsCount, incidentsCount] = await Promise.all([
+        ElectionData.countDocuments({ user: userId }),
+        IncidentReport.countDocuments({ user: userId }),
+    ]);
+    return { resultsCount, incidentsCount };
+};
+/** Remove a deleted user's agree/flag actions from other people's submissions. */
+const scrubDeletedUserActions = async (userId) => {
+    const [results, incidents] = await Promise.all([
+        ElectionData.find({ "actions.userId": userId }),
+        IncidentReport.find({ "actions.userId": userId }),
+    ]);
+    let changedAny = false;
+    for (const doc of [...results, ...incidents]) {
+        const before = Array.isArray(doc.actions) ? doc.actions.length : 0;
+        doc.actions = (doc.actions ?? []).filter((a) => a.userId == null || String(a.userId) !== String(userId));
+        if ((doc.actions?.length ?? 0) === before)
+            continue;
+        // Required: reassigning a DocumentArray is not always detected as dirty.
+        doc.markModified("actions");
+        const flaggedCount = (doc.actions ?? []).filter((a) => a.action === "flag").length;
+        // Exclude the deleting user so priority matches post-delete headcount.
+        const totalUsersInPollingUnit = doc.pollingUnit
+            ? await CompletedUser.countDocuments({
+                pollingUnit: doc.pollingUnit,
+                role: { $in: ["observer", "volunteer"] },
+                _id: { $ne: userId },
+            })
+            : 0;
+        const totalUsers = totalUsersInPollingUnit > 0 ? totalUsersInPollingUnit : 1;
+        const priorityLevel = Math.round((flaggedCount / totalUsers) * 100);
+        doc.flagged = flaggedCount > 0;
+        doc.priorityLevel = flaggedCount > 0 ? priorityLevel : 0;
+        doc.hidden = priorityLevel >= 50;
+        await doc.save();
+        changedAny = true;
+    }
+    // Scrub-only paths may not call detach/sync, so refresh caches here.
+    if (changedAny) {
+        await invalidateAllMobileReadCaches();
+    }
+};
+/** Clear evidenceId pointers that referenced submissions we are about to delete. */
+const clearEvidenceRefsToSubmissions = async (submissionIds) => {
+    if (submissionIds.length === 0)
+        return;
+    const idSet = new Set(submissionIds.map(String));
+    const [results, incidents] = await Promise.all([
+        ElectionData.find({ "actions.evidenceId": { $in: submissionIds } }),
+        IncidentReport.find({ "actions.evidenceId": { $in: submissionIds } }),
+    ]);
+    for (const doc of [...results, ...incidents]) {
+        let changed = false;
+        for (const action of doc.actions ?? []) {
+            if (action.evidenceId && idSet.has(String(action.evidenceId))) {
+                // null clears the ref more reliably than undefined on mongoose subdocs
+                action.evidenceId = null;
+                changed = true;
+            }
+        }
+        if (changed) {
+            doc.markModified("actions");
+            await doc.save();
+        }
+    }
+};
+const deleteUserSubmissions = async (userId) => {
+    // Clear this user's agree/flag marks on others before removing their uploads.
+    await scrubDeletedUserActions(userId);
+    const [userResults, userIncidents] = await Promise.all([
+        ElectionData.find({ user: userId }).select("_id election").lean(),
+        IncidentReport.find({ user: userId }).select("_id election").lean(),
+    ]);
+    const submissionIds = [
+        ...userResults.map((r) => r._id),
+        ...userIncidents.map((i) => i._id),
+    ];
+    await clearEvidenceRefsToSubmissions(submissionIds);
+    await ElectionData.deleteMany({ user: userId });
+    await IncidentReport.deleteMany({ user: userId });
+    await detachSubmissionsFromActiveElections({
+        results: userResults,
+        incidents: userIncidents,
+    });
+    return {
+        deletedResults: userResults.length,
+        deletedIncidents: userIncidents.length,
+    };
+};
+export const removeVolunteerSubmissionsForAccountDelete = deleteUserSubmissions;
+export const scrubUserElectionActions = scrubDeletedUserActions;
+const notifyPollingUnitObserverSlotOpen = async (pollingUnit, deletedUserId) => {
+    if (!pollingUnit?.trim())
+        return 0;
+    // Slot is only "open" if no other approved observer remains in the PU.
+    const anotherApprovedObserver = await CompletedUser.exists({
+        pollingUnit,
+        _id: { $ne: deletedUserId },
+        role: "observer",
+        isObserverInPollingUnit: true,
+    });
+    if (anotherApprovedObserver)
+        return 0;
+    // Include volunteers, public-viewers, and pending observers — exclude only
+    // other approved observers.
+    const peers = await CompletedUser.find({
+        pollingUnit,
+        _id: { $ne: deletedUserId },
+        $nor: [{ role: "observer", isObserverInPollingUnit: true }],
+    }).select("_id email firstName role pendingObserverVerification");
+    let emailed = 0;
+    for (const peer of peers) {
+        try {
+            // Volunteers who applied while the slot was taken can re-apply cleanly.
+            if (peer.role === "volunteer" &&
+                peer.pendingObserverVerification) {
+                peer.pendingObserverVerification = false;
+                await peer.save();
+            }
+            if (!peer.email)
+                continue;
+            await sendEmail({
+                to: peer.email,
+                subject: "Observer Role Available - Citizen Monitors",
+                htmlbody: observerRoleAvailableTemplate(peer.firstName ?? "Citizen", pollingUnit),
+            });
+            emailed += 1;
+        }
+        catch (err) {
+            console.error(`Failed to notify ${peer.email} about open observer slot:`, err);
+        }
+    }
+    return emailed;
+};
+export const notifyPollingUnitAfterObserverLeft = notifyPollingUnitObserverSlotOpen;
+/**
+ * Self-service account deletion:
+ * - volunteer (or other non-observer) with uploads: allowed; submissions deleted
+ * - observer with any result/incident: blocked (collation keeps their uploads)
+ * - observer with no uploads: allowed; notify PU that observer slot is open
+ * - public-viewer with no uploads: allowed; scrub agree/flag marks if any
+ * - admin / super-admin: blocked (use admin tooling)
+ */
 export const deleteUserService = async (userId) => {
     try {
-        const deletedUser = await CompletedUser.findByIdAndDelete(userId);
-        if (!deletedUser) {
+        const user = await CompletedUser.findById(userId);
+        if (!user) {
             throw new Error("User not found");
         }
-        return deletedUser;
+        const role = String(user.role ?? "");
+        if (role === "admin" || role === "super-admin") {
+            throw new AccountDeletionBlockedError("Admin accounts cannot be deleted from this endpoint.");
+        }
+        const { resultsCount, incidentsCount } = await countUserSubmissions(userId);
+        const hasSubmissions = resultsCount + incidentsCount > 0;
+        let deletedResults = 0;
+        let deletedIncidents = 0;
+        let notifiedPeers = 0;
+        if (role === "observer") {
+            if (hasSubmissions) {
+                throw new AccountDeletionBlockedError("Observers who have uploaded election results or incidents cannot delete their account, because those submissions are kept for collation and cannot be removed after an election.");
+            }
+            const pollingUnit = user.pollingUnit;
+            const wasApprovedObserver = Boolean(user.isObserverInPollingUnit);
+            // Observers with no uploads may still have agree/flag marks on others.
+            await scrubDeletedUserActions(userId);
+            await revokeAllRefreshTokensForEmail(user.email);
+            await User.deleteMany({ email: user.email });
+            await CompletedUser.findByIdAndDelete(userId);
+            await invalidateAllMobileReadCaches();
+            // Only notify when an approved observer leaves and frees the PU slot.
+            if (wasApprovedObserver) {
+                try {
+                    notifiedPeers = await notifyPollingUnitObserverSlotOpen(pollingUnit, userId);
+                }
+                catch (err) {
+                    console.error("Account deleted but failed to notify polling unit about open observer slot:", err);
+                }
+            }
+            return {
+                message: "User account deleted successfully",
+                deletedResults: 0,
+                deletedIncidents: 0,
+                notifiedPeers,
+                ...(wasApprovedObserver
+                    ? {
+                        note: notifiedPeers > 0
+                            ? "Your polling unit was notified that the observer role is now available."
+                            : "Observer slot is now open in your polling unit.",
+                    }
+                    : {}),
+            };
+        }
+        if (hasSubmissions) {
+            // Volunteers (and any non-observer role with uploads): remove submissions.
+            const removed = await deleteUserSubmissions(userId);
+            deletedResults = removed.deletedResults;
+            deletedIncidents = removed.deletedIncidents;
+        }
+        else {
+            // No uploads: still scrub agree/flag marks on others.
+            await scrubDeletedUserActions(userId);
+        }
+        await revokeAllRefreshTokensForEmail(user.email);
+        await User.deleteMany({ email: user.email });
+        await CompletedUser.findByIdAndDelete(userId);
+        await invalidateAllMobileReadCaches();
+        return {
+            message: "User account deleted successfully",
+            deletedResults,
+            deletedIncidents,
+            ...(deletedResults + deletedIncidents > 0
+                ? {
+                    note: "Your election results and incidents were removed with your account.",
+                }
+                : {}),
+        };
     }
     catch (error) {
-        throw new Error(`Error deleting user account: ${error.message}`);
+        if (error instanceof AccountDeletionBlockedError)
+            throw error;
+        const message = error instanceof Error ? error.message : String(error);
+        throw new Error(`Error deleting user account: ${message}`);
     }
 };
 //# sourceMappingURL=userService.js.map

@@ -476,6 +476,8 @@ export declare const getUserByIdService: (id: Id) => Promise<import("mongoose").
 }>;
 export declare const deleteUserService: (userId: Id, adminId: Id) => Promise<{
     message: string;
+    deletedResults: number;
+    deletedIncidents: number;
 }>;
 export declare const approveObserverService: (id: Id, adminId: Id) => Promise<{
     message: string;

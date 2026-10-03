@@ -9,7 +9,14 @@ const ElectionDataSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "CompletedUser",
-        required: true,
+        // Optional so account deletion can keep results for collation.
+        required: false,
+        default: null,
+    },
+    /** Set when the uploader deletes their account; results stay for collation. */
+    uploaderDeleted: {
+        type: Boolean,
+        default: false,
     },
     userRole: {
         type: String,

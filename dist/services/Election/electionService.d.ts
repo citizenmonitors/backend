@@ -1,7 +1,15 @@
 import type { Types } from "mongoose";
 type Id = Types.ObjectId | string;
+/**
+ * Source of truth for ActiveElection.resultsCount:
+ * count of ElectionData docs for that active election.
+ * Also prunes stale ObjectIds from the `results` array.
+ */
+export declare const syncActiveElectionResultsCount: (activeElectionId: Id | null | undefined) => Promise<number>;
 /** Keep ActiveElection.results / resultsCount in sync after a result is deleted. */
 export declare const detachResultFromActiveElection: (activeElectionId: Id | null | undefined, resultId: Id) => Promise<void>;
+/** Rebuild ActiveElection.incidentReports from real IncidentReport docs. */
+export declare const syncActiveElectionIncidentRefs: (activeElectionId: Id | null | undefined) => Promise<number>;
 /** Keep ActiveElection.incidentReports in sync after an incident is deleted. */
 export declare const detachIncidentFromActiveElection: (activeElectionId: Id | null | undefined, incidentId: Id) => Promise<void>;
 /** Bulk-detach many result/incident ids grouped by active election. */
@@ -317,7 +325,7 @@ export declare const getElectionResultById: (electionId: Id, userId: Id) => Prom
         pollingUnit: string;
         election: Types.ObjectId;
         flagged: boolean;
-        user: Types.ObjectId;
+        uploaderDeleted: boolean;
         partiesVotes: Types.DocumentArray<{
             party?: string | null | undefined;
             count?: number | null | undefined;
@@ -450,6 +458,7 @@ export declare const getElectionResultById: (electionId: Id, userId: Id) => Prom
             __v: number;
         })>;
         agreed: boolean;
+        user?: Types.ObjectId | null | undefined;
         resultPicture?: {
             name?: string | null | undefined;
             type?: string | null | undefined;
@@ -496,7 +505,7 @@ export declare const getElectionResultById: (electionId: Id, userId: Id) => Prom
         pollingUnit: string;
         election: Types.ObjectId;
         flagged: boolean;
-        user: Types.ObjectId;
+        uploaderDeleted: boolean;
         userRole: string;
         actions: Types.DocumentArray<{
             action: "agree" | "flag";
@@ -660,6 +669,7 @@ export declare const getElectionResultById: (electionId: Id, userId: Id) => Prom
             location?: string | null | undefined;
             size?: number | null | undefined;
         }>;
+        user?: Types.ObjectId | null | undefined;
         uploadLocation?: {
             latitude?: number | null | undefined;
             longitude?: number | null | undefined;
@@ -694,7 +704,7 @@ export declare const getElectionById: (electionId: Id, userId: Id) => Promise<{
             pollingUnit: string;
             election: Types.ObjectId;
             flagged: boolean;
-            user: Types.ObjectId;
+            uploaderDeleted: boolean;
             partiesVotes: Types.DocumentArray<{
                 party?: string | null | undefined;
                 count?: number | null | undefined;
@@ -827,6 +837,7 @@ export declare const getElectionById: (electionId: Id, userId: Id) => Promise<{
                 __v: number;
             })>;
             agreed: boolean;
+            user?: Types.ObjectId | null | undefined;
             resultPicture?: {
                 name?: string | null | undefined;
                 type?: string | null | undefined;
@@ -873,7 +884,7 @@ export declare const getElectionById: (electionId: Id, userId: Id) => Promise<{
             pollingUnit: string;
             election: Types.ObjectId;
             flagged: boolean;
-            user: Types.ObjectId;
+            uploaderDeleted: boolean;
             userRole: string;
             actions: Types.DocumentArray<{
                 action: "agree" | "flag";
@@ -1037,6 +1048,7 @@ export declare const getElectionById: (electionId: Id, userId: Id) => Promise<{
                 location?: string | null | undefined;
                 size?: number | null | undefined;
             }>;
+            user?: Types.ObjectId | null | undefined;
             uploadLocation?: {
                 latitude?: number | null | undefined;
                 longitude?: number | null | undefined;
@@ -1113,7 +1125,7 @@ export declare const uploadResultDataService: (electionId: Id, userId: Id, data:
     pollingUnit: string;
     election: Types.ObjectId;
     flagged: boolean;
-    user: Types.ObjectId;
+    uploaderDeleted: boolean;
     partiesVotes: Types.DocumentArray<{
         party?: string | null | undefined;
         count?: number | null | undefined;
@@ -1183,6 +1195,7 @@ export declare const uploadResultDataService: (electionId: Id, userId: Id, data:
         evidenceId?: Types.ObjectId | null | undefined;
     }>;
     agreed: boolean;
+    user?: Types.ObjectId | null | undefined;
     resultPicture?: {
         name?: string | null | undefined;
         type?: string | null | undefined;
@@ -1230,7 +1243,7 @@ export declare const updateResultDataService: (electionId: Id, userId: Id, data?
     pollingUnit: string;
     election: Types.ObjectId;
     flagged: boolean;
-    user: Types.ObjectId;
+    uploaderDeleted: boolean;
     partiesVotes: Types.DocumentArray<{
         party?: string | null | undefined;
         count?: number | null | undefined;
@@ -1300,6 +1313,7 @@ export declare const updateResultDataService: (electionId: Id, userId: Id, data?
         evidenceId?: Types.ObjectId | null | undefined;
     }>;
     agreed: boolean;
+    user?: Types.ObjectId | null | undefined;
     resultPicture?: {
         name?: string | null | undefined;
         type?: string | null | undefined;
@@ -1342,7 +1356,7 @@ export declare const updateResultDataService: (electionId: Id, userId: Id, data?
     pollingUnit: string;
     election: Types.ObjectId;
     flagged: boolean;
-    user: Types.ObjectId;
+    uploaderDeleted: boolean;
     partiesVotes: Types.DocumentArray<{
         party?: string | null | undefined;
         count?: number | null | undefined;
@@ -1412,6 +1426,7 @@ export declare const updateResultDataService: (electionId: Id, userId: Id, data?
         evidenceId?: Types.ObjectId | null | undefined;
     }>;
     agreed: boolean;
+    user?: Types.ObjectId | null | undefined;
     resultPicture?: {
         name?: string | null | undefined;
         type?: string | null | undefined;
@@ -1462,7 +1477,7 @@ export declare const getUserElectionData: (userId: Id) => Promise<(import("mongo
     pollingUnit: string;
     election: Types.ObjectId;
     flagged: boolean;
-    user: Types.ObjectId;
+    uploaderDeleted: boolean;
     partiesVotes: Types.DocumentArray<{
         party?: string | null | undefined;
         count?: number | null | undefined;
@@ -1532,6 +1547,7 @@ export declare const getUserElectionData: (userId: Id) => Promise<(import("mongo
         evidenceId?: Types.ObjectId | null | undefined;
     }>;
     agreed: boolean;
+    user?: Types.ObjectId | null | undefined;
     resultPicture?: {
         name?: string | null | undefined;
         type?: string | null | undefined;
@@ -1574,7 +1590,7 @@ export declare const getUserElectionData: (userId: Id) => Promise<(import("mongo
     pollingUnit: string;
     election: Types.ObjectId;
     flagged: boolean;
-    user: Types.ObjectId;
+    uploaderDeleted: boolean;
     partiesVotes: Types.DocumentArray<{
         party?: string | null | undefined;
         count?: number | null | undefined;
@@ -1644,6 +1660,7 @@ export declare const getUserElectionData: (userId: Id) => Promise<(import("mongo
         evidenceId?: Types.ObjectId | null | undefined;
     }>;
     agreed: boolean;
+    user?: Types.ObjectId | null | undefined;
     resultPicture?: {
         name?: string | null | undefined;
         type?: string | null | undefined;
@@ -1694,7 +1711,7 @@ export declare const uploadIncidentReportDataService: (electionId: Id, userId: I
     pollingUnit: string;
     election: Types.ObjectId;
     flagged: boolean;
-    user: Types.ObjectId;
+    uploaderDeleted: boolean;
     userRole: string;
     actions: Types.DocumentArray<{
         action: "agree" | "flag";
@@ -1795,6 +1812,7 @@ export declare const uploadIncidentReportDataService: (electionId: Id, userId: I
         location?: string | null | undefined;
         size?: number | null | undefined;
     }>;
+    user?: Types.ObjectId | null | undefined;
     uploadLocation?: {
         latitude?: number | null | undefined;
         longitude?: number | null | undefined;
@@ -1815,7 +1833,7 @@ export declare const uploadIncidentReportDataService: (electionId: Id, userId: I
     pollingUnit: string;
     election: Types.ObjectId;
     flagged: boolean;
-    user: Types.ObjectId;
+    uploaderDeleted: boolean;
     userRole: string;
     actions: Types.DocumentArray<{
         action: "agree" | "flag";
@@ -1916,6 +1934,7 @@ export declare const uploadIncidentReportDataService: (electionId: Id, userId: I
         location?: string | null | undefined;
         size?: number | null | undefined;
     }>;
+    user?: Types.ObjectId | null | undefined;
     uploadLocation?: {
         latitude?: number | null | undefined;
         longitude?: number | null | undefined;
@@ -1941,7 +1960,7 @@ export declare const updateIncidentReportDataService: (electionId: Id, userId: I
     pollingUnit: string;
     election: Types.ObjectId;
     flagged: boolean;
-    user: Types.ObjectId;
+    uploaderDeleted: boolean;
     userRole: string;
     actions: Types.DocumentArray<{
         action: "agree" | "flag";
@@ -2042,6 +2061,7 @@ export declare const updateIncidentReportDataService: (electionId: Id, userId: I
         location?: string | null | undefined;
         size?: number | null | undefined;
     }>;
+    user?: Types.ObjectId | null | undefined;
     uploadLocation?: {
         latitude?: number | null | undefined;
         longitude?: number | null | undefined;
@@ -2062,7 +2082,7 @@ export declare const updateIncidentReportDataService: (electionId: Id, userId: I
     pollingUnit: string;
     election: Types.ObjectId;
     flagged: boolean;
-    user: Types.ObjectId;
+    uploaderDeleted: boolean;
     userRole: string;
     actions: Types.DocumentArray<{
         action: "agree" | "flag";
@@ -2163,6 +2183,7 @@ export declare const updateIncidentReportDataService: (electionId: Id, userId: I
         location?: string | null | undefined;
         size?: number | null | undefined;
     }>;
+    user?: Types.ObjectId | null | undefined;
     uploadLocation?: {
         latitude?: number | null | undefined;
         longitude?: number | null | undefined;

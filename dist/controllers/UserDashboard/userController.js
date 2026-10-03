@@ -1,4 +1,4 @@
-import { volunteerToObserverService, updateUserService, verifyUserEmail, resendTokenService, deleteUserService, updateUserEmail, } from "../../services/UserDashboard/userService.js";
+import { volunteerToObserverService, updateUserService, verifyUserEmail, resendTokenService, deleteUserService, updateUserEmail, AccountDeletionBlockedError, } from "../../services/UserDashboard/userService.js";
 import upload from "../../config/multer.js";
 const getErrorMessage = (error) => error instanceof Error ? error.message : String(error);
 const hasMessage = (value) => typeof value === "object" &&
@@ -142,16 +142,19 @@ export const resendToken = async (req, res) => {
         });
     }
 };
-// Delete user account
+// Delete user account (role-aware: observers with uploads are blocked)
 export const deleteUser = async (req, res) => {
     try {
         const r = req;
         const userId = requireUser(r)._id;
-        await deleteUserService(userId);
-        return res.status(200).json({ message: "User account deleted successfully" });
+        const result = await deleteUserService(userId);
+        return res.status(200).json(result);
     }
     catch (error) {
         const message = getErrorMessage(error);
+        if (error instanceof AccountDeletionBlockedError) {
+            return res.status(403).json({ message, error: message });
+        }
         return res
             .status(500)
             .json({ message: "Error deleting user account", error: message });

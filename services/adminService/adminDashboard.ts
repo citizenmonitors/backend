@@ -15,7 +15,14 @@ import {
   dispatchMobileNotification,
   dispatchNotificationToUsers,
 } from "../mobile/notificationDispatchService.ts";
-import { detachSubmissionsFromActiveElections } from "../Election/electionService.ts";
+import {
+  notifyPollingUnitAfterObserverLeft,
+  removeVolunteerSubmissionsForAccountDelete,
+  scrubUserElectionActions,
+} from "../UserDashboard/userService.ts";
+import { revokeAllRefreshTokensForEmail } from "../authTokenService.ts";
+import { invalidateAllMobileReadCaches } from "../../utils/cache.ts";
+import User from "../../models/User.ts";
 
 type Id = string | Types.ObjectId;
 
@@ -348,30 +355,64 @@ export const deleteUserService = async (userId: Id, adminId: Id) => {
       throw new Error("User not found or already deleted");
     }
 
-    // Delete user's election results / incidents and detach from ActiveElection
-    const [userResults, userIncidents] = await Promise.all([
-      ElectionData.find({ user: userId }).select("_id election").lean(),
-      IncidentReport.find({ user: userId }).select("_id election").lean(),
+    const role = String(user.role ?? "");
+    const wasApprovedObserver =
+      role === "observer" && Boolean(user.isObserverInPollingUnit);
+    const pollingUnit = user.pollingUnit;
+
+    const [resultsCount, incidentsCount] = await Promise.all([
+      ElectionData.countDocuments({ user: userId }),
+      IncidentReport.countDocuments({ user: userId }),
     ]);
-    await ElectionData.deleteMany({ user: userId });
-    await IncidentReport.deleteMany({ user: userId });
-    await detachSubmissionsFromActiveElections({
-      results: userResults,
-      incidents: userIncidents,
-    });
+    const hasSubmissions = resultsCount + incidentsCount > 0;
 
-    // Delete the user
+    let deletedResults = 0;
+    let deletedIncidents = 0;
+
+    // Admin delete always removes the user's results/incidents (including
+    // observers). Self-delete still blocks observers who have uploads.
+    if (hasSubmissions || role === "volunteer" || role === "observer") {
+      const removed = await removeVolunteerSubmissionsForAccountDelete(userId);
+      deletedResults = removed.deletedResults;
+      deletedIncidents = removed.deletedIncidents;
+    } else {
+      await scrubUserElectionActions(userId);
+    }
+
+    await revokeAllRefreshTokensForEmail(user.email);
+    await User.deleteMany({ email: user.email });
     await CompletedUser.findByIdAndDelete(userId);
+    await invalidateAllMobileReadCaches();
 
-    // Log the admin action
+    if (wasApprovedObserver) {
+      try {
+        await notifyPollingUnitAfterObserverLeft(pollingUnit, userId);
+      } catch (err) {
+        console.error(
+          "Admin deleted observer but failed to notify polling unit:",
+          err
+        );
+      }
+    }
+
     await AdminLog.create({
       admin: adminId,
       action: "Deleted user",
-      details: { userId, email: user.email },
+      details: {
+        userId,
+        email: user.email,
+        role,
+        deletedResults,
+        deletedIncidents,
+      },
       timestamp: new Date(),
     });
 
-    return { message: "User deleted successfully" };
+    return {
+      message: "User deleted successfully",
+      deletedResults,
+      deletedIncidents,
+    };
   } catch (error) {
     throw new Error(`Error deleting user: ${errMsg(error)}`);
   }

@@ -7,6 +7,7 @@ import {
   resendTokenService,
   deleteUserService,
   updateUserEmail,
+  AccountDeletionBlockedError,
 } from "../../services/UserDashboard/userService.ts";
 import upload from "../../config/multer.ts";
 
@@ -209,18 +210,21 @@ export const resendToken = async (req: Request, res: Response) => {
   }
 };
 
-// Delete user account
+// Delete user account (role-aware: observers with uploads are blocked)
 export const deleteUser = async (req: Request, res: Response) => {
-   try {
-     const r = req as AuthenticatedRequest;
-     const userId = requireUser(r)._id;
-     await deleteUserService(userId);
-     return res.status(200).json({ message: "User account deleted successfully" });
-   } catch (error) {
-     const message = getErrorMessage(error);
-     return res
-       .status(500)
-       .json({ message: "Error deleting user account", error: message });
-   }
+  try {
+    const r = req as AuthenticatedRequest;
+    const userId = requireUser(r)._id;
+    const result = await deleteUserService(userId);
+    return res.status(200).json(result);
+  } catch (error) {
+    const message = getErrorMessage(error);
+    if (error instanceof AccountDeletionBlockedError) {
+      return res.status(403).json({ message, error: message });
+    }
+    return res
+      .status(500)
+      .json({ message: "Error deleting user account", error: message });
+  }
 };
 

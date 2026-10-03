@@ -297,6 +297,7 @@ export declare const getAllResultService: () => Promise<({
     }>[];
     createdAt: NativeDate;
     resultUploaded: string;
+    uploaderDeleted: boolean;
 } | {
     id: Types.ObjectId;
     firstName: string;
@@ -347,6 +348,7 @@ export declare const getAllResultService: () => Promise<({
     }>>;
     createdAt: NativeDate;
     resultUploaded: string;
+    uploaderDeleted: boolean;
 })[]>;
 export declare const getResultOrIncidentByIdService: (id: Id) => Promise<{
     result: {
@@ -358,7 +360,7 @@ export declare const getResultOrIncidentByIdService: (id: Id) => Promise<{
         ward: string;
         pollingUnit: string;
         election: Types.ObjectId;
-        user: Types.ObjectId;
+        uploaderDeleted: boolean;
         partiesVotes: Types.DocumentArray<mongoose.FlattenMaps<{
             party?: string | null | undefined;
             count?: number | null | undefined;
@@ -369,6 +371,7 @@ export declare const getResultOrIncidentByIdService: (id: Id) => Promise<{
             party?: string | null | undefined;
             count?: number | null | undefined;
         }>>;
+        user?: Types.ObjectId | null | undefined;
         resultPicture?: mongoose.FlattenMaps<{
             name?: string | null | undefined;
             type?: string | null | undefined;
@@ -422,7 +425,7 @@ export declare const getResultOrIncidentByIdService: (id: Id) => Promise<{
         ward: string;
         pollingUnit: string;
         election: Types.ObjectId;
-        user: Types.ObjectId;
+        uploaderDeleted: boolean;
         userRole: string;
         selectIncident: "Ballot Stuffing" | "Thuggery & Violence" | "Underage Voting" | "INEC Misconduct" | "Result Alteration" | "Voter Intimidation" | "Late Opening" | "Missing Materials" | "Other Incidents" | "Thuggery and Violence" | "Lack of electoral materials" | "Fraudulent electoral officers" | "Late commencement" | "Over voting" | "Other";
         incidentNote: string;
@@ -464,6 +467,7 @@ export declare const getResultOrIncidentByIdService: (id: Id) => Promise<{
             location?: string | null | undefined;
             size?: number | null | undefined;
         }>>;
+        user?: Types.ObjectId | null | undefined;
         uploadLocation?: mongoose.FlattenMaps<{
             latitude?: number | null | undefined;
             longitude?: number | null | undefined;
@@ -530,6 +534,7 @@ export declare const getFlaggedResultsService: () => Promise<({
     }>[];
     createdAt: NativeDate;
     resultUploaded: string;
+    uploaderDeleted: boolean;
     hidden?: undefined;
 } | {
     id: Types.ObjectId;
@@ -585,6 +590,7 @@ export declare const getFlaggedResultsService: () => Promise<({
     }>>;
     createdAt: NativeDate;
     resultUploaded: string;
+    uploaderDeleted: boolean;
 })[]>;
 export declare const deleteFlaggedResults: (id: Id, adminId: Id) => Promise<{
     message: string;
@@ -629,6 +635,7 @@ export declare const deleteFlaggedResults: (id: Id, adminId: Id) => Promise<{
         }>[];
         createdAt: NativeDate;
         resultUploaded: string;
+        uploaderDeleted: boolean;
         hidden?: undefined;
     } | {
         id: Types.ObjectId;
@@ -684,6 +691,7 @@ export declare const deleteFlaggedResults: (id: Id, adminId: Id) => Promise<{
         }>>;
         createdAt: NativeDate;
         resultUploaded: string;
+        uploaderDeleted: boolean;
     })[];
 }>;
 export declare const restoreFlaggedResult: (id: Id, adminId: Id) => Promise<{
@@ -729,6 +737,7 @@ export declare const restoreFlaggedResult: (id: Id, adminId: Id) => Promise<{
         }>[];
         createdAt: NativeDate;
         resultUploaded: string;
+        uploaderDeleted: boolean;
         hidden?: undefined;
     } | {
         id: Types.ObjectId;
@@ -784,6 +793,7 @@ export declare const restoreFlaggedResult: (id: Id, adminId: Id) => Promise<{
         }>>;
         createdAt: NativeDate;
         resultUploaded: string;
+        uploaderDeleted: boolean;
     })[];
 }>;
 export declare const getSingleFlaggedElectionService: (id: Id) => Promise<{
@@ -797,7 +807,7 @@ export declare const getSingleFlaggedElectionService: (id: Id) => Promise<{
         pollingUnit: string;
         election: Types.ObjectId;
         flagged: boolean;
-        user: Types.ObjectId;
+        uploaderDeleted: boolean;
         partiesVotes: Types.DocumentArray<mongoose.FlattenMaps<{
             party?: string | null | undefined;
             count?: number | null | undefined;
@@ -808,6 +818,7 @@ export declare const getSingleFlaggedElectionService: (id: Id) => Promise<{
             party?: string | null | undefined;
             count?: number | null | undefined;
         }>>;
+        user?: Types.ObjectId | null | undefined;
         resultPicture?: mongoose.FlattenMaps<{
             name?: string | null | undefined;
             type?: string | null | undefined;
@@ -900,7 +911,7 @@ export declare const getSingleFlaggedElectionService: (id: Id) => Promise<{
         pollingUnit: string;
         election: Types.ObjectId;
         flagged: boolean;
-        user: Types.ObjectId;
+        uploaderDeleted: boolean;
         userRole: string;
         selectIncident: "Ballot Stuffing" | "Thuggery & Violence" | "Underage Voting" | "INEC Misconduct" | "Result Alteration" | "Voter Intimidation" | "Late Opening" | "Missing Materials" | "Other Incidents" | "Thuggery and Violence" | "Lack of electoral materials" | "Fraudulent electoral officers" | "Late commencement" | "Over voting" | "Other";
         incidentNote: string;
@@ -942,6 +953,7 @@ export declare const getSingleFlaggedElectionService: (id: Id) => Promise<{
             location?: string | null | undefined;
             size?: number | null | undefined;
         }>>;
+        user?: Types.ObjectId | null | undefined;
         uploadLocation?: mongoose.FlattenMaps<{
             latitude?: number | null | undefined;
             longitude?: number | null | undefined;

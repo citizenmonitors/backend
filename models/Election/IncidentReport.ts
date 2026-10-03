@@ -11,7 +11,14 @@ const incidentReportSchema = new mongoose.Schema(
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "CompletedUser",
-      required: true,
+      // Optional so account deletion can keep incidents for collation.
+      required: false,
+      default: null,
+    },
+    /** Set when the uploader deletes their account; incidents stay for collation. */
+    uploaderDeleted: {
+      type: Boolean,
+      default: false,
     },
     userRole: {
       type: String,

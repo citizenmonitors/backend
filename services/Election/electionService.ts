@@ -19,10 +19,36 @@ import {
   dispatchMobileNotification,
   dispatchNotificationToUsers,
 } from "../mobile/notificationDispatchService.ts";
+import { invalidateAllMobileReadCaches } from "../../utils/cache.ts";
 
 const BACKEND_URL = process.env.BACKEND_URL;
 
 type Id = Types.ObjectId | string;
+
+/**
+ * Source of truth for ActiveElection.resultsCount:
+ * count of ElectionData docs for that active election.
+ * Also prunes stale ObjectIds from the `results` array.
+ */
+export const syncActiveElectionResultsCount = async (
+  activeElectionId: Id | null | undefined
+): Promise<number> => {
+  if (!activeElectionId) return 0;
+
+  const [actualCount, resultIds] = await Promise.all([
+    ElectionData.countDocuments({ election: activeElectionId }),
+    ElectionData.find({ election: activeElectionId }).distinct("_id"),
+  ]);
+
+  await ActiveElection.findByIdAndUpdate(activeElectionId, {
+    $set: {
+      results: resultIds,
+      resultsCount: Math.max(0, actualCount),
+    },
+  });
+
+  return Math.max(0, actualCount);
+};
 
 /** Keep ActiveElection.results / resultsCount in sync after a result is deleted. */
 export const detachResultFromActiveElection = async (
@@ -30,17 +56,25 @@ export const detachResultFromActiveElection = async (
   resultId: Id
 ): Promise<void> => {
   if (!activeElectionId) return;
-  const updated = await ActiveElection.findByIdAndUpdate(
-    activeElectionId,
-    { $pull: { results: resultId } },
-    { new: true }
-  );
-  if (!updated) return;
-  const nextCount = Array.isArray(updated.results) ? updated.results.length : 0;
-  if (updated.resultsCount !== nextCount) {
-    updated.resultsCount = Math.max(0, nextCount);
-    await updated.save();
-  }
+  await ActiveElection.findByIdAndUpdate(activeElectionId, {
+    $pull: { results: resultId },
+  });
+  await syncActiveElectionResultsCount(activeElectionId);
+  await invalidateAllMobileReadCaches();
+};
+
+/** Rebuild ActiveElection.incidentReports from real IncidentReport docs. */
+export const syncActiveElectionIncidentRefs = async (
+  activeElectionId: Id | null | undefined
+): Promise<number> => {
+  if (!activeElectionId) return 0;
+  const incidentIds = await IncidentReport.find({
+    election: activeElectionId,
+  }).distinct("_id");
+  await ActiveElection.findByIdAndUpdate(activeElectionId, {
+    $set: { incidentReports: incidentIds },
+  });
+  return incidentIds.length;
 };
 
 /** Keep ActiveElection.incidentReports in sync after an incident is deleted. */
@@ -52,6 +86,8 @@ export const detachIncidentFromActiveElection = async (
   await ActiveElection.findByIdAndUpdate(activeElectionId, {
     $pull: { incidentReports: incidentId },
   });
+  await syncActiveElectionIncidentRefs(activeElectionId);
+  await invalidateAllMobileReadCaches();
 };
 
 /** Bulk-detach many result/incident ids grouped by active election. */
@@ -68,17 +104,10 @@ export const detachSubmissionsFromActiveElections = async (input: {
     resultsByElection.set(key, list);
   }
   for (const [electionId, ids] of resultsByElection) {
-    const updated = await ActiveElection.findByIdAndUpdate(
-      electionId,
-      { $pull: { results: { $in: ids } } },
-      { new: true }
-    );
-    if (!updated) continue;
-    updated.resultsCount = Math.max(
-      0,
-      Array.isArray(updated.results) ? updated.results.length : 0
-    );
-    await updated.save();
+    await ActiveElection.findByIdAndUpdate(electionId, {
+      $pull: { results: { $in: ids } },
+    });
+    await syncActiveElectionResultsCount(electionId);
   }
 
   const incidentsByElection = new Map<string, Id[]>();
@@ -93,6 +122,11 @@ export const detachSubmissionsFromActiveElections = async (input: {
     await ActiveElection.findByIdAndUpdate(electionId, {
       $pull: { incidentReports: { $in: ids } },
     });
+    await syncActiveElectionIncidentRefs(electionId);
+  }
+
+  if (resultsByElection.size > 0 || incidentsByElection.size > 0) {
+    await invalidateAllMobileReadCaches();
   }
 };
 
@@ -1084,10 +1118,10 @@ export const uploadResultDataService = async (
     // Save the election result data
     const savedResultData = await electionData.save();
 
-    // Update the election document with the new result
-    activeElection.results.push(savedResultData._id);
-    activeElection.resultsCount += 1;
-    await activeElection.save();
+    // Rebuild results[] + resultsCount from ElectionData (avoids stale array /
+    // concurrent-upload races from read-modify-write on ActiveElection).
+    await syncActiveElectionResultsCount(electionId);
+    await invalidateAllMobileReadCaches();
 
     // Convert electionType and stateName to Title Case for notifications
     const toTitleCase = (text: string) =>
@@ -1566,7 +1600,8 @@ export const getAllElectionResults = async () => {
           electionName: election.election?.electionName,
           // startDate: activeElections.electionLocation.startDate,
           // endDate: activeElections.electionLocation.endDate,
-          resultsCount: election.resultsCount,
+          // Prefer live count over denormalized ActiveElection.resultsCount.
+          resultsCount: results.length,
         },
         results: aggregatedResults,
         incidents: aggregateIncidents(incidents) || [],
@@ -1721,8 +1756,8 @@ export const uploadIncidentReportDataService = async (
 
     // Save and return
     const savedReport = await incidentReport.save();
-    activeElection.incidentReports.push(savedReport._id);
-    await activeElection.save();
+    await syncActiveElectionIncidentRefs(electionId);
+    await invalidateAllMobileReadCaches();
 
     await dispatchMobileNotification({
       type: "incident-upload",
@@ -2158,7 +2193,7 @@ export const getResultsAndPerformAction = async (
 
     const activeElectionId = data.election ? String(data.election) : undefined;
 
-    if (String(data.user) === String(userId)) {
+    if (data.user && String(data.user) === String(userId)) {
       throw new Error("You cannot act on your own result or incident.");
     }
 
@@ -2251,14 +2286,16 @@ export const getResultsAndPerformAction = async (
         } else {
           existingAction.action = "agree";
           if (evidenceId) existingAction.evidenceId = evidenceId;
-          await dispatchNotificationToUsers({
-            type: "report-confirmed",
-            preferenceKey: "reportConfirmed",
-            body: "Your report/result received a confirmation.",
-            info: "Another user agreed with your submission.",
-            activeElectionId,
-            userIds: [String(data.user)],
-          });
+          if (data.user) {
+            await dispatchNotificationToUsers({
+              type: "report-confirmed",
+              preferenceKey: "reportConfirmed",
+              body: "Your report/result received a confirmation.",
+              info: "Another user agreed with your submission.",
+              activeElectionId,
+              userIds: [String(data.user)],
+            });
+          }
         }
       } else if (actionData.action === "flag") {
         existingAction.action = "flag";
@@ -2270,7 +2307,7 @@ export const getResultsAndPerformAction = async (
           existingAction.flagVideo = flagMediaEmbedded.flagVideo;
         }
         existingAction.evidenceId = evidenceId;
-        if (!wasAlreadyFlaggedByActor) {
+        if (!wasAlreadyFlaggedByActor && data.user) {
           await dispatchNotificationToUsers({
             type: "report-flagged",
             preferenceKey: "reportFlagged",
@@ -2319,26 +2356,30 @@ export const getResultsAndPerformAction = async (
         if (flagMediaEmbedded.flagVideo) {
           newAction.flagVideo = flagMediaEmbedded.flagVideo;
         }
-        await dispatchNotificationToUsers({
-          type: "report-flagged",
-          preferenceKey: "reportFlagged",
-          body: "Your report/result was flagged for review.",
-          info: formatFlagNotificationInfo(
-            actionData.flagReason,
-            flagMediaEmbedded
-          ),
-          activeElectionId,
-          userIds: [String(data.user)],
-        });
+        if (data.user) {
+          await dispatchNotificationToUsers({
+            type: "report-flagged",
+            preferenceKey: "reportFlagged",
+            body: "Your report/result was flagged for review.",
+            info: formatFlagNotificationInfo(
+              actionData.flagReason,
+              flagMediaEmbedded
+            ),
+            activeElectionId,
+            userIds: [String(data.user)],
+          });
+        }
       } else if (actionData.action === "agree") {
-        await dispatchNotificationToUsers({
-          type: "report-confirmed",
-          preferenceKey: "reportConfirmed",
-          body: "Your report/result received a confirmation.",
-          info: "Another user agreed with your submission.",
-          activeElectionId,
-          userIds: [String(data.user)],
-        });
+        if (data.user) {
+          await dispatchNotificationToUsers({
+            type: "report-confirmed",
+            preferenceKey: "reportConfirmed",
+            body: "Your report/result received a confirmation.",
+            info: "Another user agreed with your submission.",
+            activeElectionId,
+            userIds: [String(data.user)],
+          });
+        }
       }
       data.actions.push(newAction);
     }

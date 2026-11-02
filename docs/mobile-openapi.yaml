@@ -870,7 +870,10 @@ paths:
         - in: query
           name: limit
           schema: { type: integer, default: 20 }
-      responses: { "200": { description: OK } }
+        - in: query
+          name: scope
+          schema: { type: string, enum: [all, state, lga, ward, polling-unit], default: all }
+      responses: { "200": { description: OK }, "401": { description: Missing or invalid token } }
     post:
       tags: [Pulse]
       summary: Create pulse post
@@ -883,14 +886,85 @@ paths:
               required: [body]
               properties:
                 body: { type: string }
-                visibilityScope: { type: string, enum: [ward, lga], default: lga }
+                visibilityScope: { type: string, enum: [all, state, lga, ward, polling-unit], default: all }
                 useAnonymousDisplay: { type: boolean }
                 image: { type: string, format: binary }
       responses: { "201": { description: Created } }
+  /pulse/posts/{postId}:
+    patch:
+      tags: [Pulse]
+      summary: Edit your pulse post (only fields sent are changed)
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema: { type: string }
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                body: { type: string }
+                visibilityScope: { type: string, enum: [all, state, lga, ward, polling-unit] }
+                useAnonymousDisplay: { type: boolean }
+                removeImage: { type: boolean }
+                image: { type: string, format: binary }
+          application/json:
+            schema:
+              type: object
+              properties:
+                body: { type: string }
+                visibilityScope: { type: string, enum: [all, state, lga, ward, polling-unit] }
+                useAnonymousDisplay: { type: boolean }
+                removeImage: { type: boolean }
+      responses: { "200": { description: Updated }, "400": { description: Invalid input or repost }, "403": { description: Not your post }, "404": { description: Not found } }
+    delete:
+      tags: [Pulse]
+      summary: Delete your pulse post (also removes its comments; originals also remove their reposts)
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema: { type: string }
+      responses: { "200": { description: Deleted }, "403": { description: Not your post }, "404": { description: Not found } }
+  /pulse/posts/{postId}/repost:
+    post:
+      tags: [Pulse]
+      summary: Repost a pulse post
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema: { type: string }
+      responses: { "201": { description: Created }, "409": { description: Already reposted or own post } }
+    delete:
+      tags: [Pulse]
+      summary: Undo your repost (postId may be the original or your repost)
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema: { type: string }
+      responses: { "200": { description: Repost removed }, "404": { description: Not reposted } }
   /pulse/posts/{postId}/like:
     post:
       tags: [Pulse]
       summary: Like/unlike pulse post
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema: { type: string }
+      responses: { "200": { description: Updated } }
+    delete:
+      tags: [Pulse]
+      summary: Unlike pulse post (idempotent)
       security: [{ bearerAuth: [] }]
       parameters:
         - in: path
@@ -929,6 +1003,43 @@ paths:
                 body: { type: string }
                 useAnonymousDisplay: { type: boolean }
       responses: { "201": { description: Created } }
+  /pulse/posts/{postId}/comments/{commentId}:
+    patch:
+      tags: [Pulse]
+      summary: Edit your pulse comment
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema: { type: string }
+        - in: path
+          name: commentId
+          required: true
+          schema: { type: string }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                body: { type: string }
+                useAnonymousDisplay: { type: boolean }
+      responses: { "200": { description: Updated }, "403": { description: Not your comment }, "404": { description: Not found } }
+    delete:
+      tags: [Pulse]
+      summary: Delete a pulse comment (comment author or post author)
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema: { type: string }
+        - in: path
+          name: commentId
+          required: true
+          schema: { type: string }
+      responses: { "200": { description: Deleted }, "403": { description: Not allowed }, "404": { description: Not found } }
   /pulse/posts/{postId}/comments/{commentId}/like:
     post:
       tags: [Pulse]
@@ -944,6 +1055,98 @@ paths:
           required: true
           schema: { type: string }
       responses: { "200": { description: Updated } }
+    delete:
+      tags: [Pulse]
+      summary: Unlike pulse comment (idempotent)
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema: { type: string }
+        - in: path
+          name: commentId
+          required: true
+          schema: { type: string }
+      responses: { "200": { description: Updated } }
+
+  /pulse/posts/{postId}/report:
+    post:
+      tags: [Pulse]
+      summary: Report a pulse post (reposts report the original)
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, enum: [spam, harassment, hate, violence, sexual, misinformation, other] }
+                details: { type: string, maxLength: 1000 }
+      responses: { "201": { description: Reported }, "400": { description: Invalid reason or own content }, "404": { description: Not found }, "409": { description: Already reported } }
+  /pulse/posts/{postId}/comments/{commentId}/report:
+    post:
+      tags: [Pulse]
+      summary: Report a pulse comment
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema: { type: string }
+        - in: path
+          name: commentId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, enum: [spam, harassment, hate, violence, sexual, misinformation, other] }
+                details: { type: string, maxLength: 1000 }
+      responses: { "201": { description: Reported }, "400": { description: Invalid reason or own content }, "404": { description: Not found }, "409": { description: Already reported } }
+  /pulse/blocks:
+    get:
+      tags: [Pulse]
+      summary: List your blocks (display names only, no account ids)
+      security: [{ bearerAuth: [] }]
+      responses: { "200": { description: OK } }
+    post:
+      tags: [Pulse]
+      summary: Block the author of a post or comment (idempotent). Hides content both ways and blocks interactions.
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                postId: { type: string }
+                commentId: { type: string }
+      responses: { "200": { description: Blocked }, "400": { description: Missing postId/commentId, or your own content }, "404": { description: Content not found } }
+  /pulse/blocks/{blockId}:
+    delete:
+      tags: [Pulse]
+      summary: Unblock (idempotent)
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: blockId
+          required: true
+          schema: { type: string }
+      responses: { "200": { description: Unblocked } }
 
   /notifications:
     get:

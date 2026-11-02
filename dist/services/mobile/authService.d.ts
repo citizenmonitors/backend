@@ -88,6 +88,8 @@ export declare const mobileContinueWithGoogle: (idToken: string, mobileMeta?: Mo
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
+            legacyExpoExperienceId?: string | null | undefined;
+            legacyExpoDetectedAt?: NativeDate | null | undefined;
         } | null | undefined;
         authProviders?: {
             google?: {
@@ -322,6 +324,8 @@ export declare const mobileSelectRole: (email: string, role: string) => Promise<
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
+            legacyExpoExperienceId?: string | null | undefined;
+            legacyExpoDetectedAt?: NativeDate | null | undefined;
         } | null | undefined;
         authProviders?: {
             google?: {
@@ -434,6 +438,8 @@ export declare const mobileSubmitObserverDetails: (input: {
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
+            legacyExpoExperienceId?: string | null | undefined;
+            legacyExpoDetectedAt?: NativeDate | null | undefined;
         } | null | undefined;
         authProviders?: {
             google?: {
@@ -545,6 +551,8 @@ export declare const mobileSignIn: (payload: {
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
+            legacyExpoExperienceId?: string | null | undefined;
+            legacyExpoDetectedAt?: NativeDate | null | undefined;
         } | null | undefined;
         authProviders?: {
             google?: {
@@ -661,6 +669,8 @@ export declare const mobileValidateSession: (token: string) => Promise<{
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
+            legacyExpoExperienceId?: string | null | undefined;
+            legacyExpoDetectedAt?: NativeDate | null | undefined;
         } | null | undefined;
         authProviders?: {
             google?: {

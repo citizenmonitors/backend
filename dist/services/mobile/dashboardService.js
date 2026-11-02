@@ -5,6 +5,7 @@ import CollationDiscussionPost from "../../models/Election/CollationDiscussionPo
 import CollationDiscussionComment from "../../models/Election/CollationDiscussionComment.js";
 import PulsePost from "../../models/Pulse/PulsePost.js";
 import PulseComment from "../../models/Pulse/PulseComment.js";
+import { buildViewerSafetyFilter } from "./pulseService.js";
 import { getMobileLiveElectionsCarousel } from "./electionService.js";
 import { getOrSetCache } from "../../utils/cache.js";
 import { buildHideConcludedElectionNotificationsFilter } from "../../utils/electionNotificationVisibility.js";
@@ -56,11 +57,13 @@ const relativeTime = (date) => {
 const normalizeLocationKey = (value) => String(value ?? "")
     .trim()
     .toLowerCase();
-const resolveAuthorName = (author) => author?.firstName
-    ? `${author.firstName} ${author.lastName ?? ""}`.trim()
-    : author?.anonymousUsername
-        ? `@${author.anonymousUsername}`
-        : "Member";
+/** Same rule as the Pulse feed: an anonymous post shows only the anonymous handle. */
+const resolveAuthorName = (author, useAnonymousDisplay) => {
+    if (useAnonymousDisplay && author?.anonymousUsername)
+        return `@${author.anonymousUsername}`;
+    const name = [author?.firstName, author?.lastName].filter(Boolean).join(" ").trim();
+    return name || "Member";
+};
 const DASHBOARD_CACHE_TTL_SECONDS = 45;
 const buildDashboardCacheKey = (user) => {
     const userId = String(user._id ?? "");
@@ -77,7 +80,10 @@ const buildMobileDashboard = async (user) => {
     const role = String(user.role ?? "");
     const liveElections = await getMobileLiveElectionsCarousel(user);
     const liveIds = liveElections.map((e) => e.id);
-    const concludedElectionNotificationFilter = await buildHideConcludedElectionNotificationsFilter();
+    const [concludedElectionNotificationFilter, pulseSafety] = await Promise.all([
+        buildHideConcludedElectionNotificationsFilter(),
+        buildViewerSafetyFilter(userId),
+    ]);
     const [electionNotifications, discussionPosts, pulsePosts, insights, pressCoverageFeed] = await Promise.all([
         Notification.find({
             $and: [
@@ -108,7 +114,7 @@ const buildMobileDashboard = async (user) => {
                 .limit(10)
                 .lean()
             : Promise.resolve([]),
-        PulsePost.find({})
+        PulsePost.find(pulseSafety.filter)
             .populate("author", "firstName lastName anonymousUsername")
             .sort({ createdAt: -1 })
             .limit(10)
@@ -174,7 +180,7 @@ const buildMobileDashboard = async (user) => {
                 imageUrl: Array.isArray(p.imageUrls) ? p.imageUrls[0] : undefined,
                 likesCount: Array.isArray(p.likes) ? p.likes.length : 0,
                 commentsCount: discussionCommentCountByPost.get(String(p._id)) ?? 0,
-                authorName: resolveAuthorName(author),
+                authorName: resolveAuthorName(author, Boolean(p.useAnonymousDisplay)),
                 timeAgo: relativeTime(p.createdAt),
                 createdAt: p.createdAt,
             };
@@ -189,7 +195,7 @@ const buildMobileDashboard = async (user) => {
                     imageUrl: p.imageUrl,
                     likesCount: Array.isArray(p.likes) ? p.likes.length : 0,
                     commentsCount: pulseCommentCountByPost.get(String(p._id)) ?? 0,
-                    authorName: resolveAuthorName(author),
+                    authorName: resolveAuthorName(author, Boolean(p.useAnonymousDisplay)),
                     timeAgo: relativeTime(p.createdAt),
                     createdAt: p.createdAt,
                 };

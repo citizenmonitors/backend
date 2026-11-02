@@ -67,7 +67,7 @@ export declare const getMobileElectionSubmissionByActiveElection: (activeElectio
             pollingUnit: string;
             election: Types.ObjectId;
             flagged: boolean;
-            user: Types.ObjectId;
+            uploaderDeleted: boolean;
             partiesVotes: Types.DocumentArray<{
                 party?: string | null | undefined;
                 count?: number | null | undefined;
@@ -200,6 +200,7 @@ export declare const getMobileElectionSubmissionByActiveElection: (activeElectio
                 __v: number;
             })>;
             agreed: boolean;
+            user?: Types.ObjectId | null | undefined;
             resultPicture?: {
                 name?: string | null | undefined;
                 type?: string | null | undefined;
@@ -246,7 +247,7 @@ export declare const getMobileElectionSubmissionByActiveElection: (activeElectio
             pollingUnit: string;
             election: Types.ObjectId;
             flagged: boolean;
-            user: Types.ObjectId;
+            uploaderDeleted: boolean;
             userRole: string;
             actions: Types.DocumentArray<{
                 action: "agree" | "flag";
@@ -410,6 +411,7 @@ export declare const getMobileElectionSubmissionByActiveElection: (activeElectio
                 location?: string | null | undefined;
                 size?: number | null | undefined;
             }>;
+            user?: Types.ObjectId | null | undefined;
             uploadLocation?: {
                 latitude?: number | null | undefined;
                 longitude?: number | null | undefined;

@@ -158,6 +158,8 @@ export declare const selectUserRole: (email: string, role: string) => Promise<{
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
+            legacyExpoExperienceId?: string | null | undefined;
+            legacyExpoDetectedAt?: NativeDate | null | undefined;
         } | null | undefined;
         authProviders?: {
             google?: {
@@ -268,6 +270,8 @@ export declare const submitObserverDetails: ({ email, observerIdFiles: observerI
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
+            legacyExpoExperienceId?: string | null | undefined;
+            legacyExpoDetectedAt?: NativeDate | null | undefined;
         } | null | undefined;
         authProviders?: {
             google?: {
@@ -376,6 +380,8 @@ export declare const authenticateUser: ({ email, password }: AuthCredentials) =>
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
+            legacyExpoExperienceId?: string | null | undefined;
+            legacyExpoDetectedAt?: NativeDate | null | undefined;
         } | null | undefined;
         authProviders?: {
             google?: {
@@ -489,6 +495,8 @@ export declare const validateTokenService: (token: string) => Promise<{
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
+            legacyExpoExperienceId?: string | null | undefined;
+            legacyExpoDetectedAt?: NativeDate | null | undefined;
         } | null | undefined;
         authProviders?: {
             google?: {

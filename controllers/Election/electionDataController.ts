@@ -35,6 +35,8 @@ const requireUserId = (req: AuthenticatedRequest): Types.ObjectId | string => {
   return userId;
 };
 
+
+
 export const createElection = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const adminId = requireUserId(req);

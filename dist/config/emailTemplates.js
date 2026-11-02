@@ -296,7 +296,7 @@ export const pvcIssueInternalNotificationTemplate = ({ reportId, fullName, phone
       ${otherIssueDetail ? `<p><strong>Other Detail:</strong> ${otherIssueDetail}</p>` : ""}
       <p><strong>Description:</strong> ${description}</p>
       <p><strong>Evidence files:</strong> ${evidenceCount}</p>
-    `,
+                                            `,
 });
 // Speaker slot booking – confirmation to speaker (72-Hour X Space)
 export const speakerSlotConfirmationTemplate = ({ firstName, date, timeWAT, theme, sessionType }) => baseTemplate({
@@ -3405,6 +3405,210 @@ export const newsLetterTemplateFactCheckPeterObiMoneyOrDebtsAsGovernor = () => b
                   <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">A breakdown of cash, investments, receivables and restricted funds. A schedule of domestic and external debt, guarantees, unpaid certificates and other liabilities. Independent reconciliation of the figures by the relevant state and federal financial authorities. Without these documents, political arguments can easily confuse cash with investments, debt with unpaid bills, and allegations with audited findings.</p>
 
                   <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">A governor's financial legacy should not be measured by a headline figure alone, but a transparent, verifiable financial position: what it owned, what it owed, what it had invested, and what obligations it passed to its successor. Peter Obi's record in Anambra deserves to be examined with the same standard applied to every governor and President, regardless of party or political ambition. Public money demands public evidence.</p>
+
+                  <p style="margin:10px 0 0;font-size:12px;line-height:1.5;font-style:italic;color:#555555;">
+                    Promoting transparency, accountability and informed public discourse.
+                  </p>
+    `.trim(),
+});
+export const newsLetterTemplateDoesTinubuDeserveASecondTerm = () => buildNewsletterEditionEmailHtml({
+    title: "Does President Tinubu Deserve a Second Term?",
+    bodyHtml: `
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;"><strong>Dear Citizen Monitors,</strong></p>
+
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">After almost four years in office, Nigerians have enough experience of the Tinubu administration to ask a very simple question: Has Nigeria become better under President Bola Ahmed Tinubu? The question is about his record. And Nigerians should examine that record before deciding whether he deserves another four years.</p>
+
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">What has changed in Nigeria since May 2023, what has it cost Nigerians, and what evidence is there that the direction of the country is improving?</p>
+
+                  <h4 style="color:#06BBAF;margin:10px 0 6px;font-size:14px;line-height:1.35;">The case for Tinubu</h4>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">President Tinubu inherited an economy with serious structural problems and chose to confront some of them aggressively. He removed the petrol subsidy. He changed the foreign-exchange regime. He pursued tax reform. He increased government revenues. He has promoted major infrastructure projects and argued that painful reforms are necessary to put Nigeria on a more sustainable economic footing. There are also signs of improved macroeconomic performance.</p>
+
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">Nigeria recorded 4.43% real GDP growth in the second quarter of 2026, according to the National Bureau of Statistics. So, supporters of the administration can legitimately argue: The reforms are beginning to work. But that is only half of the story.</p>
+
+                  <h4 style="color:#06BBAF;margin:10px 0 6px;font-size:14px;line-height:1.35;">The case Nigerians are feeling</h4>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">Ask the average Nigerian what has changed. The answer may not sound like a GDP report. Food remains expensive. Transport remains expensive. Electricity costs remain a major burden. Businesses continue to struggle with operating costs. The naira's loss of value has affected household purchasing power. And petrol prices have risen dramatically since the subsidy was removed.</p>
+
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">The administration can point to improving economic indicators. But the ordinary Nigerian can ask: <strong>"When will I feel the improvement in my pocket?"</strong></p>
+
+                  <h4 style="color:#06BBAF;margin:10px 0 6px;font-size:14px;line-height:1.35;">What about security?</h4>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">Nigeria cannot be declared economically successful if citizens cannot safely travel, farm, trade or sleep in their homes. The Tinubu administration inherited terrorism, banditry, kidnapping and other security challenges. But after more than three years in office, the responsibility for the country's current security situation also belongs substantially to the current government.</p>
+
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">So, Nigerians should ask: Are we safer today? Are kidnappings declining? Are terrorists losing territory and capacity? Can farmers return safely to their farms? Can Nigerians travel on major roads without fear? Are security agencies better equipped and better coordinated? The answers should come from evidence; not political propaganda.</p>
+
+                  <h4 style="color:#06BBAF;margin:10px 0 6px;font-size:14px;line-height:1.35;">And then there is accountability</h4>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">A president asking for another four years should also explain failures. What happened to promises that have not been fulfilled? Why have some projects taken longer or cost more than expected? How effectively is public money being spent? Are government institutions becoming stronger and more independent? Are citizens getting value for their taxes? And perhaps most importantly: Can Nigerians hold government accountable without political intimidation or partisan hostility? These questions should apply to whoever occupies Aso Rock.</p>
+
+                  <h4 style="color:#06BBAF;margin:10px 0 6px;font-size:14px;line-height:1.35;">The real test</h4>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">Perhaps the biggest mistake Nigerians can make in 2027 is to reduce the election to: Tinubu versus whoever. That is too simplistic. The real comparison should be: Promises versus delivery. Policies versus consequences. Expenditure versus value. Growth versus household welfare. Security promises versus security outcomes. Political speeches versus measurable results.</p>
+
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">And finally: Tinubu's record versus the alternatives being offered to Nigerians.</p>
+
+                  <h4 style="color:#06BBAF;margin:10px 0 6px;font-size:14px;line-height:1.35;">So, does he deserve a second term?</h4>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">That is a question for you. If you believe the answer is yes, ask one more question: Can the administration do even better with another four years? If your answer is no, ask yourself: Who has a credible alternative; and how will that alternative actually work? Because changing a president is easy. Changing Nigeria is not. 2027 should therefore not be about finding the politician Nigerians love most. It should be about deciding what kind of government Nigerians want; and which candidate has provided the most credible evidence that they can deliver it.</p>
+
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;"><strong>Your vote is not a thank-you note. It is your decision for the next four years.</strong> Nigeria belongs to all of us. The responsibility to choose belongs to each of us; and Citizen Monitors allows us collate election results directly from polling units, to ensure whoever is the winner of the elections, is who the voters chose.</p>
+
+                  <p style="margin:10px 0 0;font-size:12px;line-height:1.5;font-style:italic;color:#555555;">
+                    Promoting transparency, accountability and informed public discourse.
+                  </p>
+    `.trim(),
+});
+export const newsLetterTemplate66YearsAfterCredibleLeadership = () => buildNewsletterEditionEmailHtml({
+    title: "66 Years After, Will Nigeria Have Credible Leadership?",
+    bodyHtml: `
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;"><strong>Dear Citizen Monitors,</strong></p>
+
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">Sixty-six years after independence, Nigeria has changed governments, rewritten political arrangements, survived coups, returned to democracy and produced some of Africa's most talented people. Yet one thing remains stubbornly unresolved; the quality of leadership at the centre of power.</p>
+
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">On October 1, 1960, Nigeria became independent with enormous promise. We inherited a country rich in natural resources, human capital and cultural diversity. We had universities, a functioning civil service, a growing economy and a political class that, despite its imperfections, produced leaders who had demonstrated themselves in public life before seeking the highest offices. Sixty-six years later, Nigeria is still asking many of the same basic questions.</p>
+
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">Why is electricity still unreliable? Why are roads that consume billions of naira repeatedly reconstructed? Why does a country blessed with oil, gas and enormous human resources continue to struggle with poverty? Why do citizens often feel that government exists for those who control it, rather than for those who fund it? And perhaps most importantly: where is the credible leadership capable of changing this trajectory?</p>
+
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">We have had leaders with grand visions and leaders with little vision. Leaders who promised transformation and leaders who mastered survival. We have watched enormous public wealth pass through government, while millions of citizens continue to struggle with the basics of a decent life. So, as Nigeria approaches another consequential political cycle, the question is no longer merely who will lead; but who can Nigerians actually trust with power? Because after 66 years, Nigeria should be searching for credible leadership.</p>
+
+                  <h4 style="color:#06BBAF;margin:10px 0 6px;font-size:14px;line-height:1.35;">What is credible leadership?</h4>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">Credibility is not simply about being popular. It is not about speaking eloquently, winning elections, commanding a large political structure or having thousands of followers on social media. A credible leader should possess integrity, competence, accountability, courage and a demonstrable record of service.</p>
+
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">Credible leadership means saying what you believe and doing what you promised. It means accepting responsibility when things go wrong rather than always finding someone else to blame. It means understanding that public money is not personal money. It means respecting institutions even when those institutions disagree with you. It means appointing people because they are competent; not merely because they are loyal. And perhaps most importantly, it means understanding that political power is a temporary trust, not a personal entitlement.</p>
+
+                  <h4 style="color:#06BBAF;margin:10px 0 6px;font-size:14px;line-height:1.35;">Have we had credible leaders?</h4>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">This is where Nigerians often become divided. Some point to individual leaders and highlight their achievements. Others remember their failures, controversies and shortcomings. The truth may be more complicated. Nigeria has produced leaders with genuine achievements. It has also produced leaders whose administrations were undermined by corruption, poor judgment, weak institutions, political manipulation or an unwillingness to confront difficult problems. Perhaps the mistake is in looking for a perfect Nigerian leader. There probably isn't one. We ought to seek leaders who have demonstrated enough integrity, competence and accountability to deserve the public trust to be placed in them.</p>
+
+                  <h4 style="color:#06BBAF;margin:10px 0 6px;font-size:14px;line-height:1.35;">The problem may not only be the leaders</h4>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">Leadership reflects society. We complain about corruption while sometimes celebrating unexplained wealth. We condemn vote buying while accepting money during elections. We demand accountability but defend politicians because they belong to our ethnic group, religion or political party. If Nigeria wants credible leadership, Nigerians must become more demanding citizens.</p>
+
+                  <h4 style="color:#06BBAF;margin:10px 0 6px;font-size:14px;line-height:1.35;">Elections must become a test of character and record</h4>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">A presidential election should be more than a contest of slogans, identity or political loyalty. It should be an examination of character, record and capacity. As Nigeria moves toward 2027, voters have an opportunity to ask better questions:</p>
+
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">Not: Where is the candidate from? What religion does the candidate practise? Which party does the candidate belong to? How much can the candidate give us? But; <strong>What has this person actually done before?</strong></p>
+
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">Credible leadership will not appear simply because another election is announced. It will emerge when voters scrutinise records, journalists investigate rather than amplify propaganda, civil society demands evidence, institutions command respect and citizens understand that their vote is not a favour to a politician. It is a contract.</p>
+
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">Nigeria does not need a perfect leader. She needs leaders whose records can withstand scrutiny, whose exercise of power is constrained by strong institutions and who can be held accountable by citizens. Are Nigerians ready to choose leaders who will serve Nigeria rather than themselves? That is the real test of 2027. And the Citizen Monitors App helps us digitally secure our polling units by documenting and collating results directly from polling units, making it impossible to doctor results at collation centres. Tell three voters about Citizen Monitors App today.</p>
+
+                  <p style="margin:10px 0 0;font-size:12px;line-height:1.5;font-style:italic;color:#555555;">
+                    Promoting transparency, accountability and informed public discourse.
+                  </p>
+    `.trim(),
+});
+export const newsLetterTemplate2027NextGenerationOfLeaders = () => buildNewsletterEditionEmailHtml({
+    title: "2027: What Should Define Nigeria’s Next Generation of Leaders?",
+    bodyHtml: `
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;"><strong>Dear Citizen Monitors,</strong></p>
+
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">Nigeria needs a new standard of leadership. As the country approaches another defining general election, Nigerians must ask: What should truly qualify anyone to lead this country? Should it be political connections, wealth, party loyalty, ethnic identity, religious affiliation or the ability to mobilise crowds? Or should leadership be defined by competence, integrity, accountability and a demonstrable commitment to the welfare of citizens?</p>
+
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">For too long, Nigerian politics has placed more emphasis on winning elections than on delivering good governance. Political calculations often overshadow public interest, while campaign promises are forgotten once power is secured. Citizens are left to contend with insecurity, unemployment, rising living costs, failing infrastructure and diminishing confidence in public institutions. Yet, Nigeria is not short of talented, intelligent and hardworking people. What remains is whether our political system can consistently identify, elect and hold accountable those capable of translating the country’s enormous potential into tangible progress.</p>
+
+                  <h4 style="color:#06BBAF;margin:10px 0 6px;font-size:14px;line-height:1.35;">Beyond slogans and political loyalty</h4>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">What Nigeria needs is a generation of leaders, young and old, who understand that public office is a responsibility, not a personal reward. They must demonstrate the capacity to make difficult decisions, manage public resources transparently, strengthen institutions and deliver measurable results. They must respect the rule of law, protect citizens’ rights and recognise that no individual, political party or ethnic group is greater than the country. Above all, they must understand that leadership is about service, not the accumulation of power and privilege.</p>
+
+                  <h4 style="color:#06BBAF;margin:10px 0 6px;font-size:14px;line-height:1.35;">The character test</h4>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">We must examine the character and records of those seeking our votes. What have they done with the opportunities and responsibilities they have previously held? Can they explain how they intend to address Nigeria’s problems? Are they willing to answer difficult questions? Do they respect democratic institutions? Can they unite a divided country without exploiting its ethnic, religious and political differences? These questions matter because the consequences of poor leadership are not abstract.</p>
+
+                  <h4 style="color:#06BBAF;margin:10px 0 6px;font-size:14px;line-height:1.35;">The responsibility is ours, too</h4>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">We must stop treating elections as opportunities to collect temporary benefits from politicians. Our votes are instruments for determining the direction of our country and the future of generations yet unborn. The media, civil society organisations and election-monitoring groups also have a responsibility to scrutinise candidates, verify claims and provide citizens with the information they need to make informed choices. Ultimately, the quality of our leaders will reflect the standards we are prepared to demand and defend.</p>
+
+                  <h4 style="color:#06BBAF;margin:10px 0 6px;font-size:14px;line-height:1.35;">The question for 2027</h4>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">The coming elections present an opportunity to move beyond familiar political loyalties and insist on a leadership culture built on competence, character, transparency and measurable performance. What single quality should be non-negotiable for anyone seeking to lead Nigeria in 2027? Is it integrity, competence, courage, accountability or something else? Citizen Monitors App helps us digitally secure our polling units by documenting and collating results directly from polling units; ensuring we have credible elections for leaders with these qualities to emerge. Tell three voters about Citizen Monitors App today.</p>
+
+                  <p style="margin:10px 0 0;font-size:12px;line-height:1.5;font-style:italic;color:#555555;">
+                    Promoting transparency, accountability and informed public discourse.
+                  </p>
+    `.trim(),
+});
+export const newsLetterTemplate2027WhoDeterminesNigeriasLeadership = () => buildNewsletterEditionEmailHtml({
+    title: "2027 Elections; Who Determines Nigeria’s Leadership?",
+    bodyHtml: `
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;"><strong>Dear Citizen Monitors,</strong></p>
+
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">When Nigerians go to the polls in 2027, will they choose their leaders, or will the real decisions have been made elsewhere? This is a question we must confront honestly as Nigeria approaches another pivotal election. Sovereignty means little if citizens cannot freely determine who governs them, how their votes are counted, and whose interests elected leaders ultimately serve.</p>
+
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">Every election season, politicians ask Nigerians for their votes, promising economic recovery, security, jobs and a better future. Yet, between campaign promises and the final declaration of results, powerful interests often compete to shape the outcome. Political godfathers, wealthy financiers, party structures, influential business interests and those who control access to public resources can exercise enormous influence over who emerges as a candidate and who eventually wins.</p>
+
+                  <h4 style="color:#06BBAF;margin:10px 0 6px;font-size:14px;line-height:1.35;">Foreign influence and the national interest</h4>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">But there is another dimension to this question: the influence of foreign powers over Nigeria’s political and economic future. Nigeria is sovereign, yet her economic partnerships, strategic agreements and dependence on foreign investment can affect the choices available to her government. Deals involving natural resources, critical minerals, infrastructure, ports and security cooperation deserve public scrutiny. Whether the partners are Britain, the United States, France, China or any other country, Nigerians deserve to know what is being agreed, who benefits, what the country gives up, and whether these arrangements serve the national interest. International partnerships can create jobs, develop infrastructure and strengthen the economy. The danger arises when agreements are negotiated without sufficient transparency, public accountability or meaningful scrutiny of their long-term implications.</p>
+
+                  <h4 style="color:#06BBAF;margin:10px 0 6px;font-size:14px;line-height:1.35;">Institutions, integrity and citizen power</h4>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">However, we must not blame foreign powers for every failure of Nigerian leadership. Foreign influence becomes more consequential when domestic institutions are weak, political financing is opaque, public officials evade accountability and citizens are excluded from decisions that affect their future. The independence and credibility of the Independent National Electoral Commission (INEC), the neutrality of security agencies, the conduct of political parties, the integrity of election technology and the transparency of result collation will all matter. So will the willingness of the judiciary to dispense justice impartially. If votes can be bought, results manipulated, citizens intimidated and electoral disputes compromised, then the people’s mandate becomes vulnerable to those with money, influence or coercive power. Yet, the responsibility does not rest with institutions alone. This is where citizen-led election monitoring becomes essential. When voters document incidents, report irregularities, verify evidence and independently monitor results at polling-unit level, they help make electoral manipulation more difficult to conceal. Through Citizen Monitors, the objective is simple; empower citizens to protect their votes with credible evidence, and help ensure that the people’s choices are not erased between the polling unit and the final declaration.</p>
+
+                  <h4 style="color:#06BBAF;margin:10px 0 6px;font-size:14px;line-height:1.35;">Your vote. Your voice. Your country.</h4>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">Ultimately, Nigeria’s leadership should be determined neither by foreign capitals nor by political godfathers, wealthy interests or electoral insiders. It should be determined by Nigerians exercising their democratic rights in a credible process and by institutions strong enough to protect those rights.</p>
+
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">As we look towards 2027, our vote must be more than a ritual. It must be an instrument of national sovereignty. <strong>Your vote. Your voice. Your country.</strong> Use Citizen Monitors App to Protect it.</p>
+
+                  <p style="margin:10px 0 0;font-size:12px;line-height:1.5;font-style:italic;color:#555555;">
+                    Promoting transparency, accountability and informed public discourse.
+                  </p>
+    `.trim(),
+});
+export const newsLetterTemplateWhyDoNigeriansSellTheirPoliticalFuture = () => buildNewsletterEditionEmailHtml({
+    title: "Why Do Nigerians Sell Their Political Future?",
+    bodyHtml: `
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;"><strong>Dear Citizen Monitors,</strong></p>
+
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">What is the price of your future? A bag of rice? ₦50,000? ₦60 fuel subsidy? Or a temporary promise from a politician who may never return after winning your vote? Why do Nigerians continue to exchange their political power for temporary relief, even when the consequences could last another four years?</p>
+
+                  <h4 style="color:#06BBAF;margin:10px 0 6px;font-size:14px;line-height:1.35;">Poverty has a price. So does bad leadership.</h4>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">Let us be honest. When people struggle to feed their families, pay school fees, afford healthcare and survive rising living costs, an offer of cash or food can be difficult to reject. For many, this is not necessarily a lack of political awareness; it is a reflection of desperation. But this is precisely where the danger lies. Politicians who exploit poverty to secure votes are not solving any problem. They are using the consequences of poor governance as a campaign strategy. A bag of rice may feed a family for a few days, but bad leadership can leave that same family struggling for years.</p>
+
+                  <h4 style="color:#06BBAF;margin:10px 0 6px;font-size:14px;line-height:1.35;">When a politician buys your vote, who is really paying the price?</h4>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">It is the trader who cannot access affordable credit, the graduate who cannot find decent employment, the parent whose child attends an underfunded school, and the patient who cannot afford treatment. The money distributed during campaigns often comes at the expense of meaningful conversations about policies, public services and accountability. Citizens are sometimes persuaded to celebrate receiving a tiny fraction of what responsible governance should deliver.</p>
+
+                  <h4 style="color:#06BBAF;margin:10px 0 6px;font-size:14px;line-height:1.35;">Who benefits when we sell our votes?</h4>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">Vote buying is not simply a transaction between a politician and a voter. It risks becoming an investment in political impunity. When leaders believe they can win elections by distributing money rather than presenting credible plans, the incentive to deliver meaningful results weakens. Yet responsibility does not rest on voters alone. Political parties must stop normalising financial inducements. Electoral authorities must enforce the law, and civil society and the media must expose malpractice. Governments must also address the economic hardship that makes voters vulnerable to inducement.</p>
+
+                  <h4 style="color:#06BBAF;margin:10px 0 6px;font-size:14px;line-height:1.35;">Five practical steps every voter can take</h4>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">Changing this pattern requires more than telling people not to sell their votes. It requires practical action.</p>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;"><strong>1. Evaluate candidates before election day.</strong> Research their track records, qualifications, public service, integrity and previous promises. Look beyond party loyalty and campaign slogans.</p>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;"><strong>2. Ask specific questions.</strong> Demand clear plans for jobs, security, education, healthcare, electricity and the cost of living. Ask how candidates will fund their promises and how progress will be measured.</p>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;"><strong>3. Reject vote buying safely.</strong> Do not exchange your vote for cash, food, gifts or promises of personal favours. Report suspected electoral offences through appropriate official channels when safe to do so.</p>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;"><strong>4. Protect your ballot and your information.</strong> Confirm your voter registration and polling-unit details through official INEC channels. Keep your Permanent Voter Card safe, never surrender it to a political agent, and remember that your ballot is secret. Upload results at your polling unit onto Citizen Monitors for immediate collation. The Citizen Monitors App works even when there’s no internet service.</p>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;"><strong>5. Organise and hold leaders accountable.</strong> Discuss candidates and policies with family, friends and community members. Share verified information rather than rumours. After elections, monitor government projects, attend public meetings where possible, and demand explanations when elected officials fail to deliver.</p>
+
+                  <h4 style="color:#06BBAF;margin:10px 0 6px;font-size:14px;line-height:1.35;">Your vote is worth more than the price offered</h4>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">Demand evidence, not slogans. Examine records, not campaign gifts. Judge candidates by competence, integrity, accountability and their capacity to deliver. Democracy gives citizens the opportunity to shape their future. Selling a vote may provide temporary relief, but it risks surrendering that opportunity to those who can afford to buy it.</p>
+
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">The real question is not whether politicians can afford to buy our votes. It is whether Nigerians can afford the cost of selling them. In 2027, will we vote for the money in our hands today, or for the future we want our children to inherit? The choice is ours. So is the consequence.</p>
+
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;"><strong>Your vote is your power. Do not sell your future.</strong></p>
+
+                  <p style="margin:10px 0 0;font-size:12px;line-height:1.5;font-style:italic;color:#555555;">
+                    Promoting transparency, accountability and informed public discourse.
+                  </p>
+    `.trim(),
+});
+export const newsLetterTemplateCanInecConductCredibleElectionsIn2027 = () => buildNewsletterEditionEmailHtml({
+    title: "Can INEC Conduct Credible Elections in 2027?",
+    bodyHtml: `
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;"><strong>Dear Citizen Monitors,</strong></p>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">Every election comes with promises of change, political ambition and intense competition. But without a credible electoral process, the people’s votes risk becoming little more than a formality. As the 2027 general elections draw closer, the Independent National Electoral Commission (INEC) faces a critical test: can it deliver elections that are free, fair, transparent and acceptable to Nigerians?</p>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">The question is particularly important given the controversies that have followed previous elections, including technical failures, delayed results, allegations of manipulation, vote buying and concerns about the independence of electoral institutions; particularly recent occurrences with politicians having access to back-end INEC data, delayed publication of the voters’ register and AI images on the register.</p>
+
+                  <h4 style="color:#06BBAF;margin:10px 0 6px;font-size:14px;line-height:1.35;">Technology alone cannot guarantee credible elections</h4>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">When results fail to upload promptly, when technical explanations are unclear, or when electoral guidelines are inconsistently applied, public confidence suffers. The controversies surrounding the 2023 general elections and subsequent off-cycle elections have reinforced the need for INEC to demonstrate not just technical competence, but institutional independence, transparency and accountability.</p>
+
+                  <h4 style="color:#06BBAF;margin:10px 0 6px;font-size:14px;line-height:1.35;">Can INEC be truly independent?</h4>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">An electoral commission must be independent not only in its constitutional provisions but also in its decisions, operations and relationship with political power. Its leadership must be above political influence. Its officials must demonstrate impartiality, and its decisions must be guided by electoral laws, rather than political interests.</p>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">The credibility of an election also depends on other institutions. Political parties must respect the rules, security agencies must remain neutral, the judiciary must dispense justice without political interference, and the media must report responsibly. INEC cannot deliver credible elections alone, but it must lead the process with integrity.</p>
+
+                  <h4 style="color:#06BBAF;margin:10px 0 6px;font-size:14px;line-height:1.35;">What must change before 2027?</h4>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">There are practical steps INEC must take to earn public confidence:</p>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;"><strong>1. Guarantee transparency.</strong> Publish polling-unit results promptly and ensure the public can independently verify them.</p>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;"><strong>2. Strengthen technology.</strong> Conduct transparent testing of BVAS and IReV, address identified weaknesses and publish clear contingency plans for technical failures.</p>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;"><strong>3. Protect institutional independence.</strong> Demonstrate that appointments, decisions and election administration by National Youth Service Corps (NYSC) members are free from political interference.</p>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;"><strong>4. Improve voter education.</strong> Help Nigerians understand their voting rights, accreditation procedures and how to report electoral violations.</p>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;"><strong>5. Ensure accountability.</strong> Investigate electoral misconduct, sanction erring officials and work with law enforcement to prosecute offenders.</p>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;"><strong>6. Engage citizens.</strong> Work with credible civil society organisations and independent election observers to strengthen public oversight. Encourage civic-tech tools for monitoring elections like Citizen Monitors, rather than issuing threats.</p>
+
+                  <h4 style="color:#06BBAF;margin:10px 0 6px;font-size:14px;line-height:1.35;">The responsibility does not rest with INEC alone</h4>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">Nigerians must also move beyond complaining about election results after they have been announced. Citizens must become active participants in protecting the electoral process. They must monitor polling units, document incidents, verify results, challenge irregularities through lawful channels and refuse to sell their votes. Tell voters around you to download the Citizen Monitors App.</p>
+
+                  <h4 style="color:#06BBAF;margin:10px 0 6px;font-size:14px;line-height:1.35;">Why citizen-led monitoring matters</h4>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">This is where citizen-led election monitoring becomes particularly important. Independent platforms such as Citizen Monitors can help citizens document and verify polling-unit results, providing an additional layer of transparency and public accountability.</p>
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;">The 2027 elections must not be another exercise in political promises followed by arguments over credibility. Nigeria deserves an electoral system where the winner is determined by the votes cast by citizens, not by manipulation, intimidation, technical failures or political influence.</p>
+
+                  <p style="margin:0 0 8px;font-size:12px;line-height:1.5;"><strong>The credibility of 2027 cannot be negotiated after the elections. It must be built before the first ballot is cast.</strong></p>
 
                   <p style="margin:10px 0 0;font-size:12px;line-height:1.5;font-style:italic;color:#555555;">
                     Promoting transparency, accountability and informed public discourse.

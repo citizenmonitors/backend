@@ -144,5 +144,11 @@ export declare const newsLetterTemplateTerribleFederalRoadsWhichCandidateHasCapa
 export declare const newsLetterTemplateAreWeVotingForChangeOrRepeatingSameMistakes: () => string;
 export declare const newsLetterTemplateFakeProductsFakePromisesWhyDoNigeriansAcceptLess: () => string;
 export declare const newsLetterTemplateFactCheckPeterObiMoneyOrDebtsAsGovernor: () => string;
+export declare const newsLetterTemplateDoesTinubuDeserveASecondTerm: () => string;
+export declare const newsLetterTemplate66YearsAfterCredibleLeadership: () => string;
+export declare const newsLetterTemplate2027NextGenerationOfLeaders: () => string;
+export declare const newsLetterTemplate2027WhoDeterminesNigeriasLeadership: () => string;
+export declare const newsLetterTemplateWhyDoNigeriansSellTheirPoliticalFuture: () => string;
+export declare const newsLetterTemplateCanInecConductCredibleElectionsIn2027: () => string;
 export {};
 //# sourceMappingURL=emailTemplates.d.ts.map

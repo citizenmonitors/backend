@@ -11,3 +11,6 @@ config/firebaseServiceAccountKey.json
 *-service-account*.json
 *.pem
 backups/
+
+# Local debug / scratch output
+tmp/

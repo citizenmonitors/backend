@@ -150,7 +150,7 @@ export const authenticateUser = async (
   }
 
   const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET as string, {
-    expiresIn: "1h",
+    algorithm: "HS256",
   });
   return token;
 };

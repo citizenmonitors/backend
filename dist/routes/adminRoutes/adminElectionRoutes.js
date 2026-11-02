@@ -9,6 +9,7 @@ import * as PressCoverageAdminController from "../../controllers/adminController
 import { parseNewsPressAdminMultipart } from "../../config/electionMulter.js";
 import * as AdminSpeakerSlotsController from "../../controllers/speakerSlots/adminSpeakerSlotsController.js";
 import * as AdminPvcIssuesController from "../../controllers/pvcIssues/adminPvcIssuesController.js";
+import * as PulseReportAdminController from "../../controllers/adminController/pulseReportAdminController.js";
 const router = express.Router();
 router.get("/admin/", authMiddleware, isAdmin, AdminCont.getDashboardDataController);
 router.get("/admin/admins", authMiddleware, isAuthorized("getAdmins"), AdminCont.getAllAdminController);
@@ -38,6 +39,8 @@ router.get("/admin/logs/:adminId", authMiddleware, isSuperAdmin, AdminController
 router.get("/admin/access-control", authMiddleware, isSuperAdmin, AdminController.getAccessControl);
 router.get("/admin/single-admin/:adminId", authMiddleware, isAdmin, AdminController.getSingleAdmin);
 router.post("/admin/podcast", authMiddleware, isAdmin, PodcastController.sendPodcast);
+router.get("/admin/newsletter/active", authMiddleware, isAdmin, PodcastController.getActiveNewsletter);
+router.post("/admin/newsletter/preview", authMiddleware, isAdmin, PodcastController.previewNewsletterCompose);
 router.post("/admin/newsletter", authMiddleware, isAdmin, PodcastController.sendNewsletter);
 router.patch("/admin/podcast/:id", authMiddleware, isAdmin, PodcastController.editPodcast);
 router.get("/admin/podcast", authMiddleware, isAdmin, PodcastController.getAllPodcasts);
@@ -51,6 +54,8 @@ router.get("/admin/press-coverage/:id", authMiddleware, isAdmin, PressCoverageAd
 router.get("/podcast/:id", authMiddleware, PodcastController.getSinglePodcast);
 router.get("/podcasts/inbox", authMiddleware, PodcastController.getUserInbox);
 router.patch("/podcast/mark-read/:podcastId", authMiddleware, PodcastController.markPodcastAsRead);
+router.get("/admin/pulse/reports", authMiddleware, isAdmin, PulseReportAdminController.listPulseReports);
+router.patch("/admin/pulse/reports/:reportId", authMiddleware, isAdmin, PulseReportAdminController.resolvePulseReport);
 router.get("/admin/notifications", authMiddleware, isAdmin, AdminCont.adminNotificationController);
 router.patch("/admin/notification/mark-read/:notificationId", authMiddleware, isAdmin, AdminCont.markNotificationAsRead);
 router.patch("/admin/notification/delete/:notificationId", authMiddleware, isAdmin, AdminCont.deleteNotificationForUser);

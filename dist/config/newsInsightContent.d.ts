@@ -15,4 +15,10 @@ export declare const newsInsightTerribleFederalRoadsWhichCandidateHasCapacity: (
 export declare const newsInsightAreWeVotingForChangeOrRepeatingSameMistakes: () => NewsInsightArticleContent;
 export declare const newsInsightFakeProductsFakePromisesWhyDoNigeriansAcceptLess: () => NewsInsightArticleContent;
 export declare const newsInsightFactCheckPeterObiMoneyOrDebtsAsGovernor: () => NewsInsightArticleContent;
+export declare const newsInsightDoesTinubuDeserveASecondTerm: () => NewsInsightArticleContent;
+export declare const newsInsight66YearsAfterCredibleLeadership: () => NewsInsightArticleContent;
+export declare const newsInsight2027NextGenerationOfLeaders: () => NewsInsightArticleContent;
+export declare const newsInsight2027WhoDeterminesNigeriasLeadership: () => NewsInsightArticleContent;
+export declare const newsInsightWhyDoNigeriansSellTheirPoliticalFuture: () => NewsInsightArticleContent;
+export declare const newsInsightCanInecConductCredibleElectionsIn2027: () => NewsInsightArticleContent;
 //# sourceMappingURL=newsInsightContent.d.ts.map

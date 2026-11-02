@@ -120,6 +120,8 @@ export declare const getAllAdminService: () => Promise<(mongoose.Document<unknow
         appVersion?: string | null | undefined;
         pushToken?: string | null | undefined;
         lastLoginAt?: NativeDate | null | undefined;
+        legacyExpoExperienceId?: string | null | undefined;
+        legacyExpoDetectedAt?: NativeDate | null | undefined;
     } | null | undefined;
     authProviders?: {
         google?: {
@@ -221,6 +223,8 @@ export declare const getAllAdminService: () => Promise<(mongoose.Document<unknow
         appVersion?: string | null | undefined;
         pushToken?: string | null | undefined;
         lastLoginAt?: NativeDate | null | undefined;
+        legacyExpoExperienceId?: string | null | undefined;
+        legacyExpoDetectedAt?: NativeDate | null | undefined;
     } | null | undefined;
     authProviders?: {
         google?: {

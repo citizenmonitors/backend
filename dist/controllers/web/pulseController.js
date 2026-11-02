@@ -40,6 +40,9 @@ export const getPulsePostsPublic = async (req, res) => {
     }
     catch (error) {
         const message = errMsg(error);
+        if (message.includes("haven't blocked")) {
+            return res.status(403).json({ message });
+        }
         if (message.includes("Sign in") ||
             message.includes("Authentication") ||
             message.includes("User not found")) {
@@ -66,6 +69,9 @@ export const getPulsePostCommentsPublic = async (req, res) => {
     }
     catch (error) {
         const message = errMsg(error);
+        if (message.includes("haven't blocked")) {
+            return res.status(403).json({ message });
+        }
         if (message.includes("not found")) {
             return res.status(404).json({ message });
         }
@@ -92,6 +98,9 @@ export const postPulsePostWeb = async (req, res) => {
     }
     catch (error) {
         const message = errMsg(error);
+        if (message.includes("haven't blocked")) {
+            return res.status(403).json({ message });
+        }
         if (message.includes("Authentication required")) {
             return res.status(401).json({ message });
         }
@@ -120,6 +129,9 @@ export const postPulseRepostWeb = async (req, res) => {
     }
     catch (error) {
         const message = errMsg(error);
+        if (message.includes("haven't blocked")) {
+            return res.status(403).json({ message });
+        }
         if (message.includes("Authentication required")) {
             return res.status(401).json({ message });
         }
@@ -146,6 +158,9 @@ export const postPulsePostLikeWeb = async (req, res) => {
     }
     catch (error) {
         const message = errMsg(error);
+        if (message.includes("haven't blocked")) {
+            return res.status(403).json({ message });
+        }
         if (message.includes("Authentication required")) {
             return res.status(401).json({ message });
         }
@@ -176,6 +191,9 @@ export const postPulsePostCommentWeb = async (req, res) => {
     }
     catch (error) {
         const message = errMsg(error);
+        if (message.includes("haven't blocked")) {
+            return res.status(403).json({ message });
+        }
         if (message.includes("Authentication required")) {
             return res.status(401).json({ message });
         }
@@ -203,6 +221,9 @@ export const postPulseCommentLikeWeb = async (req, res) => {
     }
     catch (error) {
         const message = errMsg(error);
+        if (message.includes("haven't blocked")) {
+            return res.status(403).json({ message });
+        }
         if (message.includes("Authentication required")) {
             return res.status(401).json({ message });
         }

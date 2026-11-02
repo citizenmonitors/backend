@@ -53,6 +53,9 @@ const completedUserSchema = new mongoose.Schema(
       appVersion: String,
       pushToken: String,
       lastLoginAt: Date,
+      /** Set when this user's push token came from an old Expo project (old app build). */
+      legacyExpoExperienceId: String,
+      legacyExpoDetectedAt: Date,
     },
     authProviders: {
       google: {

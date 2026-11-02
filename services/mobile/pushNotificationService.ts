@@ -25,6 +25,16 @@ type ExpoPushTicket = {
   details?: { error?: string };
 };
 
+type ExpoApiError = {
+  code?: string;
+  message?: string;
+  details?: Record<string, string[]>;
+};
+
+/** Preferred Expo app slug, e.g. `@citizenmonitors/citizen-monitors`. */
+const preferredExpoExperienceId = (): string =>
+  String(process.env.EXPO_PREFERRED_EXPERIENCE_ID ?? "").trim();
+
 const isTruthyEnv = (value: string | undefined): boolean =>
   value === "1" || value === "true" || value === "yes";
 
@@ -61,20 +71,42 @@ const clearInvalidPushTokens = async (tokens: string[]): Promise<void> => {
   );
 };
 
-const sendExpoPushChunk = async (
-  targets: TokenTarget[],
-  input: { title: string; body: string; data?: Record<string, string> }
-): Promise<void> => {
-  if (targets.length === 0) return;
+/**
+ * Tokens from an old Expo project can't receive pushes from the current one.
+ * Remember which users had them (they're on an old app build), then drop the token.
+ */
+const markLegacyExpoTokens = async (tokens: string[], experienceId: string): Promise<void> => {
+  const unique = Array.from(new Set(tokens.map((t) => t.trim()).filter(Boolean)));
+  if (unique.length === 0) return;
+  await CompletedUser.updateMany(
+    { "mobileMeta.pushToken": { $in: unique } },
+    {
+      $set: {
+        "mobileMeta.legacyExpoExperienceId": experienceId,
+        "mobileMeta.legacyExpoDetectedAt": new Date(),
+      },
+      $unset: { "mobileMeta.pushToken": "" },
+    }
+  );
+};
 
-  const messages: ExpoPushMessage[] = targets.map(({ token }) => ({
-    to: token,
-    title: input.title.slice(0, 120),
-    body: input.body.slice(0, 240),
-    sound: "default",
-    data: input.data,
-  }));
+/** A push reached this user through the current project, so they've updated the app. */
+const clearLegacyExpoFlag = async (userIds: string[]): Promise<void> => {
+  if (userIds.length === 0) return;
+  await CompletedUser.updateMany(
+    { _id: { $in: userIds }, "mobileMeta.legacyExpoExperienceId": { $exists: true } },
+    {
+      $unset: {
+        "mobileMeta.legacyExpoExperienceId": "",
+        "mobileMeta.legacyExpoDetectedAt": "",
+      },
+    }
+  );
+};
 
+const postExpoPushMessages = async (
+  messages: ExpoPushMessage[]
+): Promise<{ ok: boolean; status: number; body: string }> => {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -89,18 +121,30 @@ const sendExpoPushChunk = async (
     headers,
     body: JSON.stringify(messages),
   });
+  const body = await response.text();
+  return { ok: response.ok, status: response.status, body };
+};
 
-  if (!response.ok) {
-    const text = await response.text();
-    console.error("Expo push request failed:", response.status, text);
+const applyExpoTickets = async (
+  targets: TokenTarget[],
+  body: string
+): Promise<void> => {
+  let payload: { data?: ExpoPushTicket[] } = {};
+  try {
+    payload = JSON.parse(body) as { data?: ExpoPushTicket[] };
+  } catch {
     return;
   }
-
-  const payload = (await response.json()) as { data?: ExpoPushTicket[] };
   const tickets = Array.isArray(payload.data) ? payload.data : [];
   const invalidTokens: string[] = [];
+  const deliveredUserIds: string[] = [];
 
   tickets.forEach((ticket, index) => {
+    if (ticket.status === "ok") {
+      const userId = targets[index]?.userId;
+      if (userId) deliveredUserIds.push(userId);
+      return;
+    }
     if (ticket.status !== "error") return;
     const errorCode = ticket.details?.error ?? "";
     if (errorCode === "DeviceNotRegistered" || errorCode === "InvalidCredentials") {
@@ -112,6 +156,100 @@ const sendExpoPushChunk = async (
   if (invalidTokens.length > 0) {
     await clearInvalidPushTokens(invalidTokens);
   }
+  await clearLegacyExpoFlag(deliveredUserIds);
+};
+
+/**
+ * Expo rejects a batch if tokens belong to different projects
+ * (e.g. legacy `@nippysky/...` + current `@citizenmonitors/...`).
+ * Retry by sending one request per experience group from the error details.
+ */
+const sendExpoPushChunkByExperience = async (
+  targets: TokenTarget[],
+  input: { title: string; body: string; data?: Record<string, string> },
+  groups: Record<string, string[]>
+): Promise<void> => {
+  const byToken = new Map(targets.map((t) => [t.token, t]));
+  const preferred = preferredExpoExperienceId();
+  const entries = Object.entries(groups);
+
+  for (const [experienceId, tokens] of entries) {
+    if (preferred && experienceId !== preferred) {
+      console.warn(
+        `Skipping Expo push tokens for non-preferred experience ${experienceId} (${tokens.length} tokens)`
+      );
+      // Stale tokens from an old Expo project: flag those users, then clear the tokens
+      // so they stop poisoning batches. List them with scripts/listLegacyExpoUsers.ts.
+      await markLegacyExpoTokens(tokens, experienceId);
+      continue;
+    }
+
+    const groupTargets = tokens
+      .map((token) => byToken.get(token))
+      .filter((t): t is TokenTarget => Boolean(t));
+    if (groupTargets.length === 0) continue;
+
+    const messages: ExpoPushMessage[] = groupTargets.map(({ token }) => ({
+      to: token,
+      title: input.title.slice(0, 120),
+      body: input.body.slice(0, 240),
+      sound: "default",
+      data: input.data,
+    }));
+
+    const result = await postExpoPushMessages(messages);
+    if (!result.ok) {
+      console.error(
+        `Expo push request failed for ${experienceId}:`,
+        result.status,
+        result.body
+      );
+      continue;
+    }
+    await applyExpoTickets(groupTargets, result.body);
+  }
+};
+
+const sendExpoPushChunk = async (
+  targets: TokenTarget[],
+  input: { title: string; body: string; data?: Record<string, string> }
+): Promise<void> => {
+  if (targets.length === 0) return;
+
+  const messages: ExpoPushMessage[] = targets.map(({ token }) => ({
+    to: token,
+    title: input.title.slice(0, 120),
+    body: input.body.slice(0, 240),
+    sound: "default",
+    data: input.data,
+  }));
+
+  const result = await postExpoPushMessages(messages);
+  if (!result.ok) {
+    let parsed: { errors?: ExpoApiError[] } | null = null;
+    try {
+      parsed = JSON.parse(result.body) as { errors?: ExpoApiError[] };
+    } catch {
+      parsed = null;
+    }
+
+    const conflict = parsed?.errors?.find(
+      (err) => err.code === "PUSH_TOO_MANY_EXPERIENCE_IDS"
+    );
+    if (conflict?.details && typeof conflict.details === "object") {
+      console.warn(
+        "Expo push mixed experience IDs — retrying per project:",
+        Object.keys(conflict.details).join(", ")
+      );
+      await sendExpoPushChunkByExperience(targets, input, conflict.details);
+      return;
+    }
+
+    console.error("Expo push request failed:", result.status, result.body);
+    return;
+  }
+
+  await applyExpoTickets(targets, result.body);
 };
 
 const sendFcmPush = async (

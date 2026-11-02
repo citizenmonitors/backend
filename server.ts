@@ -46,9 +46,14 @@ import anonymousRoutes from "./routes/anonymousRoutes.ts";
 import collationDiscussionRoutes from "./routes/collationDiscussionRoutes.ts";
 import donationRoutes from "./routes/donationRoutes.ts";
 import mobileDonationRoutes from "./routes/mobile/donationRoutes.ts";
-import { inhouseApiAccessMiddleware } from "./middleware/inhouseApiAccessMiddleware.ts";
+import {
+  assertInhouseApiAccessConfigured,
+  inhouseApiAccessMiddleware,
+} from "./middleware/inhouseApiAccessMiddleware.ts";
 import { initSocketServer } from "./services/realtime/socketServer.ts";
 import { setSocketServer } from "./services/realtime/socketBus.ts";
+
+assertInhouseApiAccessConfigured();
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);

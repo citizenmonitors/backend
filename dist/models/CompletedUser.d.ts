@@ -67,6 +67,8 @@ declare const _default: mongoose.Model<{
         appVersion?: string | null | undefined;
         pushToken?: string | null | undefined;
         lastLoginAt?: NativeDate | null | undefined;
+        legacyExpoExperienceId?: string | null | undefined;
+        legacyExpoDetectedAt?: NativeDate | null | undefined;
     } | null | undefined;
     authProviders?: {
         google?: {
@@ -168,6 +170,8 @@ declare const _default: mongoose.Model<{
         appVersion?: string | null | undefined;
         pushToken?: string | null | undefined;
         lastLoginAt?: NativeDate | null | undefined;
+        legacyExpoExperienceId?: string | null | undefined;
+        legacyExpoDetectedAt?: NativeDate | null | undefined;
     } | null | undefined;
     authProviders?: {
         google?: {
@@ -269,6 +273,8 @@ declare const _default: mongoose.Model<{
         appVersion?: string | null | undefined;
         pushToken?: string | null | undefined;
         lastLoginAt?: NativeDate | null | undefined;
+        legacyExpoExperienceId?: string | null | undefined;
+        legacyExpoDetectedAt?: NativeDate | null | undefined;
     } | null | undefined;
     authProviders?: {
         google?: {
@@ -376,6 +382,8 @@ declare const _default: mongoose.Model<{
         appVersion?: string | null | undefined;
         pushToken?: string | null | undefined;
         lastLoginAt?: NativeDate | null | undefined;
+        legacyExpoExperienceId?: string | null | undefined;
+        legacyExpoDetectedAt?: NativeDate | null | undefined;
     } | null | undefined;
     authProviders?: {
         google?: {
@@ -477,6 +485,8 @@ declare const _default: mongoose.Model<{
         appVersion?: string | null | undefined;
         pushToken?: string | null | undefined;
         lastLoginAt?: NativeDate | null | undefined;
+        legacyExpoExperienceId?: string | null | undefined;
+        legacyExpoDetectedAt?: NativeDate | null | undefined;
     } | null | undefined;
     authProviders?: {
         google?: {
@@ -578,6 +588,8 @@ declare const _default: mongoose.Model<{
         appVersion?: string | null | undefined;
         pushToken?: string | null | undefined;
         lastLoginAt?: NativeDate | null | undefined;
+        legacyExpoExperienceId?: string | null | undefined;
+        legacyExpoDetectedAt?: NativeDate | null | undefined;
     } | null | undefined;
     authProviders?: {
         google?: {

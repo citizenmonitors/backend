@@ -12,6 +12,7 @@
     "migrate:files": "tsx ./scripts/backfillInboxFields.ts",
     "backup:notifications": "tsx ./scripts/backupNotifications.ts",
     "export:users": "tsx ./scripts/exportUsersToExcel.ts",
+    "legacy-expo:list": "tsx ./scripts/listLegacyExpoUsers.ts",
     "news:migrate-covers": "tsx ./scripts/migrateNewsInsightCoversToFirebase.ts"
   },
   "keywords": [],

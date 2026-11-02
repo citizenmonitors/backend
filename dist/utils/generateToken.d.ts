@@ -1,7 +1,6 @@
-/** Parse values like `15m`, `1h`, `7d` into seconds for clients. */
 export declare const accessTokenExpiresInSeconds: () => number;
 /**
- * Short-lived access JWT used on API requests.
+ * Access JWT used on API requests. It does not expire.
  * Prefer `issueAuthTokens` when logging users in so a refresh token is also created.
  */
 export declare const generateAccessToken: (payload: Record<string, unknown>) => string;

@@ -56,6 +56,9 @@ export const getPulsePostsMobile = async (req: Request, res: Response) => {
     return res.status(200).json(data);
   } catch (error) {
     const message = errMsg(error);
+    if (message.includes("haven't blocked")) {
+      return res.status(403).json({ message });
+    }
     if (
       message.includes("Sign in") ||
       message.includes("Authentication") ||
@@ -104,6 +107,9 @@ export const postPulsePostMobile = async (req: Request, res: Response) => {
     return res.status(201).json({ post });
   } catch (error) {
     const message = errMsg(error);
+    if (message.includes("haven't blocked")) {
+      return res.status(403).json({ message });
+    }
     if (message.includes("Authentication required")) {
       return res.status(401).json({ message });
     }
@@ -132,6 +138,9 @@ export const postPulseRepostMobile = async (req: Request, res: Response) => {
     return res.status(201).json({ post });
   } catch (error) {
     const message = errMsg(error);
+    if (message.includes("haven't blocked")) {
+      return res.status(403).json({ message });
+    }
     if (message.includes("already reposted") || message.includes("your own post")) {
       return res.status(409).json({ message });
     }
@@ -153,6 +162,9 @@ export const postPulsePostLikeMobile = async (req: Request, res: Response) => {
     return res.status(200).json(data);
   } catch (error) {
     const message = errMsg(error);
+    if (message.includes("haven't blocked")) {
+      return res.status(403).json({ message });
+    }
     if (message.includes("not available for your location")) {
       return res.status(403).json({ message });
     }
@@ -172,6 +184,9 @@ export const getPulsePostCommentsMobile = async (req: Request, res: Response) =>
     return res.status(200).json({ comments });
   } catch (error) {
     const message = errMsg(error);
+    if (message.includes("haven't blocked")) {
+      return res.status(403).json({ message });
+    }
     if (message.includes("not available for your location")) {
       return res.status(403).json({ message });
     }
@@ -201,6 +216,9 @@ export const postPulsePostCommentMobile = async (req: Request, res: Response) =>
     return res.status(201).json({ comment });
   } catch (error) {
     const message = errMsg(error);
+    if (message.includes("haven't blocked")) {
+      return res.status(403).json({ message });
+    }
     if (
       message.includes("anonymous username") ||
       message.includes("body must") ||
@@ -229,6 +247,9 @@ export const postPulseCommentLikeMobile = async (req: Request, res: Response) =>
     return res.status(200).json({ comment });
   } catch (error) {
     const message = errMsg(error);
+    if (message.includes("haven't blocked")) {
+      return res.status(403).json({ message });
+    }
     if (message.includes("not available for your location")) {
       return res.status(403).json({ message });
     }

@@ -127,6 +127,8 @@ export declare const upgradeVolunteerToObserver: ({ email, details, files, }: Ob
         appVersion?: string | null | undefined;
         pushToken?: string | null | undefined;
         lastLoginAt?: NativeDate | null | undefined;
+        legacyExpoExperienceId?: string | null | undefined;
+        legacyExpoDetectedAt?: NativeDate | null | undefined;
     } | null | undefined;
     authProviders?: {
         google?: {
@@ -189,7 +191,7 @@ export declare const getElectionVault: (userId: Id) => Promise<{
         pollingUnit: string;
         election: Types.ObjectId;
         flagged: boolean;
-        user: Types.ObjectId;
+        uploaderDeleted: boolean;
         partiesVotes: Types.DocumentArray<{
             party?: string | null | undefined;
             count?: number | null | undefined;
@@ -322,6 +324,7 @@ export declare const getElectionVault: (userId: Id) => Promise<{
             __v: number;
         })>;
         agreed: boolean;
+        user?: Types.ObjectId | null | undefined;
         resultPicture?: {
             name?: string | null | undefined;
             type?: string | null | undefined;
@@ -368,7 +371,7 @@ export declare const getElectionVault: (userId: Id) => Promise<{
         pollingUnit: string;
         election: Types.ObjectId;
         flagged: boolean;
-        user: Types.ObjectId;
+        uploaderDeleted: boolean;
         userRole: string;
         actions: Types.DocumentArray<{
             action: "agree" | "flag";
@@ -532,6 +535,7 @@ export declare const getElectionVault: (userId: Id) => Promise<{
             location?: string | null | undefined;
             size?: number | null | undefined;
         }>;
+        user?: Types.ObjectId | null | undefined;
         uploadLocation?: {
             latitude?: number | null | undefined;
             longitude?: number | null | undefined;
@@ -600,16 +604,16 @@ export declare const submitMobileFeedback: (input: {
 } & {
     message: string;
     email: string;
-    user: Types.ObjectId;
     title: string;
+    user: Types.ObjectId;
 }> & {
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
     message: string;
     email: string;
-    user: Types.ObjectId;
     title: string;
+    user: Types.ObjectId;
 } & {
     _id: Types.ObjectId;
 } & {

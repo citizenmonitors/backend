@@ -12,5 +12,9 @@ export interface SendEmailOptions {
     trackClicks?: boolean;
     trackOpens?: boolean;
 }
+/**
+ * Sends one email via ZeptoMail using fetch (avoids the official SDK bug that
+ * crashes Node when an error response is not JSON-parseable).
+ */
 export declare const sendEmail: ({ to, subject, htmlbody, textbody, fromName, listUnsubscribeUrl, trackClicks, trackOpens, }: SendEmailOptions) => Promise<unknown>;
 //# sourceMappingURL=email.d.ts.map

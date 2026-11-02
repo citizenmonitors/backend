@@ -93,6 +93,8 @@ export declare const volunteerToObserverService: ({ email, details, files, }: Vo
         appVersion?: string | null | undefined;
         pushToken?: string | null | undefined;
         lastLoginAt?: NativeDate | null | undefined;
+        legacyExpoExperienceId?: string | null | undefined;
+        legacyExpoDetectedAt?: NativeDate | null | undefined;
     } | null | undefined;
     authProviders?: {
         google?: {

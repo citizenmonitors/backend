@@ -93,6 +93,8 @@ export declare const getDashboardData: () => Promise<{
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
+            legacyExpoExperienceId?: string | null | undefined;
+            legacyExpoDetectedAt?: NativeDate | null | undefined;
         } | null | undefined;
         authProviders?: {
             google?: {
@@ -194,6 +196,8 @@ export declare const getDashboardData: () => Promise<{
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
+            legacyExpoExperienceId?: string | null | undefined;
+            legacyExpoDetectedAt?: NativeDate | null | undefined;
         } | null | undefined;
         authProviders?: {
             google?: {
@@ -330,6 +334,8 @@ export declare const getAllUsersService: () => Promise<{
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
+            legacyExpoExperienceId?: string | null | undefined;
+            legacyExpoDetectedAt?: NativeDate | null | undefined;
         } | null | undefined;
         authProviders?: {
             google?: {
@@ -436,6 +442,8 @@ export declare const getUserByIdService: (id: Id) => Promise<import("mongoose").
         appVersion?: string | null | undefined;
         pushToken?: string | null | undefined;
         lastLoginAt?: NativeDate | null | undefined;
+        legacyExpoExperienceId?: string | null | undefined;
+        legacyExpoDetectedAt?: NativeDate | null | undefined;
     } | null | undefined;
     authProviders?: {
         google?: {
@@ -548,6 +556,8 @@ export declare const approveObserverService: (id: Id, adminId: Id) => Promise<{
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
+            legacyExpoExperienceId?: string | null | undefined;
+            legacyExpoDetectedAt?: NativeDate | null | undefined;
         } | null | undefined;
         authProviders?: {
             google?: {
@@ -656,6 +666,8 @@ export declare const getAllObsersverService: () => Promise<{
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
+            legacyExpoExperienceId?: string | null | undefined;
+            legacyExpoDetectedAt?: NativeDate | null | undefined;
         } | null | undefined;
         authProviders?: {
             google?: {
@@ -764,6 +776,8 @@ export declare const unapproveObserverService: (id: Id, adminId: Id) => Promise<
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
+            legacyExpoExperienceId?: string | null | undefined;
+            legacyExpoDetectedAt?: NativeDate | null | undefined;
         } | null | undefined;
         authProviders?: {
             google?: {
@@ -872,6 +886,8 @@ export declare const downgradeObserverService: (id: Id, adminReason: string, adm
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
+            legacyExpoExperienceId?: string | null | undefined;
+            legacyExpoDetectedAt?: NativeDate | null | undefined;
         } | null | undefined;
         authProviders?: {
             google?: {
@@ -1099,6 +1115,8 @@ export declare const createAdminService: (adminId: Id | undefined, { email, role
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
+            legacyExpoExperienceId?: string | null | undefined;
+            legacyExpoDetectedAt?: NativeDate | null | undefined;
         } | null | undefined;
         authProviders?: {
             google?: {
@@ -1200,6 +1218,8 @@ export declare const createAdminService: (adminId: Id | undefined, { email, role
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
+            legacyExpoExperienceId?: string | null | undefined;
+            legacyExpoDetectedAt?: NativeDate | null | undefined;
         } | null | undefined;
         authProviders?: {
             google?: {
@@ -1367,6 +1387,8 @@ export declare const suspendAdminService: (adminId: Id, suspendedBy: Id) => Prom
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
+            legacyExpoExperienceId?: string | null | undefined;
+            legacyExpoDetectedAt?: NativeDate | null | undefined;
         } | null | undefined;
         authProviders?: {
             google?: {
@@ -1468,6 +1490,8 @@ export declare const suspendAdminService: (adminId: Id, suspendedBy: Id) => Prom
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
+            legacyExpoExperienceId?: string | null | undefined;
+            legacyExpoDetectedAt?: NativeDate | null | undefined;
         } | null | undefined;
         authProviders?: {
             google?: {
@@ -1575,6 +1599,8 @@ export declare const getAllAdminsService: () => Promise<{
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
+            legacyExpoExperienceId?: string | null | undefined;
+            legacyExpoDetectedAt?: NativeDate | null | undefined;
         } | null | undefined;
         authProviders?: {
             google?: {

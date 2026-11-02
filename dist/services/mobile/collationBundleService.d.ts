@@ -68,6 +68,8 @@ export declare const assertMobileCollationAccess: (activeElectionId: string, use
             appVersion?: string | null | undefined;
             pushToken?: string | null | undefined;
             lastLoginAt?: NativeDate | null | undefined;
+            legacyExpoExperienceId?: string | null | undefined;
+            legacyExpoDetectedAt?: NativeDate | null | undefined;
         } | null | undefined;
         authProviders?: {
             google?: {

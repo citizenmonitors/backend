@@ -14,6 +14,7 @@ import * as PressCoverageAdminController from "../../controllers/adminController
 import { parseNewsPressAdminMultipart } from "../../config/electionMulter.ts";
 import * as AdminSpeakerSlotsController from "../../controllers/speakerSlots/adminSpeakerSlotsController.ts";
 import * as AdminPvcIssuesController from "../../controllers/pvcIssues/adminPvcIssuesController.ts";
+import * as PulseReportAdminController from "../../controllers/adminController/pulseReportAdminController.ts";
 
 const router = express.Router();
 
@@ -178,6 +179,13 @@ router.get("/admin/press-coverage/:id", authMiddleware, isAdmin, PressCoverageAd
 router.get("/podcast/:id", authMiddleware, PodcastController.getSinglePodcast);
 router.get("/podcasts/inbox", authMiddleware, PodcastController.getUserInbox);
 router.patch("/podcast/mark-read/:podcastId", authMiddleware, PodcastController.markPodcastAsRead);
+router.get("/admin/pulse/reports", authMiddleware, isAdmin, PulseReportAdminController.listPulseReports);
+router.patch(
+  "/admin/pulse/reports/:reportId",
+  authMiddleware,
+  isAdmin,
+  PulseReportAdminController.resolvePulseReport
+);
 router.get("/admin/notifications", authMiddleware, isAdmin, AdminCont.adminNotificationController);
 router.patch("/admin/notification/mark-read/:notificationId", authMiddleware, isAdmin, AdminCont.markNotificationAsRead);
 router.patch("/admin/notification/delete/:notificationId", authMiddleware, isAdmin, AdminCont.deleteNotificationForUser);

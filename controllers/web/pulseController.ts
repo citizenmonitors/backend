@@ -57,6 +57,9 @@ export const getPulsePostsPublic = async (req: Request, res: Response) => {
     return res.status(200).json(data);
   } catch (error) {
     const message = errMsg(error);
+    if (message.includes("haven't blocked")) {
+      return res.status(403).json({ message });
+    }
     if (
       message.includes("Sign in") ||
       message.includes("Authentication") ||
@@ -87,6 +90,9 @@ export const getPulsePostCommentsPublic = async (req: Request, res: Response) =>
     return res.status(200).json({ comments });
   } catch (error) {
     const message = errMsg(error);
+    if (message.includes("haven't blocked")) {
+      return res.status(403).json({ message });
+    }
     if (message.includes("not found")) {
       return res.status(404).json({ message });
     }
@@ -126,6 +132,9 @@ export const postPulsePostWeb = async (req: Request, res: Response) => {
     return res.status(201).json({ post });
   } catch (error) {
     const message = errMsg(error);
+    if (message.includes("haven't blocked")) {
+      return res.status(403).json({ message });
+    }
     if (message.includes("Authentication required")) {
       return res.status(401).json({ message });
     }
@@ -156,6 +165,9 @@ export const postPulseRepostWeb = async (req: Request, res: Response) => {
     return res.status(201).json({ post });
   } catch (error) {
     const message = errMsg(error);
+    if (message.includes("haven't blocked")) {
+      return res.status(403).json({ message });
+    }
     if (message.includes("Authentication required")) {
       return res.status(401).json({ message });
     }
@@ -182,6 +194,9 @@ export const postPulsePostLikeWeb = async (req: Request, res: Response) => {
     return res.status(200).json(data);
   } catch (error) {
     const message = errMsg(error);
+    if (message.includes("haven't blocked")) {
+      return res.status(403).json({ message });
+    }
     if (message.includes("Authentication required")) {
       return res.status(401).json({ message });
     }
@@ -213,6 +228,9 @@ export const postPulsePostCommentWeb = async (req: Request, res: Response) => {
     return res.status(201).json({ comment });
   } catch (error) {
     const message = errMsg(error);
+    if (message.includes("haven't blocked")) {
+      return res.status(403).json({ message });
+    }
     if (message.includes("Authentication required")) {
       return res.status(401).json({ message });
     }
@@ -244,6 +262,9 @@ export const postPulseCommentLikeWeb = async (req: Request, res: Response) => {
     return res.status(200).json({ comment });
   } catch (error) {
     const message = errMsg(error);
+    if (message.includes("haven't blocked")) {
+      return res.status(403).json({ message });
+    }
     if (message.includes("Authentication required")) {
       return res.status(401).json({ message });
     }

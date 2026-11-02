@@ -11,19 +11,45 @@ const stripDangerousHtml = (html) => html
     .replace(/<style[\s\S]*?<\/style>/gi, "")
     .replace(/\son\w+=(["']).*?\1/gi, "")
     .trim();
+/** True when most longer words start with a capital, e.g. "Poverty Has a Price." */
+const isTitleCase = (line) => {
+    const words = line.split(/\s+/).filter((w) => /^[A-Za-z]{4,}/.test(w));
+    if (words.length === 0)
+        return false;
+    const capitalised = words.filter((w) => /^[A-Z]/.test(w)).length;
+    return capitalised / words.length >= 0.75;
+};
 const isLikelyHeading = (line) => {
     const trimmed = line.trim();
     if (!trimmed)
         return false;
     if (/^dear\s+citizen\s+monitors/i.test(trimmed))
         return false;
-    if (trimmed.length > 90)
+    if (/^\d+[.)]\s/.test(trimmed))
         return false;
-    if (/[.!?]$/.test(trimmed))
+    if (trimmed.length > 90)
         return false;
     if (trimmed.split(/\s+/).length > 14)
         return false;
+    if (/[,:;]$/.test(trimmed))
+        return false;
+    // Short questions read as section headings ("Who benefits when…?").
+    if (/\?$/.test(trimmed))
+        return true;
+    // Sentences ending in "." / "!" only count when written in Title Case.
+    if (/[.!]$/.test(trimmed))
+        return isTitleCase(trimmed);
     return true;
+};
+/** "1. Do this. More detail" → bold the step's first sentence. */
+const numberedStepHtml = (line) => {
+    const match = line.match(/^(\d+[.)])\s+(.+?[.!?])(\s+.*)?$/);
+    if (!match)
+        return null;
+    const [, num, lead, rest = ""] = match;
+    if (lead.split(/\s+/).length > 12)
+        return null;
+    return `<p><strong>${escapeHtml(`${num} ${lead}`)}</strong>${escapeHtml(rest)}</p>`;
 };
 /** Remove sign-off / social lines — email + app templates already include footer. */
 const stripSignOff = (text) => {
@@ -104,12 +130,16 @@ export const pasteToNewsInsightHtml = (raw) => {
             .split("\n")
             .map((line) => line.trim())
             .filter(Boolean);
-        if (lines.length === 1 && isLikelyHeading(lines[0])) {
-            parts.push(`<h4>${escapeHtml(lines[0])}</h4>`);
-            continue;
+        // A heading may sit alone or directly above its paragraph.
+        if (isLikelyHeading(lines[0])) {
+            parts.push(`<h4>${escapeHtml(lines.shift())}</h4>`);
         }
         for (const line of lines) {
-            if (/^dear\s+citizen\s+monitors/i.test(line)) {
+            const step = numberedStepHtml(line);
+            if (step) {
+                parts.push(step);
+            }
+            else if (/^dear\s+citizen\s+monitors/i.test(line)) {
                 parts.push(`<p><strong>${escapeHtml(line)}</strong></p>`);
             }
             else if (/^citizen monitors app is live/i.test(line)) {
@@ -135,7 +165,10 @@ export const newsInsightHtmlToEmailBody = (html) => {
         .replace(/<p style="margin:0 0 8px;font-size:12px;line-height:1.5;"><em>/gi, '<p style="margin:10px 0 0;font-size:12px;line-height:1.5;font-style:italic;color:#555555;"><em>');
 };
 const excerptFromHtml = (html, max = 160) => {
-    const plain = html
+    // Use the first real paragraph — skip the greeting and headings.
+    const paragraphs = html.match(/<p>[\s\S]*?<\/p>/gi) ?? [html];
+    const first = paragraphs.find((p) => !/dear\s+citizen\s+monitors/i.test(p) && !/^<p><em>/i.test(p)) ?? paragraphs[0];
+    const plain = first
         .replace(/<[^>]+>/g, " ")
         .replace(/\s+/g, " ")
         .trim();

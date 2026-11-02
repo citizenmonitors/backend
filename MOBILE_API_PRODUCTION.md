@@ -449,22 +449,41 @@ Create discussion post fields:
 
 ## 7) Pulse API (Standalone, Protected)
 
-Base: `/pulse`
+Base: `/pulse`. **Every Pulse endpoint on mobile requires a Bearer token, including the GETs.**
 
-### `GET /pulse/posts?page=1&limit=20`
-Location-scoped pulse feed.
+### `GET /pulse/posts?page=1&limit=20&scope=all`
+Pulse feed. `scope`: `all` (default) | `state` | `lga` | `ward` | `polling-unit` (non-`all` filters by your profile location).
 
 ### `POST /pulse/posts` (`multipart/form-data`)
 Create standalone pulse post (not tied to active election).
 
 Fields:
-- `body` (required)
-- `visibilityScope`: `ward` | `lga` (default `lga`)
+- `body` (required, max 5000 chars)
+- `visibilityScope`: `all` | `state` | `lga` | `ward` | `polling-unit` (default `all`)
 - `useAnonymousDisplay`: boolean-like
 - `image` (optional file)
 
+### `PATCH /pulse/posts/:postId` (`multipart/form-data` or JSON)
+Edit your own post. Send only the fields you want to change:
+- `body`, `visibilityScope`, `useAnonymousDisplay`
+- `image` (file) replaces the image; `removeImage: true` removes it
+
+Reposts can't be edited (`400`). Not your post → `403`. Returns `{ post }`.
+
+### `DELETE /pulse/posts/:postId`
+Delete your own post and its comments. Deleting an original also deletes all reposts of it; deleting a repost lowers the original's `repostCount`. Returns `{ id, deleted: true }`.
+
+### `POST /pulse/posts/:postId/repost`
+Repost. `409` if already reposted or it's your own post.
+
+### `DELETE /pulse/posts/:postId/repost`
+Undo your repost. `postId` can be the original post or your repost of it. Returns `{ id, removedRepostId, repostCount }`. `404` if you haven't reposted it.
+
 ### `POST /pulse/posts/:postId/like`
 Toggle like/unlike.
+
+### `DELETE /pulse/posts/:postId/like`
+Unlike (safe to call even if not liked). Returns `{ id, likesCount, isLikedByCurrentUser: false }`.
 
 ### `GET /pulse/posts/:postId/comments`
 Get comments.
@@ -478,8 +497,43 @@ Body:
 }
 ```
 
+### `PATCH /pulse/posts/:postId/comments/:commentId`
+Edit your own comment. Body: `{ "body": "...", "useAnonymousDisplay": false }` (either field optional). Returns `{ comment }`.
+
+### `DELETE /pulse/posts/:postId/comments/:commentId`
+Delete a comment. Allowed for the comment's author or the post's author. Returns `{ id, deleted: true }`.
+
 ### `POST /pulse/posts/:postId/comments/:commentId/like`
 Toggle like/unlike for comment.
+
+### `DELETE /pulse/posts/:postId/comments/:commentId/like`
+Unlike a comment (safe to call even if not liked). Returns `{ comment }`.
+
+### `POST /pulse/posts/:postId/report`
+Report a post. Body: `{ "reason": "harassment", "details": "optional, max 1000 chars" }`.
+`reason`: `spam` | `harassment` | `hate` | `violence` | `sexual` | `misinformation` | `other`.
+Reporting a repost reports the original. The reported post (and its reposts) disappears from the reporter's feed.
+`201` `{ report: { id, targetType, reason, status, createdAt } }`. `409` if already reported; `400` for your own post.
+
+### `POST /pulse/posts/:postId/comments/:commentId/report`
+Same body and responses as reporting a post. The comment disappears from the reporter's comment list.
+
+### `POST /pulse/blocks`
+Block the author of a post or comment. Body: `{ "postId": "..." }` or `{ "commentId": "..." }`. Safe to repeat.
+Blocks are made from content because anonymous posts never expose the author's account id.
+Both users stop seeing each other's posts, reposts and comments (feed, comments and dashboard), and can't comment on, like or repost each other's content (`403`).
+Anonymous authors follow the same rules: blocking an anonymous handle blocks the person behind it, including their named content.
+`200` `{ block: { id, displayName, blockedAt } }` — `displayName` is the name shown on that content (the anonymous handle for anonymous content).
+
+### `DELETE /pulse/blocks/:blockId`
+Unblock, using `block.id`. Safe to repeat. `200` `{ id, blocked: false }`.
+
+### `GET /pulse/blocks`
+`200` `{ blocks: [{ id, displayName, blockedAt }] }`, newest first. No account ids.
+
+### Pulse anonymity
+- `author.id` is `null` whenever `author.usedAnonymous` is `true` (posts, comments and `originalPost.author`).
+- Use `isOwnedByCurrentUser` on posts and comments to decide whether to show Edit/Delete — don't compare `author.id`.
 
 ### Citizen Academy (educational articles)
 

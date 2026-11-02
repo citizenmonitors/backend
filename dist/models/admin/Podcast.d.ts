@@ -3,27 +3,27 @@ declare const _default: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
+    title: string;
     recipients: string[];
     readBy: mongoose.Types.ObjectId[];
-    title: string;
     content: string;
     sender: mongoose.Types.ObjectId;
 }, {}, {}, {}, mongoose.Document<unknown, {}, {
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
+    title: string;
     recipients: string[];
     readBy: mongoose.Types.ObjectId[];
-    title: string;
     content: string;
     sender: mongoose.Types.ObjectId;
 }> & {
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
+    title: string;
     recipients: string[];
     readBy: mongoose.Types.ObjectId[];
-    title: string;
     content: string;
     sender: mongoose.Types.ObjectId;
 } & {
@@ -36,27 +36,27 @@ declare const _default: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
+    title: string;
     recipients: string[];
     readBy: mongoose.Types.ObjectId[];
-    title: string;
     content: string;
     sender: mongoose.Types.ObjectId;
 }, mongoose.Document<unknown, {}, mongoose.FlatRecord<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
+    title: string;
     recipients: string[];
     readBy: mongoose.Types.ObjectId[];
-    title: string;
     content: string;
     sender: mongoose.Types.ObjectId;
 }>> & mongoose.FlatRecord<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
+    title: string;
     recipients: string[];
     readBy: mongoose.Types.ObjectId[];
-    title: string;
     content: string;
     sender: mongoose.Types.ObjectId;
 }> & {

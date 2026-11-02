@@ -4,7 +4,7 @@ const podcastSchema = new mongoose.Schema({
     content: { type: String, required: true },
     recipients: {
         type: [String],
-        enum: ["all", "super-admin", "admin", "observer", "volunteer"],
+        enum: ["all", "super-admin", "admin", "observer", "volunteer", "public-viewer"],
         required: true,
     },
     sender: {

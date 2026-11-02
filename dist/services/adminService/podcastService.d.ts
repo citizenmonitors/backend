@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
 import type { Types } from "mongoose";
 type Id = string | Types.ObjectId;
-type RecipientRole = "all" | "super-admin" | "admin" | "observer" | "volunteer";
+declare const RECIPIENT_ROLES: readonly ["all", "super-admin", "admin", "observer", "volunteer", "public-viewer"];
+type RecipientRole = (typeof RECIPIENT_ROLES)[number];
 type SendPodcastInput = {
     title: string;
     content: string;

@@ -21,36 +21,29 @@ import { dispatchMobileNotification } from "../mobile/notificationDispatchServic
 import { createNewsInsightArticle } from "./newsInsightAdminService.ts";
 
 type Id = string | Types.ObjectId;
-type RecipientRole = "all" | "super-admin" | "admin" | "observer" | "volunteer";
-type MobileDispatchRole =
-  | "all"
-  | "super-admin"
-  | "admin"
-  | "observer"
-  | "volunteer"
-  | "public-viewer";
-
-const toMobileDispatchRecipients = (
-  recipients: RecipientRole[]
-): MobileDispatchRole[] => {
-  if (recipients.includes("all")) return ["all"];
-  return recipients as MobileDispatchRole[];
-};
+const RECIPIENT_ROLES = [
+  "all",
+  "super-admin",
+  "admin",
+  "observer",
+  "volunteer",
+  "public-viewer",
+] as const;
+type RecipientRole = (typeof RECIPIENT_ROLES)[number];
 
 const dispatchNewsletterMobileInbox = async (input: {
   recipients: RecipientRole[];
   title: string;
   info?: string;
 }) => {
-  const mobileRecipients = toMobileDispatchRecipients(input.recipients);
-  if (mobileRecipients.length === 0) return;
+  if (input.recipients.length === 0) return;
 
   await dispatchMobileNotification({
     type: "newsletter",
     preferenceKey: "newsletter",
     body: input.title,
     info: input.info ?? "",
-    recipients: mobileRecipients,
+    recipients: input.recipients,
   });
 };
 type UserEmailOnly = { email: string };
@@ -68,11 +61,25 @@ const requireId = (id: Id | undefined, field: string): Id => {
 const normalizeRecipients = (
   recipients: RecipientRole[] | RecipientRole
 ): RecipientRole[] => {
-  const normalized = typeof recipients === "string" ? [recipients] : recipients;
+  const list: unknown[] = Array.isArray(recipients) ? recipients : [recipients];
+  const normalized = [
+    ...new Set(list.map((r) => String(r ?? "").trim().toLowerCase()).filter(Boolean)),
+  ];
+  const invalid = normalized.filter(
+    (r) => !(RECIPIENT_ROLES as readonly string[]).includes(r)
+  );
+  if (invalid.length > 0) {
+    throw new Error(
+      `Invalid recipients: ${invalid.join(", ")}. Allowed: ${RECIPIENT_ROLES.join(", ")}`
+    );
+  }
+  if (normalized.length === 0) {
+    throw new Error("recipients is required");
+  }
   if (normalized.includes("all") && normalized.length > 1) {
     throw new Error("Cannot combine 'all' with specific roles. Choose either 'all' or specific roles.");
   }
-  return normalized;
+  return normalized as RecipientRole[];
 };
 
 type SendPodcastInput = {
@@ -145,7 +152,11 @@ const DEFAULT_NEWSLETTER_TEST_EMAILS = [
   "citizenmonitors@yahoo.com",
   "oluwaloninyo@yahoo.com",
   "yunusmustapha01@yahoo.com",
+  "olajumoke@citizenmonitors.com",
+  "yunus@citizenmonitors.com",
 ] as const;
+
+
 
 const normalizeTestEmails = (value: unknown): string[] => {
   if (value === undefined || value === null || value === "") return [];
@@ -599,14 +610,14 @@ export const sendNewsletterService = async ({
     );
   }
 
-  let normalizedRecipients: RecipientRole[] = ["all"];
   const providedRecipients =
-    recipients === undefined || recipients === null
+    recipients === undefined || recipients === null || (recipients as unknown) === ""
       ? null
       : Array.isArray(recipients) && recipients.length === 0
         ? null
         : recipients;
 
+  let normalizedRecipients: RecipientRole[] = ["all"];
   if (!isTestSend && shouldSendEmail) {
     if (!providedRecipients) {
       throw new Error("recipients is required for a live newsletter send");
@@ -654,20 +665,57 @@ export const sendNewsletterService = async ({
       const htmlContent = newsletter.buildEmailHtml();
       const listUnsubscribeUrl = getNewsletterUnsubscribeUrl();
 
-      const emailPromises = userEmails.map((email) =>
-        sendEmail({
-          to: email,
-          subject: newsletter.title,
-          htmlbody: htmlContent,
-          listUnsubscribeUrl,
-          trackClicks: false,
-          trackOpens: false,
-        }).catch((err) => {
-          console.error(`Failed to send email to ${email}:`, err);
-        })
+      // Zepto rate-limits / errors when every address fires at once. That used to
+      // crash the SDK mid-send and cut the newsletter short. Send in small batches.
+      const concurrency = Math.max(
+        1,
+        Math.min(10, Number(process.env.NEWSLETTER_SEND_CONCURRENCY) || 5)
       );
+      const delayMs = Math.max(
+        0,
+        Number(process.env.NEWSLETTER_SEND_DELAY_MS) || 200
+      );
+      let sent = 0;
+      let failed = 0;
 
-      await Promise.all(emailPromises);
+      for (let i = 0; i < userEmails.length; i += concurrency) {
+        const chunk = userEmails.slice(i, i + concurrency);
+        const results = await Promise.allSettled(
+          chunk.map((email) =>
+            sendEmail({
+              to: email,
+              subject: newsletter.title,
+              htmlbody: htmlContent,
+              listUnsubscribeUrl,
+              trackClicks: false,
+              trackOpens: false,
+            })
+          )
+        );
+
+        for (let j = 0; j < results.length; j++) {
+          const result = results[j]!;
+          if (result.status === "fulfilled") {
+            sent += 1;
+          } else {
+            failed += 1;
+            const email = chunk[j]!;
+            const reason =
+              result.reason instanceof Error
+                ? result.reason.message
+                : String(result.reason);
+            console.error(`Failed to send email to ${email}:`, reason);
+          }
+        }
+
+        console.log(
+          `Newsletter progress: ${Math.min(i + chunk.length, userEmails.length)}/${userEmails.length} (sent=${sent}, failed=${failed})`
+        );
+
+        if (delayMs > 0 && i + concurrency < userEmails.length) {
+          await new Promise((resolve) => setTimeout(resolve, delayMs));
+        }
+      }
     }
 
     const notificationsSent =

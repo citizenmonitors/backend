@@ -91,7 +91,7 @@ export const authenticateUser = async (payload) => {
         throw new Error("Invalid password");
     }
     const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
-        expiresIn: "1h",
+        algorithm: "HS256",
     });
     return token;
 };

@@ -384,7 +384,8 @@ Returns current user's submission (result or incident) for this active election.
 Upload fields:
 - `resultPicture` (file, optional)
 - `resultVideo` (file, optional)
-- body fields used by result schema, including `uploadLocation` (JSON/stringified JSON depending client)
+- body fields used by result schema, including `uploadLocation` (JSON/stringified JSON depending client). **Required for observers on mobile:** `{ "latitude": number, "longitude": number, "accuracy"?: number }`.
+- One submission per user per election: a result **or** an incident, not both.
 
 ### Incident CRUD
 - `POST /elections/:activeElectionId/report` (`multipart/form-data`)
@@ -405,17 +406,26 @@ Upload fields:
 Base: `/elections/:activeElectionId`
 
 ### `GET /elections/:activeElectionId/collation`
-Get collation bundle for active election.
+Get collation bundle for active election: `electionDetails`, `result`, `incidentReport`, `sentimentAnalysis`, `geoBreakdown`, `overview`, `meta`.
+- Counts include observer uploads kept (anonymised) after the observer deleted their account. `overview.distinctObserverSubmitters` counts current accounts only, so it can be lower than `overview.resultsUploadedCount`.
+- One result per polling unit: when a new observer uploads for a unit, their result replaces the anonymised one in the counts.
+- `geoBreakdown` regions use the same totals as the chart.
 
-### `POST /elections/:activeElectionId/collation/user-action`
-Actions: `agree`, `flag`, `unagree`
+### `GET /elections/:activeElectionId/user-action` and `GET /elections/:activeElectionId/collation/user-action`
+Polling-unit verification feed for this election: `{ message, results: { results: [...], incidentReports: [...] } }`. Each item's `electionId` is the result/incident id to act on; `agreed` / `flagged` are the viewer's own action. Hidden items are excluded. Readable after the election ends.
+- `403` for public viewers, users without a polling unit, or when the election isn't relevant to the user's location.
+
+### `POST /elections/:activeElectionId/user-action` and `POST /elections/:activeElectionId/collation/user-action`
+Actions: `agree`, `flag`, `unagree`, `unflag`
+
+Rules: only submissions from your own polling unit; never your own submission; only while the election is live (`403` after it ends: "Agree and flag are only allowed while the election is live..."). Response has the same shape as the GET feed. A POST with an empty body also returns the feed (prefer GET).
 
 Send as `multipart/form-data` when attaching optional flag evidence; `application/json` is still OK when you are not uploading files.
 
 Body fields:
 - `electionId` (required): target `ElectionData` or `IncidentReport` document id
 - `dataType` (required): `election` | `incident`
-- `action` (required): `agree` | `flag` | `unagree`
+- `action` (required): `agree` | `flag` | `unagree` | `unflag`
 - `flagReason` (**required** when `action` is `flag`): short explanation
 - `flagImage` (optional file): extra evidence
 - `flagVideo` (optional file): extra evidence

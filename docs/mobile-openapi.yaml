@@ -644,9 +644,19 @@ paths:
           schema: { type: string }
       responses: { "200": { description: OK } }
   /elections/{activeElectionId}/collation/user-action:
+    get:
+      tags: [Collation]
+      summary: Polling-unit verification feed for this election (also at /elections/{activeElectionId}/user-action)
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: activeElectionId
+          required: true
+          schema: { type: string }
+      responses: { "200": { description: "{ message, results: { results, incidentReports } }" }, "403": { description: Public viewer, no polling unit, or election not relevant to user } }
     post:
       tags: [Collation]
-      summary: Agree/flag/unagree collation item
+      summary: Agree/flag/unagree/unflag a result or incident (own polling unit, while live)
       security: [{ bearerAuth: [] }]
       parameters:
         - in: path
@@ -662,7 +672,7 @@ paths:
               required: [electionId, action, dataType]
               properties:
                 electionId: { type: string }
-                action: { type: string, enum: [agree, flag, unagree] }
+                action: { type: string, enum: [agree, flag, unagree, unflag] }
                 dataType: { type: string, enum: [election, incident] }
                 flagReason: { type: string, description: Required when action is flag }
           multipart/form-data:
@@ -671,7 +681,7 @@ paths:
               required: [electionId, action, dataType]
               properties:
                 electionId: { type: string }
-                action: { type: string, enum: [agree, flag, unagree] }
+                action: { type: string, enum: [agree, flag, unagree, unflag] }
                 dataType: { type: string, enum: [election, incident] }
                 flagReason: { type: string }
                 flagImage:

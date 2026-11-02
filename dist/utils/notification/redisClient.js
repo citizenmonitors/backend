@@ -4,6 +4,15 @@ dotenv.config();
 const redisUrl = process.env.REDIS_URL;
 const redisClient = createClient({
     ...(redisUrl ? { url: redisUrl } : {}),
+    // While disconnected, fail commands immediately instead of queueing them until a
+    // reconnect. Queued commands made cached API requests hang with no response.
+    disableOfflineQueue: true,
+    // Keep idle connections alive (hosted Redis often drops idle sockets).
+    pingInterval: 30_000,
+    socket: {
+        connectTimeout: 5_000,
+        reconnectStrategy: (retries) => Math.min(250 * 2 ** retries, 10_000),
+    },
 });
 redisClient.on("error", (err) => console.error("Redis Client Error", err));
 async function connectRedis() {

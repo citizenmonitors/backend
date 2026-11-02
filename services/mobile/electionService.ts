@@ -182,7 +182,9 @@ const getMobileActiveElectionsUncached = async (input: {
   user: AuthenticatedUser;
 }) => {
   const now = new Date();
+  // results[] / incidentReports[] can hold one id per upload; this list never uses them.
   const docs = await ActiveElection.find()
+    .select("-results -incidentReports")
     .populate("election", "electionType electionName")
     .sort({ startDate: statusSort(input.status) })
     .lean();

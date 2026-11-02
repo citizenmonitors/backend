@@ -10,6 +10,7 @@ import { invalidateCacheByPrefixes } from "../../utils/cache.ts";
 import {
   deletePulseComment,
   deletePulsePost,
+  getPulsePost,
   undoPulseRepost,
   unlikePulseComment,
   unlikePulsePost,
@@ -69,6 +70,19 @@ const readIds = (req: Request, withComment: boolean) => {
   const commentId = withComment ? asParamString(req.params.commentId) : "";
   const valid = isValidObjectId(postId) && (!withComment || isValidObjectId(commentId));
   return { postId, commentId, valid };
+};
+
+/** GET /posts/:postId — one post (auth optional on web, required on mobile). */
+export const getPulsePostById = async (req: Request, res: Response) => {
+  try {
+    const { postId, valid } = readIds(req, false);
+    if (!valid) return res.status(400).json({ message: "Invalid post id" });
+    const viewerId = (req as AuthenticatedRequest).user?._id;
+    const post = await getPulsePost(postId, viewerId ? String(viewerId) : null);
+    return res.status(200).json({ post });
+  } catch (error) {
+    return sendError(res, error);
+  }
 };
 
 /** PATCH /posts/:postId — multipart or JSON: body, visibilityScope, useAnonymousDisplay, removeImage, image file. */

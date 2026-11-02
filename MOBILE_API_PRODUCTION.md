@@ -283,6 +283,14 @@ Delete the signed-in account. Allowed for every role except admin / super-admin 
 ```
 Sign the user out locally after `200`; refresh tokens are revoked server-side. `403` → show `message`.
 
+### `POST /profile/push-token`
+Save this device's push token. Body: `{ "token": "ExponentPushToken[...]", "platform": "ios" | "android" | "web" }`. Call on login and whenever the token changes. The token is removed from any other account first (shared phones). `200` `{ registered: true, platform }`; `400` for an invalid token or platform.
+
+### `DELETE /profile/push-token`
+Remove the token on logout. Body: `{ "token": "..." }` (optional; without it the user's token is cleared). Idempotent. `200` `{ removed }`.
+
+Tokens Expo reports as `DeviceNotRegistered` (on send or in the delivery receipt ~15 min later) and tokens from the old `@nippysky` Expo project are removed automatically.
+
 ### `PUT /profile/me/password`
 Body:
 ```json
@@ -384,7 +392,7 @@ Returns current user's submission (result or incident) for this active election.
 Upload fields:
 - `resultPicture` (file, optional)
 - `resultVideo` (file, optional)
-- body fields used by result schema, including `uploadLocation` (JSON/stringified JSON depending client). **Required for observers on mobile:** `{ "latitude": number, "longitude": number, "accuracy"?: number }`.
+- body fields used by result schema, including `uploadLocation` (JSON/stringified JSON depending client). **Required for observers on mobile:** `{ "latitude": number, "longitude": number, "accuracy"?: number, "address"?: string }`. When GPS isn't available, `{ "latitude": 0, "longitude": 0, "address": "<polling unit address>" }` is accepted.
 - One submission per user per election: a result **or** an incident, not both.
 
 ### Incident CRUD
@@ -495,6 +503,9 @@ Fields:
 
 If the image can't be uploaded (for example a storage outage), the post is still published without it. The response then includes `"warning": "Your post was published without the image..."` and `post.imageUploadFailed: true`. Show the warning; don't retry the whole post. The same applies to quotes and to edits (on edit the old image is kept; an edit that only changes the image returns `503`).
 
+### `GET /pulse/posts/:postId`
+One post (shared links, tapped quotes, notifications). `200` `{ post }`. `404` if it doesn't exist, was deleted, or is hidden for this user (blocked author or reported by them).
+
 ### `PATCH /pulse/posts/:postId` (`multipart/form-data` or JSON)
 Edit your own post. Send only the fields you want to change:
 - `body`, `visibilityScope`, `useAnonymousDisplay`
@@ -503,11 +514,11 @@ Edit your own post. Send only the fields you want to change:
 Reposts can't be edited (`400`). Not your post → `403`. Returns `{ post }`.
 
 ### `DELETE /pulse/posts/:postId`
-Delete your own post and its comments. Deleting an original also deletes all reposts of it; deleting a repost lowers the original's `repostCount`. Returns `{ id, deleted: true }`.
+Delete your own post and its comments. Plain reposts of it are deleted too; quotes of it stay and show `originalPost.unavailable: true`. Deleting a repost or quote lowers the original's `repostCount` / `quoteCount`. Returns `{ id, deleted: true, repostsDeleted }`.
 
 ### `POST /pulse/posts/:postId/repost` (JSON or `multipart/form-data`)
 Repost or quote, like X.
-- **No `body`** → plain repost. One per user per post; not allowed on your own post (`409` for either).
+- **No `body`** → plain repost. One per user per post, including your own posts (`409` if already reposted).
 - **With `body`** → quote post: your own text on top of the post. Optional fields: `image` (file), `visibilityScope`, `useAnonymousDisplay`. Many quotes allowed, including of your own post. An `image` without `body` is rejected (`400`).
 - Reposting a plain repost targets its original; reposting or quoting a quote targets that quote.
 
@@ -568,6 +579,11 @@ Unblock, using `block.id`. Safe to repeat. `200` `{ id, blocked: false }`.
 
 ### `GET /pulse/blocks`
 `200` `{ blocks: [{ id, displayName, blockedAt }] }`, newest first. No account ids.
+
+### Pulse author, ownership and edit fields
+- `author.avatarUrl`: profile photo URL, or `null` (no photo, or anonymous post/comment).
+- `originalPost.isOwnedByCurrentUser`: the viewer owns the reposted/quoted post (hide Repost/Report/Block for it).
+- `editedAt` on posts and comments: set only when the text or image is edited; `null` otherwise. Use it for an "Edited" label.
 
 ### Pulse post fields for reposts and quotes
 - `isRepost` (true for plain reposts and quotes), `isQuote`, `repostCount`, `quoteCount`.

@@ -12,6 +12,9 @@ type AuthorLean = {
     firstName?: string | null;
     lastName?: string | null;
     anonymousUsername?: string | null;
+    profileImage?: {
+        url?: string | null;
+    } | null;
 };
 export declare const parsePulseFeedScope: (value: unknown) => PulseFeedScope;
 export declare const parseVisibilityScope: (value: unknown, fallback?: VisibilityScope) => VisibilityScope;
@@ -56,7 +59,9 @@ export declare const listPulseFeed: (input?: {
                 id: string | null;
                 displayName: string;
                 usedAnonymous: boolean;
+                avatarUrl: string | null;
             };
+            isOwnedByCurrentUser: boolean;
             unavailable: boolean;
         } | {
             id: string;
@@ -66,16 +71,19 @@ export declare const listPulseFeed: (input?: {
             isQuote?: undefined;
             createdAt?: undefined;
             author?: undefined;
+            isOwnedByCurrentUser?: undefined;
         } | null;
         repostCount: number;
         quoteCount: number;
         isRepostedByCurrentUser: boolean;
         createdAt: Date | undefined;
         updatedAt: Date | undefined;
+        editedAt: Date | null;
         author: {
             id: string | null;
             displayName: string;
             usedAnonymous: boolean;
+            avatarUrl: string | null;
         };
         isOwnedByCurrentUser: boolean;
         likesCount: number;
@@ -86,6 +94,63 @@ export declare const listPulseFeed: (input?: {
     page: number;
     limit: number;
     scope: VisibilityScope;
+}>;
+/**
+ * One post by id (shared links, tapped quotes, notifications).
+ * Hidden the same way as the feed: blocked users' posts and posts the viewer reported
+ * return "Post not found".
+ */
+export declare const getPulsePost: (postId: string, viewerUserId?: Id | null) => Promise<{
+    id: string;
+    body: string | undefined;
+    imageUrl: string | null;
+    visibilityScope: string;
+    audienceState: string | null;
+    audienceLga: string | null;
+    audienceWard: string | null;
+    audiencePollingUnit: string | null;
+    isRepost: boolean;
+    isQuote: boolean;
+    originalPost: {
+        id: string;
+        body: string | undefined;
+        imageUrl: string | null;
+        isQuote: boolean;
+        createdAt: Date | undefined;
+        author: {
+            id: string | null;
+            displayName: string;
+            usedAnonymous: boolean;
+            avatarUrl: string | null;
+        };
+        isOwnedByCurrentUser: boolean;
+        unavailable: boolean;
+    } | {
+        id: string;
+        unavailable: boolean;
+        body?: undefined;
+        imageUrl?: undefined;
+        isQuote?: undefined;
+        createdAt?: undefined;
+        author?: undefined;
+        isOwnedByCurrentUser?: undefined;
+    } | null;
+    repostCount: number;
+    quoteCount: number;
+    isRepostedByCurrentUser: boolean;
+    createdAt: Date | undefined;
+    updatedAt: Date | undefined;
+    editedAt: Date | null;
+    author: {
+        id: string | null;
+        displayName: string;
+        usedAnonymous: boolean;
+        avatarUrl: string | null;
+    };
+    isOwnedByCurrentUser: boolean;
+    likesCount: number;
+    commentsCount: number;
+    isLikedByCurrentUser: boolean;
 }>;
 export declare const listPulsePosts: (userId: Id, page?: number, limit?: number, scope?: unknown) => Promise<{
     posts: {
@@ -109,7 +174,9 @@ export declare const listPulsePosts: (userId: Id, page?: number, limit?: number,
                 id: string | null;
                 displayName: string;
                 usedAnonymous: boolean;
+                avatarUrl: string | null;
             };
+            isOwnedByCurrentUser: boolean;
             unavailable: boolean;
         } | {
             id: string;
@@ -119,16 +186,19 @@ export declare const listPulsePosts: (userId: Id, page?: number, limit?: number,
             isQuote?: undefined;
             createdAt?: undefined;
             author?: undefined;
+            isOwnedByCurrentUser?: undefined;
         } | null;
         repostCount: number;
         quoteCount: number;
         isRepostedByCurrentUser: boolean;
         createdAt: Date | undefined;
         updatedAt: Date | undefined;
+        editedAt: Date | null;
         author: {
             id: string | null;
             displayName: string;
             usedAnonymous: boolean;
+            avatarUrl: string | null;
         };
         isOwnedByCurrentUser: boolean;
         likesCount: number;
@@ -163,7 +233,9 @@ export declare const listPulsePostsPublic: (page?: number, limit?: number, scope
                 id: string | null;
                 displayName: string;
                 usedAnonymous: boolean;
+                avatarUrl: string | null;
             };
+            isOwnedByCurrentUser: boolean;
             unavailable: boolean;
         } | {
             id: string;
@@ -173,16 +245,19 @@ export declare const listPulsePostsPublic: (page?: number, limit?: number, scope
             isQuote?: undefined;
             createdAt?: undefined;
             author?: undefined;
+            isOwnedByCurrentUser?: undefined;
         } | null;
         repostCount: number;
         quoteCount: number;
         isRepostedByCurrentUser: boolean;
         createdAt: Date | undefined;
         updatedAt: Date | undefined;
+        editedAt: Date | null;
         author: {
             id: string | null;
             displayName: string;
             usedAnonymous: boolean;
+            avatarUrl: string | null;
         };
         isOwnedByCurrentUser: boolean;
         likesCount: number;
@@ -222,7 +297,9 @@ export declare const createPulsePost: (userId: Id, input: {
             id: string | null;
             displayName: string;
             usedAnonymous: boolean;
+            avatarUrl: string | null;
         };
+        isOwnedByCurrentUser: boolean;
         unavailable: boolean;
     } | {
         id: string;
@@ -232,16 +309,19 @@ export declare const createPulsePost: (userId: Id, input: {
         isQuote?: undefined;
         createdAt?: undefined;
         author?: undefined;
+        isOwnedByCurrentUser?: undefined;
     } | null;
     repostCount: number;
     quoteCount: number;
     isRepostedByCurrentUser: boolean;
     createdAt: Date | undefined;
     updatedAt: Date | undefined;
+    editedAt: Date | null;
     author: {
         id: string | null;
         displayName: string;
         usedAnonymous: boolean;
+        avatarUrl: string | null;
     };
     isOwnedByCurrentUser: boolean;
     likesCount: number;
@@ -250,7 +330,7 @@ export declare const createPulsePost: (userId: Id, input: {
 }>;
 /**
  * Repost like X.
- * - No body: plain repost (one per user per post; not your own post).
+ * - No body: plain repost (one per user per post, including your own).
  * - With body (and optional image): quote post with your own text on top. Many allowed,
  *   including quoting your own post.
  * Reposting a plain repost targets its original; reposting or quoting a quote targets
@@ -284,7 +364,9 @@ export declare const repostPulsePost: (userId: Id, postId: string, input?: {
             id: string | null;
             displayName: string;
             usedAnonymous: boolean;
+            avatarUrl: string | null;
         };
+        isOwnedByCurrentUser: boolean;
         unavailable: boolean;
     } | {
         id: string;
@@ -294,16 +376,19 @@ export declare const repostPulsePost: (userId: Id, postId: string, input?: {
         isQuote?: undefined;
         createdAt?: undefined;
         author?: undefined;
+        isOwnedByCurrentUser?: undefined;
     } | null;
     repostCount: number;
     quoteCount: number;
     isRepostedByCurrentUser: boolean;
     createdAt: Date | undefined;
     updatedAt: Date | undefined;
+    editedAt: Date | null;
     author: {
         id: string | null;
         displayName: string;
         usedAnonymous: boolean;
+        avatarUrl: string | null;
     };
     isOwnedByCurrentUser: boolean;
     likesCount: number;
@@ -326,10 +411,12 @@ export declare const listPulsePostComments: (userId: Id, postId: string) => Prom
     body: string | undefined;
     createdAt: Date | undefined;
     updatedAt: Date | undefined;
+    editedAt: Date | null;
     author: {
         id: string | null;
         displayName: string;
         usedAnonymous: boolean;
+        avatarUrl: string | null;
     };
     isOwnedByCurrentUser: boolean;
     likesCount: number;
@@ -341,10 +428,12 @@ export declare const listPulsePostCommentsPublic: (postId: string, viewerUserId?
     body: string | undefined;
     createdAt: Date | undefined;
     updatedAt: Date | undefined;
+    editedAt: Date | null;
     author: {
         id: string | null;
         displayName: string;
         usedAnonymous: boolean;
+        avatarUrl: string | null;
     };
     isOwnedByCurrentUser: boolean;
     likesCount: number;
@@ -358,10 +447,12 @@ export declare const addPulsePostComment: (userId: Id, postId: string, input: {
     body: string | undefined;
     createdAt: Date | undefined;
     updatedAt: Date | undefined;
+    editedAt: Date | null;
     author: {
         id: string | null;
         displayName: string;
         usedAnonymous: boolean;
+        avatarUrl: string | null;
     };
     isOwnedByCurrentUser: boolean;
     likesCount: number;
@@ -376,10 +467,12 @@ export declare const addPulsePostCommentAnyLocation: (userId: Id, postId: string
     body: string | undefined;
     createdAt: Date | undefined;
     updatedAt: Date | undefined;
+    editedAt: Date | null;
     author: {
         id: string | null;
         displayName: string;
         usedAnonymous: boolean;
+        avatarUrl: string | null;
     };
     isOwnedByCurrentUser: boolean;
     likesCount: number;
@@ -390,10 +483,12 @@ export declare const togglePulseCommentLike: (userId: Id, postId: string, commen
     body: string | undefined;
     createdAt: Date | undefined;
     updatedAt: Date | undefined;
+    editedAt: Date | null;
     author: {
         id: string | null;
         displayName: string;
         usedAnonymous: boolean;
+        avatarUrl: string | null;
     };
     isOwnedByCurrentUser: boolean;
     likesCount: number;
@@ -405,10 +500,12 @@ export declare const togglePulseCommentLikeAnyLocation: (userId: Id, postId: str
     body: string | undefined;
     createdAt: Date | undefined;
     updatedAt: Date | undefined;
+    editedAt: Date | null;
     author: {
         id: string | null;
         displayName: string;
         usedAnonymous: boolean;
+        avatarUrl: string | null;
     };
     isOwnedByCurrentUser: boolean;
     likesCount: number;
@@ -444,7 +541,9 @@ export declare const updatePulsePost: (userId: Id, postId: string, input: {
             id: string | null;
             displayName: string;
             usedAnonymous: boolean;
+            avatarUrl: string | null;
         };
+        isOwnedByCurrentUser: boolean;
         unavailable: boolean;
     } | {
         id: string;
@@ -454,16 +553,19 @@ export declare const updatePulsePost: (userId: Id, postId: string, input: {
         isQuote?: undefined;
         createdAt?: undefined;
         author?: undefined;
+        isOwnedByCurrentUser?: undefined;
     } | null;
     repostCount: number;
     quoteCount: number;
     isRepostedByCurrentUser: boolean;
     createdAt: Date | undefined;
     updatedAt: Date | undefined;
+    editedAt: Date | null;
     author: {
         id: string | null;
         displayName: string;
         usedAnonymous: boolean;
+        avatarUrl: string | null;
     };
     isOwnedByCurrentUser: boolean;
     likesCount: number;
@@ -515,10 +617,12 @@ export declare const updatePulseComment: (userId: Id, postId: string, commentId:
     body: string | undefined;
     createdAt: Date | undefined;
     updatedAt: Date | undefined;
+    editedAt: Date | null;
     author: {
         id: string | null;
         displayName: string;
         usedAnonymous: boolean;
+        avatarUrl: string | null;
     };
     isOwnedByCurrentUser: boolean;
     likesCount: number;
@@ -535,10 +639,12 @@ export declare const unlikePulseComment: (userId: Id, postId: string, commentId:
     body: string | undefined;
     createdAt: Date | undefined;
     updatedAt: Date | undefined;
+    editedAt: Date | null;
     author: {
         id: string | null;
         displayName: string;
         usedAnonymous: boolean;
+        avatarUrl: string | null;
     };
     isOwnedByCurrentUser: boolean;
     likesCount: number;

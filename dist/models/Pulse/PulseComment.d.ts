@@ -14,6 +14,7 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
+    editedAt: NativeDate;
 }, {}, {}, {}, mongoose.Document<unknown, {}, {
     createdAt: NativeDate;
     updatedAt: NativeDate;
@@ -29,6 +30,7 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
+    editedAt: NativeDate;
 }> & {
     createdAt: NativeDate;
     updatedAt: NativeDate;
@@ -44,6 +46,7 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
+    editedAt: NativeDate;
 } & {
     _id: mongoose.Types.ObjectId;
 } & {
@@ -65,6 +68,7 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
+    editedAt: NativeDate;
 }, mongoose.Document<unknown, {}, mongoose.FlatRecord<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
@@ -80,6 +84,7 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
+    editedAt: NativeDate;
 }>> & mongoose.FlatRecord<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
@@ -95,6 +100,7 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
+    editedAt: NativeDate;
 }> & {
     _id: mongoose.Types.ObjectId;
 } & {

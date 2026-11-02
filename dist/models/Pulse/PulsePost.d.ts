@@ -17,6 +17,7 @@ declare const PulsePost: mongoose.Model<{
     isQuote: boolean;
     repostCount: number;
     quoteCount: number;
+    editedAt: NativeDate;
     imageUrl?: string | null | undefined;
     audienceState?: string | null | undefined;
     audienceLga?: string | null | undefined;
@@ -41,6 +42,7 @@ declare const PulsePost: mongoose.Model<{
     isQuote: boolean;
     repostCount: number;
     quoteCount: number;
+    editedAt: NativeDate;
     imageUrl?: string | null | undefined;
     audienceState?: string | null | undefined;
     audienceLga?: string | null | undefined;
@@ -65,6 +67,7 @@ declare const PulsePost: mongoose.Model<{
     isQuote: boolean;
     repostCount: number;
     quoteCount: number;
+    editedAt: NativeDate;
     imageUrl?: string | null | undefined;
     audienceState?: string | null | undefined;
     audienceLga?: string | null | undefined;
@@ -95,6 +98,7 @@ declare const PulsePost: mongoose.Model<{
     isQuote: boolean;
     repostCount: number;
     quoteCount: number;
+    editedAt: NativeDate;
     imageUrl?: string | null | undefined;
     audienceState?: string | null | undefined;
     audienceLga?: string | null | undefined;
@@ -119,6 +123,7 @@ declare const PulsePost: mongoose.Model<{
     isQuote: boolean;
     repostCount: number;
     quoteCount: number;
+    editedAt: NativeDate;
     imageUrl?: string | null | undefined;
     audienceState?: string | null | undefined;
     audienceLga?: string | null | undefined;
@@ -143,6 +148,7 @@ declare const PulsePost: mongoose.Model<{
     isQuote: boolean;
     repostCount: number;
     quoteCount: number;
+    editedAt: NativeDate;
     imageUrl?: string | null | undefined;
     audienceState?: string | null | undefined;
     audienceLga?: string | null | undefined;

@@ -20,6 +20,7 @@ type TokenTarget = {
 };
 
 type ExpoPushTicket = {
+  id?: string;
   status?: string;
   message?: string;
   details?: { error?: string };
@@ -104,6 +105,56 @@ const clearLegacyExpoFlag = async (userIds: string[]): Promise<void> => {
   );
 };
 
+const EXPO_RECEIPTS_URL = "https://exp.host/--/api/v2/push/getReceipts";
+
+/**
+ * Expo often reports an uninstalled app (DeviceNotRegistered) only in the delivery
+ * receipt, a few minutes after the send. Check receipts later and drop those tokens.
+ * Best-effort and in memory: a restart skips pending checks.
+ */
+const scheduleExpoReceiptCheck = (receiptTokens: Map<string, string>) => {
+  if (receiptTokens.size === 0) return;
+  const delayMs = Number(process.env.EXPO_RECEIPT_CHECK_DELAY_MS) || 15 * 60 * 1000;
+  const timer = setTimeout(() => {
+    void checkExpoReceipts(receiptTokens).catch((error) =>
+      console.error("Expo receipt check failed:", error)
+    );
+  }, delayMs);
+  timer.unref?.();
+};
+
+export const checkExpoReceipts = async (receiptTokens: Map<string, string>) => {
+  const ids = [...receiptTokens.keys()];
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  };
+  const expoAccessToken = process.env.EXPO_ACCESS_TOKEN?.trim();
+  if (expoAccessToken) headers.Authorization = `Bearer ${expoAccessToken}`;
+
+  const dead: string[] = [];
+  for (let i = 0; i < ids.length; i += 300) {
+    const chunk = ids.slice(i, i + 300);
+    const response = await fetch(EXPO_RECEIPTS_URL, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ ids: chunk }),
+    });
+    if (!response.ok) continue;
+    const payload = (await response.json().catch(() => ({}))) as {
+      data?: Record<string, { status?: string; details?: { error?: string } }>;
+    };
+    for (const [id, receipt] of Object.entries(payload.data ?? {})) {
+      if (receipt?.status === "error" && receipt.details?.error === "DeviceNotRegistered") {
+        const token = receiptTokens.get(id);
+        if (token) dead.push(token);
+      }
+    }
+  }
+  await clearInvalidPushTokens(dead);
+  return { checked: ids.length, removed: dead.length };
+};
+
 const postExpoPushMessages = async (
   messages: ExpoPushMessage[]
 ): Promise<{ ok: boolean; status: number; body: string }> => {
@@ -139,10 +190,14 @@ const applyExpoTickets = async (
   const invalidTokens: string[] = [];
   const deliveredUserIds: string[] = [];
 
+  const receiptTokens = new Map<string, string>();
+
   tickets.forEach((ticket, index) => {
     if (ticket.status === "ok") {
       const userId = targets[index]?.userId;
       if (userId) deliveredUserIds.push(userId);
+      const token = targets[index]?.token;
+      if (ticket.id && token) receiptTokens.set(ticket.id, token);
       return;
     }
     if (ticket.status !== "error") return;
@@ -157,6 +212,7 @@ const applyExpoTickets = async (
     await clearInvalidPushTokens(invalidTokens);
   }
   await clearLegacyExpoFlag(deliveredUserIds);
+  scheduleExpoReceiptCheck(receiptTokens);
 };
 
 /**
@@ -371,4 +427,52 @@ export const sendPushForMobileNotification = async (input: {
     body: subtitle,
     data,
   });
+};
+
+const PUSH_PLATFORMS = ["ios", "android", "web"] as const;
+
+/**
+ * Save the device's push token for this user (called on login / app start).
+ * A token belongs to one device, so it's removed from any other account first:
+ * otherwise a shared phone would keep getting the previous user's notifications.
+ */
+export const registerPushToken = async (
+  userId: string,
+  input: { token?: unknown; platform?: unknown }
+) => {
+  const token = String(input.token ?? "").trim();
+  if (!token) throw new Error("token is required");
+  if (!isExpoPushToken(token) && !isFcmPushToken(token)) {
+    throw new Error("Invalid push token");
+  }
+  const platform = String(input.platform ?? "").trim().toLowerCase();
+  if (platform && !(PUSH_PLATFORMS as readonly string[]).includes(platform)) {
+    throw new Error("Invalid platform. Use ios, android or web");
+  }
+
+  await CompletedUser.updateMany(
+    { _id: { $ne: userId }, "mobileMeta.pushToken": token },
+    { $unset: { "mobileMeta.pushToken": "" } }
+  );
+  const result = await CompletedUser.updateOne(
+    { _id: userId },
+    {
+      $set: {
+        "mobileMeta.pushToken": token,
+        ...(platform ? { "mobileMeta.platform": platform } : {}),
+      },
+    }
+  );
+  if (result.matchedCount === 0) throw new Error("User not found");
+  return { registered: true, platform: platform || null };
+};
+
+/** Remove the token on logout. Idempotent; without a token, clears the user's token. */
+export const unregisterPushToken = async (userId: string, input: { token?: unknown }) => {
+  const token = String(input.token ?? "").trim();
+  const result = await CompletedUser.updateOne(
+    token ? { _id: userId, "mobileMeta.pushToken": token } : { _id: userId },
+    { $unset: { "mobileMeta.pushToken": "" } }
+  );
+  return { removed: result.modifiedCount > 0 };
 };

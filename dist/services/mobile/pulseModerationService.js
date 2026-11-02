@@ -114,12 +114,12 @@ const resolveBlockTarget = async (input) => {
     const row = commentId
         ? isValidObjectId(commentId)
             ? await PulseComment.findById(commentId)
-                .populate("author", "firstName lastName anonymousUsername")
+                .populate("author", "firstName lastName anonymousUsername profileImage.url")
                 .lean()
             : null
         : isValidObjectId(postId)
             ? await PulsePost.findById(postId)
-                .populate("author", "firstName lastName anonymousUsername")
+                .populate("author", "firstName lastName anonymousUsername profileImage.url")
                 .lean()
             : null;
     if (!row)

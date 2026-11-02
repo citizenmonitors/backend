@@ -11,6 +11,7 @@ import {
   postPulseRepostMobile,
 } from "../../controllers/mobile/pulseController.ts";
 import {
+  getPulsePostById,
   patchPulseComment,
   patchPulsePost,
   removePulseComment,
@@ -62,6 +63,7 @@ router.post(
 );
 
 /** Edit / delete / unlike / undo repost — auth required. */
+router.get("/posts/:postId", authMiddleware, getPulsePostById);
 router.patch("/posts/:postId", authMiddleware, handlePulseUpload, patchPulsePost);
 router.delete("/posts/:postId", authMiddleware, removePulsePost);
 router.delete("/posts/:postId/repost", authMiddleware, removePulseRepost);

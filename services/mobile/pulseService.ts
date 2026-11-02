@@ -21,7 +21,11 @@ type AuthorLean = {
   firstName?: string | null;
   lastName?: string | null;
   anonymousUsername?: string | null;
+  profileImage?: { url?: string | null } | null;
 };
+
+/** Fields loaded for post/comment authors (name, anonymous handle, photo). */
+const AUTHOR_FIELDS = "firstName lastName anonymousUsername profileImage.url";
 type PulseLocation = {
   state: string;
   lga: string;
@@ -270,12 +274,14 @@ const serializeAuthor = (
     author,
     useAnonymousDisplay
   );
+  const photo = String(author?.profileImage?.url ?? "").trim();
   return {
-    // Never expose the account id behind an anonymous name: it would link the
-    // anonymous handle to the same person's named posts.
+    // Never expose the account id or photo behind an anonymous name: either would
+    // link the anonymous handle to the same person's named posts.
     id: !usedAnonymous && author?._id != null ? String(author._id) : null,
     displayName,
     usedAnonymous,
+    avatarUrl: !usedAnonymous && /^https?:\/\//i.test(photo) ? photo : null,
   };
 };
 
@@ -333,7 +339,8 @@ const serializeOriginalPost = (
       }
     | null
     | undefined,
-  fallbackId?: string | null
+  fallbackId?: string | null,
+  viewerUserId?: Id | null
 ) => {
   if (row?._id) {
     return {
@@ -343,6 +350,7 @@ const serializeOriginalPost = (
       isQuote: Boolean(row.isQuote),
       createdAt: row.createdAt,
       author: serializeAuthor(row.author, Boolean(row.useAnonymousDisplay)),
+      isOwnedByCurrentUser: isOwnedBy(row.author, viewerUserId),
       unavailable: false,
     };
   }
@@ -370,6 +378,7 @@ const serializePulsePost = (
     quoteCount?: number;
     createdAt?: Date;
     updatedAt?: Date;
+    editedAt?: Date | null;
   },
   viewerUserId?: Id | null,
   commentsCount = 0,
@@ -402,13 +411,16 @@ const serializePulsePost = (
             author?: AuthorLean | null;
           })
         : null,
-      originalIdOf(row.repostedFrom)
+      originalIdOf(row.repostedFrom),
+      viewerUserId
     ),
     repostCount: Number(row.repostCount ?? 0),
     quoteCount: Number(row.quoteCount ?? 0),
     isRepostedByCurrentUser: Boolean(extras.isRepostedByCurrentUser),
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
+    // Only set when the text or image was edited; use this for an "Edited" label.
+    editedAt: row.editedAt ?? null,
     author: serializeAuthor(row.author, Boolean(row.useAnonymousDisplay)),
     isOwnedByCurrentUser: isOwnedBy(row.author, viewerUserId),
     likesCount: likes.length,
@@ -421,7 +433,7 @@ const serializePulsePost = (
 
 const pulseAuthorPopulate = {
   path: "author",
-  select: "firstName lastName anonymousUsername",
+  select: AUTHOR_FIELDS,
 } as const;
 
 const pulseOriginalPopulate = {
@@ -439,6 +451,7 @@ const serializePulseComment = (
     author?: AuthorLean | null;
     createdAt?: Date;
     updatedAt?: Date;
+    editedAt?: Date | null;
   },
   viewerUserId?: Id | null
 ) => {
@@ -448,6 +461,7 @@ const serializePulseComment = (
     body: row.body,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
+    editedAt: row.editedAt ?? null,
     author: serializeAuthor(row.author, Boolean(row.useAnonymousDisplay)),
     isOwnedByCurrentUser: isOwnedBy(row.author, viewerUserId),
     likesCount: likes.length,
@@ -554,6 +568,41 @@ export const listPulseFeed = async (input?: {
   return { posts, total, page, limit: safeLimit, scope };
 };
 
+/**
+ * One post by id (shared links, tapped quotes, notifications).
+ * Hidden the same way as the feed: blocked users' posts and posts the viewer reported
+ * return "Post not found".
+ */
+export const getPulsePost = async (postId: string, viewerUserId?: Id | null) => {
+  if (viewerUserId) {
+    const safety = await buildViewerSafetyFilter(viewerUserId);
+    const visible = await PulsePost.exists({ _id: postId, ...safety.filter });
+    if (!visible) throw new Error("Post not found");
+    const row = await PulsePost.findById(postId)
+      .populate(pulseAuthorPopulate)
+      .populate(pulseOriginalPopulate)
+      .lean();
+    if (!row) throw new Error("Post not found");
+    const counts = await commentCountsByPost([row._id], safety.hiddenUserIds);
+    const target = repostTargetIdOf({
+      _id: row._id,
+      repostedFrom: originalIdOf(row.repostedFrom),
+      isQuote: row.isQuote,
+    });
+    const reposted = await viewerRepostedTargets(viewerUserId, target ? [target] : []);
+    return serializePulsePost(row, viewerUserId, counts.get(String(row._id)) ?? 0, {
+      isRepostedByCurrentUser: Boolean(target && reposted.has(target)),
+    });
+  }
+  const row = await PulsePost.findById(postId)
+    .populate(pulseAuthorPopulate)
+    .populate(pulseOriginalPopulate)
+    .lean();
+  if (!row) throw new Error("Post not found");
+  const counts = await commentCountsByPost([row._id]);
+  return serializePulsePost(row, null, counts.get(String(row._id)) ?? 0);
+};
+
 export const listPulsePosts = async (
   userId: Id,
   page = 1,
@@ -635,7 +684,7 @@ export const createPulsePost = async (
 
 /**
  * Repost like X.
- * - No body: plain repost (one per user per post; not your own post).
+ * - No body: plain repost (one per user per post, including your own).
  * - With body (and optional image): quote post with your own text on top. Many allowed,
  *   including quoting your own post.
  * Reposting a plain repost targets its original; reposting or quoting a quote targets
@@ -699,9 +748,7 @@ export const repostPulsePost = async (
     });
     await PulsePost.updateOne({ _id: targetId }, { $inc: { quoteCount: 1 } });
   } else {
-    if (String(target.author) === String(userId)) {
-      throw new Error("You cannot repost your own post");
-    }
+    // Reposting your own post is allowed, like on X.
     const already = await PulsePost.exists({
       author: userId,
       repostedFrom: targetId,
@@ -796,7 +843,7 @@ export const listPulsePostComments = async (userId: Id, postId: string) => {
   await assertPostVisibleToUser(postId, userId);
   const safety = await buildCommentSafetyFilter(userId);
   const rows = await PulseComment.find({ post: postId, ...safety })
-    .populate("author", "firstName lastName anonymousUsername")
+    .populate("author", AUTHOR_FIELDS)
     .sort({ createdAt: -1 })
     .lean();
   return rows.map((row) => serializePulseComment(row, userId));
@@ -812,7 +859,7 @@ export const listPulsePostCommentsPublic = async (
 
   const safety = await buildCommentSafetyFilter(viewerUserId);
   const rows = await PulseComment.find({ post: postId, ...safety })
-    .populate("author", "firstName lastName anonymousUsername")
+    .populate("author", AUTHOR_FIELDS)
     .sort({ createdAt: -1 })
     .lean();
 
@@ -867,7 +914,7 @@ const addPulsePostCommentCore = async (
   });
 
   const populated = await PulseComment.findById(created._id)
-    .populate("author", "firstName lastName anonymousUsername")
+    .populate("author", AUTHOR_FIELDS)
     .lean();
 
   if (postAuthor && String(postAuthor) !== String(userId)) {
@@ -927,7 +974,7 @@ const togglePulseCommentLikeCore = async (
       : { $addToSet: { likes: { user: likeUserId } } },
     { new: true }
   )
-    .populate("author", "firstName lastName anonymousUsername")
+    .populate("author", AUTHOR_FIELDS)
     .lean();
   if (!updated) throw new Error("Comment not found");
   return serializePulseComment(updated, userId);
@@ -1029,6 +1076,9 @@ export const updatePulsePost = async (
     throw new Error("Nothing to update");
   }
 
+  if ("body" in set || "imageUrl" in set || unset.imageUrl) {
+    set.editedAt = new Date();
+  }
   const update: Record<string, unknown> = {};
   if (Object.keys(set).length) update.$set = set;
   if (Object.keys(unset).length) update.$unset = unset;
@@ -1170,13 +1220,14 @@ export const updatePulseComment = async (
     set.useAnonymousDisplay = input.useAnonymousDisplay;
   }
   if (Object.keys(set).length === 0) throw new Error("Nothing to update");
+  if ("body" in set) set.editedAt = new Date();
 
   const updated = await PulseComment.findOneAndUpdate(
     { _id: commentId, post: postId },
     { $set: set },
     { new: true }
   )
-    .populate("author", "firstName lastName anonymousUsername")
+    .populate("author", AUTHOR_FIELDS)
     .lean();
   if (!updated) throw new Error("Comment not found");
   return serializePulseComment(updated, userId);
@@ -1212,7 +1263,7 @@ export const unlikePulseComment = async (
     { $pull: { likes: { user: likeUserId } } },
     { new: true }
   )
-    .populate("author", "firstName lastName anonymousUsername")
+    .populate("author", AUTHOR_FIELDS)
     .lean();
   if (!updated) throw new Error("Comment not found");
   return serializePulseComment(updated, userId);

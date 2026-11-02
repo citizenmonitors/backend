@@ -27,6 +27,8 @@ const pulseCommentSchema = new mongoose.Schema(
     },
     body: { type: String, required: true, trim: true, maxlength: 3000 },
     useAnonymousDisplay: { type: Boolean, default: false },
+    /** Set only when the text or image is edited (not on likes, counts, etc.). */
+    editedAt: { type: Date, default: null },
     likes: [likeUserSchema],
   },
   { timestamps: true }

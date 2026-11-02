@@ -4,6 +4,8 @@
  * All routes using these must run authMiddleware first.
  */
 import type { Request, Response } from "express";
+/** GET /posts/:postId — one post (auth optional on web, required on mobile). */
+export declare const getPulsePostById: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
 /** PATCH /posts/:postId — multipart or JSON: body, visibilityScope, useAnonymousDisplay, removeImage, image file. */
 export declare const patchPulsePost: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
 /** DELETE /posts/:postId */

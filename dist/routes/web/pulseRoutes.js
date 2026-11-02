@@ -2,7 +2,7 @@ import express from "express";
 import { authMiddleware, optionalAuthMiddleware } from "../../middleware/authMiddleware.js";
 import { uploadPulsePostFiles } from "../../config/electionMulter.js";
 import { getPulsePostCommentsPublic, getPulsePostsPublic, postPulseCommentLikeWeb, postPulsePostCommentWeb, postPulsePostLikeWeb, postPulsePostWeb, postPulseRepostWeb, } from "../../controllers/web/pulseController.js";
-import { patchPulseComment, patchPulsePost, removePulseComment, removePulseCommentLike, removePulsePost, removePulsePostLike, removePulseRepost, } from "../../controllers/shared/pulseManageController.js";
+import { getPulsePostById, patchPulseComment, patchPulsePost, removePulseComment, removePulseCommentLike, removePulsePost, removePulsePostLike, removePulseRepost, } from "../../controllers/shared/pulseManageController.js";
 import { deletePulseBlock, getPulseBlocks, postPulseBlock, postPulseCommentReport, postPulsePostReport, } from "../../controllers/shared/pulseSafetyController.js";
 const router = express.Router();
 const handlePulseUpload = (req, res, next) => {
@@ -28,6 +28,7 @@ router.post("/posts/:postId/like", authMiddleware, postPulsePostLikeWeb);
 router.post("/posts/:postId/comments", authMiddleware, postPulsePostCommentWeb);
 router.post("/posts/:postId/comments/:commentId/like", authMiddleware, postPulseCommentLikeWeb);
 /** Edit / delete / unlike / undo repost — auth required. */
+router.get("/posts/:postId", optionalAuthMiddleware, getPulsePostById);
 router.patch("/posts/:postId", authMiddleware, handlePulseUpload, patchPulsePost);
 router.delete("/posts/:postId", authMiddleware, removePulsePost);
 router.delete("/posts/:postId/repost", authMiddleware, removePulseRepost);

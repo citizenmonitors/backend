@@ -3,6 +3,7 @@ import { authMiddleware } from "../../middleware/authMiddleware.js";
 import { handleValidationErrors } from "../../validators/authValidators.js";
 import { deleteUser, resendToken, updateUserEmailCon, verifyEmail, } from "../../controllers/UserDashboard/userController.js";
 import { getElectionVaultMobile, generateAnonymousUsernameMobile, getMyProfileMobile, getNotificationSettingsMobile, locatePollingUnitMobile, publicViewerToVolunteerMobile, submitFeedbackMobile, setAnonymousIdentityToggleMobile, upsertObserverDataMobile, updateMyPasswordMobile, updateMyProfileMobile, updateNotificationSettingsMobile, volunteerToObserverMobile, } from "../../controllers/mobile/profileController.js";
+import { deletePushToken, postPushToken } from "../../controllers/mobile/pushTokenController.js";
 import { mobileFeedbackValidation, mobileAnonymousIdentityToggleValidation, mobileNotificationUpdateValidation, mobileObserverDataValidation, mobilePollingUnitLookupValidation, mobileUpdatePasswordValidation, profileEmailUpdateValidation, profileVerifyEmailValidation, } from "../../validators/mobile/profileValidators.js";
 const router = express.Router();
 router.get("/me", authMiddleware, getMyProfileMobile);
@@ -19,6 +20,9 @@ router.post("/me/anonymous-username/generate", authMiddleware, generateAnonymous
 router.put("/me/anonymous-identity", authMiddleware, mobileAnonymousIdentityToggleValidation, handleValidationErrors, setAnonymousIdentityToggleMobile);
 router.get("/election-vault", authMiddleware, getElectionVaultMobile);
 router.post("/polling-unit/lookup", authMiddleware, mobilePollingUnitLookupValidation, handleValidationErrors, locatePollingUnitMobile);
+// Device push token: save on login / app start, remove on logout.
+router.post("/push-token", authMiddleware, postPushToken);
+router.delete("/push-token", authMiddleware, deletePushToken);
 router.get("/notifications", authMiddleware, getNotificationSettingsMobile);
 router.put("/notifications", authMiddleware, mobileNotificationUpdateValidation, handleValidationErrors, updateNotificationSettingsMobile);
 router.post("/feedback", authMiddleware, mobileFeedbackValidation, handleValidationErrors, submitFeedbackMobile);

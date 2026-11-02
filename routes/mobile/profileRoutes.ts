@@ -22,6 +22,7 @@ import {
   updateNotificationSettingsMobile,
   volunteerToObserverMobile,
 } from "../../controllers/mobile/profileController.ts";
+import { deletePushToken, postPushToken } from "../../controllers/mobile/pushTokenController.ts";
 import {
   mobileFeedbackValidation,
   mobileAnonymousIdentityToggleValidation,
@@ -100,6 +101,10 @@ router.post(
   handleValidationErrors,
   locatePollingUnitMobile
 );
+
+// Device push token: save on login / app start, remove on logout.
+router.post("/push-token", authMiddleware, postPushToken);
+router.delete("/push-token", authMiddleware, deletePushToken);
 
 router.get("/notifications", authMiddleware, getNotificationSettingsMobile);
 router.put(

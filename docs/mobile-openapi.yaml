@@ -972,7 +972,7 @@ paths:
                 body: { type: string }
                 visibilityScope: { type: string }
                 useAnonymousDisplay: { type: boolean }
-      responses: { "201": { description: Created }, "400": { description: Image without text, or invalid input }, "409": { description: Plain repost already made, or own post } }
+      responses: { "201": { description: Created }, "400": { description: Image without text, or invalid input }, "409": { description: Plain repost already made } }
     delete:
       tags: [Pulse]
       summary: Undo your repost (postId may be the original or your repost)

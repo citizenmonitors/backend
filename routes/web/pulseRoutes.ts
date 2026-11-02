@@ -11,6 +11,7 @@ import {
   postPulseRepostWeb,
 } from "../../controllers/web/pulseController.ts";
 import {
+  getPulsePostById,
   patchPulseComment,
   patchPulsePost,
   removePulseComment,
@@ -64,6 +65,7 @@ router.post(
 );
 
 /** Edit / delete / unlike / undo repost — auth required. */
+router.get("/posts/:postId", optionalAuthMiddleware, getPulsePostById);
 router.patch("/posts/:postId", authMiddleware, handlePulseUpload, patchPulsePost);
 router.delete("/posts/:postId", authMiddleware, removePulsePost);
 router.delete("/posts/:postId/repost", authMiddleware, removePulseRepost);

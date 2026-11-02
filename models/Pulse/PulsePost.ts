@@ -41,6 +41,8 @@ const pulsePostSchema = new mongoose.Schema(
     repostCount: { type: Number, default: 0, min: 0 },
     quoteCount: { type: Number, default: 0, min: 0 },
     useAnonymousDisplay: { type: Boolean, default: false },
+    /** Set only when the text or image is edited (not on likes, counts, etc.). */
+    editedAt: { type: Date, default: null },
     likes: [likeUserSchema],
   },
   { timestamps: true }

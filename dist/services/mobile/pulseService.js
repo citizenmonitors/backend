@@ -7,6 +7,8 @@ import UserBlock from "../../models/Pulse/UserBlock.js";
 import { uploadFileToFirebase } from "../../config/firebaseUploader.js";
 import { dispatchNotificationToUsers } from "./notificationDispatchService.js";
 import { isValidObjectId } from "../../utils/validators.js";
+/** Fields loaded for post/comment authors (name, anonymous handle, photo). */
+const AUTHOR_FIELDS = "firstName lastName anonymousUsername profileImage.url";
 const VISIBILITY_SCOPES = [
     "all",
     "state",
@@ -201,12 +203,14 @@ const buildFeedFilter = (scope, viewer) => {
 const buildViewerFilter = (viewer) => buildFeedFilter("lga", viewer);
 const serializeAuthor = (author, useAnonymousDisplay) => {
     const { displayName, usedAnonymous } = formatAuthorDisplay(author, useAnonymousDisplay);
+    const photo = String(author?.profileImage?.url ?? "").trim();
     return {
-        // Never expose the account id behind an anonymous name: it would link the
-        // anonymous handle to the same person's named posts.
+        // Never expose the account id or photo behind an anonymous name: either would
+        // link the anonymous handle to the same person's named posts.
         id: !usedAnonymous && author?._id != null ? String(author._id) : null,
         displayName,
         usedAnonymous,
+        avatarUrl: !usedAnonymous && /^https?:\/\//i.test(photo) ? photo : null,
     };
 };
 const isOwnedBy = (author, viewerUserId) => {
@@ -245,7 +249,7 @@ const viewerRepostedTargets = async (viewerUserId, targetIds) => {
     });
     return new Set(ids.map(String));
 };
-const serializeOriginalPost = (row, fallbackId) => {
+const serializeOriginalPost = (row, fallbackId, viewerUserId) => {
     if (row?._id) {
         return {
             id: String(row._id),
@@ -254,6 +258,7 @@ const serializeOriginalPost = (row, fallbackId) => {
             isQuote: Boolean(row.isQuote),
             createdAt: row.createdAt,
             author: serializeAuthor(row.author, Boolean(row.useAnonymousDisplay)),
+            isOwnedByCurrentUser: isOwnedBy(row.author, viewerUserId),
             unavailable: false,
         };
     }
@@ -280,12 +285,14 @@ const serializePulsePost = (row, viewerUserId, commentsCount = 0, extras = {}) =
             "_id" in row.repostedFrom &&
             "body" in row.repostedFrom
             ? row.repostedFrom
-            : null, originalIdOf(row.repostedFrom)),
+            : null, originalIdOf(row.repostedFrom), viewerUserId),
         repostCount: Number(row.repostCount ?? 0),
         quoteCount: Number(row.quoteCount ?? 0),
         isRepostedByCurrentUser: Boolean(extras.isRepostedByCurrentUser),
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
+        // Only set when the text or image was edited; use this for an "Edited" label.
+        editedAt: row.editedAt ?? null,
         author: serializeAuthor(row.author, Boolean(row.useAnonymousDisplay)),
         isOwnedByCurrentUser: isOwnedBy(row.author, viewerUserId),
         likesCount: likes.length,
@@ -297,7 +304,7 @@ const serializePulsePost = (row, viewerUserId, commentsCount = 0, extras = {}) =
 };
 const pulseAuthorPopulate = {
     path: "author",
-    select: "firstName lastName anonymousUsername",
+    select: AUTHOR_FIELDS,
 };
 const pulseOriginalPopulate = {
     path: "repostedFrom",
@@ -311,6 +318,7 @@ const serializePulseComment = (row, viewerUserId) => {
         body: row.body,
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
+        editedAt: row.editedAt ?? null,
         author: serializeAuthor(row.author, Boolean(row.useAnonymousDisplay)),
         isOwnedByCurrentUser: isOwnedBy(row.author, viewerUserId),
         likesCount: likes.length,
@@ -388,6 +396,43 @@ export const listPulseFeed = async (input) => {
     }, input?.viewerUserId ?? null, commentCountByPost.get(String(row._id)) ?? 0, { isRepostedByCurrentUser: reposted.has(String(repostTargetIdOf(row))) }));
     return { posts, total, page, limit: safeLimit, scope };
 };
+/**
+ * One post by id (shared links, tapped quotes, notifications).
+ * Hidden the same way as the feed: blocked users' posts and posts the viewer reported
+ * return "Post not found".
+ */
+export const getPulsePost = async (postId, viewerUserId) => {
+    if (viewerUserId) {
+        const safety = await buildViewerSafetyFilter(viewerUserId);
+        const visible = await PulsePost.exists({ _id: postId, ...safety.filter });
+        if (!visible)
+            throw new Error("Post not found");
+        const row = await PulsePost.findById(postId)
+            .populate(pulseAuthorPopulate)
+            .populate(pulseOriginalPopulate)
+            .lean();
+        if (!row)
+            throw new Error("Post not found");
+        const counts = await commentCountsByPost([row._id], safety.hiddenUserIds);
+        const target = repostTargetIdOf({
+            _id: row._id,
+            repostedFrom: originalIdOf(row.repostedFrom),
+            isQuote: row.isQuote,
+        });
+        const reposted = await viewerRepostedTargets(viewerUserId, target ? [target] : []);
+        return serializePulsePost(row, viewerUserId, counts.get(String(row._id)) ?? 0, {
+            isRepostedByCurrentUser: Boolean(target && reposted.has(target)),
+        });
+    }
+    const row = await PulsePost.findById(postId)
+        .populate(pulseAuthorPopulate)
+        .populate(pulseOriginalPopulate)
+        .lean();
+    if (!row)
+        throw new Error("Post not found");
+    const counts = await commentCountsByPost([row._id]);
+    return serializePulsePost(row, null, counts.get(String(row._id)) ?? 0);
+};
 export const listPulsePosts = async (userId, page = 1, limit = 20, scope = "all") => listPulseFeed({
     page,
     limit,
@@ -441,7 +486,7 @@ export const createPulsePost = async (userId, input, media) => {
 };
 /**
  * Repost like X.
- * - No body: plain repost (one per user per post; not your own post).
+ * - No body: plain repost (one per user per post, including your own).
  * - With body (and optional image): quote post with your own text on top. Many allowed,
  *   including quoting your own post.
  * Reposting a plain repost targets its original; reposting or quoting a quote targets
@@ -497,9 +542,7 @@ export const repostPulsePost = async (userId, postId, input = {}, media) => {
         await PulsePost.updateOne({ _id: targetId }, { $inc: { quoteCount: 1 } });
     }
     else {
-        if (String(target.author) === String(userId)) {
-            throw new Error("You cannot repost your own post");
-        }
+        // Reposting your own post is allowed, like on X.
         const already = await PulsePost.exists({
             author: userId,
             repostedFrom: targetId,
@@ -584,7 +627,7 @@ export const listPulsePostComments = async (userId, postId) => {
     await assertPostVisibleToUser(postId, userId);
     const safety = await buildCommentSafetyFilter(userId);
     const rows = await PulseComment.find({ post: postId, ...safety })
-        .populate("author", "firstName lastName anonymousUsername")
+        .populate("author", AUTHOR_FIELDS)
         .sort({ createdAt: -1 })
         .lean();
     return rows.map((row) => serializePulseComment(row, userId));
@@ -596,7 +639,7 @@ export const listPulsePostCommentsPublic = async (postId, viewerUserId) => {
         throw new Error("Post not found");
     const safety = await buildCommentSafetyFilter(viewerUserId);
     const rows = await PulseComment.find({ post: postId, ...safety })
-        .populate("author", "firstName lastName anonymousUsername")
+        .populate("author", AUTHOR_FIELDS)
         .sort({ createdAt: -1 })
         .lean();
     return rows.map((row) => serializePulseComment(row, viewerUserId ?? null));
@@ -631,7 +674,7 @@ const addPulsePostCommentCore = async (userId, postId, input, postAuthor) => {
         likes: [],
     });
     const populated = await PulseComment.findById(created._id)
-        .populate("author", "firstName lastName anonymousUsername")
+        .populate("author", AUTHOR_FIELDS)
         .lean();
     if (postAuthor && String(postAuthor) !== String(userId)) {
         try {
@@ -670,7 +713,7 @@ const togglePulseCommentLikeCore = async (userId, postId, commentId) => {
     const updated = await PulseComment.findOneAndUpdate({ _id: commentId, post: postId }, alreadyLiked
         ? { $pull: { likes: { user: likeUserId } } }
         : { $addToSet: { likes: { user: likeUserId } } }, { new: true })
-        .populate("author", "firstName lastName anonymousUsername")
+        .populate("author", AUTHOR_FIELDS)
         .lean();
     if (!updated)
         throw new Error("Comment not found");
@@ -760,6 +803,9 @@ export const updatePulsePost = async (userId, postId, input, media) => {
             throw new Error("The image could not be uploaded right now. Try again later.");
         }
         throw new Error("Nothing to update");
+    }
+    if ("body" in set || "imageUrl" in set || unset.imageUrl) {
+        set.editedAt = new Date();
     }
     const update = {};
     if (Object.keys(set).length)
@@ -876,8 +922,10 @@ export const updatePulseComment = async (userId, postId, commentId, input) => {
     }
     if (Object.keys(set).length === 0)
         throw new Error("Nothing to update");
+    if ("body" in set)
+        set.editedAt = new Date();
     const updated = await PulseComment.findOneAndUpdate({ _id: commentId, post: postId }, { $set: set }, { new: true })
-        .populate("author", "firstName lastName anonymousUsername")
+        .populate("author", AUTHOR_FIELDS)
         .lean();
     if (!updated)
         throw new Error("Comment not found");
@@ -901,7 +949,7 @@ export const deletePulseComment = async (userId, postId, commentId) => {
 export const unlikePulseComment = async (userId, postId, commentId) => {
     const likeUserId = new mongoose.Types.ObjectId(String(userId));
     const updated = await PulseComment.findOneAndUpdate({ _id: commentId, post: postId }, { $pull: { likes: { user: likeUserId } } }, { new: true })
-        .populate("author", "firstName lastName anonymousUsername")
+        .populate("author", AUTHOR_FIELDS)
         .lean();
     if (!updated)
         throw new Error("Comment not found");

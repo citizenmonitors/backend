@@ -154,12 +154,12 @@ const resolveBlockTarget = async (input: {
   const row = commentId
     ? isValidObjectId(commentId)
       ? await PulseComment.findById(commentId)
-          .populate<{ author: AuthorLean | null }>("author", "firstName lastName anonymousUsername")
+          .populate<{ author: AuthorLean | null }>("author", "firstName lastName anonymousUsername profileImage.url")
           .lean()
       : null
     : isValidObjectId(postId)
       ? await PulsePost.findById(postId)
-          .populate<{ author: AuthorLean | null }>("author", "firstName lastName anonymousUsername")
+          .populate<{ author: AuthorLean | null }>("author", "firstName lastName anonymousUsername profileImage.url")
           .lean()
       : null;
   if (!row) throw new Error(commentId ? "Comment not found" : "Post not found");

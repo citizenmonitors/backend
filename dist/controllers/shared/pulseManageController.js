@@ -1,6 +1,6 @@
 import { asParamString, isValidObjectId } from "../../utils/validators.js";
 import { invalidateCacheByPrefixes } from "../../utils/cache.js";
-import { deletePulseComment, deletePulsePost, undoPulseRepost, unlikePulseComment, unlikePulsePost, updatePulseComment, updatePulsePost, PULSE_IMAGE_UPLOAD_FAILED_MESSAGE, } from "../../services/mobile/pulseService.js";
+import { deletePulseComment, deletePulsePost, getPulsePost, undoPulseRepost, unlikePulseComment, unlikePulsePost, updatePulseComment, updatePulsePost, PULSE_IMAGE_UPLOAD_FAILED_MESSAGE, } from "../../services/mobile/pulseService.js";
 const errMsg = (e) => (e instanceof Error ? e.message : String(e));
 const requireUserId = (req) => {
     const id = req.user?._id;
@@ -51,6 +51,20 @@ const readIds = (req, withComment) => {
     const commentId = withComment ? asParamString(req.params.commentId) : "";
     const valid = isValidObjectId(postId) && (!withComment || isValidObjectId(commentId));
     return { postId, commentId, valid };
+};
+/** GET /posts/:postId — one post (auth optional on web, required on mobile). */
+export const getPulsePostById = async (req, res) => {
+    try {
+        const { postId, valid } = readIds(req, false);
+        if (!valid)
+            return res.status(400).json({ message: "Invalid post id" });
+        const viewerId = req.user?._id;
+        const post = await getPulsePost(postId, viewerId ? String(viewerId) : null);
+        return res.status(200).json({ post });
+    }
+    catch (error) {
+        return sendError(res, error);
+    }
 };
 /** PATCH /posts/:postId — multipart or JSON: body, visibilityScope, useAnonymousDisplay, removeImage, image file. */
 export const patchPulsePost = async (req, res) => {

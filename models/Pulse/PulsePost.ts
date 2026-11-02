@@ -36,7 +36,10 @@ const pulsePostSchema = new mongoose.Schema(
       ref: "PulsePost",
       index: true,
     },
+    /** true = quote post: the author's own text (and optional image) on top of repostedFrom. */
+    isQuote: { type: Boolean, default: false, index: true },
     repostCount: { type: Number, default: 0, min: 0 },
+    quoteCount: { type: Number, default: 0, min: 0 },
     useAnonymousDisplay: { type: Boolean, default: false },
     likes: [likeUserSchema],
   },

@@ -14,7 +14,9 @@ declare const PulsePost: mongoose.Model<{
         user: mongoose.Types.ObjectId;
     }>;
     visibilityScope: "state" | "lga" | "ward" | "all" | "polling-unit";
+    isQuote: boolean;
     repostCount: number;
+    quoteCount: number;
     imageUrl?: string | null | undefined;
     audienceState?: string | null | undefined;
     audienceLga?: string | null | undefined;
@@ -36,7 +38,9 @@ declare const PulsePost: mongoose.Model<{
         user: mongoose.Types.ObjectId;
     }>;
     visibilityScope: "state" | "lga" | "ward" | "all" | "polling-unit";
+    isQuote: boolean;
     repostCount: number;
+    quoteCount: number;
     imageUrl?: string | null | undefined;
     audienceState?: string | null | undefined;
     audienceLga?: string | null | undefined;
@@ -58,7 +62,9 @@ declare const PulsePost: mongoose.Model<{
         user: mongoose.Types.ObjectId;
     }>;
     visibilityScope: "state" | "lga" | "ward" | "all" | "polling-unit";
+    isQuote: boolean;
     repostCount: number;
+    quoteCount: number;
     imageUrl?: string | null | undefined;
     audienceState?: string | null | undefined;
     audienceLga?: string | null | undefined;
@@ -86,7 +92,9 @@ declare const PulsePost: mongoose.Model<{
         user: mongoose.Types.ObjectId;
     }>;
     visibilityScope: "state" | "lga" | "ward" | "all" | "polling-unit";
+    isQuote: boolean;
     repostCount: number;
+    quoteCount: number;
     imageUrl?: string | null | undefined;
     audienceState?: string | null | undefined;
     audienceLga?: string | null | undefined;
@@ -108,7 +116,9 @@ declare const PulsePost: mongoose.Model<{
         user: mongoose.Types.ObjectId;
     }>;
     visibilityScope: "state" | "lga" | "ward" | "all" | "polling-unit";
+    isQuote: boolean;
     repostCount: number;
+    quoteCount: number;
     imageUrl?: string | null | undefined;
     audienceState?: string | null | undefined;
     audienceLga?: string | null | undefined;
@@ -130,7 +140,9 @@ declare const PulsePost: mongoose.Model<{
         user: mongoose.Types.ObjectId;
     }>;
     visibilityScope: "state" | "lga" | "ward" | "all" | "polling-unit";
+    isQuote: boolean;
     repostCount: number;
+    quoteCount: number;
     imageUrl?: string | null | undefined;
     audienceState?: string | null | undefined;
     audienceLga?: string | null | undefined;

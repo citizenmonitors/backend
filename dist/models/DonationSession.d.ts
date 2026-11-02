@@ -4,7 +4,7 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     source: "mobile" | "web";
-    status: "pending" | "expired" | "paid" | "failed" | "canceled";
+    status: "failed" | "pending" | "expired" | "paid" | "canceled";
     amount: number;
     amountMinor: number;
     currency: "ngn" | "usd" | "gbp" | "eur";
@@ -16,7 +16,7 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     source: "mobile" | "web";
-    status: "pending" | "expired" | "paid" | "failed" | "canceled";
+    status: "failed" | "pending" | "expired" | "paid" | "canceled";
     amount: number;
     amountMinor: number;
     currency: "ngn" | "usd" | "gbp" | "eur";
@@ -28,7 +28,7 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     source: "mobile" | "web";
-    status: "pending" | "expired" | "paid" | "failed" | "canceled";
+    status: "failed" | "pending" | "expired" | "paid" | "canceled";
     amount: number;
     amountMinor: number;
     currency: "ngn" | "usd" | "gbp" | "eur";
@@ -46,7 +46,7 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     source: "mobile" | "web";
-    status: "pending" | "expired" | "paid" | "failed" | "canceled";
+    status: "failed" | "pending" | "expired" | "paid" | "canceled";
     amount: number;
     amountMinor: number;
     currency: "ngn" | "usd" | "gbp" | "eur";
@@ -58,7 +58,7 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     source: "mobile" | "web";
-    status: "pending" | "expired" | "paid" | "failed" | "canceled";
+    status: "failed" | "pending" | "expired" | "paid" | "canceled";
     amount: number;
     amountMinor: number;
     currency: "ngn" | "usd" | "gbp" | "eur";
@@ -70,7 +70,7 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     source: "mobile" | "web";
-    status: "pending" | "expired" | "paid" | "failed" | "canceled";
+    status: "failed" | "pending" | "expired" | "paid" | "canceled";
     amount: number;
     amountMinor: number;
     currency: "ngn" | "usd" | "gbp" | "eur";

@@ -9,6 +9,10 @@ import {
 } from "../Election/electionLive.ts";
 import { isActiveElectionRelevantForUser } from "../../utils/electionRelevanceForUser.ts";
 import { buildMobileGeoBreakdown } from "./geoBreakdown.ts";
+import {
+  buildCollationSubmitterFilter,
+  dropSupersededAnonymizedSubmissions,
+} from "../../utils/observerSubmissions.ts";
 
 type Id = Types.ObjectId | string;
 
@@ -45,11 +49,8 @@ export const getMobileCollationBundle = async (activeElectionId: string, userId:
   // Same source set as live chart (getLiveElectionService): approved observers +
   // location filter OR the viewer's own submissions. Geo was previously stricter
   // (hidden:false + exact loc only), so chart could have data while geo was empty.
-  const approvedObservers = await CompletedUser.find(
-    { role: "observer", isObserverInPollingUnit: true },
-    "_id"
-  ).lean();
-  const approvedObserverIds = approvedObservers.map((u) => u._id);
+  // Approved observers' uploads + uploads kept after an observer deleted their account.
+  const submitterFilter = await buildCollationSubmitterFilter();
   const loc = buildObserverSubmissionLocationFilter(electionType, user);
   const locationOrSelf =
     Object.keys(loc).length > 0
@@ -58,23 +59,24 @@ export const getMobileCollationBundle = async (activeElectionId: string, userId:
 
   const resultQuery = {
     election: active._id,
-    userRole: "observer",
-    user: { $in: approvedObserverIds },
+    ...submitterFilter,
     ...locationOrSelf,
   };
   const incidentQuery = {
     election: active._id,
-    userRole: "observer",
-    user: { $in: approvedObserverIds },
+    ...submitterFilter,
     ...locationOrSelf,
   };
 
-  const [results, incidents, rMax, iMax] = await Promise.all([
+  const [rawResults, rawIncidents, rMax, iMax] = await Promise.all([
     ElectionData.find(resultQuery).lean(),
     IncidentReport.find(incidentQuery).lean(),
     ElectionData.find(resultQuery).sort({ updatedAt: -1 }).limit(1).select("updatedAt").lean(),
     IncidentReport.find(incidentQuery).sort({ updatedAt: -1 }).limit(1).select("updatedAt").lean(),
   ]);
+
+  const results = dropSupersededAnonymizedSubmissions(rawResults);
+  const incidents = dropSupersededAnonymizedSubmissions(rawIncidents);
 
   const submitterIds = new Set<string>();
   for (const r of results) {

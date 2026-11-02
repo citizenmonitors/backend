@@ -25,6 +25,10 @@ import { dispatchMobileNotification } from "../mobile/notificationDispatchServic
 import { revokeAllRefreshTokensForEmail } from "../authTokenService.ts";
 import { detachSubmissionsFromActiveElections } from "../Election/electionService.ts";
 import { invalidateAllMobileReadCaches } from "../../utils/cache.ts";
+import {
+  anonymizeUserSubmissions,
+  purgeUserPersonalContent,
+} from "./accountDataPurge.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -631,14 +635,6 @@ export class AccountDeletionBlockedError extends Error {
   }
 }
 
-const countUserSubmissions = async (userId: Id) => {
-  const [resultsCount, incidentsCount] = await Promise.all([
-    ElectionData.countDocuments({ user: userId }),
-    IncidentReport.countDocuments({ user: userId }),
-  ]);
-  return { resultsCount, incidentsCount };
-};
-
 type ActionBearingDoc = {
   actions?: Array<{ userId?: Id; action?: string }>;
   pollingUnit?: string | null;
@@ -752,8 +748,6 @@ const deleteUserSubmissions = async (userId: Id) => {
   };
 };
 
-export const removeVolunteerSubmissionsForAccountDelete = deleteUserSubmissions;
-export const scrubUserElectionActions = scrubDeletedUserActions;
 
 const notifyPollingUnitObserverSlotOpen = async (
   pollingUnit: string | null | undefined,
@@ -810,16 +804,84 @@ const notifyPollingUnitObserverSlotOpen = async (
   return emailed;
 };
 
-export const notifyPollingUnitAfterObserverLeft =
-  notifyPollingUnitObserverSlotOpen;
+
+type DeletableUser = {
+  _id: Id;
+  email?: string | null;
+  role?: string | null;
+  pollingUnit?: string | null;
+  isObserverInPollingUnit?: boolean | null;
+  profileImage?: { _id?: unknown; location?: string | null } | null;
+  observerId?: Array<{ _id?: unknown; location?: string | null }> | null;
+};
 
 /**
- * Self-service account deletion:
- * - volunteer (or other non-observer) with uploads: allowed; submissions deleted
- * - observer with any result/incident: blocked (collation keeps their uploads)
- * - observer with no uploads: allowed; notify PU that observer slot is open
- * - public-viewer with no uploads: allowed; scrub agree/flag marks if any
- * - admin / super-admin: blocked (use admin tooling)
+ * Shared by self-service and admin deletion.
+ * - Observer results/incidents stay in collation, anonymised (no name or account link).
+ * - Volunteer and other non-observer results/incidents are deleted (they never count
+ *   toward collation).
+ * - The person's agree/flag marks on others' submissions are removed.
+ * - Pulse, discussion and article content, likes, notifications, feedback and stored
+ *   ID / profile files are removed.
+ */
+export const performAccountDeletion = async (user: DeletableUser) => {
+  const userId = user._id;
+  const role = String(user.role ?? "");
+  const wasApprovedObserver = role === "observer" && Boolean(user.isObserverInPollingUnit);
+
+  let deletedResults = 0;
+  let deletedIncidents = 0;
+  let anonymizedResults = 0;
+  let anonymizedIncidents = 0;
+
+  if (role === "observer") {
+    await scrubDeletedUserActions(userId);
+    const kept = await anonymizeUserSubmissions(userId);
+    anonymizedResults = kept.anonymizedResults;
+    anonymizedIncidents = kept.anonymizedIncidents;
+  } else {
+    // deleteUserSubmissions also scrubs this user's agree/flag marks on others.
+    const removed = await deleteUserSubmissions(userId);
+    deletedResults = removed.deletedResults;
+    deletedIncidents = removed.deletedIncidents;
+  }
+
+  await purgeUserPersonalContent(user);
+
+  if (user.email) {
+    await revokeAllRefreshTokensForEmail(user.email);
+    await User.deleteMany({ email: user.email });
+  }
+  await CompletedUser.findByIdAndDelete(userId);
+  await invalidateAllMobileReadCaches();
+
+  let notifiedPeers = 0;
+  // Only an approved observer leaving frees the polling unit's observer slot.
+  if (wasApprovedObserver) {
+    try {
+      notifiedPeers = await notifyPollingUnitObserverSlotOpen(user.pollingUnit, userId);
+    } catch (err) {
+      console.error(
+        "Account deleted but failed to notify polling unit about open observer slot:",
+        err
+      );
+    }
+  }
+
+  return {
+    role,
+    wasApprovedObserver,
+    deletedResults,
+    deletedIncidents,
+    anonymizedResults,
+    anonymizedIncidents,
+    notifiedPeers,
+  };
+};
+
+/**
+ * Self-service account deletion (DELETE /api/user, DELETE /api/v1/mobile/profile/me).
+ * Allowed for every role except admin / super-admin (they use admin tooling).
  */
 export const deleteUserService = async (userId: Id) => {
   try {
@@ -835,86 +897,33 @@ export const deleteUserService = async (userId: Id) => {
       );
     }
 
-    const { resultsCount, incidentsCount } = await countUserSubmissions(userId);
-    const hasSubmissions = resultsCount + incidentsCount > 0;
+    const outcome = await performAccountDeletion(user);
 
-    let deletedResults = 0;
-    let deletedIncidents = 0;
-    let notifiedPeers = 0;
-
-    if (role === "observer") {
-      if (hasSubmissions) {
-        throw new AccountDeletionBlockedError(
-          "Observers who have uploaded election results or incidents cannot delete their account, because those submissions are kept for collation and cannot be removed after an election."
-        );
-      }
-
-      const pollingUnit = user.pollingUnit;
-      const wasApprovedObserver = Boolean(user.isObserverInPollingUnit);
-
-      // Observers with no uploads may still have agree/flag marks on others.
-      await scrubDeletedUserActions(userId);
-
-      await revokeAllRefreshTokensForEmail(user.email);
-      await User.deleteMany({ email: user.email });
-      await CompletedUser.findByIdAndDelete(userId);
-      await invalidateAllMobileReadCaches();
-
-      // Only notify when an approved observer leaves and frees the PU slot.
-      if (wasApprovedObserver) {
-        try {
-          notifiedPeers = await notifyPollingUnitObserverSlotOpen(
-            pollingUnit,
-            userId
-          );
-        } catch (err) {
-          console.error(
-            "Account deleted but failed to notify polling unit about open observer slot:",
-            err
-          );
-        }
-      }
-
-      return {
-        message: "User account deleted successfully",
-        deletedResults: 0,
-        deletedIncidents: 0,
-        notifiedPeers,
-        ...(wasApprovedObserver
-          ? {
-              note:
-                notifiedPeers > 0
-                  ? "Your polling unit was notified that the observer role is now available."
-                  : "Observer slot is now open in your polling unit.",
-            }
-          : {}),
-      };
+    const notes: string[] = [];
+    if (outcome.anonymizedResults + outcome.anonymizedIncidents > 0) {
+      notes.push(
+        "Your election results and incidents stay in collation without your name or account."
+      );
     }
-
-    if (hasSubmissions) {
-      // Volunteers (and any non-observer role with uploads): remove submissions.
-      const removed = await deleteUserSubmissions(userId);
-      deletedResults = removed.deletedResults;
-      deletedIncidents = removed.deletedIncidents;
-    } else {
-      // No uploads: still scrub agree/flag marks on others.
-      await scrubDeletedUserActions(userId);
+    if (outcome.deletedResults + outcome.deletedIncidents > 0) {
+      notes.push("Your election results and incidents were removed with your account.");
     }
-
-    await revokeAllRefreshTokensForEmail(user.email);
-    await User.deleteMany({ email: user.email });
-    await CompletedUser.findByIdAndDelete(userId);
-    await invalidateAllMobileReadCaches();
+    if (outcome.wasApprovedObserver) {
+      notes.push(
+        outcome.notifiedPeers > 0
+          ? "Your polling unit was notified that the observer role is now available."
+          : "The observer slot in your polling unit is now open."
+      );
+    }
 
     return {
       message: "User account deleted successfully",
-      deletedResults,
-      deletedIncidents,
-      ...(deletedResults + deletedIncidents > 0
-        ? {
-            note: "Your election results and incidents were removed with your account.",
-          }
-        : {}),
+      deletedResults: outcome.deletedResults,
+      deletedIncidents: outcome.deletedIncidents,
+      anonymizedResults: outcome.anonymizedResults,
+      anonymizedIncidents: outcome.anonymizedIncidents,
+      notifiedPeers: outcome.notifiedPeers,
+      ...(notes.length ? { note: notes.join(" ") } : {}),
     };
   } catch (error) {
     if (error instanceof AccountDeletionBlockedError) throw error;

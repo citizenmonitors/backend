@@ -482,10 +482,21 @@ export declare const getUserByIdService: (id: Id) => Promise<import("mongoose").
 } & {
     __v: number;
 }>;
+export declare class AdminDeleteForbiddenError extends Error {
+    constructor(message: string);
+}
+/**
+ * Admin removes an account. Same data rules as self-service deletion
+ * (observer submissions kept anonymised for collation; personal content removed).
+ * Guards: no deleting yourself here; only a super-admin can delete admin accounts.
+ * To remove a specific result or incident, use the flagged-result delete tooling.
+ */
 export declare const deleteUserService: (userId: Id, adminId: Id) => Promise<{
     message: string;
     deletedResults: number;
     deletedIncidents: number;
+    anonymizedResults: number;
+    anonymizedIncidents: number;
 }>;
 export declare const approveObserverService: (id: Id, adminId: Id) => Promise<{
     message: string;

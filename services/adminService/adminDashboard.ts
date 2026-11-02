@@ -15,14 +15,7 @@ import {
   dispatchMobileNotification,
   dispatchNotificationToUsers,
 } from "../mobile/notificationDispatchService.ts";
-import {
-  notifyPollingUnitAfterObserverLeft,
-  removeVolunteerSubmissionsForAccountDelete,
-  scrubUserElectionActions,
-} from "../UserDashboard/userService.ts";
-import { revokeAllRefreshTokensForEmail } from "../authTokenService.ts";
-import { invalidateAllMobileReadCaches } from "../../utils/cache.ts";
-import User from "../../models/User.ts";
+import { performAccountDeletion } from "../UserDashboard/userService.ts";
 
 type Id = string | Types.ObjectId;
 
@@ -348,72 +341,68 @@ export const getUserByIdService = async (id: Id) => {
 
 // Delete single user
 
+export class AdminDeleteForbiddenError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "AdminDeleteForbiddenError";
+  }
+}
+
+/**
+ * Admin removes an account. Same data rules as self-service deletion
+ * (observer submissions kept anonymised for collation; personal content removed).
+ * Guards: no deleting yourself here; only a super-admin can delete admin accounts.
+ * To remove a specific result or incident, use the flagged-result delete tooling.
+ */
 export const deleteUserService = async (userId: Id, adminId: Id) => {
   try {
-    const user = await CompletedUser.findById(userId);
+    if (String(userId) === String(adminId)) {
+      throw new AdminDeleteForbiddenError("You cannot delete your own account from the admin panel.");
+    }
+
+    const [user, actingAdmin] = await Promise.all([
+      CompletedUser.findById(userId),
+      CompletedUser.findById(adminId).select("role").lean(),
+    ]);
     if (!user) {
       throw new Error("User not found or already deleted");
     }
 
-    const role = String(user.role ?? "");
-    const wasApprovedObserver =
-      role === "observer" && Boolean(user.isObserverInPollingUnit);
-    const pollingUnit = user.pollingUnit;
-
-    const [resultsCount, incidentsCount] = await Promise.all([
-      ElectionData.countDocuments({ user: userId }),
-      IncidentReport.countDocuments({ user: userId }),
-    ]);
-    const hasSubmissions = resultsCount + incidentsCount > 0;
-
-    let deletedResults = 0;
-    let deletedIncidents = 0;
-
-    // Admin delete always removes the user's results/incidents (including
-    // observers). Self-delete still blocks observers who have uploads.
-    if (hasSubmissions || role === "volunteer" || role === "observer") {
-      const removed = await removeVolunteerSubmissionsForAccountDelete(userId);
-      deletedResults = removed.deletedResults;
-      deletedIncidents = removed.deletedIncidents;
-    } else {
-      await scrubUserElectionActions(userId);
+    const targetRole = String(user.role ?? "");
+    if (
+      (targetRole === "admin" || targetRole === "super-admin") &&
+      actingAdmin?.role !== "super-admin"
+    ) {
+      throw new AdminDeleteForbiddenError("Only a super-admin can delete admin accounts.");
     }
 
-    await revokeAllRefreshTokensForEmail(user.email);
-    await User.deleteMany({ email: user.email });
-    await CompletedUser.findByIdAndDelete(userId);
-    await invalidateAllMobileReadCaches();
-
-    if (wasApprovedObserver) {
-      try {
-        await notifyPollingUnitAfterObserverLeft(pollingUnit, userId);
-      } catch (err) {
-        console.error(
-          "Admin deleted observer but failed to notify polling unit:",
-          err
-        );
-      }
-    }
+    const email = user.email;
+    const outcome = await performAccountDeletion(user);
 
     await AdminLog.create({
       admin: adminId,
       action: "Deleted user",
       details: {
         userId,
-        email: user.email,
-        role,
-        deletedResults,
-        deletedIncidents,
+        email,
+        role: outcome.role,
+        deletedResults: outcome.deletedResults,
+        deletedIncidents: outcome.deletedIncidents,
+        anonymizedResults: outcome.anonymizedResults,
+        anonymizedIncidents: outcome.anonymizedIncidents,
       },
       timestamp: new Date(),
     });
 
     return {
       message: "User deleted successfully",
-      deletedResults,
-      deletedIncidents,
+      deletedResults: outcome.deletedResults,
+      deletedIncidents: outcome.deletedIncidents,
+      anonymizedResults: outcome.anonymizedResults,
+      anonymizedIncidents: outcome.anonymizedIncidents,
     };
   } catch (error) {
+    if (error instanceof AdminDeleteForbiddenError) throw error;
     throw new Error(`Error deleting user: ${errMsg(error)}`);
   }
 };

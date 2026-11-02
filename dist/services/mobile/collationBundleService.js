@@ -5,6 +5,7 @@ import CompletedUser from "../../models/CompletedUser.js";
 import { getLiveElectionService, buildObserverSubmissionLocationFilter, } from "../Election/electionLive.js";
 import { isActiveElectionRelevantForUser } from "../../utils/electionRelevanceForUser.js";
 import { buildMobileGeoBreakdown } from "./geoBreakdown.js";
+import { buildCollationSubmitterFilter, dropSupersededAnonymizedSubmissions, } from "../../utils/observerSubmissions.js";
 export const assertMobileCollationAccess = async (activeElectionId, userId) => {
     const user = await CompletedUser.findById(userId).lean();
     if (!user)
@@ -26,30 +27,30 @@ export const getMobileCollationBundle = async (activeElectionId, userId) => {
     // Same source set as live chart (getLiveElectionService): approved observers +
     // location filter OR the viewer's own submissions. Geo was previously stricter
     // (hidden:false + exact loc only), so chart could have data while geo was empty.
-    const approvedObservers = await CompletedUser.find({ role: "observer", isObserverInPollingUnit: true }, "_id").lean();
-    const approvedObserverIds = approvedObservers.map((u) => u._id);
+    // Approved observers' uploads + uploads kept after an observer deleted their account.
+    const submitterFilter = await buildCollationSubmitterFilter();
     const loc = buildObserverSubmissionLocationFilter(electionType, user);
     const locationOrSelf = Object.keys(loc).length > 0
         ? { $or: [loc, { user: userId }] }
         : {};
     const resultQuery = {
         election: active._id,
-        userRole: "observer",
-        user: { $in: approvedObserverIds },
+        ...submitterFilter,
         ...locationOrSelf,
     };
     const incidentQuery = {
         election: active._id,
-        userRole: "observer",
-        user: { $in: approvedObserverIds },
+        ...submitterFilter,
         ...locationOrSelf,
     };
-    const [results, incidents, rMax, iMax] = await Promise.all([
+    const [rawResults, rawIncidents, rMax, iMax] = await Promise.all([
         ElectionData.find(resultQuery).lean(),
         IncidentReport.find(incidentQuery).lean(),
         ElectionData.find(resultQuery).sort({ updatedAt: -1 }).limit(1).select("updatedAt").lean(),
         IncidentReport.find(incidentQuery).sort({ updatedAt: -1 }).limit(1).select("updatedAt").lean(),
     ]);
+    const results = dropSupersededAnonymizedSubmissions(rawResults);
+    const incidents = dropSupersededAnonymizedSubmissions(rawIncidents);
     const submitterIds = new Set();
     for (const r of results) {
         if (r.user)

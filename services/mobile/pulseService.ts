@@ -123,6 +123,26 @@ const assertPulseLocation = (
   return loc;
 };
 
+export const PULSE_IMAGE_UPLOAD_FAILED_MESSAGE =
+  "Your post was published without the image because the image could not be uploaded. Try adding it again later.";
+
+/**
+ * Image storage problems (e.g. Firebase billing) must not block posting.
+ * Returns the URL, or `failed: true` so the caller can publish without the image.
+ */
+const tryUploadPulseImage = async (
+  image: MulterMemoryFile | undefined,
+  folder: string
+): Promise<{ url?: string; failed: boolean }> => {
+  if (!image) return { failed: false };
+  try {
+    return { url: (await uploadFileToFirebase(image, folder)).publicUrl, failed: false };
+  } catch (error) {
+    console.error("Pulse image upload failed; publishing without image:", error);
+    return { failed: true };
+  }
+};
+
 const ensureViewer = async (userId: Id) => {
   const user = await CompletedUser.findById(userId).lean();
   if (!user) throw new Error("User not found");
@@ -169,9 +189,9 @@ export const buildViewerSafetyFilter = async (
   ]);
   const clauses: Record<string, unknown>[] = [];
   if (hiddenUserIds.length) {
+    // Any of their posts can be reposted or quoted (originals and quotes alike).
     const hiddenOriginalIds = await PulsePost.distinct("_id", {
       author: { $in: hiddenUserIds },
-      repostedFrom: { $in: [null] },
     });
     clauses.push({ author: { $nin: hiddenUserIds } });
     if (hiddenOriginalIds.length) {
@@ -282,6 +302,24 @@ const originalIdOf = (value: unknown): string | null => {
   return isValidObjectId(asString) ? asString : null;
 };
 
+/** A plain repost points at its original; an original or a quote is its own target. */
+const repostTargetIdOf = (row: { _id: Id; repostedFrom?: unknown; isQuote?: boolean | null }) =>
+  row.repostedFrom && !row.isQuote ? originalIdOf(row.repostedFrom) : String(row._id);
+
+/** Target post ids (from the list) that the viewer has plainly reposted. */
+const viewerRepostedTargets = async (
+  viewerUserId: Id | null | undefined,
+  targetIds: string[]
+): Promise<Set<string>> => {
+  if (!viewerUserId || targetIds.length === 0) return new Set();
+  const ids = await PulsePost.distinct("repostedFrom", {
+    author: viewerUserId,
+    isQuote: { $ne: true },
+    repostedFrom: { $in: targetIds },
+  });
+  return new Set(ids.map(String));
+};
+
 const serializeOriginalPost = (
   row:
     | {
@@ -289,6 +327,8 @@ const serializeOriginalPost = (
         body?: string;
         imageUrl?: string | null;
         useAnonymousDisplay?: boolean;
+        isQuote?: boolean | null;
+        createdAt?: Date;
         author?: AuthorLean | null;
       }
     | null
@@ -300,10 +340,14 @@ const serializeOriginalPost = (
       id: String(row._id),
       body: row.body,
       imageUrl: row.imageUrl ?? null,
+      isQuote: Boolean(row.isQuote),
+      createdAt: row.createdAt,
       author: serializeAuthor(row.author, Boolean(row.useAnonymousDisplay)),
+      unavailable: false,
     };
   }
-  if (fallbackId) return { id: fallbackId };
+  // The quoted/reposted post was deleted (quotes are kept, like on X).
+  if (fallbackId) return { id: fallbackId, unavailable: true };
   return null;
 };
 
@@ -321,12 +365,15 @@ const serializePulsePost = (
     likes?: { user?: Id }[];
     author?: AuthorLean | null;
     repostedFrom?: unknown;
+    isQuote?: boolean | null;
     repostCount?: number;
+    quoteCount?: number;
     createdAt?: Date;
     updatedAt?: Date;
   },
   viewerUserId?: Id | null,
-  commentsCount = 0
+  commentsCount = 0,
+  extras: { isRepostedByCurrentUser?: boolean } = {}
 ) => {
   const likes = Array.isArray(row.likes) ? row.likes : [];
   return {
@@ -339,6 +386,7 @@ const serializePulsePost = (
     audienceWard: row.audienceWard ?? null,
     audiencePollingUnit: row.audiencePollingUnit ?? null,
     isRepost: Boolean(originalIdOf(row.repostedFrom)),
+    isQuote: Boolean(row.isQuote),
     originalPost: serializeOriginalPost(
       typeof row.repostedFrom === "object" &&
         row.repostedFrom != null &&
@@ -349,12 +397,16 @@ const serializePulsePost = (
             body?: string;
             imageUrl?: string | null;
             useAnonymousDisplay?: boolean;
+            isQuote?: boolean | null;
+            createdAt?: Date;
             author?: AuthorLean | null;
           })
         : null,
       originalIdOf(row.repostedFrom)
     ),
     repostCount: Number(row.repostCount ?? 0),
+    quoteCount: Number(row.quoteCount ?? 0),
+    isRepostedByCurrentUser: Boolean(extras.isRepostedByCurrentUser),
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
     author: serializeAuthor(row.author, Boolean(row.useAnonymousDisplay)),
@@ -374,7 +426,7 @@ const pulseAuthorPopulate = {
 
 const pulseOriginalPopulate = {
   path: "repostedFrom",
-  select: "body imageUrl useAnonymousDisplay author",
+  select: "body imageUrl useAnonymousDisplay isQuote createdAt author",
   populate: pulseAuthorPopulate,
 } as const;
 
@@ -483,6 +535,10 @@ export const listPulseFeed = async (input?: {
     rows.map((r) => r._id),
     safety.hiddenUserIds
   );
+  const reposted = await viewerRepostedTargets(
+    input?.viewerUserId,
+    rows.map(repostTargetIdOf).filter((id): id is string => Boolean(id))
+  );
   const posts = rows.map((row) =>
     serializePulsePost(
       {
@@ -490,7 +546,8 @@ export const listPulseFeed = async (input?: {
         repostedFrom: originalById.get(String(originalIdOf(row.repostedFrom))) ?? row.repostedFrom,
       },
       input?.viewerUserId ?? null,
-      commentCountByPost.get(String(row._id)) ?? 0
+      commentCountByPost.get(String(row._id)) ?? 0,
+      { isRepostedByCurrentUser: reposted.has(String(repostTargetIdOf(row))) }
     )
   );
 
@@ -552,9 +609,8 @@ export const createPulsePost = async (
     audienceLoc.lga || "all",
   ].join("/");
 
-  const uploadedImageUrl = media?.image
-    ? (await uploadFileToFirebase(media.image, uploadFolder)).publicUrl
-    : undefined;
+  const upload = await tryUploadPulseImage(media?.image, uploadFolder);
+  const uploadedImageUrl = upload.url;
 
   const created = await PulsePost.create({
     author: userId,
@@ -574,34 +630,90 @@ export const createPulsePost = async (
     .populate(pulseAuthorPopulate)
     .populate(pulseOriginalPopulate)
     .lean();
-  return serializePulsePost(populated!, userId, 0);
+  return { ...serializePulsePost(populated!, userId, 0), imageUploadFailed: upload.failed };
 };
 
-export const repostPulsePost = async (userId: Id, postId: string) => {
+/**
+ * Repost like X.
+ * - No body: plain repost (one per user per post; not your own post).
+ * - With body (and optional image): quote post with your own text on top. Many allowed,
+ *   including quoting your own post.
+ * Reposting a plain repost targets its original; reposting or quoting a quote targets
+ * the quote itself.
+ */
+export const repostPulsePost = async (
+  userId: Id,
+  postId: string,
+  input: { body?: unknown; visibilityScope?: unknown; useAnonymousDisplay?: boolean } = {},
+  media?: { image?: MulterMemoryFile }
+) => {
   const author = await ensureViewer(userId);
   const source = await PulsePost.findById(postId).lean();
   if (!source) throw new Error("Post not found");
 
-  const rootId = source.repostedFrom ? String(source.repostedFrom) : String(source._id);
-  const root = source.repostedFrom
-    ? await PulsePost.findById(rootId).lean()
-    : source;
-  if (!root) throw new Error("Original post not found");
-  if (String(root.author) === String(userId)) {
-    throw new Error("You cannot repost your own post");
+  const target =
+    source.repostedFrom && !source.isQuote
+      ? await PulsePost.findById(source.repostedFrom).lean()
+      : source;
+  if (!target) throw new Error("Original post not found");
+  const targetId = String(target._id);
+  const quoteBody = String(input.body ?? "").trim();
+  const isQuote = quoteBody.length > 0;
+
+  if (!isQuote && media?.image) {
+    throw new Error("Add some text to quote this post");
   }
-  await assertNotBlockedBetween(userId, root.author);
+  await assertNotBlockedBetween(userId, target.author);
 
-  const already = await PulsePost.exists({ author: userId, repostedFrom: rootId });
-  if (already) throw new Error("You already reposted this post");
-
-  const loc = readPulseLocation(author);
   let created;
-  try {
+  let imageUploadFailed = false;
+  if (isQuote) {
+    if (quoteBody.length > 5000) throw new Error("body must be 5000 characters or fewer");
+    const useAnonymous = Boolean(input.useAnonymousDisplay);
+    if (useAnonymous && !author.anonymousUsername) {
+      throw new Error("Set an anonymous username before posting anonymously");
+    }
+    const visibilityScope = parseVisibilityScope(input.visibilityScope, "all");
+    const loc = assertPulseLocation(author, visibilityScope);
+    const upload = await tryUploadPulseImage(
+      media?.image,
+      ["pulse/posts", loc.state || "all", loc.lga || "all"].join("/")
+    );
+    imageUploadFailed = upload.failed;
+    const imageUrl = upload.url;
     created = await PulsePost.create({
       author: userId,
-      body: String(root.body ?? "").trim(),
-      imageUrl: root.imageUrl,
+      body: quoteBody,
+      imageUrl,
+      visibilityScope,
+      audienceState: loc.state || undefined,
+      audienceLga: loc.lga || undefined,
+      audienceWard: loc.ward || undefined,
+      audiencePollingUnit: loc.pollingUnit || undefined,
+      useAnonymousDisplay: useAnonymous,
+      likes: [],
+      repostedFrom: targetId,
+      isQuote: true,
+      repostCount: 0,
+      quoteCount: 0,
+    });
+    await PulsePost.updateOne({ _id: targetId }, { $inc: { quoteCount: 1 } });
+  } else {
+    if (String(target.author) === String(userId)) {
+      throw new Error("You cannot repost your own post");
+    }
+    const already = await PulsePost.exists({
+      author: userId,
+      repostedFrom: targetId,
+      isQuote: { $ne: true },
+    });
+    if (already) throw new Error("You already reposted this post");
+
+    const loc = readPulseLocation(author);
+    created = await PulsePost.create({
+      author: userId,
+      body: String(target.body ?? "").trim(),
+      imageUrl: target.imageUrl,
       visibilityScope: "all",
       audienceState: loc.state || undefined,
       audienceLga: loc.lga || undefined,
@@ -609,33 +721,22 @@ export const repostPulsePost = async (userId: Id, postId: string) => {
       audiencePollingUnit: loc.pollingUnit || undefined,
       useAnonymousDisplay: false,
       likes: [],
-      repostedFrom: rootId,
+      repostedFrom: targetId,
+      isQuote: false,
       repostCount: 0,
+      quoteCount: 0,
     });
-  } catch (error) {
-    const duplicate =
-      typeof error === "object" &&
-      error != null &&
-      "code" in error &&
-      (error as { code?: number }).code === 11000;
-    if (duplicate) throw new Error("You already reposted this post");
-    throw error;
+    await PulsePost.updateOne({ _id: targetId }, { $inc: { repostCount: 1 } });
   }
 
-  try {
-    await PulsePost.updateOne({ _id: rootId }, { $inc: { repostCount: 1 } });
-  } catch (error) {
-    console.error("Pulse repost count update failed:", error);
-  }
-
-  if (root.author && String(root.author) !== String(userId)) {
+  if (target.author && String(target.author) !== String(userId)) {
     try {
       await dispatchNotificationToUsers({
         type: "discussion-reply",
         preferenceKey: "discussionReplies",
-        body: "Someone reposted your pulse post.",
-        info: String(root.body ?? "").slice(0, 120),
-        userIds: [String(root.author)],
+        body: isQuote ? "Someone quoted your pulse post." : "Someone reposted your pulse post.",
+        info: (isQuote ? quoteBody : String(target.body ?? "")).slice(0, 120),
+        userIds: [String(target.author)],
       });
     } catch (error) {
       console.error("Pulse repost notification failed:", error);
@@ -646,7 +747,10 @@ export const repostPulsePost = async (userId: Id, postId: string) => {
     .populate(pulseAuthorPopulate)
     .populate(pulseOriginalPopulate)
     .lean();
-  return serializePulsePost(populated!, userId, 0);
+  return {
+    ...serializePulsePost(populated!, userId, 0, { isRepostedByCurrentUser: !isQuote }),
+    imageUploadFailed,
+  };
 };
 
 export const togglePulsePostLike = async (userId: Id, postId: string) => {
@@ -840,10 +944,18 @@ const loadPopulatedPost = async (postId: Id, viewerUserId: Id) => {
     .lean();
   if (!row) throw new Error("Post not found");
   const counts = await commentCountsByPost([row._id]);
-  return serializePulsePost(row, viewerUserId, counts.get(String(row._id)) ?? 0);
+  const target = repostTargetIdOf({
+    _id: row._id,
+    repostedFrom: originalIdOf(row.repostedFrom),
+    isQuote: row.isQuote,
+  });
+  const reposted = await viewerRepostedTargets(viewerUserId, target ? [target] : []);
+  return serializePulsePost(row, viewerUserId, counts.get(String(row._id)) ?? 0, {
+    isRepostedByCurrentUser: Boolean(target && reposted.has(target)),
+  });
 };
 
-/** Author only. Reposts can't be edited; undo the repost instead. */
+/** Author only. Quotes can be edited; plain reposts can't (undo the repost instead). */
 export const updatePulsePost = async (
   userId: Id,
   postId: string,
@@ -860,7 +972,7 @@ export const updatePulsePost = async (
   if (String(post.author) !== String(userId)) {
     throw new Error("You can only edit your own post");
   }
-  if (post.repostedFrom) {
+  if (post.repostedFrom && !post.isQuote) {
     throw new Error("Reposts cannot be edited");
   }
 
@@ -898,15 +1010,22 @@ export const updatePulsePost = async (
     }
   }
 
+  let imageUploadFailed = false;
   if (media?.image) {
     const loc = audienceLoc ?? readPulseLocation(author);
     const folder = ["pulse/posts", loc.state || "all", loc.lga || "all"].join("/");
-    set.imageUrl = (await uploadFileToFirebase(media.image, folder)).publicUrl;
+    const upload = await tryUploadPulseImage(media.image, folder);
+    if (upload.url) set.imageUrl = upload.url;
+    // Keep the existing image if the new one can't be uploaded.
+    imageUploadFailed = upload.failed;
   } else if (input.removeImage) {
     unset.imageUrl = 1;
   }
 
   if (Object.keys(set).length === 0 && Object.keys(unset).length === 0) {
+    if (imageUploadFailed) {
+      throw new Error("The image could not be uploaded right now. Try again later.");
+    }
     throw new Error("Nothing to update");
   }
 
@@ -915,13 +1034,14 @@ export const updatePulsePost = async (
   if (Object.keys(unset).length) update.$unset = unset;
   await PulsePost.updateOne({ _id: postId }, update);
 
-  // Reposts keep a copy of the original's body and image; keep them in sync.
+  // Plain reposts keep a copy of the original's body and image; keep them in sync.
+  // Quotes have their own text and image, so they're left alone.
   const repostSync: Record<string, unknown> = {};
   if ("body" in set) repostSync.body = set.body;
   if ("imageUrl" in set) repostSync.imageUrl = set.imageUrl;
   if (Object.keys(repostSync).length || unset.imageUrl) {
     await PulsePost.updateMany(
-      { repostedFrom: postId },
+      { repostedFrom: postId, isQuote: { $ne: true } },
       {
         ...(Object.keys(repostSync).length ? { $set: repostSync } : {}),
         ...(unset.imageUrl ? { $unset: { imageUrl: 1 } } : {}),
@@ -929,12 +1049,14 @@ export const updatePulsePost = async (
     );
   }
 
-  return loadPopulatedPost(postId, userId);
+  return { ...(await loadPopulatedPost(postId, userId)), imageUploadFailed };
 };
 
 /**
- * Author only. Deleting a repost decrements the original's repost count.
- * Deleting an original also removes its reposts and all their comments.
+ * Author only.
+ * - Deletes the post, its comments, and plain reposts of it (with their comments).
+ * - Quotes of it are kept and show the original as unavailable, like on X.
+ * - A deleted repost or quote lowers the target's repostCount / quoteCount.
  */
 export const deletePulsePost = async (userId: Id, postId: string) => {
   const post = await PulsePost.findById(postId).lean();
@@ -949,35 +1071,42 @@ export const deletePulsePost = async (userId: Id, postId: string) => {
 export const deletePulsePostCore = async (post: {
   _id: Types.ObjectId;
   repostedFrom?: Types.ObjectId | null;
+  isQuote?: boolean | null;
 }) => {
-  if (post.repostedFrom) {
-    await PulseComment.deleteMany({ post: post._id });
-    await PulsePost.deleteOne({ _id: post._id });
-    await PulsePost.updateOne(
-      { _id: post.repostedFrom, repostCount: { $gt: 0 } },
-      { $inc: { repostCount: -1 } }
-    );
-    return { id: String(post._id), deleted: true };
-  }
-
-  const repostIds = (
-    await PulsePost.find({ repostedFrom: post._id }).select("_id").lean()
+  const plainRepostIds = (
+    await PulsePost.find({ repostedFrom: post._id, isQuote: { $ne: true } })
+      .select("_id")
+      .lean()
   ).map((r) => r._id);
-  const allIds = [post._id, ...repostIds];
+  const allIds = [post._id, ...plainRepostIds];
   await PulseComment.deleteMany({ post: { $in: allIds } });
-  await PulsePost.deleteMany({ _id: { $in: allIds } });
-  return { id: String(post._id), deleted: true, repostsDeleted: repostIds.length };
+  const removed = await PulsePost.deleteMany({ _id: { $in: allIds } });
+
+  // Only adjust counters if this call actually removed the post.
+  if (post.repostedFrom && removed.deletedCount > 0) {
+    const counter = post.isQuote ? "quoteCount" : "repostCount";
+    await PulsePost.updateOne(
+      { _id: post.repostedFrom, [counter]: { $gt: 0 } },
+      { $inc: { [counter]: -1 } }
+    );
+  }
+  return { id: String(post._id), deleted: true, repostsDeleted: plainRepostIds.length };
 };
 
-/** postId may be the original post or the viewer's own repost of it. */
+/**
+ * Undo a plain repost. postId may be the reposted post or the viewer's own repost of it.
+ * Quotes are removed with DELETE /posts/:quoteId instead.
+ */
 export const undoPulseRepost = async (userId: Id, postId: string) => {
-  const source = await PulsePost.findById(postId).select("repostedFrom").lean();
+  const source = await PulsePost.findById(postId).select("repostedFrom isQuote").lean();
   if (!source) throw new Error("Post not found");
-  const rootId = source.repostedFrom ? String(source.repostedFrom) : String(source._id);
+  const rootId =
+    source.repostedFrom && !source.isQuote ? String(source.repostedFrom) : String(source._id);
 
   const repost = await PulsePost.findOneAndDelete({
     author: userId,
     repostedFrom: rootId,
+    isQuote: { $ne: true },
   }).lean();
   if (!repost) throw new Error("You have not reposted this post");
 

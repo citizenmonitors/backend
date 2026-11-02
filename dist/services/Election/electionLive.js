@@ -7,6 +7,7 @@ import AllState from "../../state-data/state.json" with { type: "json" };
 import AllLga from "../../state-data/lga.json" with { type: "json" };
 import AllWard from "../../state-data/wards.json" with { type: "json" };
 import ActiveElection from "../../models/Election/ActiveElection.js";
+import { buildCollationSubmitterFilter, dropSupersededAnonymizedSubmissions, } from "../../utils/observerSubmissions.js";
 const INCIDENT_COUNT_TEMPLATE = {
     "Ballot Stuffing": 0,
     "Thuggery & Violence": 0,
@@ -301,20 +302,16 @@ export const getLiveElectionService = async (electionId, userId, options) => {
         let incidentReport = null;
         let sentimentAnalysis = null;
         // Fetch election results and sentiment analysis based on location and grouping
-        const approvedObservers = await CompletedUser.find({ role: "observer", isObserverInPollingUnit: true }, "_id").lean();
-        const approvedObserverIds = approvedObservers.map((u) => u._id);
-        const submitterFilter = {
-            userRole: "observer",
-            user: { $in: approvedObserverIds },
-        };
+        // Approved observers' uploads + uploads kept after an observer deleted their account.
+        const submitterFilter = await buildCollationSubmitterFilter();
         const scopedFilter = buildObserverSubmissionLocationFilter(electionRef?.electionType, user);
-        const electionResults = await ElectionData.find({
+        const electionResults = dropSupersededAnonymizedSubmissions(await ElectionData.find({
             election: activeElection._id,
             ...submitterFilter,
             ...(Object.keys(scopedFilter).length > 0
                 ? { $or: [scopedFilter, { user: userId }] }
                 : {}),
-        }).lean();
+        }).lean());
         if (electionResults.length > 0) {
             const { resultData, regions, aggregateAnalysis, overallChart } = aggregateResultsAndTopParties(electionResults, groupBy, electionRef?.electionType);
             const sentimentData = await getSentimentAnalysisService(electionId, groupBy, user, activeElection);
@@ -346,13 +343,13 @@ export const getLiveElectionService = async (electionId, userId, options) => {
             };
         }
         // Fetch incident reports, restricted by the user's location for non-presidential elections
-        const incidents = await IncidentReport.find({
+        const incidents = dropSupersededAnonymizedSubmissions(await IncidentReport.find({
             election: electionId,
             ...submitterFilter,
             ...(Object.keys(scopedFilter).length > 0
                 ? { $or: [scopedFilter, { user: userId }] }
                 : {}),
-        }).lean();
+        }).lean());
         if (incidents.length > 0) {
             const { chart: incidentChart, aggregateAnalysis: incidentAggregateAnalysis, } = aggregateIncidentsByLocation(incidents, groupBy);
             incidentReport = {

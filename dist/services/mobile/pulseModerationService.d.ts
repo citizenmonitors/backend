@@ -4,7 +4,10 @@
  */
 import { type Types } from "mongoose";
 type Id = Types.ObjectId | string;
-/** Reporting a repost reports the original post, since that's whose content it is. */
+/**
+ * Reporting a plain repost reports the original, since that's whose content it is.
+ * A quote is the quoter's own text, so reporting a quote reports the quote.
+ */
 export declare const reportPulsePost: (userId: Id, postId: string, input: {
     reason?: unknown;
     details?: unknown;

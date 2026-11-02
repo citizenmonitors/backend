@@ -1,5 +1,5 @@
 import { asParamString, isValidObjectId } from "../../utils/validators.js";
-import { addPulsePostCommentAnyLocation, createPulsePost, listPulsePostCommentsPublic, listPulseFeed, parsePulseFeedScope, parseVisibilityScope, repostPulsePost, togglePulseCommentLikeAnyLocation, togglePulsePostLikeAnyLocation, } from "../../services/mobile/pulseService.js";
+import { addPulsePostCommentAnyLocation, createPulsePost, listPulsePostCommentsPublic, listPulseFeed, parsePulseFeedScope, parseVisibilityScope, repostPulsePost, togglePulseCommentLikeAnyLocation, togglePulsePostLikeAnyLocation, PULSE_IMAGE_UPLOAD_FAILED_MESSAGE, } from "../../services/mobile/pulseService.js";
 import { invalidateCacheByPrefixes } from "../../utils/cache.js";
 const errMsg = (e) => (e instanceof Error ? e.message : String(e));
 const requireUserId = (req) => {
@@ -74,7 +74,10 @@ export const postPulsePostMobile = async (req, res) => {
             useAnonymousDisplay: toBooleanIfBooleanLike(b.useAnonymousDisplay),
         }, { image });
         await invalidateMobileReadCaches(userId);
-        return res.status(201).json({ post });
+        return res.status(201).json({
+            post,
+            ...(post.imageUploadFailed ? { warning: PULSE_IMAGE_UPLOAD_FAILED_MESSAGE } : {}),
+        });
     }
     catch (error) {
         const message = errMsg(error);
@@ -102,9 +105,19 @@ export const postPulseRepostMobile = async (req, res) => {
         if (!isValidObjectId(postId))
             return res.status(400).json({ message: "Invalid post id" });
         const userId = requireUserId(r);
-        const post = await repostPulsePost(userId, postId);
+        const b = (req.body ?? {});
+        const image = r.files?.image?.[0];
+        // No body = plain repost; body (+ optional image) = quote post.
+        const post = await repostPulsePost(userId, postId, {
+            body: b.body,
+            visibilityScope: b.visibilityScope,
+            useAnonymousDisplay: toBooleanIfBooleanLike(b.useAnonymousDisplay),
+        }, { image });
         await invalidateMobileReadCaches(userId);
-        return res.status(201).json({ post });
+        return res.status(201).json({
+            post,
+            ...(post.imageUploadFailed ? { warning: PULSE_IMAGE_UPLOAD_FAILED_MESSAGE } : {}),
+        });
     }
     catch (error) {
         const message = errMsg(error);
@@ -116,6 +129,9 @@ export const postPulseRepostMobile = async (req, res) => {
         }
         if (message.includes("not found")) {
             return res.status(404).json({ message });
+        }
+        if (message.includes("Authentication required")) {
+            return res.status(401).json({ message });
         }
         return res.status(400).json({ message });
     }

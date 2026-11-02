@@ -1,6 +1,7 @@
 import Election from "../../models/Election/Election.js";
 import ElectionData from "../../models/Election/ElectionData.js";
 import ActiveElection from "../../models/Election/ActiveElection.js";
+import { buildCollationSubmitterFilter, dropSupersededAnonymizedSubmissions, } from "../../utils/observerSubmissions.js";
 import CompletedUser from "../../models/CompletedUser.js";
 import { politicalParties } from "../../models/Election/PoliticalParty.js";
 import IncidentReport from "../../models/Election/IncidentReport.js";
@@ -723,9 +724,9 @@ export const uploadResultDataService = async (electionId, userId, data, files, o
         });
         // Save the election result data
         const savedResultData = await electionData.save();
-        // Rebuild results[] + resultsCount from ElectionData (avoids stale array /
-        // concurrent-upload races from read-modify-write on ActiveElection).
-        await syncActiveElectionResultsCount(electionId);
+        // Atomic and idempotent: no read-modify-write race, and no full rebuild of
+        // results[] on every upload. Deletes still do a full recount.
+        await ActiveElection.updateOne({ _id: electionId, results: { $ne: savedResultData._id } }, { $push: { results: savedResultData._id }, $inc: { resultsCount: 1 } });
         await invalidateAllMobileReadCaches();
         // Convert electionType and stateName to Title Case for notifications
         const toTitleCase = (text) => text
@@ -1191,7 +1192,7 @@ export const uploadIncidentReportDataService = async (electionId, userId, data, 
         });
         // Save and return
         const savedReport = await incidentReport.save();
-        await syncActiveElectionIncidentRefs(electionId);
+        await ActiveElection.updateOne({ _id: electionId }, { $addToSet: { incidentReports: savedReport._id } });
         await invalidateAllMobileReadCaches();
         await dispatchMobileNotification({
             type: "incident-upload",
@@ -1670,12 +1671,11 @@ export const getResultsAndPerformAction = async (userId, actionData, flagMediaFi
 };
 // Helper function to fetch results and reports for a polling unit and specific user
 const fetchResults = async (pollingUnit, userId) => {
-    const approvedObservers = await CompletedUser.find({ role: "observer", isObserverInPollingUnit: true }, "_id").lean();
-    const approvedObserverIds = approvedObservers.map((u) => u._id);
-    const electionResults = await ElectionData.find({
+    // Approved observers' uploads + uploads kept after an observer deleted their account.
+    const submitterFilter = await buildCollationSubmitterFilter();
+    const electionResults = dropSupersededAnonymizedSubmissions(await ElectionData.find({
         pollingUnit,
-        userRole: "observer",
-        user: { $in: approvedObserverIds },
+        ...submitterFilter,
         hidden: false,
     })
         .populate({
@@ -1686,11 +1686,10 @@ const fetchResults = async (pollingUnit, userId) => {
         },
         select: "startDate endDate electionLocation mockElection",
     })
-        .lean();
-    const incidentReports = await IncidentReport.find({
+        .lean());
+    const incidentReports = dropSupersededAnonymizedSubmissions(await IncidentReport.find({
         pollingUnit,
-        userRole: "observer",
-        user: { $in: approvedObserverIds },
+        ...submitterFilter,
         hidden: false,
     })
         .populate({
@@ -1701,7 +1700,7 @@ const fetchResults = async (pollingUnit, userId) => {
         },
         select: "startDate endDate electionLocation mockElection",
     })
-        .lean();
+        .lean());
     // Process election results
     const resultData = electionResults.map((result) => {
         const e = result.election;

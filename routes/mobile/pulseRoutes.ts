@@ -50,7 +50,8 @@ router.post(
   handlePulseUpload,
   postPulsePostMobile
 );
-router.post("/posts/:postId/repost", authMiddleware, postPulseRepostMobile);
+// No body = plain repost; body (+ optional image) = quote post.
+router.post("/posts/:postId/repost", authMiddleware, handlePulseUpload, postPulseRepostMobile);
 router.post("/posts/:postId/like", authMiddleware, postPulsePostLikeMobile);
 router.get("/posts/:postId/comments", authMiddleware, getPulsePostCommentsMobile);
 router.post("/posts/:postId/comments", authMiddleware, postPulsePostCommentMobile);

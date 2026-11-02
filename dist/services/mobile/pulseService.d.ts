@@ -19,6 +19,7 @@ export declare const formatAuthorDisplay: (author: AuthorLean | null | undefined
     displayName: string;
     usedAnonymous: boolean;
 };
+export declare const PULSE_IMAGE_UPLOAD_FAILED_MESSAGE = "Your post was published without the image because the image could not be uploaded. Try adding it again later.";
 /** Users hidden from the viewer: those they blocked and those who blocked them. */
 export declare const hiddenUserIdsFor: (viewerUserId: Id) => Promise<string[]>;
 /** Throws when either user has blocked the other. */
@@ -44,22 +45,31 @@ export declare const listPulseFeed: (input?: {
         audienceWard: string | null;
         audiencePollingUnit: string | null;
         isRepost: boolean;
+        isQuote: boolean;
         originalPost: {
             id: string;
             body: string | undefined;
             imageUrl: string | null;
+            isQuote: boolean;
+            createdAt: Date | undefined;
             author: {
                 id: string | null;
                 displayName: string;
                 usedAnonymous: boolean;
             };
+            unavailable: boolean;
         } | {
             id: string;
+            unavailable: boolean;
             body?: undefined;
             imageUrl?: undefined;
+            isQuote?: undefined;
+            createdAt?: undefined;
             author?: undefined;
         } | null;
         repostCount: number;
+        quoteCount: number;
+        isRepostedByCurrentUser: boolean;
         createdAt: Date | undefined;
         updatedAt: Date | undefined;
         author: {
@@ -88,22 +98,31 @@ export declare const listPulsePosts: (userId: Id, page?: number, limit?: number,
         audienceWard: string | null;
         audiencePollingUnit: string | null;
         isRepost: boolean;
+        isQuote: boolean;
         originalPost: {
             id: string;
             body: string | undefined;
             imageUrl: string | null;
+            isQuote: boolean;
+            createdAt: Date | undefined;
             author: {
                 id: string | null;
                 displayName: string;
                 usedAnonymous: boolean;
             };
+            unavailable: boolean;
         } | {
             id: string;
+            unavailable: boolean;
             body?: undefined;
             imageUrl?: undefined;
+            isQuote?: undefined;
+            createdAt?: undefined;
             author?: undefined;
         } | null;
         repostCount: number;
+        quoteCount: number;
+        isRepostedByCurrentUser: boolean;
         createdAt: Date | undefined;
         updatedAt: Date | undefined;
         author: {
@@ -133,22 +152,31 @@ export declare const listPulsePostsPublic: (page?: number, limit?: number, scope
         audienceWard: string | null;
         audiencePollingUnit: string | null;
         isRepost: boolean;
+        isQuote: boolean;
         originalPost: {
             id: string;
             body: string | undefined;
             imageUrl: string | null;
+            isQuote: boolean;
+            createdAt: Date | undefined;
             author: {
                 id: string | null;
                 displayName: string;
                 usedAnonymous: boolean;
             };
+            unavailable: boolean;
         } | {
             id: string;
+            unavailable: boolean;
             body?: undefined;
             imageUrl?: undefined;
+            isQuote?: undefined;
+            createdAt?: undefined;
             author?: undefined;
         } | null;
         repostCount: number;
+        quoteCount: number;
+        isRepostedByCurrentUser: boolean;
         createdAt: Date | undefined;
         updatedAt: Date | undefined;
         author: {
@@ -173,6 +201,7 @@ export declare const createPulsePost: (userId: Id, input: {
 }, media?: {
     image?: MulterMemoryFile;
 }) => Promise<{
+    imageUploadFailed: boolean;
     id: string;
     body: string | undefined;
     imageUrl: string | null;
@@ -182,22 +211,31 @@ export declare const createPulsePost: (userId: Id, input: {
     audienceWard: string | null;
     audiencePollingUnit: string | null;
     isRepost: boolean;
+    isQuote: boolean;
     originalPost: {
         id: string;
         body: string | undefined;
         imageUrl: string | null;
+        isQuote: boolean;
+        createdAt: Date | undefined;
         author: {
             id: string | null;
             displayName: string;
             usedAnonymous: boolean;
         };
+        unavailable: boolean;
     } | {
         id: string;
+        unavailable: boolean;
         body?: undefined;
         imageUrl?: undefined;
+        isQuote?: undefined;
+        createdAt?: undefined;
         author?: undefined;
     } | null;
     repostCount: number;
+    quoteCount: number;
+    isRepostedByCurrentUser: boolean;
     createdAt: Date | undefined;
     updatedAt: Date | undefined;
     author: {
@@ -210,7 +248,22 @@ export declare const createPulsePost: (userId: Id, input: {
     commentsCount: number;
     isLikedByCurrentUser: boolean;
 }>;
-export declare const repostPulsePost: (userId: Id, postId: string) => Promise<{
+/**
+ * Repost like X.
+ * - No body: plain repost (one per user per post; not your own post).
+ * - With body (and optional image): quote post with your own text on top. Many allowed,
+ *   including quoting your own post.
+ * Reposting a plain repost targets its original; reposting or quoting a quote targets
+ * the quote itself.
+ */
+export declare const repostPulsePost: (userId: Id, postId: string, input?: {
+    body?: unknown;
+    visibilityScope?: unknown;
+    useAnonymousDisplay?: boolean;
+}, media?: {
+    image?: MulterMemoryFile;
+}) => Promise<{
+    imageUploadFailed: boolean;
     id: string;
     body: string | undefined;
     imageUrl: string | null;
@@ -220,22 +273,31 @@ export declare const repostPulsePost: (userId: Id, postId: string) => Promise<{
     audienceWard: string | null;
     audiencePollingUnit: string | null;
     isRepost: boolean;
+    isQuote: boolean;
     originalPost: {
         id: string;
         body: string | undefined;
         imageUrl: string | null;
+        isQuote: boolean;
+        createdAt: Date | undefined;
         author: {
             id: string | null;
             displayName: string;
             usedAnonymous: boolean;
         };
+        unavailable: boolean;
     } | {
         id: string;
+        unavailable: boolean;
         body?: undefined;
         imageUrl?: undefined;
+        isQuote?: undefined;
+        createdAt?: undefined;
         author?: undefined;
     } | null;
     repostCount: number;
+    quoteCount: number;
+    isRepostedByCurrentUser: boolean;
     createdAt: Date | undefined;
     updatedAt: Date | undefined;
     author: {
@@ -352,7 +414,7 @@ export declare const togglePulseCommentLikeAnyLocation: (userId: Id, postId: str
     likesCount: number;
     isLikedByCurrentUser: boolean;
 }>;
-/** Author only. Reposts can't be edited; undo the repost instead. */
+/** Author only. Quotes can be edited; plain reposts can't (undo the repost instead). */
 export declare const updatePulsePost: (userId: Id, postId: string, input: {
     body?: unknown;
     visibilityScope?: unknown;
@@ -361,6 +423,7 @@ export declare const updatePulsePost: (userId: Id, postId: string, input: {
 }, media?: {
     image?: MulterMemoryFile;
 }) => Promise<{
+    imageUploadFailed: boolean;
     id: string;
     body: string | undefined;
     imageUrl: string | null;
@@ -370,22 +433,31 @@ export declare const updatePulsePost: (userId: Id, postId: string, input: {
     audienceWard: string | null;
     audiencePollingUnit: string | null;
     isRepost: boolean;
+    isQuote: boolean;
     originalPost: {
         id: string;
         body: string | undefined;
         imageUrl: string | null;
+        isQuote: boolean;
+        createdAt: Date | undefined;
         author: {
             id: string | null;
             displayName: string;
             usedAnonymous: boolean;
         };
+        unavailable: boolean;
     } | {
         id: string;
+        unavailable: boolean;
         body?: undefined;
         imageUrl?: undefined;
+        isQuote?: undefined;
+        createdAt?: undefined;
         author?: undefined;
     } | null;
     repostCount: number;
+    quoteCount: number;
+    isRepostedByCurrentUser: boolean;
     createdAt: Date | undefined;
     updatedAt: Date | undefined;
     author: {
@@ -399,14 +471,12 @@ export declare const updatePulsePost: (userId: Id, postId: string, input: {
     isLikedByCurrentUser: boolean;
 }>;
 /**
- * Author only. Deleting a repost decrements the original's repost count.
- * Deleting an original also removes its reposts and all their comments.
+ * Author only.
+ * - Deletes the post, its comments, and plain reposts of it (with their comments).
+ * - Quotes of it are kept and show the original as unavailable, like on X.
+ * - A deleted repost or quote lowers the target's repostCount / quoteCount.
  */
 export declare const deletePulsePost: (userId: Id, postId: string) => Promise<{
-    id: string;
-    deleted: boolean;
-    repostsDeleted?: undefined;
-} | {
     id: string;
     deleted: boolean;
     repostsDeleted: number;
@@ -415,16 +485,16 @@ export declare const deletePulsePost: (userId: Id, postId: string) => Promise<{
 export declare const deletePulsePostCore: (post: {
     _id: Types.ObjectId;
     repostedFrom?: Types.ObjectId | null;
+    isQuote?: boolean | null;
 }) => Promise<{
-    id: string;
-    deleted: boolean;
-    repostsDeleted?: undefined;
-} | {
     id: string;
     deleted: boolean;
     repostsDeleted: number;
 }>;
-/** postId may be the original post or the viewer's own repost of it. */
+/**
+ * Undo a plain repost. postId may be the reposted post or the viewer's own repost of it.
+ * Quotes are removed with DELETE /posts/:quoteId instead.
+ */
 export declare const undoPulseRepost: (userId: Id, postId: string) => Promise<{
     id: string;
     removedRepostId: string;

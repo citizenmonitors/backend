@@ -263,6 +263,26 @@ Common fields:
 - `nationality`, `whyYouJoinUs`
 - `profileImage` (optional file)
 
+### `DELETE /profile/me`
+Delete the signed-in account. Allowed for every role except admin / super-admin (`403`; use admin tooling).
+- Observers: results and incidents stay in collation, anonymised (no name or account link).
+- Volunteers and others: results and incidents are deleted.
+- Removed for everyone: Pulse posts, comments, likes and blocks; discussion and article comments; notifications aimed only at the user; feedback; profile image and observer ID files.
+
+`200`:
+```json
+{
+  "message": "User account deleted successfully",
+  "deletedResults": 0,
+  "deletedIncidents": 0,
+  "anonymizedResults": 1,
+  "anonymizedIncidents": 0,
+  "notifiedPeers": 2,
+  "note": "Your election results and incidents stay in collation without your name or account. ..."
+}
+```
+Sign the user out locally after `200`; refresh tokens are revoked server-side. `403` → show `message`.
+
 ### `PUT /profile/me/password`
 Body:
 ```json
@@ -463,6 +483,8 @@ Fields:
 - `useAnonymousDisplay`: boolean-like
 - `image` (optional file)
 
+If the image can't be uploaded (for example a storage outage), the post is still published without it. The response then includes `"warning": "Your post was published without the image..."` and `post.imageUploadFailed: true`. Show the warning; don't retry the whole post. The same applies to quotes and to edits (on edit the old image is kept; an edit that only changes the image returns `503`).
+
 ### `PATCH /pulse/posts/:postId` (`multipart/form-data` or JSON)
 Edit your own post. Send only the fields you want to change:
 - `body`, `visibilityScope`, `useAnonymousDisplay`
@@ -473,8 +495,14 @@ Reposts can't be edited (`400`). Not your post → `403`. Returns `{ post }`.
 ### `DELETE /pulse/posts/:postId`
 Delete your own post and its comments. Deleting an original also deletes all reposts of it; deleting a repost lowers the original's `repostCount`. Returns `{ id, deleted: true }`.
 
-### `POST /pulse/posts/:postId/repost`
-Repost. `409` if already reposted or it's your own post.
+### `POST /pulse/posts/:postId/repost` (JSON or `multipart/form-data`)
+Repost or quote, like X.
+- **No `body`** → plain repost. One per user per post; not allowed on your own post (`409` for either).
+- **With `body`** → quote post: your own text on top of the post. Optional fields: `image` (file), `visibilityScope`, `useAnonymousDisplay`. Many quotes allowed, including of your own post. An `image` without `body` is rejected (`400`).
+- Reposting a plain repost targets its original; reposting or quoting a quote targets that quote.
+
+`201` `{ post }` with `isRepost: true`, `isQuote`, and `originalPost`. The target's `repostCount` or `quoteCount` goes up by 1.
+Quotes are edited and deleted like normal posts (`PATCH` / `DELETE /pulse/posts/:quoteId`); plain reposts can't be edited.
 
 ### `DELETE /pulse/posts/:postId/repost`
 Undo your repost. `postId` can be the original post or your repost of it. Returns `{ id, removedRepostId, repostCount }`. `404` if you haven't reposted it.
@@ -530,6 +558,12 @@ Unblock, using `block.id`. Safe to repeat. `200` `{ id, blocked: false }`.
 
 ### `GET /pulse/blocks`
 `200` `{ blocks: [{ id, displayName, blockedAt }] }`, newest first. No account ids.
+
+### Pulse post fields for reposts and quotes
+- `isRepost` (true for plain reposts and quotes), `isQuote`, `repostCount`, `quoteCount`.
+- `isRepostedByCurrentUser`: the viewer has plainly reposted this post (or, on a repost card, its original). Use it to toggle Repost / Undo repost.
+- `originalPost`: `{ id, body, imageUrl, isQuote, createdAt, author, unavailable: false }`, or `{ id, unavailable: true }` when the quoted post was deleted (quotes are kept, like on X). Deleting a post removes its plain reposts.
+- Comments: anyone, including the post's author, can comment on posts and quotes.
 
 ### Pulse anonymity
 - `author.id` is `null` whenever `author.usedAnonymous` is `true` (posts, comments and `originalPost.author`).

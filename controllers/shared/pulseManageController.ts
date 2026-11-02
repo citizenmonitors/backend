@@ -15,6 +15,7 @@ import {
   unlikePulsePost,
   updatePulseComment,
   updatePulsePost,
+  PULSE_IMAGE_UPLOAD_FAILED_MESSAGE,
 } from "../../services/mobile/pulseService.ts";
 
 const errMsg = (e: unknown): string => (e instanceof Error ? e.message : String(e));
@@ -42,6 +43,7 @@ const optionalBoolean = (value: unknown): boolean | undefined => {
 
 const statusFor = (message: string): number => {
   if (message.includes("Authentication required")) return 401;
+  if (message.includes("could not be uploaded")) return 503;
   if (message.includes("You can only")) return 403;
   if (message.includes("not found") || message.includes("have not reposted")) return 404;
   if (
@@ -92,7 +94,10 @@ export const patchPulsePost = async (req: Request, res: Response) => {
       { image: image?.[0] }
     );
     await invalidateReadCaches(userId);
-    return res.status(200).json({ post });
+    return res.status(200).json({
+      post,
+      ...(post.imageUploadFailed ? { warning: PULSE_IMAGE_UPLOAD_FAILED_MESSAGE } : {}),
+    });
   } catch (error) {
     return sendError(res, error);
   }

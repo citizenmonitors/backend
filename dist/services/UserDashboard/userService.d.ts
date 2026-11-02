@@ -145,31 +145,51 @@ export declare class AccountDeletionBlockedError extends Error {
     statusCode: number;
     constructor(message: string);
 }
-export declare const removeVolunteerSubmissionsForAccountDelete: (userId: Id) => Promise<{
+type DeletableUser = {
+    _id: Id;
+    email?: string | null;
+    role?: string | null;
+    pollingUnit?: string | null;
+    isObserverInPollingUnit?: boolean | null;
+    profileImage?: {
+        _id?: unknown;
+        location?: string | null;
+    } | null;
+    observerId?: Array<{
+        _id?: unknown;
+        location?: string | null;
+    }> | null;
+};
+/**
+ * Shared by self-service and admin deletion.
+ * - Observer results/incidents stay in collation, anonymised (no name or account link).
+ * - Volunteer and other non-observer results/incidents are deleted (they never count
+ *   toward collation).
+ * - The person's agree/flag marks on others' submissions are removed.
+ * - Pulse, discussion and article content, likes, notifications, feedback and stored
+ *   ID / profile files are removed.
+ */
+export declare const performAccountDeletion: (user: DeletableUser) => Promise<{
+    role: string;
+    wasApprovedObserver: boolean;
     deletedResults: number;
     deletedIncidents: number;
+    anonymizedResults: number;
+    anonymizedIncidents: number;
+    notifiedPeers: number;
 }>;
-export declare const scrubUserElectionActions: (userId: Id) => Promise<void>;
-export declare const notifyPollingUnitAfterObserverLeft: (pollingUnit: string | null | undefined, deletedUserId: Id) => Promise<number>;
 /**
- * Self-service account deletion:
- * - volunteer (or other non-observer) with uploads: allowed; submissions deleted
- * - observer with any result/incident: blocked (collation keeps their uploads)
- * - observer with no uploads: allowed; notify PU that observer slot is open
- * - public-viewer with no uploads: allowed; scrub agree/flag marks if any
- * - admin / super-admin: blocked (use admin tooling)
+ * Self-service account deletion (DELETE /api/user, DELETE /api/v1/mobile/profile/me).
+ * Allowed for every role except admin / super-admin (they use admin tooling).
  */
 export declare const deleteUserService: (userId: Id) => Promise<{
     note?: string | undefined;
     message: string;
     deletedResults: number;
     deletedIncidents: number;
+    anonymizedResults: number;
+    anonymizedIncidents: number;
     notifiedPeers: number;
-} | {
-    note?: string | undefined;
-    message: string;
-    deletedResults: number;
-    deletedIncidents: number;
 }>;
 export {};
 //# sourceMappingURL=userService.d.ts.map

@@ -11,9 +11,9 @@ declare const _default: mongoose.Model<{
     post: mongoose.Types.ObjectId;
     status: "open" | "dismissed" | "removed";
     targetType: "comment" | "post";
-    reason: "spam" | "harassment" | "hate" | "violence" | "sexual" | "misinformation" | "other";
     reporter: mongoose.Types.ObjectId;
     reportedUser: mongoose.Types.ObjectId;
+    reason: "spam" | "harassment" | "hate" | "violence" | "sexual" | "misinformation" | "other";
     details?: string | null | undefined;
     snapshot?: {
         imageUrl?: string | null | undefined;
@@ -30,9 +30,9 @@ declare const _default: mongoose.Model<{
     post: mongoose.Types.ObjectId;
     status: "open" | "dismissed" | "removed";
     targetType: "comment" | "post";
-    reason: "spam" | "harassment" | "hate" | "violence" | "sexual" | "misinformation" | "other";
     reporter: mongoose.Types.ObjectId;
     reportedUser: mongoose.Types.ObjectId;
+    reason: "spam" | "harassment" | "hate" | "violence" | "sexual" | "misinformation" | "other";
     details?: string | null | undefined;
     snapshot?: {
         imageUrl?: string | null | undefined;
@@ -49,9 +49,9 @@ declare const _default: mongoose.Model<{
     post: mongoose.Types.ObjectId;
     status: "open" | "dismissed" | "removed";
     targetType: "comment" | "post";
-    reason: "spam" | "harassment" | "hate" | "violence" | "sexual" | "misinformation" | "other";
     reporter: mongoose.Types.ObjectId;
     reportedUser: mongoose.Types.ObjectId;
+    reason: "spam" | "harassment" | "hate" | "violence" | "sexual" | "misinformation" | "other";
     details?: string | null | undefined;
     snapshot?: {
         imageUrl?: string | null | undefined;
@@ -74,9 +74,9 @@ declare const _default: mongoose.Model<{
     post: mongoose.Types.ObjectId;
     status: "open" | "dismissed" | "removed";
     targetType: "comment" | "post";
-    reason: "spam" | "harassment" | "hate" | "violence" | "sexual" | "misinformation" | "other";
     reporter: mongoose.Types.ObjectId;
     reportedUser: mongoose.Types.ObjectId;
+    reason: "spam" | "harassment" | "hate" | "violence" | "sexual" | "misinformation" | "other";
     details?: string | null | undefined;
     snapshot?: {
         imageUrl?: string | null | undefined;
@@ -93,9 +93,9 @@ declare const _default: mongoose.Model<{
     post: mongoose.Types.ObjectId;
     status: "open" | "dismissed" | "removed";
     targetType: "comment" | "post";
-    reason: "spam" | "harassment" | "hate" | "violence" | "sexual" | "misinformation" | "other";
     reporter: mongoose.Types.ObjectId;
     reportedUser: mongoose.Types.ObjectId;
+    reason: "spam" | "harassment" | "hate" | "violence" | "sexual" | "misinformation" | "other";
     details?: string | null | undefined;
     snapshot?: {
         imageUrl?: string | null | undefined;
@@ -112,9 +112,9 @@ declare const _default: mongoose.Model<{
     post: mongoose.Types.ObjectId;
     status: "open" | "dismissed" | "removed";
     targetType: "comment" | "post";
-    reason: "spam" | "harassment" | "hate" | "violence" | "sexual" | "misinformation" | "other";
     reporter: mongoose.Types.ObjectId;
     reportedUser: mongoose.Types.ObjectId;
+    reason: "spam" | "harassment" | "hate" | "violence" | "sexual" | "misinformation" | "other";
     details?: string | null | undefined;
     snapshot?: {
         imageUrl?: string | null | undefined;

@@ -1,6 +1,6 @@
 import { asParamString, isValidObjectId } from "../../utils/validators.js";
 import { invalidateCacheByPrefixes } from "../../utils/cache.js";
-import { deletePulseComment, deletePulsePost, undoPulseRepost, unlikePulseComment, unlikePulsePost, updatePulseComment, updatePulsePost, } from "../../services/mobile/pulseService.js";
+import { deletePulseComment, deletePulsePost, undoPulseRepost, unlikePulseComment, unlikePulsePost, updatePulseComment, updatePulsePost, PULSE_IMAGE_UPLOAD_FAILED_MESSAGE, } from "../../services/mobile/pulseService.js";
 const errMsg = (e) => (e instanceof Error ? e.message : String(e));
 const requireUserId = (req) => {
     const id = req.user?._id;
@@ -26,6 +26,8 @@ const optionalBoolean = (value) => {
 const statusFor = (message) => {
     if (message.includes("Authentication required"))
         return 401;
+    if (message.includes("could not be uploaded"))
+        return 503;
     if (message.includes("You can only"))
         return 403;
     if (message.includes("not found") || message.includes("have not reposted"))
@@ -66,7 +68,10 @@ export const patchPulsePost = async (req, res) => {
             removeImage: optionalBoolean(b.removeImage),
         }, { image: image?.[0] });
         await invalidateReadCaches(userId);
-        return res.status(200).json({ post });
+        return res.status(200).json({
+            post,
+            ...(post.imageUploadFailed ? { warning: PULSE_IMAGE_UPLOAD_FAILED_MESSAGE } : {}),
+        });
     }
     catch (error) {
         return sendError(res, error);

@@ -1,6 +1,10 @@
 import Election from "../../models/Election/Election.ts";
 import ElectionData from "../../models/Election/ElectionData.ts";
 import ActiveElection from "../../models/Election/ActiveElection.ts";
+import {
+  buildCollationSubmitterFilter,
+  dropSupersededAnonymizedSubmissions,
+} from "../../utils/observerSubmissions.ts";
 import CompletedUser from "../../models/CompletedUser.ts";
 import { politicalParties } from "../../models/Election/PoliticalParty.ts";
 import IncidentReport from "../../models/Election/IncidentReport.ts";
@@ -1118,9 +1122,12 @@ export const uploadResultDataService = async (
     // Save the election result data
     const savedResultData = await electionData.save();
 
-    // Rebuild results[] + resultsCount from ElectionData (avoids stale array /
-    // concurrent-upload races from read-modify-write on ActiveElection).
-    await syncActiveElectionResultsCount(electionId);
+    // Atomic and idempotent: no read-modify-write race, and no full rebuild of
+    // results[] on every upload. Deletes still do a full recount.
+    await ActiveElection.updateOne(
+      { _id: electionId, results: { $ne: savedResultData._id } },
+      { $push: { results: savedResultData._id }, $inc: { resultsCount: 1 } }
+    );
     await invalidateAllMobileReadCaches();
 
     // Convert electionType and stateName to Title Case for notifications
@@ -1756,7 +1763,10 @@ export const uploadIncidentReportDataService = async (
 
     // Save and return
     const savedReport = await incidentReport.save();
-    await syncActiveElectionIncidentRefs(electionId);
+    await ActiveElection.updateOne(
+      { _id: electionId },
+      { $addToSet: { incidentReports: savedReport._id } }
+    );
     await invalidateAllMobileReadCaches();
 
     await dispatchMobileNotification({
@@ -2471,16 +2481,12 @@ const fetchResults = async (pollingUnit: string, userId: Id) => {
     election?: ElectionNested | null;
   };
 
-  const approvedObservers = await CompletedUser.find(
-    { role: "observer", isObserverInPollingUnit: true },
-    "_id"
-  ).lean();
-  const approvedObserverIds = approvedObservers.map((u) => u._id);
+  // Approved observers' uploads + uploads kept after an observer deleted their account.
+  const submitterFilter = await buildCollationSubmitterFilter();
 
-  const electionResults = await ElectionData.find({
+  const electionResults = dropSupersededAnonymizedSubmissions(await ElectionData.find({
     pollingUnit,
-    userRole: "observer",
-    user: { $in: approvedObserverIds },
+    ...submitterFilter,
     hidden: false,
   })
     .populate({
@@ -2491,12 +2497,11 @@ const fetchResults = async (pollingUnit: string, userId: Id) => {
       },
       select: "startDate endDate electionLocation mockElection",
     })
-    .lean();
+    .lean());
 
-  const incidentReports = await IncidentReport.find({
+  const incidentReports = dropSupersededAnonymizedSubmissions(await IncidentReport.find({
     pollingUnit,
-    userRole: "observer",
-    user: { $in: approvedObserverIds },
+    ...submitterFilter,
     hidden: false,
   })
     .populate({
@@ -2507,7 +2512,7 @@ const fetchResults = async (pollingUnit: string, userId: Id) => {
       },
       select: "startDate endDate electionLocation mockElection",
     })
-    .lean();
+    .lean());
 
   // Process election results
   const resultData = (electionResults as unknown as ObserverResult[]).map(

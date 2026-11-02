@@ -143,7 +143,11 @@ export const deleteUserByIdController = async (req, res) => {
         res.status(200).json(result);
     }
     catch (error) {
-        res.status(500).json({
+        if (error instanceof AdminDashServices.AdminDeleteForbiddenError) {
+            return res.status(403).json({ message: error.message });
+        }
+        const message = getErrorMessage(error);
+        res.status(message.includes("not found") ? 404 : 500).json({
             message: "Error deleting user",
             error: getErrorMessage(error),
         });

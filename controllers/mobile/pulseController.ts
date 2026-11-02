@@ -11,6 +11,7 @@ import {
   repostPulsePost,
   togglePulseCommentLikeAnyLocation,
   togglePulsePostLikeAnyLocation,
+  PULSE_IMAGE_UPLOAD_FAILED_MESSAGE,
 } from "../../services/mobile/pulseService.ts";
 import { invalidateCacheByPrefixes } from "../../utils/cache.ts";
 
@@ -104,7 +105,10 @@ export const postPulsePostMobile = async (req: Request, res: Response) => {
       { image }
     );
     await invalidateMobileReadCaches(userId);
-    return res.status(201).json({ post });
+    return res.status(201).json({
+      post,
+      ...(post.imageUploadFailed ? { warning: PULSE_IMAGE_UPLOAD_FAILED_MESSAGE } : {}),
+    });
   } catch (error) {
     const message = errMsg(error);
     if (message.includes("haven't blocked")) {
@@ -133,9 +137,28 @@ export const postPulseRepostMobile = async (req: Request, res: Response) => {
     const postId = asParamString(req.params.postId);
     if (!isValidObjectId(postId)) return res.status(400).json({ message: "Invalid post id" });
     const userId = requireUserId(r);
-    const post = await repostPulsePost(userId, postId);
+    const b = (req.body ?? {}) as Record<string, unknown>;
+    const image = (
+      (r.files as Record<string, unknown> | undefined)?.image as
+        | { buffer: Buffer; mimetype: string; originalname: string }[]
+        | undefined
+    )?.[0];
+    // No body = plain repost; body (+ optional image) = quote post.
+    const post = await repostPulsePost(
+      userId,
+      postId,
+      {
+        body: b.body,
+        visibilityScope: b.visibilityScope,
+        useAnonymousDisplay: toBooleanIfBooleanLike(b.useAnonymousDisplay),
+      },
+      { image }
+    );
     await invalidateMobileReadCaches(userId);
-    return res.status(201).json({ post });
+    return res.status(201).json({
+      post,
+      ...(post.imageUploadFailed ? { warning: PULSE_IMAGE_UPLOAD_FAILED_MESSAGE } : {}),
+    });
   } catch (error) {
     const message = errMsg(error);
     if (message.includes("haven't blocked")) {
@@ -146,6 +169,9 @@ export const postPulseRepostMobile = async (req: Request, res: Response) => {
     }
     if (message.includes("not found")) {
       return res.status(404).json({ message });
+    }
+    if (message.includes("Authentication required")) {
+      return res.status(401).json({ message });
     }
     return res.status(400).json({ message });
   }

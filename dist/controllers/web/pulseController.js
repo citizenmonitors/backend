@@ -1,6 +1,6 @@
 import { asParamString, isValidObjectId } from "../../utils/validators.js";
 import { invalidateCacheByPrefixes } from "../../utils/cache.js";
-import { addPulsePostCommentAnyLocation, createPulsePost, listPulsePostCommentsPublic, listPulsePostsPublic, parsePulseFeedScope, parseVisibilityScope, repostPulsePost, togglePulseCommentLikeAnyLocation, togglePulsePostLikeAnyLocation, } from "../../services/mobile/pulseService.js";
+import { addPulsePostCommentAnyLocation, createPulsePost, listPulsePostCommentsPublic, listPulsePostsPublic, parsePulseFeedScope, parseVisibilityScope, repostPulsePost, togglePulseCommentLikeAnyLocation, togglePulsePostLikeAnyLocation, PULSE_IMAGE_UPLOAD_FAILED_MESSAGE, } from "../../services/mobile/pulseService.js";
 const errMsg = (e) => (e instanceof Error ? e.message : String(e));
 const requireUserId = (req) => {
     const id = req.user?._id;
@@ -94,7 +94,10 @@ export const postPulsePostWeb = async (req, res) => {
             useAnonymousDisplay: toBooleanIfBooleanLike(b.useAnonymousDisplay),
         }, { image });
         await invalidateMobileReadCaches(userId);
-        return res.status(201).json({ post });
+        return res.status(201).json({
+            post,
+            ...(post.imageUploadFailed ? { warning: PULSE_IMAGE_UPLOAD_FAILED_MESSAGE } : {}),
+        });
     }
     catch (error) {
         const message = errMsg(error);
@@ -123,9 +126,19 @@ export const postPulseRepostWeb = async (req, res) => {
             return res.status(400).json({ message: "Invalid post id" });
         }
         const userId = requireUserId(r);
-        const post = await repostPulsePost(userId, postId);
+        const b = (req.body ?? {});
+        const image = r.files?.image?.[0];
+        // No body = plain repost; body (+ optional image) = quote post.
+        const post = await repostPulsePost(userId, postId, {
+            body: b.body,
+            visibilityScope: b.visibilityScope,
+            useAnonymousDisplay: toBooleanIfBooleanLike(b.useAnonymousDisplay),
+        }, { image });
         await invalidateMobileReadCaches(userId);
-        return res.status(201).json({ post });
+        return res.status(201).json({
+            post,
+            ...(post.imageUploadFailed ? { warning: PULSE_IMAGE_UPLOAD_FAILED_MESSAGE } : {}),
+        });
     }
     catch (error) {
         const message = errMsg(error);

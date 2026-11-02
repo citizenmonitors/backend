@@ -363,6 +363,11 @@ paths:
                 whyYouJoinUs: { type: string }
                 profileImage: { type: string, format: binary }
       responses: { "200": { description: Updated } }
+    delete:
+      tags: [Profile]
+      summary: Delete account (observer submissions kept anonymised; personal content removed)
+      security: [{ bearerAuth: [] }]
+      responses: { "200": { description: Deleted (counts of deleted/anonymised submissions) }, "403": { description: Admin accounts cannot self-delete } }
   /profile/me/password:
     put:
       tags: [Profile]
@@ -933,14 +938,31 @@ paths:
   /pulse/posts/{postId}/repost:
     post:
       tags: [Pulse]
-      summary: Repost a pulse post
+      summary: Repost (no body) or quote (with body), like X
       security: [{ bearerAuth: [] }]
       parameters:
         - in: path
           name: postId
           required: true
           schema: { type: string }
-      responses: { "201": { description: Created }, "409": { description: Already reposted or own post } }
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                body: { type: string, description: Quote text. Omit for a plain repost. }
+                image: { type: string, format: binary, description: Optional image for a quote (needs body) }
+                visibilityScope: { type: string, enum: [all, state, lga, ward, polling-unit] }
+                useAnonymousDisplay: { type: boolean }
+          application/json:
+            schema:
+              type: object
+              properties:
+                body: { type: string }
+                visibilityScope: { type: string }
+                useAnonymousDisplay: { type: boolean }
+      responses: { "201": { description: Created }, "400": { description: Image without text, or invalid input }, "409": { description: Plain repost already made, or own post } }
     delete:
       tags: [Pulse]
       summary: Undo your repost (postId may be the original or your repost)

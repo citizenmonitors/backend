@@ -12,6 +12,7 @@ import {
   repostPulsePost,
   togglePulseCommentLikeAnyLocation,
   togglePulsePostLikeAnyLocation,
+  PULSE_IMAGE_UPLOAD_FAILED_MESSAGE,
 } from "../../services/mobile/pulseService.ts";
 
 const errMsg = (e: unknown): string => (e instanceof Error ? e.message : String(e));
@@ -129,7 +130,10 @@ export const postPulsePostWeb = async (req: Request, res: Response) => {
       { image }
     );
     await invalidateMobileReadCaches(userId);
-    return res.status(201).json({ post });
+    return res.status(201).json({
+      post,
+      ...(post.imageUploadFailed ? { warning: PULSE_IMAGE_UPLOAD_FAILED_MESSAGE } : {}),
+    });
   } catch (error) {
     const message = errMsg(error);
     if (message.includes("haven't blocked")) {
@@ -160,9 +164,28 @@ export const postPulseRepostWeb = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Invalid post id" });
     }
     const userId = requireUserId(r);
-    const post = await repostPulsePost(userId, postId);
+    const b = (req.body ?? {}) as Record<string, unknown>;
+    const image = (
+      (r.files as Record<string, unknown> | undefined)?.image as
+        | { buffer: Buffer; mimetype: string; originalname: string }[]
+        | undefined
+    )?.[0];
+    // No body = plain repost; body (+ optional image) = quote post.
+    const post = await repostPulsePost(
+      userId,
+      postId,
+      {
+        body: b.body,
+        visibilityScope: b.visibilityScope,
+        useAnonymousDisplay: toBooleanIfBooleanLike(b.useAnonymousDisplay),
+      },
+      { image }
+    );
     await invalidateMobileReadCaches(userId);
-    return res.status(201).json({ post });
+    return res.status(201).json({
+      post,
+      ...(post.imageUploadFailed ? { warning: PULSE_IMAGE_UPLOAD_FAILED_MESSAGE } : {}),
+    });
   } catch (error) {
     const message = errMsg(error);
     if (message.includes("haven't blocked")) {

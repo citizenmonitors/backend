@@ -55,7 +55,10 @@ const serializeReportForReporter = (row: {
 
 /* ------------------------------ Reports ------------------------------ */
 
-/** Reporting a repost reports the original post, since that's whose content it is. */
+/**
+ * Reporting a plain repost reports the original, since that's whose content it is.
+ * A quote is the quoter's own text, so reporting a quote reports the quote.
+ */
 export const reportPulsePost = async (
   userId: Id,
   postId: string,
@@ -67,7 +70,10 @@ export const reportPulsePost = async (
   const source = await PulsePost.findById(postId).lean();
   if (!source) throw new Error("Post not found");
   const target =
-    (source.repostedFrom && (await PulsePost.findById(source.repostedFrom).lean())) || source;
+    (source.repostedFrom &&
+      !source.isQuote &&
+      (await PulsePost.findById(source.repostedFrom).lean())) ||
+    source;
 
   if (String(target.author) === String(userId)) {
     throw new Error("You can't report your own post");
@@ -338,7 +344,7 @@ export const resolvePulseReportAdmin = async (
       const result = await PulseComment.deleteOne({ _id: report.comment });
       contentRemoved = result.deletedCount > 0;
     } else {
-      const post = await PulsePost.findById(report.post).select("_id repostedFrom").lean();
+      const post = await PulsePost.findById(report.post).select("_id repostedFrom isQuote").lean();
       if (post) {
         await deletePulsePostCore(post);
         contentRemoved = true;

@@ -27,6 +27,8 @@ const newsInsightCommentSchema = new mongoose.Schema(
     },
     body: { type: String, required: true, trim: true, maxlength: 3000 },
     useAnonymousDisplay: { type: Boolean, default: false },
+    /** Set only when the comment text is edited. */
+    editedAt: { type: Date, default: null },
     likes: { type: [likeUserSchema], default: [] },
   },
   { timestamps: true }

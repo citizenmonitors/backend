@@ -5,6 +5,10 @@ declare const _default: mongoose.Model<{
 } & {
     slug: string;
     title: string;
+    content: string;
+    publishedAt: NativeDate;
+    isPublished: boolean;
+    createdBy: mongoose.Types.ObjectId;
     likes: mongoose.Types.DocumentArray<{
         user: mongoose.Types.ObjectId;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
@@ -12,10 +16,6 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
-    content: string;
-    publishedAt: NativeDate;
-    isPublished: boolean;
-    createdBy: mongoose.Types.ObjectId;
     thumbnailURL: string;
     excerpt?: string | null | undefined;
     heroImageURL?: string | null | undefined;
@@ -26,6 +26,10 @@ declare const _default: mongoose.Model<{
 } & {
     slug: string;
     title: string;
+    content: string;
+    publishedAt: NativeDate;
+    isPublished: boolean;
+    createdBy: mongoose.Types.ObjectId;
     likes: mongoose.Types.DocumentArray<{
         user: mongoose.Types.ObjectId;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
@@ -33,10 +37,6 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
-    content: string;
-    publishedAt: NativeDate;
-    isPublished: boolean;
-    createdBy: mongoose.Types.ObjectId;
     thumbnailURL: string;
     excerpt?: string | null | undefined;
     heroImageURL?: string | null | undefined;
@@ -47,6 +47,10 @@ declare const _default: mongoose.Model<{
 } & {
     slug: string;
     title: string;
+    content: string;
+    publishedAt: NativeDate;
+    isPublished: boolean;
+    createdBy: mongoose.Types.ObjectId;
     likes: mongoose.Types.DocumentArray<{
         user: mongoose.Types.ObjectId;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
@@ -54,10 +58,6 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
-    content: string;
-    publishedAt: NativeDate;
-    isPublished: boolean;
-    createdBy: mongoose.Types.ObjectId;
     thumbnailURL: string;
     excerpt?: string | null | undefined;
     heroImageURL?: string | null | undefined;
@@ -74,6 +74,10 @@ declare const _default: mongoose.Model<{
 } & {
     slug: string;
     title: string;
+    content: string;
+    publishedAt: NativeDate;
+    isPublished: boolean;
+    createdBy: mongoose.Types.ObjectId;
     likes: mongoose.Types.DocumentArray<{
         user: mongoose.Types.ObjectId;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
@@ -81,10 +85,6 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
-    content: string;
-    publishedAt: NativeDate;
-    isPublished: boolean;
-    createdBy: mongoose.Types.ObjectId;
     thumbnailURL: string;
     excerpt?: string | null | undefined;
     heroImageURL?: string | null | undefined;
@@ -95,6 +95,10 @@ declare const _default: mongoose.Model<{
 } & {
     slug: string;
     title: string;
+    content: string;
+    publishedAt: NativeDate;
+    isPublished: boolean;
+    createdBy: mongoose.Types.ObjectId;
     likes: mongoose.Types.DocumentArray<{
         user: mongoose.Types.ObjectId;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
@@ -102,10 +106,6 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
-    content: string;
-    publishedAt: NativeDate;
-    isPublished: boolean;
-    createdBy: mongoose.Types.ObjectId;
     thumbnailURL: string;
     excerpt?: string | null | undefined;
     heroImageURL?: string | null | undefined;
@@ -116,6 +116,10 @@ declare const _default: mongoose.Model<{
 } & {
     slug: string;
     title: string;
+    content: string;
+    publishedAt: NativeDate;
+    isPublished: boolean;
+    createdBy: mongoose.Types.ObjectId;
     likes: mongoose.Types.DocumentArray<{
         user: mongoose.Types.ObjectId;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
@@ -123,10 +127,6 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
-    content: string;
-    publishedAt: NativeDate;
-    isPublished: boolean;
-    createdBy: mongoose.Types.ObjectId;
     thumbnailURL: string;
     excerpt?: string | null | undefined;
     heroImageURL?: string | null | undefined;

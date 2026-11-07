@@ -151,18 +151,18 @@ export declare const sendPodcastService: ({ title, content, recipients, adminId,
     updatedAt: NativeDate;
 } & {
     title: string;
+    content: string;
     recipients: string[];
     readBy: Types.ObjectId[];
-    content: string;
     sender: Types.ObjectId;
 }> & {
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
     title: string;
+    content: string;
     recipients: string[];
     readBy: Types.ObjectId[];
-    content: string;
     sender: Types.ObjectId;
 } & {
     _id: Types.ObjectId;
@@ -174,18 +174,18 @@ export declare const editPodcastService: ({ podcastId, updates, adminId, }: Edit
     updatedAt: NativeDate;
 } & {
     title: string;
+    content: string;
     recipients: string[];
     readBy: Types.ObjectId[];
-    content: string;
     sender: Types.ObjectId;
 }> & {
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
     title: string;
+    content: string;
     recipients: string[];
     readBy: Types.ObjectId[];
-    content: string;
     sender: Types.ObjectId;
 } & {
     _id: Types.ObjectId;
@@ -197,18 +197,18 @@ export declare const getAllPodcastsService: () => Promise<(mongoose.Document<unk
     updatedAt: NativeDate;
 } & {
     title: string;
+    content: string;
     recipients: string[];
     readBy: Types.ObjectId[];
-    content: string;
     sender: Types.ObjectId;
 }> & {
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
     title: string;
+    content: string;
     recipients: string[];
     readBy: Types.ObjectId[];
-    content: string;
     sender: Types.ObjectId;
 } & {
     _id: Types.ObjectId;
@@ -219,8 +219,8 @@ export declare const getSinglePodcastService: (id: Id, userId: Id | undefined) =
     createdAt: NativeDate;
     updatedAt: NativeDate;
     title: string;
-    recipients: string[];
     content: string;
+    recipients: string[];
     sender: Types.ObjectId;
     _id: Types.ObjectId;
     __v: number;
@@ -233,8 +233,8 @@ export declare const getUserInboxService: (userId: Id | undefined) => Promise<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
     title: string;
-    recipients: string[];
     content: string;
+    recipients: string[];
     sender: Types.ObjectId;
     _id: Types.ObjectId;
     __v: number;

@@ -3,6 +3,8 @@ export type NewsletterCover = {
     themes: string[];
     url: string;
 };
+/** Folder served at /newsletter-covers (see server.ts). */
+export declare const NEWSLETTER_COVER_DIR: string;
 export declare const newsletterCoverUrl: (file: string) => string;
 /** Rewrite Render / local newsletter-cover URLs to the matching Firebase public URL. */
 export declare const rewriteLegacyCoverUrl: (url: string) => string;

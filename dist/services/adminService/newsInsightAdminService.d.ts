@@ -19,6 +19,11 @@ export declare const createNewsInsightArticle: (input: CreateNewsInsightInput) =
 } & {
     slug: string;
     title: string;
+    content: string;
+    thumbnailURLUrl: string;
+    publishedAt: NativeDate;
+    isPublished: boolean;
+    createdBy: Types.ObjectId;
     likes: Types.DocumentArray<{
         user: Types.ObjectId;
     }, Types.Subdocument<Types.ObjectId, any, {
@@ -26,11 +31,6 @@ export declare const createNewsInsightArticle: (input: CreateNewsInsightInput) =
     }> & {
         user: Types.ObjectId;
     }>;
-    content: string;
-    thumbnailURLUrl: string;
-    publishedAt: NativeDate;
-    isPublished: boolean;
-    createdBy: Types.ObjectId;
     excerpt?: string | null | undefined;
     heroImageURL?: string | null | undefined;
 } & {
@@ -50,6 +50,11 @@ export declare const listNewsInsightsForAdmin: (input?: {
         updatedAt: NativeDate;
         slug: string;
         title: string;
+        content: string;
+        thumbnailURLUrl: string;
+        publishedAt: NativeDate;
+        isPublished: boolean;
+        createdBy: Types.ObjectId;
         likes: Types.DocumentArray<{
             user: Types.ObjectId;
         } | {
@@ -69,11 +74,6 @@ export declare const listNewsInsightsForAdmin: (input?: {
             _id: string;
             __v: number;
         })>;
-        content: string;
-        thumbnailURLUrl: string;
-        publishedAt: NativeDate;
-        isPublished: boolean;
-        createdBy: Types.ObjectId;
         excerpt?: string | null | undefined;
         heroImageURL?: string | null | undefined;
     }> & {
@@ -87,6 +87,11 @@ export declare const getNewsInsightByIdForAdmin: (articleId: string) => Promise<
     updatedAt: NativeDate;
     slug: string;
     title: string;
+    content: string;
+    thumbnailURLUrl: string;
+    publishedAt: NativeDate;
+    isPublished: boolean;
+    createdBy: Types.ObjectId;
     likes: Types.DocumentArray<{
         user: Types.ObjectId;
     } | {
@@ -106,11 +111,6 @@ export declare const getNewsInsightByIdForAdmin: (articleId: string) => Promise<
         _id: string;
         __v: number;
     })>;
-    content: string;
-    thumbnailURLUrl: string;
-    publishedAt: NativeDate;
-    isPublished: boolean;
-    createdBy: Types.ObjectId;
     excerpt?: string | null | undefined;
     heroImageURL?: string | null | undefined;
 }> & {

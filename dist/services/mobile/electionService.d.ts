@@ -61,11 +61,11 @@ export declare const getMobileElectionSubmissionByActiveElection: (activeElectio
             createdAt: NativeDate;
             updatedAt: NativeDate;
             hidden: boolean;
+            election: Types.ObjectId;
             state: string;
             lga: string;
             ward: string;
             pollingUnit: string;
-            election: Types.ObjectId;
             flagged: boolean;
             uploaderDeleted: boolean;
             partiesVotes: Types.DocumentArray<{
@@ -241,11 +241,11 @@ export declare const getMobileElectionSubmissionByActiveElection: (activeElectio
             createdAt: NativeDate;
             updatedAt: NativeDate;
             hidden: boolean;
+            election: Types.ObjectId;
             state: string;
             lga: string;
             ward: string;
             pollingUnit: string;
-            election: Types.ObjectId;
             flagged: boolean;
             uploaderDeleted: boolean;
             userRole: string;

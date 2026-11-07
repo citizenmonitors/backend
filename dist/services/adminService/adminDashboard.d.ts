@@ -111,8 +111,8 @@ export declare const getDashboardData: () => Promise<{
         adminPermissions?: Types.ObjectId | null | undefined;
         notifications?: {
             email?: {
-                inbox: boolean;
                 election: boolean;
+                inbox: boolean;
                 newsletter: boolean;
             } | null | undefined;
             mobile?: {
@@ -214,8 +214,8 @@ export declare const getDashboardData: () => Promise<{
         adminPermissions?: Types.ObjectId | null | undefined;
         notifications?: {
             email?: {
-                inbox: boolean;
                 election: boolean;
+                inbox: boolean;
                 newsletter: boolean;
             } | null | undefined;
             mobile?: {
@@ -352,8 +352,8 @@ export declare const getAllUsersService: () => Promise<{
         adminPermissions?: Types.ObjectId | null | undefined;
         notifications?: {
             email?: {
-                inbox: boolean;
                 election: boolean;
+                inbox: boolean;
                 newsletter: boolean;
             } | null | undefined;
             mobile?: {
@@ -460,8 +460,8 @@ export declare const getUserByIdService: (id: Id) => Promise<import("mongoose").
     adminPermissions?: Types.ObjectId | null | undefined;
     notifications?: {
         email?: {
-            inbox: boolean;
             election: boolean;
+            inbox: boolean;
             newsletter: boolean;
         } | null | undefined;
         mobile?: {
@@ -585,8 +585,8 @@ export declare const approveObserverService: (id: Id, adminId: Id) => Promise<{
         adminPermissions?: Types.ObjectId | null | undefined;
         notifications?: {
             email?: {
-                inbox: boolean;
                 election: boolean;
+                inbox: boolean;
                 newsletter: boolean;
             } | null | undefined;
             mobile?: {
@@ -695,8 +695,8 @@ export declare const getAllObsersverService: () => Promise<{
         adminPermissions?: Types.ObjectId | null | undefined;
         notifications?: {
             email?: {
-                inbox: boolean;
                 election: boolean;
+                inbox: boolean;
                 newsletter: boolean;
             } | null | undefined;
             mobile?: {
@@ -805,8 +805,8 @@ export declare const unapproveObserverService: (id: Id, adminId: Id) => Promise<
         adminPermissions?: Types.ObjectId | null | undefined;
         notifications?: {
             email?: {
-                inbox: boolean;
                 election: boolean;
+                inbox: boolean;
                 newsletter: boolean;
             } | null | undefined;
             mobile?: {
@@ -915,8 +915,8 @@ export declare const downgradeObserverService: (id: Id, adminReason: string, adm
         adminPermissions?: Types.ObjectId | null | undefined;
         notifications?: {
             email?: {
-                inbox: boolean;
                 election: boolean;
+                inbox: boolean;
                 newsletter: boolean;
             } | null | undefined;
             mobile?: {
@@ -1144,8 +1144,8 @@ export declare const createAdminService: (adminId: Id | undefined, { email, role
         adminPermissions?: Types.ObjectId | null | undefined;
         notifications?: {
             email?: {
-                inbox: boolean;
                 election: boolean;
+                inbox: boolean;
                 newsletter: boolean;
             } | null | undefined;
             mobile?: {
@@ -1247,8 +1247,8 @@ export declare const createAdminService: (adminId: Id | undefined, { email, role
         adminPermissions?: Types.ObjectId | null | undefined;
         notifications?: {
             email?: {
-                inbox: boolean;
                 election: boolean;
+                inbox: boolean;
                 newsletter: boolean;
             } | null | undefined;
             mobile?: {
@@ -1416,8 +1416,8 @@ export declare const suspendAdminService: (adminId: Id, suspendedBy: Id) => Prom
         adminPermissions?: Types.ObjectId | null | undefined;
         notifications?: {
             email?: {
-                inbox: boolean;
                 election: boolean;
+                inbox: boolean;
                 newsletter: boolean;
             } | null | undefined;
             mobile?: {
@@ -1519,8 +1519,8 @@ export declare const suspendAdminService: (adminId: Id, suspendedBy: Id) => Prom
         adminPermissions?: Types.ObjectId | null | undefined;
         notifications?: {
             email?: {
-                inbox: boolean;
                 election: boolean;
+                inbox: boolean;
                 newsletter: boolean;
             } | null | undefined;
             mobile?: {
@@ -1628,8 +1628,8 @@ export declare const getAllAdminsService: () => Promise<{
         adminPermissions?: Types.ObjectId | null | undefined;
         notifications?: {
             email?: {
-                inbox: boolean;
                 election: boolean;
+                inbox: boolean;
                 newsletter: boolean;
             } | null | undefined;
             mobile?: {

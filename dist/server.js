@@ -16,6 +16,7 @@ import mongoose from "mongoose";
 import { connectDB } from "./config/db.js";
 import { ensureDefaultSpeakerEvent } from "./services/speakerSlots/seedSpeakerEvent.js";
 import redisClient from "./utils/notification/redisClient.js";
+import { NEWSLETTER_COVER_DIR } from "./utils/newsletterCover.js";
 import authRoutes from "./routes/auth.js";
 import electionRoutes from "./routes/Election/electionRoutes.js";
 import locations from "./routes/locations.js";
@@ -174,7 +175,7 @@ app.use("/observerid", express.static(path.join(__dirname, "observerId")));
 app.use("/profileimage", express.static(path.join(__dirname, "profileImage")));
 app.use("/resultpicture", express.static(path.join(__dirname, "electionsData")));
 app.use("/incidentreport", express.static(path.join(__dirname, "electionsData")));
-app.use("/newsletter-covers", express.static(path.join(__dirname, "public/newsletter-covers")));
+app.use("/newsletter-covers", express.static(NEWSLETTER_COVER_DIR));
 app.use((err, _req, res, _next) => {
     const isProd = process.env.NODE_ENV === "production";
     const e = err;

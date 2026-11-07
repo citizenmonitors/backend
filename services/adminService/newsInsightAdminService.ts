@@ -5,6 +5,22 @@ import NewsInsight from "../../models/admin/NewsInsight.ts";
 import { dispatchMobileNotification } from "../mobile/notificationDispatchService.ts";
 import { invalidateAllMobileReadCaches } from "../../utils/cache.ts";
 import { defaultNotificationSubtitle } from "../../utils/notificationContent.ts";
+import {
+  rewriteLegacyCoverUrl,
+  rewriteLegacyCoverUrlsInHtml,
+} from "../../utils/newsletterCover.ts";
+
+/** Show working cover links (Firebase covers → our server when configured). */
+const withCoverLinks = <
+  T extends { thumbnailURLUrl?: string | null; heroImageURL?: string | null; content?: string | null },
+>(
+  row: T
+): T => ({
+  ...row,
+  ...(row.thumbnailURLUrl ? { thumbnailURLUrl: rewriteLegacyCoverUrl(row.thumbnailURLUrl) } : {}),
+  ...(row.heroImageURL ? { heroImageURL: rewriteLegacyCoverUrl(row.heroImageURL) } : {}),
+  ...(row.content ? { content: rewriteLegacyCoverUrlsInHtml(row.content) } : {}),
+});
 
 type Id = string | Types.ObjectId;
 
@@ -148,7 +164,7 @@ export const listNewsInsightsForAdmin = async (input?: { page?: number; limit?: 
     NewsInsight.countDocuments({}),
   ]);
 
-  return { total, page, limit, items: rows };
+  return { total, page, limit, items: rows.map(withCoverLinks) };
 };
 
 export const getNewsInsightByIdForAdmin = async (articleId: string) => {
@@ -159,5 +175,5 @@ export const getNewsInsightByIdForAdmin = async (articleId: string) => {
     .populate("createdBy", "firstName lastName email role")
     .lean();
   if (!row) throw new Error("Article not found");
-  return row;
+  return withCoverLinks(row);
 };

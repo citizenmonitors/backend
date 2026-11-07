@@ -86,8 +86,8 @@ export declare const assertMobileCollationAccess: (activeElectionId: string, use
         adminPermissions?: Types.ObjectId | null | undefined;
         notifications?: {
             email?: {
-                inbox: boolean;
                 election: boolean;
+                inbox: boolean;
                 newsletter: boolean;
             } | null | undefined;
             mobile?: {

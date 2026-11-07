@@ -145,8 +145,8 @@ export declare const upgradeVolunteerToObserver: ({ email, details, files, }: Ob
     adminPermissions?: Types.ObjectId | null | undefined;
     notifications?: {
         email?: {
-            inbox: boolean;
             election: boolean;
+            inbox: boolean;
             newsletter: boolean;
         } | null | undefined;
         mobile?: {
@@ -185,11 +185,11 @@ export declare const getElectionVault: (userId: Id) => Promise<{
         createdAt: NativeDate;
         updatedAt: NativeDate;
         hidden: boolean;
+        election: Types.ObjectId;
         state: string;
         lga: string;
         ward: string;
         pollingUnit: string;
-        election: Types.ObjectId;
         flagged: boolean;
         uploaderDeleted: boolean;
         partiesVotes: Types.DocumentArray<{
@@ -365,11 +365,11 @@ export declare const getElectionVault: (userId: Id) => Promise<{
         createdAt: NativeDate;
         updatedAt: NativeDate;
         hidden: boolean;
+        election: Types.ObjectId;
         state: string;
         lga: string;
         ward: string;
         pollingUnit: string;
-        election: Types.ObjectId;
         flagged: boolean;
         uploaderDeleted: boolean;
         userRole: string;
@@ -604,16 +604,16 @@ export declare const submitMobileFeedback: (input: {
 } & {
     message: string;
     email: string;
-    title: string;
     user: Types.ObjectId;
+    title: string;
 }> & {
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
     message: string;
     email: string;
-    title: string;
     user: Types.ObjectId;
+    title: string;
 } & {
     _id: Types.ObjectId;
 } & {

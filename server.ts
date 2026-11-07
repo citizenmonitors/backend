@@ -19,6 +19,7 @@ import mongoose from "mongoose";
 import { connectDB } from "./config/db.ts";
 import { ensureDefaultSpeakerEvent } from "./services/speakerSlots/seedSpeakerEvent.ts";
 import redisClient from "./utils/notification/redisClient.ts";
+import { NEWSLETTER_COVER_DIR } from "./utils/newsletterCover.ts";
 import authRoutes from "./routes/auth.ts";
 import electionRoutes from "./routes/Election/electionRoutes.ts";
 import locations from "./routes/locations.ts";
@@ -196,7 +197,7 @@ app.use("/resultpicture", express.static(path.join(__dirname, "electionsData")))
 app.use("/incidentreport", express.static(path.join(__dirname, "electionsData")));
 app.use(
   "/newsletter-covers",
-  express.static(path.join(__dirname, "public/newsletter-covers"))
+  express.static(NEWSLETTER_COVER_DIR)
 );
 
 type ErrorWithStatus = Error & { status?: number };

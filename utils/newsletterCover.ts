@@ -44,9 +44,71 @@ const FIREBASE_FOLDER = "newsletter-covers";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const LOCAL_COVER_DIR = path.resolve(__dirname, "../public/newsletter-covers");
+/**
+ * Covers live in <repo>/public/newsletter-covers. From source this file sits in
+ * utils/, from the build in dist/utils/, so check both plus the working directory.
+ */
+const resolveLocalCoverDir = (): string => {
+  const candidates = [
+    path.resolve(__dirname, "../public/newsletter-covers"),
+    path.resolve(__dirname, "../../public/newsletter-covers"),
+    path.resolve(process.cwd(), "public/newsletter-covers"),
+  ];
+  return candidates.find((dir) => fs.existsSync(dir)) ?? candidates[0];
+};
+
+/** Folder served at /newsletter-covers (see server.ts). */
+export const NEWSLETTER_COVER_DIR = resolveLocalCoverDir();
+const LOCAL_COVER_DIR = NEWSLETTER_COVER_DIR;
 
 const firebaseUrlCache = new Map<string, string>();
+
+/** After a Firebase failure (e.g. billing disabled), skip it for a while and serve covers ourselves. */
+const FIREBASE_TIMEOUT_MS = 5000;
+const FIREBASE_COOLDOWN_MS = 10 * 60 * 1000;
+let firebaseDownUntil = 0;
+
+const firebaseAvailable = (): boolean => Date.now() >= firebaseDownUntil;
+
+const withTimeout = <T,>(promise: Promise<T>, ms: number): Promise<T> =>
+  new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error("Firebase Storage timed out")), ms);
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (error) => {
+        clearTimeout(timer);
+        reject(error);
+      }
+    );
+  });
+
+const trimBase = (value: unknown): string =>
+  String(value ?? "").trim().replace(/\/+$/, "");
+
+/**
+ * NEWSLETTER_COVER_BASE_URL set (e.g. https://api.citizenmonitors.com) means
+ * "host catalog covers ourselves": skip Firebase and rewrite existing Firebase
+ * cover links in articles to this server.
+ */
+const preferServerCovers = (): boolean =>
+  Boolean(trimBase(process.env.NEWSLETTER_COVER_BASE_URL));
+
+/** Base URL of this API, used to serve covers from /newsletter-covers. */
+const coverServerBase = (): string =>
+  trimBase(process.env.NEWSLETTER_COVER_BASE_URL) || trimBase(process.env.BACKEND_URL);
+
+const serverCoverUrl = (file: string): string | null => {
+  const base = coverServerBase();
+  return base ? `${base}/newsletter-covers/${encodeURIComponent(file)}` : null;
+};
+
+const isServerCoverUrl = (url: string): boolean => {
+  const base = coverServerBase();
+  return Boolean(base) && url.startsWith(`${base}/newsletter-covers/`);
+};
 
 const stableDownloadToken = (file: string): string =>
   crypto.createHash("sha256").update(`citizen-monitors:${FIREBASE_FOLDER}:${file}`).digest("hex");
@@ -72,7 +134,10 @@ const filenameFromUrl = (url: string): string => {
 };
 
 export const newsletterCoverUrl = (file: string): string =>
-  firebaseUrlCache.get(file) || firebasePublicUrl(file);
+  (preferServerCovers() && serverCoverUrl(file)) ||
+  firebaseUrlCache.get(file) ||
+  (!firebaseAvailable() && serverCoverUrl(file)) ||
+  firebasePublicUrl(file);
 
 const isCatalogCover = (file: string): boolean =>
   COVER_CATALOG.some((cover) => cover.file === file);
@@ -81,9 +146,17 @@ const isCatalogCover = (file: string): boolean =>
 export const rewriteLegacyCoverUrl = (url: string): string => {
   const raw = String(url ?? "").trim();
   if (!raw) return raw;
-  if (/firebasestorage\.googleapis\.com/i.test(raw)) return raw;
+  // Covers we serve ourselves stay as they are.
+  if (isServerCoverUrl(raw)) return raw;
+  const isFirebase = /firebasestorage\.googleapis\.com/i.test(raw);
   const file = filenameFromUrl(raw);
   if (!file || !isCatalogCover(file)) return raw;
+  if (preferServerCovers()) {
+    // Firebase links (and old Render links) for catalog covers → this server.
+    const isKnownCoverLink = isFirebase || /(?:^|\/)newsletter-covers\//i.test(raw);
+    return isKnownCoverLink ? serverCoverUrl(file) ?? raw : raw;
+  }
+  if (isFirebase) return raw;
   const isLegacyHost =
     /navalny\.onrender\.com/i.test(raw) ||
     /onrender\.com\/newsletter-covers/i.test(raw) ||
@@ -120,7 +193,7 @@ const uploadCoverToFirebase = async (file: string): Promise<string> => {
 
   const objectPath = `${FIREBASE_FOLDER}/${file}`;
   const remote = bucket.file(objectPath);
-  const [alreadyUploaded] = await remote.exists();
+  const [alreadyUploaded] = await withTimeout(remote.exists(), FIREBASE_TIMEOUT_MS);
   if (alreadyUploaded) {
     const url = firebasePublicUrl(file);
     firebaseUrlCache.set(file, url);
@@ -130,18 +203,49 @@ const uploadCoverToFirebase = async (file: string): Promise<string> => {
   const token = stableDownloadToken(file);
   const buffer = fs.readFileSync(diskPath);
 
-  await remote.save(buffer, {
-    metadata: {
-      contentType: "image/jpeg",
+  await withTimeout(
+    remote.save(buffer, {
       metadata: {
-        firebaseStorageDownloadTokens: token,
+        contentType: "image/jpeg",
+        metadata: {
+          firebaseStorageDownloadTokens: token,
+        },
       },
-    },
-  });
+    }),
+    FIREBASE_TIMEOUT_MS
+  );
 
   const url = firebasePublicUrl(file);
   firebaseUrlCache.set(file, url);
   return url;
+};
+
+/**
+ * Cover URL for the newsletter / News & Insight. Tries Firebase first; if Firebase
+ * fails (billing disabled, timeout, ...) it falls back to this server's
+ * /newsletter-covers so preview and send keep working.
+ */
+const resolveCoverUrl = async (file: string): Promise<string> => {
+  if (preferServerCovers()) {
+    const own = serverCoverUrl(file);
+    if (own) return own;
+  }
+  const cached = firebaseUrlCache.get(file);
+  if (cached) return cached;
+
+  const fallback = serverCoverUrl(file);
+  if (!firebaseAvailable() && fallback) return fallback;
+
+  try {
+    return await uploadCoverToFirebase(file);
+  } catch (error) {
+    firebaseDownUntil = Date.now() + FIREBASE_COOLDOWN_MS;
+    const message = error instanceof Error ? error.message : String(error);
+    console.warn(
+      `[newsletter-cover] Firebase unavailable (${message}); using ${fallback ? "server-hosted cover" : "Firebase link without upload"} for ${file}`
+    );
+    return fallback ?? firebasePublicUrl(file);
+  }
 };
 
 /** Upload every catalog cover to Firebase and return Firebase URLs. */
@@ -165,7 +269,8 @@ export const pickNewsletterCover = async (input?: {
   overrideUrl?: string;
 }): Promise<NewsletterCover> => {
   const override = String(input?.overrideUrl ?? "").trim();
-  if (override && !/navalny\.onrender\.com\/newsletter-covers\//i.test(override)) {
+  const legacyCoverHost = /navalny\.onrender\.com\/newsletter-covers\//i;
+  if (override && (isServerCoverUrl(override) || !legacyCoverHost.test(override))) {
     return {
       file: filenameFromUrl(override) || "custom",
       themes: ["custom"],
@@ -174,7 +279,7 @@ export const pickNewsletterCover = async (input?: {
   }
 
   const envOverride = process.env.NEWSLETTER_NEWS_THUMBNAIL_URL?.trim();
-  if (envOverride && !/navalny\.onrender\.com\/newsletter-covers\//i.test(envOverride)) {
+  if (envOverride && !legacyCoverHost.test(envOverride)) {
     return {
       file: filenameFromUrl(envOverride) || "override",
       themes: ["override"],
@@ -208,7 +313,7 @@ export const pickNewsletterCover = async (input?: {
     (unusedAny.length > 0 && pickFromPool(unusedAny)) ||
     pickFromPool(COVER_CATALOG);
 
-  const url = await uploadCoverToFirebase(chosen.file);
+  const url = await resolveCoverUrl(chosen.file);
   return { ...chosen, url };
 };
 

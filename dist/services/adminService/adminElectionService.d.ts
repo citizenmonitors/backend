@@ -138,8 +138,8 @@ export declare const getAllAdminService: () => Promise<(mongoose.Document<unknow
     adminPermissions?: Types.ObjectId | null | undefined;
     notifications?: {
         email?: {
-            inbox: boolean;
             election: boolean;
+            inbox: boolean;
             newsletter: boolean;
         } | null | undefined;
         mobile?: {
@@ -241,8 +241,8 @@ export declare const getAllAdminService: () => Promise<(mongoose.Document<unknow
     adminPermissions?: Types.ObjectId | null | undefined;
     notifications?: {
         email?: {
-            inbox: boolean;
             election: boolean;
+            inbox: boolean;
             newsletter: boolean;
         } | null | undefined;
         mobile?: {
@@ -359,11 +359,11 @@ export declare const getResultOrIncidentByIdService: (id: Id) => Promise<{
         createdAt: NativeDate;
         updatedAt: NativeDate;
         hidden: boolean;
+        election: Types.ObjectId;
         state: string;
         lga: string;
         ward: string;
         pollingUnit: string;
-        election: Types.ObjectId;
         uploaderDeleted: boolean;
         partiesVotes: Types.DocumentArray<mongoose.FlattenMaps<{
             party?: string | null | undefined;
@@ -424,11 +424,11 @@ export declare const getResultOrIncidentByIdService: (id: Id) => Promise<{
         createdAt: NativeDate;
         updatedAt: NativeDate;
         hidden: boolean;
+        election: Types.ObjectId;
         state: string;
         lga: string;
         ward: string;
         pollingUnit: string;
-        election: Types.ObjectId;
         uploaderDeleted: boolean;
         userRole: string;
         selectIncident: "Ballot Stuffing" | "Thuggery & Violence" | "Underage Voting" | "INEC Misconduct" | "Result Alteration" | "Voter Intimidation" | "Late Opening" | "Missing Materials" | "Other Incidents" | "Thuggery and Violence" | "Lack of electoral materials" | "Fraudulent electoral officers" | "Late commencement" | "Over voting" | "Other";
@@ -805,11 +805,11 @@ export declare const getSingleFlaggedElectionService: (id: Id) => Promise<{
         createdAt: NativeDate;
         updatedAt: NativeDate;
         hidden: boolean;
+        election: Types.ObjectId;
         state: string;
         lga: string;
         ward: string;
         pollingUnit: string;
-        election: Types.ObjectId;
         flagged: boolean;
         uploaderDeleted: boolean;
         partiesVotes: Types.DocumentArray<mongoose.FlattenMaps<{
@@ -909,11 +909,11 @@ export declare const getSingleFlaggedElectionService: (id: Id) => Promise<{
         createdAt: NativeDate;
         updatedAt: NativeDate;
         hidden: boolean;
+        election: Types.ObjectId;
         state: string;
         lga: string;
         ward: string;
         pollingUnit: string;
-        election: Types.ObjectId;
         flagged: boolean;
         uploaderDeleted: boolean;
         userRole: string;

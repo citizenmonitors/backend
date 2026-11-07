@@ -2,7 +2,9 @@ import type { Request, Response } from "express";
 import type { AuthenticatedRequest } from "../../types/authenticatedRequest.ts";
 import {
   addNewsInsightArticleComment,
+  deleteNewsInsightComment,
   listNewsInsightArticleComments,
+  updateNewsInsightComment,
   toggleNewsInsightArticleLike,
   toggleNewsInsightCommentLike,
 } from "../../services/mobile/newsInsightEngagementService.ts";
@@ -169,5 +171,63 @@ export const postNewsInsightCommentLikeMobile = async (req: Request, res: Respon
     }
     if (message.includes("not found")) return res.status(404).json({ message });
     return res.status(400).json({ message });
+  }
+};
+
+const commentErrorStatus = (message: string): number => {
+  if (message.includes("Authentication required")) return 401;
+  if (message.includes("You can only")) return 403;
+  if (message.includes("not found")) return 404;
+  if (
+    message.includes("body must") ||
+    message.includes("Nothing to update") ||
+    message.includes("anonymous username") ||
+    message.includes("Invalid")
+  ) {
+    return 400;
+  }
+  return 500;
+};
+
+/** PATCH /articles/:articleId/comments/:commentId — { body?, useAnonymousDisplay? } */
+export const patchNewsInsightCommentMobile = async (req: Request, res: Response) => {
+  try {
+    const r = req as AuthenticatedRequest;
+    const articleId = asParamString(req.params.articleId);
+    const commentId = asParamString(req.params.commentId);
+    if (!isValidObjectId(articleId) || !isValidObjectId(commentId)) {
+      return res.status(400).json({ message: "Invalid id" });
+    }
+    const userId = requireUserId(r);
+    const b = (req.body ?? {}) as Record<string, unknown>;
+    const comment = await updateNewsInsightComment(userId, articleId, commentId, {
+      body: b.body,
+      useAnonymousDisplay:
+        b.useAnonymousDisplay === undefined || b.useAnonymousDisplay === ""
+          ? undefined
+          : toBooleanIfBooleanLike(b.useAnonymousDisplay),
+    });
+    return res.status(200).json({ comment });
+  } catch (error) {
+    const message = getErrorMessage(error);
+    return res.status(commentErrorStatus(message)).json({ message });
+  }
+};
+
+/** DELETE /articles/:articleId/comments/:commentId — comment author or admin. */
+export const deleteNewsInsightCommentMobile = async (req: Request, res: Response) => {
+  try {
+    const r = req as AuthenticatedRequest;
+    const articleId = asParamString(req.params.articleId);
+    const commentId = asParamString(req.params.commentId);
+    if (!isValidObjectId(articleId) || !isValidObjectId(commentId)) {
+      return res.status(400).json({ message: "Invalid id" });
+    }
+    const userId = requireUserId(r);
+    const data = await deleteNewsInsightComment(userId, articleId, commentId);
+    return res.status(200).json(data);
+  } catch (error) {
+    const message = getErrorMessage(error);
+    return res.status(commentErrorStatus(message)).json({ message });
   }
 };

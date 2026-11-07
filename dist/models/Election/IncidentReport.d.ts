@@ -4,11 +4,11 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     hidden: boolean;
+    election: mongoose.Types.ObjectId;
     state: string;
     lga: string;
     ward: string;
     pollingUnit: string;
-    election: mongoose.Types.ObjectId;
     flagged: boolean;
     uploaderDeleted: boolean;
     userRole: string;
@@ -126,11 +126,11 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     hidden: boolean;
+    election: mongoose.Types.ObjectId;
     state: string;
     lga: string;
     ward: string;
     pollingUnit: string;
-    election: mongoose.Types.ObjectId;
     flagged: boolean;
     uploaderDeleted: boolean;
     userRole: string;
@@ -248,11 +248,11 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     hidden: boolean;
+    election: mongoose.Types.ObjectId;
     state: string;
     lga: string;
     ward: string;
     pollingUnit: string;
-    election: mongoose.Types.ObjectId;
     flagged: boolean;
     uploaderDeleted: boolean;
     userRole: string;
@@ -376,11 +376,11 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     hidden: boolean;
+    election: mongoose.Types.ObjectId;
     state: string;
     lga: string;
     ward: string;
     pollingUnit: string;
-    election: mongoose.Types.ObjectId;
     flagged: boolean;
     uploaderDeleted: boolean;
     userRole: string;
@@ -498,11 +498,11 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     hidden: boolean;
+    election: mongoose.Types.ObjectId;
     state: string;
     lga: string;
     ward: string;
     pollingUnit: string;
-    election: mongoose.Types.ObjectId;
     flagged: boolean;
     uploaderDeleted: boolean;
     userRole: string;
@@ -620,11 +620,11 @@ declare const _default: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     hidden: boolean;
+    election: mongoose.Types.ObjectId;
     state: string;
     lga: string;
     ward: string;
     pollingUnit: string;
-    election: mongoose.Types.ObjectId;
     flagged: boolean;
     uploaderDeleted: boolean;
     userRole: string;

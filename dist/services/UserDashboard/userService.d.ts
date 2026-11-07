@@ -111,8 +111,8 @@ export declare const volunteerToObserverService: ({ email, details, files, }: Vo
     adminPermissions?: Types.ObjectId | null | undefined;
     notifications?: {
         email?: {
-            inbox: boolean;
             election: boolean;
+            inbox: boolean;
             newsletter: boolean;
         } | null | undefined;
         mobile?: {

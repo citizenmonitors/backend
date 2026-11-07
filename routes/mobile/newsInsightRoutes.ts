@@ -3,7 +3,9 @@ import { authMiddleware, isAdmin, optionalAuthMiddleware } from "../../middlewar
 import { parseNewsPressAdminMultipart } from "../../config/electionMulter.ts";
 import { createNewsInsightAdmin } from "../../controllers/adminController/newsInsightAdminController.ts";
 import {
+  deleteNewsInsightCommentMobile,
   getNewsInsightArticleCommentsMobile,
+  patchNewsInsightCommentMobile,
   getNewsInsightBySlugMobile,
   getNewsInsightsListMobile,
   postNewsInsightArticleCommentMobile,
@@ -19,6 +21,16 @@ router.post("/", authMiddleware, isAdmin, parseNewsPressAdminMultipart, createNe
 router.post("/articles/:articleId/like", authMiddleware, postNewsInsightArticleLikeMobile);
 router.get("/articles/:articleId/comments", authMiddleware, getNewsInsightArticleCommentsMobile);
 router.post("/articles/:articleId/comments", authMiddleware, postNewsInsightArticleCommentMobile);
+router.patch(
+  "/articles/:articleId/comments/:commentId",
+  authMiddleware,
+  patchNewsInsightCommentMobile
+);
+router.delete(
+  "/articles/:articleId/comments/:commentId",
+  authMiddleware,
+  deleteNewsInsightCommentMobile
+);
 router.post(
   "/articles/:articleId/comments/:commentId/like",
   authMiddleware,

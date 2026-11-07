@@ -106,8 +106,8 @@ export declare const mobileContinueWithGoogle: (idToken: string, mobileMeta?: Mo
         adminPermissions?: import("mongoose").Types.ObjectId | null | undefined;
         notifications?: {
             email?: {
-                inbox: boolean;
                 election: boolean;
+                inbox: boolean;
                 newsletter: boolean;
             } | null | undefined;
             mobile?: {
@@ -342,8 +342,8 @@ export declare const mobileSelectRole: (email: string, role: string) => Promise<
         adminPermissions?: import("mongoose").Types.ObjectId | null | undefined;
         notifications?: {
             email?: {
-                inbox: boolean;
                 election: boolean;
+                inbox: boolean;
                 newsletter: boolean;
             } | null | undefined;
             mobile?: {
@@ -456,8 +456,8 @@ export declare const mobileSubmitObserverDetails: (input: {
         adminPermissions?: import("mongoose").Types.ObjectId | null | undefined;
         notifications?: {
             email?: {
-                inbox: boolean;
                 election: boolean;
+                inbox: boolean;
                 newsletter: boolean;
             } | null | undefined;
             mobile?: {
@@ -569,8 +569,8 @@ export declare const mobileSignIn: (payload: {
         adminPermissions?: import("mongoose").Types.ObjectId | null | undefined;
         notifications?: {
             email?: {
-                inbox: boolean;
                 election: boolean;
+                inbox: boolean;
                 newsletter: boolean;
             } | null | undefined;
             mobile?: {
@@ -687,8 +687,8 @@ export declare const mobileValidateSession: (token: string) => Promise<{
         adminPermissions?: import("mongoose").Types.ObjectId | null | undefined;
         notifications?: {
             email?: {
-                inbox: boolean;
                 election: boolean;
+                inbox: boolean;
                 newsletter: boolean;
             } | null | undefined;
             mobile?: {

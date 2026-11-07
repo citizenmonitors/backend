@@ -176,8 +176,8 @@ export declare const selectUserRole: (email: string, role: string) => Promise<{
         adminPermissions?: import("mongoose").Types.ObjectId | null | undefined;
         notifications?: {
             email?: {
-                inbox: boolean;
                 election: boolean;
+                inbox: boolean;
                 newsletter: boolean;
             } | null | undefined;
             mobile?: {
@@ -288,8 +288,8 @@ export declare const submitObserverDetails: ({ email, observerIdFiles: observerI
         adminPermissions?: import("mongoose").Types.ObjectId | null | undefined;
         notifications?: {
             email?: {
-                inbox: boolean;
                 election: boolean;
+                inbox: boolean;
                 newsletter: boolean;
             } | null | undefined;
             mobile?: {
@@ -398,8 +398,8 @@ export declare const authenticateUser: ({ email, password }: AuthCredentials) =>
         adminPermissions?: import("mongoose").Types.ObjectId | null | undefined;
         notifications?: {
             email?: {
-                inbox: boolean;
                 election: boolean;
+                inbox: boolean;
                 newsletter: boolean;
             } | null | undefined;
             mobile?: {
@@ -513,8 +513,8 @@ export declare const validateTokenService: (token: string) => Promise<{
         adminPermissions?: import("mongoose").Types.ObjectId | null | undefined;
         notifications?: {
             email?: {
-                inbox: boolean;
                 election: boolean;
+                inbox: boolean;
                 newsletter: boolean;
             } | null | undefined;
             mobile?: {

@@ -4,6 +4,14 @@ import NewsInsight from "../../models/admin/NewsInsight.js";
 import { dispatchMobileNotification } from "../mobile/notificationDispatchService.js";
 import { invalidateAllMobileReadCaches } from "../../utils/cache.js";
 import { defaultNotificationSubtitle } from "../../utils/notificationContent.js";
+import { rewriteLegacyCoverUrl, rewriteLegacyCoverUrlsInHtml, } from "../../utils/newsletterCover.js";
+/** Show working cover links (Firebase covers → our server when configured). */
+const withCoverLinks = (row) => ({
+    ...row,
+    ...(row.thumbnailURLUrl ? { thumbnailURLUrl: rewriteLegacyCoverUrl(row.thumbnailURLUrl) } : {}),
+    ...(row.heroImageURL ? { heroImageURL: rewriteLegacyCoverUrl(row.heroImageURL) } : {}),
+    ...(row.content ? { content: rewriteLegacyCoverUrlsInHtml(row.content) } : {}),
+});
 const requireId = (id, field) => {
     if (!id)
         throw new Error(`${field} is required`);
@@ -127,7 +135,7 @@ export const listNewsInsightsForAdmin = async (input) => {
             .lean(),
         NewsInsight.countDocuments({}),
     ]);
-    return { total, page, limit, items: rows };
+    return { total, page, limit, items: rows.map(withCoverLinks) };
 };
 export const getNewsInsightByIdForAdmin = async (articleId) => {
     if (!mongoose.Types.ObjectId.isValid(articleId)) {
@@ -138,6 +146,6 @@ export const getNewsInsightByIdForAdmin = async (articleId) => {
         .lean();
     if (!row)
         throw new Error("Article not found");
-    return row;
+    return withCoverLinks(row);
 };
 //# sourceMappingURL=newsInsightAdminService.js.map

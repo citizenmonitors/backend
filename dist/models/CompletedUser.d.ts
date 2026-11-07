@@ -85,8 +85,8 @@ declare const _default: mongoose.Model<{
     adminPermissions?: mongoose.Types.ObjectId | null | undefined;
     notifications?: {
         email?: {
-            inbox: boolean;
             election: boolean;
+            inbox: boolean;
             newsletter: boolean;
         } | null | undefined;
         mobile?: {
@@ -188,8 +188,8 @@ declare const _default: mongoose.Model<{
     adminPermissions?: mongoose.Types.ObjectId | null | undefined;
     notifications?: {
         email?: {
-            inbox: boolean;
             election: boolean;
+            inbox: boolean;
             newsletter: boolean;
         } | null | undefined;
         mobile?: {
@@ -291,8 +291,8 @@ declare const _default: mongoose.Model<{
     adminPermissions?: mongoose.Types.ObjectId | null | undefined;
     notifications?: {
         email?: {
-            inbox: boolean;
             election: boolean;
+            inbox: boolean;
             newsletter: boolean;
         } | null | undefined;
         mobile?: {
@@ -400,8 +400,8 @@ declare const _default: mongoose.Model<{
     adminPermissions?: mongoose.Types.ObjectId | null | undefined;
     notifications?: {
         email?: {
-            inbox: boolean;
             election: boolean;
+            inbox: boolean;
             newsletter: boolean;
         } | null | undefined;
         mobile?: {
@@ -503,8 +503,8 @@ declare const _default: mongoose.Model<{
     adminPermissions?: mongoose.Types.ObjectId | null | undefined;
     notifications?: {
         email?: {
-            inbox: boolean;
             election: boolean;
+            inbox: boolean;
             newsletter: boolean;
         } | null | undefined;
         mobile?: {
@@ -606,8 +606,8 @@ declare const _default: mongoose.Model<{
     adminPermissions?: mongoose.Types.ObjectId | null | undefined;
     notifications?: {
         email?: {
-            inbox: boolean;
             election: boolean;
+            inbox: boolean;
             newsletter: boolean;
         } | null | undefined;
         mobile?: {

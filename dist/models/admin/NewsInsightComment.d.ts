@@ -3,9 +3,6 @@ declare const _default: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    body: string;
-    author: mongoose.Types.ObjectId;
-    useAnonymousDisplay: boolean;
     likes: mongoose.Types.DocumentArray<{
         user: mongoose.Types.ObjectId;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
@@ -13,14 +10,15 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
+    body: string;
+    author: mongoose.Types.ObjectId;
+    useAnonymousDisplay: boolean;
+    editedAt: NativeDate;
     article: mongoose.Types.ObjectId;
 }, {}, {}, {}, mongoose.Document<unknown, {}, {
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    body: string;
-    author: mongoose.Types.ObjectId;
-    useAnonymousDisplay: boolean;
     likes: mongoose.Types.DocumentArray<{
         user: mongoose.Types.ObjectId;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
@@ -28,14 +26,15 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
+    body: string;
+    author: mongoose.Types.ObjectId;
+    useAnonymousDisplay: boolean;
+    editedAt: NativeDate;
     article: mongoose.Types.ObjectId;
 }> & {
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    body: string;
-    author: mongoose.Types.ObjectId;
-    useAnonymousDisplay: boolean;
     likes: mongoose.Types.DocumentArray<{
         user: mongoose.Types.ObjectId;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
@@ -43,6 +42,10 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
+    body: string;
+    author: mongoose.Types.ObjectId;
+    useAnonymousDisplay: boolean;
+    editedAt: NativeDate;
     article: mongoose.Types.ObjectId;
 } & {
     _id: mongoose.Types.ObjectId;
@@ -54,9 +57,6 @@ declare const _default: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    body: string;
-    author: mongoose.Types.ObjectId;
-    useAnonymousDisplay: boolean;
     likes: mongoose.Types.DocumentArray<{
         user: mongoose.Types.ObjectId;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
@@ -64,14 +64,15 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
+    body: string;
+    author: mongoose.Types.ObjectId;
+    useAnonymousDisplay: boolean;
+    editedAt: NativeDate;
     article: mongoose.Types.ObjectId;
 }, mongoose.Document<unknown, {}, mongoose.FlatRecord<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    body: string;
-    author: mongoose.Types.ObjectId;
-    useAnonymousDisplay: boolean;
     likes: mongoose.Types.DocumentArray<{
         user: mongoose.Types.ObjectId;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
@@ -79,14 +80,15 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
+    body: string;
+    author: mongoose.Types.ObjectId;
+    useAnonymousDisplay: boolean;
+    editedAt: NativeDate;
     article: mongoose.Types.ObjectId;
 }>> & mongoose.FlatRecord<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    body: string;
-    author: mongoose.Types.ObjectId;
-    useAnonymousDisplay: boolean;
     likes: mongoose.Types.DocumentArray<{
         user: mongoose.Types.ObjectId;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
@@ -94,6 +96,10 @@ declare const _default: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
+    body: string;
+    author: mongoose.Types.ObjectId;
+    useAnonymousDisplay: boolean;
+    editedAt: NativeDate;
     article: mongoose.Types.ObjectId;
 }> & {
     _id: mongoose.Types.ObjectId;

@@ -5,24 +5,24 @@ declare const _default: mongoose.Model<{
 } & {
     message: string;
     email: string;
-    title: string;
     user: mongoose.Types.ObjectId;
+    title: string;
 }, {}, {}, {}, mongoose.Document<unknown, {}, {
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
     message: string;
     email: string;
-    title: string;
     user: mongoose.Types.ObjectId;
+    title: string;
 }> & {
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
     message: string;
     email: string;
-    title: string;
     user: mongoose.Types.ObjectId;
+    title: string;
 } & {
     _id: mongoose.Types.ObjectId;
 } & {
@@ -35,24 +35,24 @@ declare const _default: mongoose.Model<{
 } & {
     message: string;
     email: string;
-    title: string;
     user: mongoose.Types.ObjectId;
+    title: string;
 }, mongoose.Document<unknown, {}, mongoose.FlatRecord<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
     message: string;
     email: string;
-    title: string;
     user: mongoose.Types.ObjectId;
+    title: string;
 }>> & mongoose.FlatRecord<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
     message: string;
     email: string;
-    title: string;
     user: mongoose.Types.ObjectId;
+    title: string;
 }> & {
     _id: mongoose.Types.ObjectId;
 } & {

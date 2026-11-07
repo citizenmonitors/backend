@@ -319,11 +319,11 @@ export declare const getElectionResultById: (electionId: Id, userId: Id) => Prom
         createdAt: NativeDate;
         updatedAt: NativeDate;
         hidden: boolean;
+        election: Types.ObjectId;
         state: string;
         lga: string;
         ward: string;
         pollingUnit: string;
-        election: Types.ObjectId;
         flagged: boolean;
         uploaderDeleted: boolean;
         partiesVotes: Types.DocumentArray<{
@@ -499,11 +499,11 @@ export declare const getElectionResultById: (electionId: Id, userId: Id) => Prom
         createdAt: NativeDate;
         updatedAt: NativeDate;
         hidden: boolean;
+        election: Types.ObjectId;
         state: string;
         lga: string;
         ward: string;
         pollingUnit: string;
-        election: Types.ObjectId;
         flagged: boolean;
         uploaderDeleted: boolean;
         userRole: string;
@@ -698,11 +698,11 @@ export declare const getElectionById: (electionId: Id, userId: Id) => Promise<{
             createdAt: NativeDate;
             updatedAt: NativeDate;
             hidden: boolean;
+            election: Types.ObjectId;
             state: string;
             lga: string;
             ward: string;
             pollingUnit: string;
-            election: Types.ObjectId;
             flagged: boolean;
             uploaderDeleted: boolean;
             partiesVotes: Types.DocumentArray<{
@@ -878,11 +878,11 @@ export declare const getElectionById: (electionId: Id, userId: Id) => Promise<{
             createdAt: NativeDate;
             updatedAt: NativeDate;
             hidden: boolean;
+            election: Types.ObjectId;
             state: string;
             lga: string;
             ward: string;
             pollingUnit: string;
-            election: Types.ObjectId;
             flagged: boolean;
             uploaderDeleted: boolean;
             userRole: string;
@@ -1119,11 +1119,11 @@ export declare const uploadResultDataService: (electionId: Id, userId: Id, data:
     updatedAt: NativeDate;
 } & {
     hidden: boolean;
+    election: Types.ObjectId;
     state: string;
     lga: string;
     ward: string;
     pollingUnit: string;
-    election: Types.ObjectId;
     flagged: boolean;
     uploaderDeleted: boolean;
     partiesVotes: Types.DocumentArray<{
@@ -1237,11 +1237,11 @@ export declare const updateResultDataService: (electionId: Id, userId: Id, data?
     updatedAt: NativeDate;
 } & {
     hidden: boolean;
+    election: Types.ObjectId;
     state: string;
     lga: string;
     ward: string;
     pollingUnit: string;
-    election: Types.ObjectId;
     flagged: boolean;
     uploaderDeleted: boolean;
     partiesVotes: Types.DocumentArray<{
@@ -1350,11 +1350,11 @@ export declare const updateResultDataService: (electionId: Id, userId: Id, data?
     updatedAt: NativeDate;
 } & {
     hidden: boolean;
+    election: Types.ObjectId;
     state: string;
     lga: string;
     ward: string;
     pollingUnit: string;
-    election: Types.ObjectId;
     flagged: boolean;
     uploaderDeleted: boolean;
     partiesVotes: Types.DocumentArray<{
@@ -1471,11 +1471,11 @@ export declare const getUserElectionData: (userId: Id) => Promise<(import("mongo
     updatedAt: NativeDate;
 } & {
     hidden: boolean;
+    election: Types.ObjectId;
     state: string;
     lga: string;
     ward: string;
     pollingUnit: string;
-    election: Types.ObjectId;
     flagged: boolean;
     uploaderDeleted: boolean;
     partiesVotes: Types.DocumentArray<{
@@ -1584,11 +1584,11 @@ export declare const getUserElectionData: (userId: Id) => Promise<(import("mongo
     updatedAt: NativeDate;
 } & {
     hidden: boolean;
+    election: Types.ObjectId;
     state: string;
     lga: string;
     ward: string;
     pollingUnit: string;
-    election: Types.ObjectId;
     flagged: boolean;
     uploaderDeleted: boolean;
     partiesVotes: Types.DocumentArray<{
@@ -1705,11 +1705,11 @@ export declare const uploadIncidentReportDataService: (electionId: Id, userId: I
     updatedAt: NativeDate;
 } & {
     hidden: boolean;
+    election: Types.ObjectId;
     state: string;
     lga: string;
     ward: string;
     pollingUnit: string;
-    election: Types.ObjectId;
     flagged: boolean;
     uploaderDeleted: boolean;
     userRole: string;
@@ -1827,11 +1827,11 @@ export declare const uploadIncidentReportDataService: (electionId: Id, userId: I
     updatedAt: NativeDate;
 } & {
     hidden: boolean;
+    election: Types.ObjectId;
     state: string;
     lga: string;
     ward: string;
     pollingUnit: string;
-    election: Types.ObjectId;
     flagged: boolean;
     uploaderDeleted: boolean;
     userRole: string;
@@ -1954,11 +1954,11 @@ export declare const updateIncidentReportDataService: (electionId: Id, userId: I
     updatedAt: NativeDate;
 } & {
     hidden: boolean;
+    election: Types.ObjectId;
     state: string;
     lga: string;
     ward: string;
     pollingUnit: string;
-    election: Types.ObjectId;
     flagged: boolean;
     uploaderDeleted: boolean;
     userRole: string;
@@ -2076,11 +2076,11 @@ export declare const updateIncidentReportDataService: (electionId: Id, userId: I
     updatedAt: NativeDate;
 } & {
     hidden: boolean;
+    election: Types.ObjectId;
     state: string;
     lga: string;
     ward: string;
     pollingUnit: string;
-    election: Types.ObjectId;
     flagged: boolean;
     uploaderDeleted: boolean;
     userRole: string;

@@ -3,9 +3,6 @@ declare const PulsePost: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    body: string;
-    author: mongoose.Types.ObjectId;
-    useAnonymousDisplay: boolean;
     likes: mongoose.Types.DocumentArray<{
         user: mongoose.Types.ObjectId;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
@@ -13,6 +10,9 @@ declare const PulsePost: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
+    body: string;
+    author: mongoose.Types.ObjectId;
+    useAnonymousDisplay: boolean;
     visibilityScope: "state" | "lga" | "ward" | "all" | "polling-unit";
     isQuote: boolean;
     repostCount: number;
@@ -28,9 +28,6 @@ declare const PulsePost: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    body: string;
-    author: mongoose.Types.ObjectId;
-    useAnonymousDisplay: boolean;
     likes: mongoose.Types.DocumentArray<{
         user: mongoose.Types.ObjectId;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
@@ -38,6 +35,9 @@ declare const PulsePost: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
+    body: string;
+    author: mongoose.Types.ObjectId;
+    useAnonymousDisplay: boolean;
     visibilityScope: "state" | "lga" | "ward" | "all" | "polling-unit";
     isQuote: boolean;
     repostCount: number;
@@ -53,9 +53,6 @@ declare const PulsePost: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    body: string;
-    author: mongoose.Types.ObjectId;
-    useAnonymousDisplay: boolean;
     likes: mongoose.Types.DocumentArray<{
         user: mongoose.Types.ObjectId;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
@@ -63,6 +60,9 @@ declare const PulsePost: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
+    body: string;
+    author: mongoose.Types.ObjectId;
+    useAnonymousDisplay: boolean;
     visibilityScope: "state" | "lga" | "ward" | "all" | "polling-unit";
     isQuote: boolean;
     repostCount: number;
@@ -84,9 +84,6 @@ declare const PulsePost: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    body: string;
-    author: mongoose.Types.ObjectId;
-    useAnonymousDisplay: boolean;
     likes: mongoose.Types.DocumentArray<{
         user: mongoose.Types.ObjectId;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
@@ -94,6 +91,9 @@ declare const PulsePost: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
+    body: string;
+    author: mongoose.Types.ObjectId;
+    useAnonymousDisplay: boolean;
     visibilityScope: "state" | "lga" | "ward" | "all" | "polling-unit";
     isQuote: boolean;
     repostCount: number;
@@ -109,9 +109,6 @@ declare const PulsePost: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    body: string;
-    author: mongoose.Types.ObjectId;
-    useAnonymousDisplay: boolean;
     likes: mongoose.Types.DocumentArray<{
         user: mongoose.Types.ObjectId;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
@@ -119,6 +116,9 @@ declare const PulsePost: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
+    body: string;
+    author: mongoose.Types.ObjectId;
+    useAnonymousDisplay: boolean;
     visibilityScope: "state" | "lga" | "ward" | "all" | "polling-unit";
     isQuote: boolean;
     repostCount: number;
@@ -134,9 +134,6 @@ declare const PulsePost: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    body: string;
-    author: mongoose.Types.ObjectId;
-    useAnonymousDisplay: boolean;
     likes: mongoose.Types.DocumentArray<{
         user: mongoose.Types.ObjectId;
     }, mongoose.Types.Subdocument<mongoose.Types.ObjectId, any, {
@@ -144,6 +141,9 @@ declare const PulsePost: mongoose.Model<{
     }> & {
         user: mongoose.Types.ObjectId;
     }>;
+    body: string;
+    author: mongoose.Types.ObjectId;
+    useAnonymousDisplay: boolean;
     visibilityScope: "state" | "lga" | "ward" | "all" | "polling-unit";
     isQuote: boolean;
     repostCount: number;

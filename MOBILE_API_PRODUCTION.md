@@ -614,8 +614,10 @@ Base (mobile): `/news-insights`. **Optional Bearer** on `GET /` and `GET /:slug`
 **Engagement (Bearer required):** use article **`id`** from list/detail (MongoDB ObjectId).
 
 - **`POST /news-insights/articles/:articleId/like`** — toggle like on the article. Response: `{ id, likesCount, isLikedByCurrentUser }`.
-- **`GET /news-insights/articles/:articleId/comments`** — `{ comments[] }` (newest first). Each comment: `id`, `body`, `createdAt`, `updatedAt`, `author`, `likesCount`, `isLikedByCurrentUser`.
+- **`GET /news-insights/articles/:articleId/comments`** — `{ comments[] }` (newest first). Each comment: `id`, `body`, `createdAt`, `updatedAt`, `editedAt` (set only when the text is edited), `author` (`{ id, displayName, usedAnonymous, avatarUrl }`; `id` and `avatarUrl` are `null` on anonymous comments), `isOwnedByCurrentUser`, `likesCount`, `isLikedByCurrentUser`.
 - **`POST /news-insights/articles/:articleId/comments`** — body: `{ "body": "...", "useAnonymousDisplay": false }` (anonymous requires an anonymous username on profile, same as Pulse).
+- **`PATCH /news-insights/articles/:articleId/comments/:commentId`** — edit your own comment. Body: `{ "body"?: "...", "useAnonymousDisplay"?: false }`. Response `{ comment }`. `403` if not yours; `400` for empty body or nothing to update.
+- **`DELETE /news-insights/articles/:articleId/comments/:commentId`** — delete your own comment (admins can delete any). Response `{ id, deleted: true }`. `403` if not allowed.
 - **`POST /news-insights/articles/:articleId/comments/:commentId/like`** — toggle like on a comment. Response: `{ comment }` shape (serialized comment object).
 
 **Admin (Bearer + admin role):**
